@@ -51,7 +51,7 @@ class Writer (BaseWriter):
             error ("KindleWriter: %s %s" % (options.config.MOBIGEN, what))
             raise SkipOutputFormat
 
-        (stdout, stderr) = kindlegen.communicate ('')
+        (stdout, stderr) = kindlegen.communicate ()
 
         os.chdir (cwd)
 

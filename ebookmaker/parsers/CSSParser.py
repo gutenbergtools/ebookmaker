@@ -103,26 +103,6 @@ class Parser (ParserBase):
         cssutils.replaceUrls (self.sheet, f)
 
 
-    def drop_floats (self):
-        """ Drop all floats in stylesheet.
-
-        """
-
-        for prop in self.iter_properties (self.sheet):
-            if prop and prop.name == 'float': # test for existence because we remove
-                prop.parent.removeProperty ('float')
-                prop.parent.removeProperty ('width')
-                prop.parent.removeProperty ('height')
-            elif prop and prop.name in ('position', 'left', 'right', 'top', 'bottom'):
-                prop.parent.removeProperty (prop.name)
-
-        for prop in self.iter_properties (self.sheet):
-            #print prop.name
-            #print prop.value
-            if prop and prop.value.endswith ('px'): # test for existence because we remove
-                prop.parent.removeProperty (prop.name)
-
-
     def get_image_urls (self):
         """ Return the urls of all images in document.
 

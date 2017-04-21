@@ -139,16 +139,30 @@ class Style (Directive):
     optional_arguments = 1
     has_content = True
 
-    option_spec = { 'class': class_option_add_remove,
-                    'name': directives.unchanged,
-                    'language': directives.class_option, # FIXME: a lang not a class
-                    'before': quoted_string,
-                    'after': quoted_string,
-                    'display': directives.unchanged,
-                    'formats': directives.unchanged,
-                    'titlehack': directives.flag, # see StyleTransform
-                    'width': directives.length_or_percentage_or_unitless,
-                    'align': partial (choice, entry_align_values + entry_valign_values) }
+    option_spec = {
+        'class': class_option_add_remove,
+        'name': directives.unchanged,
+        'language': directives.class_option, # FIXME: a lang not a class
+        'before': quoted_string,
+        'after': quoted_string,
+        'display': directives.unchanged,
+        'formats': directives.unchanged,
+        'titlehack': directives.flag, # see StyleTransform
+
+        # images
+        # note: figwidth and figclass can be set using width and class on the figure node
+        'align': partial (choice, entry_align_values + entry_valign_values),
+        'width': directives.length_or_percentage_or_unitless,
+        'float': partial (multi_choice, image_float_values),
+
+        # tables
+        'hrules': partial (multi_choice, table_hrules_values),
+        'vrules': partial (multi_choice, table_vrules_values),
+        'aligns': partial (multi_choice, entry_align_values),
+        'vertical-aligns': partial (multi_choice, entry_valign_values),
+        'tabularcolumns': directives.unchanged,
+        'widths': directives.positive_int_list,
+    }
 
     def run (self):
         if self.arguments:
@@ -274,7 +288,6 @@ class Example (Directive):
         topic = nodes.topic ('', *nodelist)
         topic['classes'] += ['example']
         topic['classes'] += self.options.get ('class', [])
-        topic['float'] = self.options.get ('float', ('here', 'top', 'bottom', 'page'))
         Example.example_count += 1
         target = lox_target (topic, 'example-%d' % Example.example_count)
         self.state_machine.document.note_implicit_target (target, target)
@@ -346,11 +359,8 @@ class Figure (images.Figure):
     figure_count = 0
 
     def run (self):
-        # sets default for align which in turn sets both, figure align
-        # and image align
-        self.options.setdefault ('align', 'center')
-
         if not self.arguments:
+            # no filename given: use `broken´ picture
             self.arguments.append (BROKEN)
             self.options.setdefault ('figwidth', '80%')
             self.options.setdefault ('width',    '5%')
@@ -358,8 +368,6 @@ class Figure (images.Figure):
         res = images.Figure.run (self)
 
         figure = res[0]
-        figure.setdefault ('width', 'image')
-        figure['float'] = self.options.get ('float', ('here', 'top', 'bottom', 'page'))
         Figure.figure_count += 1
         target = lox_target (figure, 'figure-%d' % Figure.figure_count)
         self.state_machine.document.note_implicit_target (target, target)
@@ -521,7 +529,8 @@ class Container (body.Container):
     def run (self):
         nodes =  body.Container.run (self)
         nodes[0]['classes'].extend (self.options.get ('class', []))
-        nodes[0]['align'] = self.options.get ('align', None)
+        if 'align' in self.options:
+            nodes[0]['align'] = self.options['align']
         return nodes
 
 
@@ -842,9 +851,9 @@ class Parser (docutils.parsers.rst.Parser):
                 parts.TextTransform,
                 parts.NodeTypeTransform,
                 parts.InlineImageTransform,
-                parts.TableDefaults,
+                parts.SetDefaults,
                 parts.AlignTransform,
-                parts.ImageWrapper,
+                parts.BlockImageWrapper,
                 parts.TitleLevelTransform,
                 parts.DocInfoCollector,
                 parts.FirstParagraphTransform,

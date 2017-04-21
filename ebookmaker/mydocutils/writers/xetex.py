@@ -1449,6 +1449,7 @@ class Translator (writers.Translator):
         self.cmd (r'\setlength{\tablewidth}{%s - \tabcolsep * 2 * %d}' % (
             self.latex_units (table.get ('width', '100%'), '\\linewidth'), len (colspecs)))
 
+        self.src_sp ()
         self.begin ('longtable', r'{%s}' % (colspec))
 
         self.header_sent = True
@@ -1472,7 +1473,8 @@ class Translator (writers.Translator):
         self.sp ()
 
     def depart_table_title (self, node):
-        self.cmd (r'\par')
+        self.cmd ('\\par\n')
+        self.cmd ('\\penalty300\n')
         self.src_sp ()
         self.sp ()
 
@@ -1528,6 +1530,8 @@ class Translator (writers.Translator):
         if 'vspan' in node:
             self.cmd (' & ' )
             raise nodes.SkipNode
+
+        self.sp (0)
 
         sum_width = sum (map (operator.itemgetter ('relative_width'), node.colspecs))
 
@@ -1663,8 +1667,6 @@ class Translator (writers.Translator):
         self.sp ()
 
     def visit_topic (self, node):
-        # FIXME
-        node['float'] = node.get ('float', ['here'])
         self.begin_float (node, 'topic')
 
     def depart_topic (self, node):
@@ -1679,7 +1681,6 @@ class Translator (writers.Translator):
         self.sp ()
 
     def visit_sidebar (self, node):
-        node['float'] = node.get ('float', ['here'])
         self.begin_float (node, 'sidebar')
 
     def depart_sidebar (self, node):

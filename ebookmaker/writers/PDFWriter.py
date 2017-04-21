@@ -74,7 +74,7 @@ class Writer (writers.BaseWriter):
 
         (dummy_stdout, dummy_stderr) = _xetex.communicate ()
 
-        with open (logfilename) as fp:
+        with open (logfilename, encoding='utf-8') as fp:
             for line in fp:
                 line = line.strip ()
                 if 'Error:' in line:

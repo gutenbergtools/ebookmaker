@@ -138,24 +138,15 @@ def get_dc (url):
     try:
         dc.load_from_rstheader (parser.unicode_content ())
     except (ValueError, UnicodeError):
+        debug ("No RST header found.")
         try:
-            debug ("No RST header found.")
             dc.load_from_parser (parser)
         except (ValueError, AttributeError, UnicodeError):
+            debug ("No HTML header found.")
             try:
-                debug ("No HTML/PG header found.")
                 dc.load_from_pgheader (parser.unicode_content ())
             except (ValueError, UnicodeError):
                 debug ("No PG header found.")
-
-    if dc.project_gutenberg_id is None:
-        # not a PG book, try DC metadata in HTML header
-        dc = DublinCore.DublinCore ()
-        dc.project_gutenberg_id = None
-        try:
-            dc.load_from_parser (parser)
-        except (ValueError, AttributeError, UnicodeError):
-            pass
 
     dc.source = parser.attribs.url
     dc.title = options.title or dc.title or 'NA'
@@ -192,7 +183,7 @@ def add_local_options (ap):
         "--make",
         dest    = "types",
         choices = CommonCode.add_dependencies (['all'], DEPENDENCIES),
-        default = ['all'],
+        default = [],
         action  = 'append',
         help    = "output type (default: all)")
 
@@ -457,6 +448,7 @@ def main ():
 
     Logger.set_log_level (options.verbose)
 
+    options.types = options.types or ['all']
     options.types = CommonCode.add_dependencies (options.types, DEPENDENCIES, BUILD_ORDER)
     debug ("Building types: %s" % ' '.join (options.types))
 

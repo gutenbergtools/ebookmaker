@@ -36,8 +36,7 @@ from libgutenberg.MediaTypes import mediatypes as mt
 from ebookmaker import parsers
 from ebookmaker import ParserFactory
 from ebookmaker import HTMLChunker
-from ebookmaker import Spider
-from ebookmaker import parsers
+# from ebookmaker import Spider
 from ebookmaker import writers
 from ebookmaker.Version import VERSION, GENERATOR
 
@@ -133,15 +132,6 @@ OPS_CONTENT_DOCUMENTS = set ( (
     'text/x-oeb1-document',        # Deprecated
     'application/xml',
 ) )
-
-CSS_PROPERTIES_TO_STRIP = frozenset ("""
-   position
-   float
-   background-image
-   background-position
-   background-attachment
-   background-repeat
-   """.split ())
 
 IMAGE_WRAPPER = """<?xml version="1.0"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
@@ -267,8 +257,8 @@ class OEBPSContainer (zipfile.ZipFile):
 
         i = self.zi ()
         i.filename = 'META-INF/container.xml'
-        self.writestr (i, etree.tostring (container,
-            encoding = 'utf-8', xml_declaration = True, pretty_print = True))
+        self.writestr (i, etree.tostring (
+            container, encoding = 'utf-8', xml_declaration = True, pretty_print = True))
 
 
     def add_image_wrapper (self, img_url, img_title):
@@ -551,8 +541,8 @@ class ContentOPF (object):
         # HACK: ADE needs cover flow as first element
         # but we don't know if we have a native coverpage until the manifest is complete
         if first:
-            self.spine.insert (0,
-                self.opf.itemref (idref = id_, linear = linear))
+            self.spine.insert (
+                0, self.opf.itemref (idref = id_, linear = linear))
         else:
             self.spine.append (
                 self.opf.itemref (idref = id_, linear = linear))
@@ -624,19 +614,19 @@ class ContentOPF (object):
         if dc.rights:
             self.metadata.append (dcterms.rights (dc.rights))
 
-        self.metadata.append (dcterms.identifier (dc.opf_identifier,
-                { NS.opf.scheme: 'URI',
-                  'id': 'id' })) # should be NS.xml.id
+        self.metadata.append (dcterms.identifier (dc.opf_identifier, {
+            NS.opf.scheme: 'URI',
+            'id': 'id' })) # should be NS.xml.id
 
         for author in dc.authors:
             pretty_name = dc.make_pretty_name (author.name)
             if author.marcrel == 'aut' or author.marcrel == 'cre':
                 self.metadata.append (dcterms.creator (
-                        pretty_name, { NS.opf['file-as']: author.name }))
+                    pretty_name, { NS.opf['file-as']: author.name }))
             else:
                 self.metadata.append (dcterms.contributor (
-                        pretty_name, { NS.opf.role: author.marcrel,
-                                       NS.opf['file-as']: author.name }))
+                    pretty_name, { NS.opf.role: author.marcrel,
+                                   NS.opf['file-as']: author.name }))
 
         # replace newlines with /
         title = re.sub (r'\s*[\r\n]+\s*', ' / ', dc.title)
@@ -644,7 +634,7 @@ class ContentOPF (object):
 
         for language in dc.languages:
             self.metadata.append (dcterms.language (
-                    language.id, { NS.xsi.type: 'dcterms:RFC4646' }))
+                language.id, { NS.xsi.type: 'dcterms:RFC4646' }))
 
         for subject in dc.subjects:
             self.metadata.append (dcterms.subject (subject.subject))
@@ -655,12 +645,12 @@ class ContentOPF (object):
 
         if dc.release_date:
             self.metadata.append (dcterms.date (
-                    dc.release_date.isoformat (),
-                    { NS.opf.event: 'publication'}))
+                dc.release_date.isoformat (),
+                { NS.opf.event: 'publication'}))
 
-        self.metadata.append (dcterms.date (datetime.datetime.now (
-                    gg.UTC ()).isoformat (),
-                                  { NS.opf.event: 'conversion'}))
+        self.metadata.append (dcterms.date (
+            datetime.datetime.now (gg.UTC ()).isoformat (),
+            { NS.opf.event: 'conversion'}))
 
         source = dc.source
         if hasattr (options.config, 'FILESDIR'):
@@ -684,10 +674,10 @@ class ContentOPF (object):
 
         # look for a manifest item with the right url
         for item in xpath (
-            self.manifest,
-            # cannot xpath for default namespace
-            "//*[local-name () = 'item' and starts-with (@media-type, 'image/jpeg') and @href = $url]",
-            url = url):
+                self.manifest,
+                # cannot xpath for default namespace
+                "//*[local-name () = 'item' and starts-with (@media-type, 'image/jpeg') and @href = $url]",
+                url = url):
 
             id_ = item.get ('id')
             break
@@ -716,10 +706,8 @@ class Writer (writers.HTMLishWriter):
 
 
     @staticmethod
-    def strip_pagenumbers (xhtml):
-        """
-
-        Strip dp page numbers.
+    def strip_pagenumbers (xhtml, strip_classes):
+        """ Strip dp page numbers.
 
         Rationale: DP implements page numbers either with float or
         with absolute positioning. Float is not supported by Kindle.
@@ -733,14 +721,13 @@ class Writer (writers.HTMLishWriter):
 
         """
 
-        # look for elements with a class that is in STRIP_CLASSES
+        # look for elements with a class that is in strip_classes
 
-        for elem in xpath (xhtml, "//xhtml:*[@class]"):
-            classes = elem.get ('class').split ()
-            if STRIP_CLASSES.intersection (classes):
+        for class_ in strip_classes:
+            xp = "//xhtml:*[@class and contains(concat(' ', normalize-space(@class), ' '), ' %s ')]" % class_
 
-                # is there a class on this element that is in DP_PAGENUMBER_CLASSES ?
-                pageno = len (DP_PAGENUMBER_CLASSES.intersection (classes)) > 0
+            count = 0
+            for elem in xpath (xhtml, xp):
 
                 # save textual content
                 text = gg.normalize (etree.tostring (elem,
@@ -766,14 +753,17 @@ class Writer (writers.HTMLishWriter):
                     # one page number in one span. take the last id
                     # because the others represent empty pages.
                     elem.set ('id', id_[-1])
-                if pageno:
-                    # avoid conflicts with class pageno in input css files
-                    # we actually don't need this class for styling
-                    # anyway because it is on an empty element
+
+                if class_ in DP_PAGENUMBER_CLASSES:
+                    # mark element as rewritten pagenumber. we
+                    # actually don't use this class for styling
+                    # because it is on an empty element
                     elem.set ('class', 'x-ebookmaker-pageno')
+
                 if text:
                     elem.set ('title', text)
                 elem.tail = tail
+                count += 1
 
                 # The OPS Spec 2.0 is very clear: "Reading Systems
                 # must be XML processors as defined in XML 1.1."
@@ -784,6 +774,10 @@ class Writer (writers.HTMLishWriter):
                 # This will force lxml to output the non-minimized form
                 # of the element.
                 elem.text = ''
+
+            if count:
+                warning ("%d elements having class %s have been rewritten." %
+                         (count, class_))
 
 
     @staticmethod
@@ -825,35 +819,70 @@ class Writer (writers.HTMLishWriter):
 
 
     @staticmethod
-    def fix_css (sheet):
+    def fix_incompatible_css (sheet):
         """ Strip CSS properties and values that are not EPUB compatible. """
 
-        # debug ("enter fix_css")
+        # debug ("enter fix_incompatible_css")
 
         for rule in sheet:
             if rule.type == rule.STYLE_RULE:
-                for p in rule.style:
-                    if p.name in CSS_PROPERTIES_TO_STRIP:
+                for p in list (rule.style):
+                    if p.name == 'float':
+                        debug ("Dropping property %s" % p.name)
+                        rule.style.removeProperty ('float')
+                        rule.style.removeProperty ('width')
+                        rule.style.removeProperty ('height')
+                    elif p.name == 'position':
+                        debug ("Dropping property %s" % p.name)
+                        rule.style.removeProperty ('position')
+                        rule.style.removeProperty ('left')
+                        rule.style.removeProperty ('right')
+                        rule.style.removeProperty ('top')
+                        rule.style.removeProperty ('bottom')
+                    elif p.name in ('background-image', 'background-position',
+                                    'background-attachment', 'background-repeat'):
                         debug ("Dropping property %s" % p.name)
                         rule.style.removeProperty (p.name)
+                    elif p.value.endswith ('px'):
+                        rule.style.removeProperty (p.name)
 
-        # debug ("exit fix_css")
+        # debug ("exit fix_incompatible_css")
+
+
+    @staticmethod
+    def get_classes_that_float (xhtml):
+        """ Get a list of all classes that use float or position. """
+
+        classes = set ()
+        regex = re.compile (r"\.(\w+)", re.ASCII)
+
+        for style in xpath (xhtml, "//xhtml:style"):
+            p = parsers.CSSParser.Parser ()
+            p.parse_string (style.text)
+
+            for rule in p.sheet:
+                if rule.type == rule.STYLE_RULE:
+                    for p in rule.style:
+                        if p.name in ('float', 'position'):
+                            classes.update (regex.findall (rule.selectorList.selectorText))
+                            break
+
+        return classes
 
 
     @staticmethod
     def fix_style_elements (xhtml):
-        """ Fixup CSS style elements """
+        """ Fix CSS style elements.  Make sure they are utf-8. """
 
         # debug ("enter fix_style_elements")
 
         for style in xpath (xhtml, "//xhtml:style"):
             p = parsers.CSSParser.Parser ()
             p.parse_string (style.text)
-            p.drop_floats ()
             try:
                 # pylint: disable=E1103
-                style.text = p.sheet.cssText
-            except ValueError:
+                style.text = p.sheet.cssText.decode ('utf-8')
+            except (ValueError, UnicodeError):
                 debug ("CSS:\n%s" % p.sheet.cssText)
                 raise
 
@@ -956,8 +985,7 @@ class Writer (writers.HTMLishWriter):
         p = e.getparent ()
         return (len (p) == 1 and
                 (p.text is None or p.text.isspace ()) and
-                (e.tail is None or e.tail.isspace ())
-                )
+                (e.tail is None or e.tail.isspace ()))
 
 
     @staticmethod
@@ -1136,9 +1164,9 @@ class Writer (writers.HTMLishWriter):
             if validator is not None:
                 params = validator.split () + [filename]
                 checker = subprocess.Popen (params,
-                                    stdin = subprocess.PIPE,
-                                    stdout = subprocess.PIPE,
-                                    stderr = subprocess.PIPE)
+                                            stdin = subprocess.PIPE,
+                                            stdout = subprocess.PIPE,
+                                            stderr = subprocess.PIPE)
 
                 (dummy_stdout, stderr) = checker.communicate ()
                 if stderr:
@@ -1165,7 +1193,7 @@ class Writer (writers.HTMLishWriter):
             chunker = HTMLChunker.HTMLChunker ()
             coverpage_url = None
 
-            # do images first as we need the new dimensions later
+            # do images early as we need the new dimensions later
             for p in job.spider.parsers:
                 if hasattr (p, 'resize_image'):
                     if 'coverpage' in p.attribs.rel:
@@ -1205,7 +1233,10 @@ class Writer (writers.HTMLishWriter):
                         p.parse ()
                         xhtml = copy.deepcopy (p.xhtml)
 
-                    self.strip_pagenumbers (xhtml)
+                    strip_classes = self.get_classes_that_float (xhtml)
+                    strip_classes = strip_classes.intersection (STRIP_CLASSES)
+                    if strip_classes:
+                        self.strip_pagenumbers (xhtml, strip_classes)
 
                     # build up TOC
                     # has side effects on xhtml
@@ -1244,7 +1275,7 @@ class Writer (writers.HTMLishWriter):
 
             for p in job.spider.parsers:
                 if hasattr (p, 'sheet'):
-                    self.fix_css (p.sheet)
+                    self.fix_incompatible_css (p.sheet)
                     p.rewrite_links (self.url2filename)
                     parsers.append (p)
 

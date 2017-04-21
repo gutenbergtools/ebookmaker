@@ -557,9 +557,8 @@ class DropCapTransform (docutils.transforms.Transform):
 
 
 class InlineImageTransform (docutils.transforms.Transform):
-    """
-    Set class 'inline' or 'block' on image according to actual usage.
-    Can be used for styling.
+    """Set class 'inline' or 'block' on an image according to actual
+    usage so it can be used for styling.
 
     """
 
@@ -637,7 +636,8 @@ class StyleTransform (docutils.transforms.Transform):
             if details.get ('display', '').lower () == 'none':
                 n.parent.remove (n)
                 continue
-            for a in ('align', 'width'):
+            for a in ('align', 'width', 'float', 'hrules', 'vrules',
+                      'aligns', 'vertical-aligns', 'tabularcolumns', 'widths'):
                 if a in details:
                     n.setdefault (a, details[a]) # style on the element has priority
                     # n[a] = details[a]
@@ -709,7 +709,7 @@ class FirstParagraphTransform (docutils.transforms.Transform):
 
 
 
-class ImageWrapper (docutils.transforms.Transform):
+class BlockImageWrapper (docutils.transforms.Transform):
     """
     Wrap a block-level image into a figure.
 
@@ -717,10 +717,58 @@ class ImageWrapper (docutils.transforms.Transform):
 
     default_priority = 801
 
-    def get_width (self, uri):
-        # calculate a sensible default width for images
-        # assume images are processed for a viewport 980px wide,
-        # the same as the iPhone browser assumes
+    def apply (self):
+
+        for image in self.document.traverse (nodes.image):
+
+            # skip inline images
+            # (See also: class `TextElement` in `docutils.nodes`.)
+            if isinstance (image.parent, nodes.TextElement):
+                continue
+
+            # wrap all block images into figures
+            if isinstance (image.parent, nodes.figure):
+                figure = image.parent
+            else:
+                figure = nodes.figure ()
+                figure['float'] = ('none', ) # do not float bare images
+                figure['width'] = image.attributes.get ('width', 'image')
+                figure['align'] = image.attributes.get ('align', 'center')
+                image['width']  = '100%'
+                image.replace_self (figure)
+                figure.append (image)
+
+            # set default width, align for block images only
+            image.setdefault ('width', '100%')
+            image.setdefault ('align', 'center')
+
+
+class SetDefaults (docutils.transforms.Transform):
+    """Set default attributes.
+
+    Set default attributes to simplify writers.
+
+    We need to set default attributes after the style directive
+    because the style directive cannot distinguish between user-set
+    attributes which must be kept and default attributes which must be
+    overridden.
+
+    Also, for simple tables and grid tables, we cannot set the default
+    attributes in the directive parser because there is no directive.
+
+    Image default attributes are set in BlockImageWrapper.
+
+    """
+
+    default_priority = 802
+
+    def get_default_width (self, uri):
+        """Calculate a sensible default width for images.
+
+        Assume images are processed for a viewport 980px wide, the
+        same as the iPhone browser assumes.
+
+        """
 
         if (self.document.settings.get_image_size and
             six.callable (self.document.settings.get_image_size)):
@@ -736,36 +784,43 @@ class ImageWrapper (docutils.transforms.Transform):
         return '100%'
 
 
-    def apply (self):
+    def apply (self, **kwargs):
+
+        def setdefault (node_type, l):
+            for node in self.document.traverse (node_type):
+                for name, default in l:
+                    node.setdefault (name, default)
+
+        # Image default attributes are set in BlockImageWrapper.
+
+        setdefault (nodes.figure, (
+            ('align',          'center'),
+            ('float',          ('here', 'top', 'bottom', 'page')),
+            ('width',          'image'),
+        ))
 
         for image in self.document.traverse (nodes.image):
+            if isinstance (image.parent, nodes.figure):
+                figure = image.parent
+                if figure['width'] == 'image':
+                    figure['width'] = self.get_default_width (image['uri'])
+                    figure['classes'].append ('auto-scaled')
 
-            # skip inline images
-            # (See also: class `TextElement` in `docutils.nodes`.)
-            if isinstance (image.parent, nodes.TextElement):
-                continue
-
-            # block images default align = center
-            image['classes'].append ('block')
-            image['align'] = image.attributes.get ('align', 'center')
-
-            # wrap all images into figures
-            if not isinstance (image.parent, nodes.figure):
-                figure = nodes.figure ()
-                figure['float'] = ['none'] # do not float bare images
-                figure['width'] = image.attributes.get ('width', 'image')
-                image['width'] = '100%'
-                figure['align'] = image['align']
-                image.replace_self (figure)
-                figure.append (image)
-
-            # set a default width for block images
-            image['width'] = image.attributes.get ('width', '100%')
-
-            figure = image.parent
-            if figure['width'] == 'image':
-                figure['width'] = self.get_width (image['uri'])
-                figure['classes'].append ('auto-scaled')
+        setdefault (nodes.table, (
+            ('align',          'center'),
+            ('float',          ('here', 'top', 'bottom', 'page')),
+            ('hrules',         ('table', 'rows')),
+            ('summary',        'no summary'),
+            ('tabularcolumns', None),
+            ('vrules',         ('none', )),
+            ('width',          '100%'),
+        ))
+        setdefault (nodes.topic, (
+            ('float',          ('here', )),
+        ))
+        setdefault (nodes.sidebar, (
+            ('float',          ('here', )),
+        ))
 
 
 class AlignTransform (docutils.transforms.Transform):
@@ -774,39 +829,13 @@ class AlignTransform (docutils.transforms.Transform):
 
     """
 
-    default_priority = 802 # after ImageWrapper
+    default_priority = 803 # after SetDefaults
 
     def apply (self):
         for body in self.document.traverse (
             lambda x: isinstance (x, (nodes.Body, nodes.Structural))):
             if 'align' in body:
                 body['classes'].append ('align-%s' % body['align'])
-
-
-class TableDefaults (docutils.transforms.Transform):
-    """ Set default attributes for tables.
-
-    For simple tables and grid tables, we cannot set the default
-    attributes in the directive parser because there is no directive.
-
-    """
-
-    default_priority = 803
-
-    def apply (self, **kwargs):
-
-        for table in self.document.traverse (nodes.table):
-            for name, default in (
-                ('align',          'center'),
-                ('float',          ('here', 'top', 'bottom', 'page')),
-                ('hrules',         ('table', 'rows')),
-                ('summary',        'no summary'),
-                ('tabularcolumns', None),
-                ('vrules',         ('none', )),
-                ('width',          '100%'),
-                ):
-
-                table[name] = table.get (name, default)
 
 
 class TextTransform (docutils.transforms.Transform):
