@@ -672,7 +672,7 @@ class Parser (HTMLParserBase):
         )
 
         for body in xpath (self.xhtml, '//xhtml:body'):
-            xhtmlparser = lxml.html.XHTMLParser (encoding = 'unicode')
+            xhtmlparser = lxml.html.XHTMLParser ()
             for par in self.pars:
                 p = etree.fromstring (self.ship_out (par), xhtmlparser)
                 p.tail = '\n\n'
