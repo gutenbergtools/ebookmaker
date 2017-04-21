@@ -35,9 +35,8 @@ from libgutenberg.Logger import info, debug, warning, error
 from libgutenberg.MediaTypes import mediatypes as mt
 
 from ebookmaker import ParserFactory
-from ebookmaker.parsers import HTMLParser
+from ebookmaker.parsers import HTMLParser, BROKEN
 
-from ebookmaker.mydocutils import broken
 from ebookmaker.mydocutils import nodes as mynodes
 from ebookmaker.mydocutils.writers import xhtml1, epub2, xetex
 
@@ -120,7 +119,7 @@ class Parser (HTMLParser.Parser):
 
         doc = self.document1
 
-        # return coverpage even in noimages build
+        # return coverpage even in no_images build
         if 'coverpage' in doc.meta_block:
             coverpage = doc.meta_block['coverpage']
             yield coverpage[0], { 'tag': NS.xhtml.link, 'rel': 'coverpage' }
@@ -133,9 +132,8 @@ class Parser (HTMLParser.Parser):
                         'rel': 'coverpage'}
                     break
 
-        # need broken.png for no-images build
-        yield (urllib.parse.urljoin (self.attribs.url, broken),
-               {'tag': NS.xhtml.img, 'rel': 'important'})
+        # need broken.png for no_images build
+        # yield (BROKEN), {'tag': NS.xhtml.img, 'rel': 'important'})
 
         # anchor links
         for node in doc.traverse (nodes.reference):
@@ -145,7 +143,7 @@ class Parser (HTMLParser.Parser):
         # images
         for node in doc.traverse (nodes.image):
             d = { 'tag': NS.xhtml.img }
-            # specify class important to keep image in no-images build
+            # specify class important if you want to keep an image in a no_images build
             if 'important' in node.get ('classes', []):
                 d['rel'] = 'important'
             if 'uri' in node:

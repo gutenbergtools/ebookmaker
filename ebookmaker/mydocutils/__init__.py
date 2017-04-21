@@ -1,2 +1,1 @@
-broken = 'images/broken.png'
-
+""" This is a package """

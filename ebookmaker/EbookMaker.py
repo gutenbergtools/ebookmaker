@@ -27,7 +27,7 @@ from six.moves import builtins, cPickle
 
 from libgutenberg.GutenbergGlobals import SkipOutputFormat
 import libgutenberg.GutenbergGlobals as gg
-from libgutenberg.Logger import debug, warning, exception
+from libgutenberg.Logger import debug, warning, error, exception
 from libgutenberg import Logger, DublinCore
 from libgutenberg import MediaTypes as mt
 
@@ -58,13 +58,12 @@ DEPENDENCIES = collections.OrderedDict ((
     ('pdf.noimages',    ('picsdir.noimages', )),
     ('pdf.images',      ('picsdir.images', )),
     ('rst.gen',         ('picsdir.images', )),
-    # ('cover',           ('cover.medium',   'cover.small')),
 ))
 
 BUILD_ORDER = """
+picsdir.images picsdir.noimages
 rst.gen
 txt.utf-8 txt.iso-8859-1 txt.us-ascii
-picsdir.images picsdir.noimages
 html.images html.noimages
 epub.images epub.noimages
 kindle.images kindle.noimages
@@ -116,12 +115,15 @@ def elect_coverpage (spider):
     for p in spider.parsers:
         if 'coverpage' in p.attribs.rel:
             if coverpage_found:
+                # keep the first one found, reset all others
                 p.attribs.rel.remove ('coverpage')
                 continue
             if hasattr (p, 'get_image_dimen'):
                 dimen = p.get_image_dimen ()
                 if (dimen[0] * dimen[1]) < COVERPAGE_MIN_AREA:
                     p.attribs.rel.remove ('coverpage')
+                    warning ("removed coverpage candidate %s because too small (%d x %d)" %
+                             (p.url, dimen[0], dimen[1]))
                     continue
             coverpage_found = True
 
@@ -232,21 +234,21 @@ def add_local_options (ap):
         default = [],
         action  = "append",
         help    = "exclude this mediatype from included mediatypes " +
-                  "(repeat for more)")
+        "(repeat for more)")
 
     ap.add_argument (
         "--input-mediatype",
         metavar = "MEDIATYPE",
         dest    = "input_mediatype",
         default = None,
-        help    = "mediatype of input url (default: guess from url)")
+        help    = "mediatype of input url (default: http response else file extension)")
 
     ap.add_argument (
         "--mediatype-from-extension",
         dest    = "mediatype_from_extension",
         action  = "store_true",
         default = False,
-        help    = "get mediatypes from url extension instead of http response")
+        help    = "guess all mediatypes from file extension, overrides http response")
 
     ap.add_argument (
         "--rewrite",
@@ -277,15 +279,31 @@ def add_local_options (ap):
 
     ap.add_argument (
         "--output-dir",
+        metavar  = "OUTPUT_DIR",
         dest    = "outputdir",
         default = "./",
         help    = "output directory (default: ./)")
 
     ap.add_argument (
         "--output-file",
+        metavar  = "OUTPUT_FILE",
         dest    = "outputfile",
         default = None,
         help    = "output file (default: <title>.epub)")
+
+    ap.add_argument (
+        "--validate",
+        dest     = "validate",
+        action   = "count",
+        help     = "validate epub through epubcheck")
+
+    ap.add_argument (
+        "--section",
+        metavar  = "TAG.CLASS",
+        dest     = "section_tags",
+        default  = [],
+        action   = "append",
+        help     = "split epub on TAG.CLASS")
 
     ap.add_argument (
         "--packager",
@@ -302,6 +320,7 @@ def add_local_options (ap):
 
     ap.add_argument (
         "--extension-package",
+        metavar  = "PYTHON_PACKAGE",
         dest    = "extension_packages",
         default = [],
         action  = "append",
@@ -350,7 +369,7 @@ def do_job (job):
                                         [os.path.dirname (job.url) + '/*'])
 
                 spider.include_mediatypes += options.include_mediatypes
-                if job.subtype == '.images':
+                if job.subtype == '.images' or job.type == 'rst.gen':
                     spider.include_mediatypes.append ('image/*')
 
                 spider.exclude_urls += options.exclude_urls
@@ -367,7 +386,8 @@ def do_job (job):
                 attribs.url = job.url
                 attribs.id = 'start'
                 if options.input_mediatype:
-                    attribs.orig_mediatype = attribs.HeaderElement.from_str (options.input_mediatype)
+                    attribs.orig_mediatype = attribs.HeaderElement.from_str (
+                        options.input_mediatype)
 
                 spider.recursive_parse (attribs)
                 elect_coverpage (spider)
@@ -390,6 +410,10 @@ def do_job (job):
             packager = PackagerFactory.create (options.packager, job.type)
             if packager:
                 packager.package (job)
+
+            if job.type == 'html.images':
+                # FIXME: hack for push packager
+                job.html_images_list = list (job.spider.aux_file_iter ())
 
         except SkipOutputFormat as what:
             warning ("%s" % what)
@@ -456,6 +480,7 @@ def main ():
         j.types = options.types
         j.outputdir = options.outputdir
         j.outputfile = options.outputfile
+        j.html_images_list = []
         job_queue = [j]
 
     for j in job_queue:

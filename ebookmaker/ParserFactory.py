@@ -20,9 +20,8 @@ import six
 from pkg_resources import resource_listdir # pylint: disable=E0611
 import requests
 
-from ebookmaker.mydocutils import broken
 from libgutenberg.Logger import debug
-from libgutenberg import MediaTypes as mt
+from libgutenberg import MediaTypes
 from ebookmaker.Version import VERSION
 from ebookmaker import parsers
 
@@ -87,16 +86,10 @@ class ParserFactory (object):
             # debug (str (parser.attribs))
             return parser
 
-        if url.endswith (broken):
-            # hack! broken.png doesn't exist at the source location.
-            # We take it from our resources and fake its provenience.
-            attribs.orig_mediatype = attribs.HeaderElement ('image/png')
-            attribs.orig_url = attribs.url = url
-            parser = cls.get (attribs)
-            parser.broken_image ()
-            return parser
-
-        if urllib.parse.urlsplit (url).scheme in ('file', ''):
+        scheme = urllib.parse.urlsplit (url).scheme
+        if scheme == 'resource':
+            fp = cls.open_resource (url, attribs)
+        elif scheme in ('file', ''):
             fp = cls.open_file (url, attribs)
         else:
             fp = cls.open_url (url, attribs)
@@ -112,7 +105,7 @@ class ParserFactory (object):
         debug ("... creating new parser for %s" % url)
 
         if options.mediatype_from_extension:
-            attribs.orig_mediatype = attribs.HeaderElement (mt.guess_type (url))
+            attribs.orig_mediatype = attribs.HeaderElement (MediaTypes.guess_type (url))
             debug ("... set mediatype %s from extension" % attribs.orig_mediatype.value)
 
         attribs.orig_url = url
@@ -150,11 +143,32 @@ class ParserFactory (object):
 
         url = orig_url
         if url.startswith ('file://'):
-            url = url[7:]
-        fp = open (url, "rb")
-        attribs.orig_mediatype = attribs.HeaderElement (mt.guess_type (url))
-        attribs.url = url
+            fp = open (url[7:], "rb")
+        else:
+            fp = open (url, "rb")
+        attribs.orig_mediatype = attribs.HeaderElement (MediaTypes.guess_type (url))
+
+        debug ("... got mediatype %s from guess_type" % str (attribs.orig_mediatype))
         attribs.orig_url = orig_url
+        attribs.url = url
+        return fp
+
+
+    @classmethod
+    def open_resource (cls, orig_url, attribs):
+        """ Open a python package resource file for parsing. """
+
+        # resource://python.package/filename.ext
+
+        o = urllib.parse.urlsplit (url)
+        package = o.host
+        filename = o.path
+        fp = resource_stream (package, filename)
+        attribs.orig_mediatype = attribs.HeaderElement (MediaTypes.guess_type (filename))
+
+        debug ("... got mediatype %s from guess_type" % str (attribs.orig_mediatype))
+        attribs.orig_url = orig_url
+        attribs.url = url
         return fp
 
 

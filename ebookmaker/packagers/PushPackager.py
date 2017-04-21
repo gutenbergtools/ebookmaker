@@ -13,19 +13,18 @@ Package a zip containing everything, that can be pushed to ibiblio.
 """
 
 
-import os
-import zipfile
+import os.path
 import re
 
 from libgutenberg.Logger import info, error
 import libgutenberg.GutenbergGlobals as gg
 
-from ebookmaker.packagers import BasePackager
+from ebookmaker.packagers import ZipPackager
 
 TYPE = 'ww'
 FORMATS = ['push']
 
-class Packager (BasePackager):
+class Packager (ZipPackager):
     """ Package one big zip for push.
 
     Zip contains one directory named after ebook_no.
@@ -39,28 +38,9 @@ class Packager (BasePackager):
 
     """
 
-    @staticmethod
-    def add (zip_, filename, memberfilename):
-        """ Add one file to the zip. """
-
-        try:
-            os.stat (filename)
-            dummy_name, ext = os.path.splitext (filename)
-            info ('  Adding file: %s as %s' % (filename, memberfilename))
-            zip_.write (filename, memberfilename,
-                        zipfile.ZIP_STORED if ext in ['.zip', '.png']
-                        else zipfile.ZIP_DEFLATED)
-        except OSError:
-            # warning ('PushPackager: Cannot find file %s', filename)
-            return
-
-
-    def package (self, job, aux_file_list = None):
+    def package (self, job):
         self.setup (job)
         zipfilename = job.outputfile # filename is zipfile
-
-        if aux_file_list is None:
-            aux_file_list = []
 
         m = re.match (r'\d+', zipfilename)
         if m:
@@ -69,9 +49,7 @@ class Packager (BasePackager):
             error ('Invalid filename %s for push packager.' % zipfilename)
             return
 
-        info ('Creating Zip file: %s' % zipfilename)
-
-        zip_ = zipfile.ZipFile (zipfilename, 'w', zipfile.ZIP_DEFLATED)
+        zip_ = self.create (zipfilename)
 
         for suffix in '.txt -8.txt -0.txt .zip -8.zip -0.zip -rst.zip -h.zip'.split ():
             filename = '%s%s' % (ebook_no, suffix)
@@ -84,12 +62,11 @@ class Packager (BasePackager):
             self.add (zip_, filename, memberfilename)
 
             # image files
-            for url in aux_file_list:
+            for url in job.html_images_list:
                 rel_url = gg.make_url_relative (job.base_url, url)
                 filename = os.path.join (self.path, rel_url)
                 memberfilename = '%s/%s%s/%s' % (ebook_no, ebook_no, suffix, rel_url)
                 self.add (zip_, filename, memberfilename)
 
         zip_.close ()
-
         info ('Done Zip file: %s' % zipfilename)

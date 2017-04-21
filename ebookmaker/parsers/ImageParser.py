@@ -23,7 +23,8 @@ from pkg_resources import resource_string # pylint: disable=E0611
 from libgutenberg.Logger import debug, error
 from libgutenberg.MediaTypes import mediatypes as mt
 from ebookmaker import parsers
-from ebookmaker.parsers import ParserBase
+from ebookmaker.parsers import ParserBase, BROKEN
+from ebookmaker.ParserFactory import ParserFactory
 
 mediatypes = (mt.jpeg, mt.png, mt.gif)
 
@@ -96,7 +97,7 @@ class Parser (ParserBase):
 
         except IOError as what:
             error ("Could not resize image: %s" % what)
-            new_parser.broken_image ()
+            return ParserFactory.create (BROKEN)
 
         return new_parser
 
@@ -108,19 +109,13 @@ class Parser (ParserBase):
         return self.dimen
 
 
-    def broken_image (self):
-        """ Insert broken image placeholder. """
-
-        self.image_data = resource_string ('ebookmaker.parsers', 'broken.png')
-        self.attribs.mediatype = parsers.ParserAttributes.HeaderElement ('image/png')
-        self.attribs.rel.add ('important') # keep even in non-image build
-
-
     def pre_parse (self):
         if self.image_data is None:
             self.image_data = self.bytes_content ()
-        if self.image_data is None:
-            self.broken_image ()
+
+        # FIXME: why did we need this?
+        #if self.image_data is None:
+        #    self.broken_image ()
 
 
     def parse (self):

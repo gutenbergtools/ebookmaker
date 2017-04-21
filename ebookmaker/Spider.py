@@ -21,7 +21,7 @@ from six.moves import urllib
 import libgutenberg.GutenbergGlobals as gg
 from libgutenberg.GutenbergGlobals import NS
 from libgutenberg.Logger import debug
-from libgutenberg import MediaTypes as mt
+from libgutenberg import MediaTypes
 
 from ebookmaker import parsers
 from ebookmaker import ParserFactory
@@ -153,7 +153,7 @@ class Spider (object):
         """ Return True if this document is eligible. """
 
         if attribs.orig_mediatype is None:
-            mediatype = mt.guess_type (attribs.url)
+            mediatype = MediaTypes.guess_type (attribs.url)
             if mediatype:
                 attribs.orig_mediatype = attribs.HeaderElement (mediatype)
             else:
@@ -180,7 +180,11 @@ class Spider (object):
     def is_included_relation (self, attribs):
         """ Return True if this document is eligible. """
 
-        return attribs.rel.intersection ( ('coverpage', 'important') )
+        keep = attribs.rel.intersection ( ('coverpage', 'important') )
+        if keep:
+            debug ("Not dropping after all because of rel.")
+
+        return keep
 
 
     def topological_sort (self):
@@ -226,7 +230,7 @@ class Spider (object):
         return dict ([(p.attribs.url, p.mediatype ()) for p in self.parsers])
 
 
-    def get_aux_file_list (self):
+    def aux_file_iter (self):
         """ Iterate over image files. Return absolute urls. """
 
         for p in self.parsers:

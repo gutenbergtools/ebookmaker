@@ -4,7 +4,7 @@
 
 from distutils.core import setup
 
-VERSION = '0.4.0a2'
+VERSION = '0.4.0a3'
 
 setup (
     name = 'ebookmaker',
@@ -38,7 +38,7 @@ setup (
         'chardet',
         'cssutils',
         'docutils',
-        'libgutenberg',
+        'libgutenberg>=0.1.6',
         'lxml',
         'roman',
         'requests',

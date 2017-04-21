@@ -78,20 +78,6 @@ def add_common_options (ap, user_config_file):
         default  = user_config_file,
         help     = "read config file (default: %(default)s)")
 
-    ap.add_argument (
-        "--validate",
-        dest     = "validate",
-        action   = "count",
-        help     = "validate epub through epubcheck")
-
-    ap.add_argument (
-        "--section",
-        metavar  = "TAG.CLASS",
-        dest     = "section_tags",
-        default  = [],
-        action   = "append",
-        help     = "split epub on TAG.CLASS")
-
 
 def parse_config_and_args (ap, sys_config, defaults = None):
 

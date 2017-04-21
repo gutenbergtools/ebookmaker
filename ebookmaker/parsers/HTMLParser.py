@@ -19,7 +19,7 @@ from six.moves import urllib
 
 import lxml.html
 from lxml import etree
-# import tidy
+from lxml.builder import ElementMaker
 
 from libgutenberg.GutenbergGlobals import NS, xpath
 from libgutenberg.Logger import info, debug, warning, error
@@ -32,39 +32,39 @@ mediatypes = ('text/html', mt.xhtml)
 
 RE_XMLDECL = re.compile (r'<\?xml[^?]+\?>\s*')
 
-DEPRECATED = { 'align':      """caption applet iframe img input object legend
-                             table hr div h1 h2 h3 h4 h5 h6 p""",
-               'alink':      'body',
-               'alt':        'applet',
-               'archive':    'applet',
-               'background': 'body',
-               'bgcolor':    '*',
-               'border':     'img object',
-               'clear':      'br',
-               'code':       'applet',
-               'codebase':   'applet',
-               'color':      '*',
-               'compact':    '*',
-               'face':       '*',
-               'height':     'td th applet',
-               'hspace':     '*',
-               'language':   'script',
-               'link':       'body',
-               'name':       'applet',
-               'noshade':    'hr',
-               'nowrap':     '*',
-               'object':     'applet',
-               'prompt':     'isindex',
-               'size':       'hr font basefont',
-               'start':      'ol',
-               'text':       'body',
-               'type':       'li ol ul',
-               'value':      'li',
-               'version':    'html',
-               'vlink':      'body',
-               'vspace':     '*',
-               'width':      'hr td th applet pre',
-               }
+DEPRECATED = {
+    'align':      'caption applet iframe img input object legend table hr div h1 h2 h3 h4 h5 h6 p',
+    'alink':      'body',
+    'alt':        'applet',
+    'archive':    'applet',
+    'background': 'body',
+    'bgcolor':    '*',
+    'border':     'img object',
+    'clear':      'br',
+    'code':       'applet',
+    'codebase':   'applet',
+    'color':      '*',
+    'compact':    '*',
+    'face':       '*',
+    'height':     'td th applet',
+    'hspace':     '*',
+    'language':   'script',
+    'link':       'body',
+    'name':       'applet',
+    'noshade':    'hr',
+    'nowrap':     '*',
+    'object':     'applet',
+    'prompt':     'isindex',
+    'size':       'hr font basefont',
+    'start':      'ol',
+    'text':       'body',
+    'type':       'li ol ul',
+    'value':      'li',
+    'version':    'html',
+    'vlink':      'body',
+    'vspace':     '*',
+    'width':      'hr td th applet pre',
+}
 
 
 class Parser (HTMLParserBase):
@@ -123,36 +123,6 @@ class Parser (HTMLParserBase):
 
         # debug ("_fix_internal_frag: frag = %s" % id_)
         return id_
-
-
-    # @staticmethod
-    # def tidylib (html):
-    #     """ Pipe html thru w3c tidylib. """
-
-    #     html = parsers.RE_RESTRICTED.sub ('', html)
-    #     html = RE_XMLDECL.sub ('', html)
-    #     html = parsers.RE_HTML_CHARSET.sub ('; charset=utf-8', html)
-
-    #     options = {
-    #         "clean": 1,
-    #         "wrap":  0,
-    #         "output_xhtml":     1,
-    #         "numeric_entities": 1,
-    #         "merge_divs":       0, # keep poetry indentation
-    #         "merge_spans":      0,
-    #         "add_xml_decl":     0,
-    #         "doctype":          "strict",
-    #         "anchor_as_name":   0,
-    #         "enclose_text":     1,
-    #         }
-
-    #     try:
-    #         html = tidy.parseString (html.encode ('utf-8'))
-    #     except TidyLibError as what:
-    #         error ("Tidy: %s" % what)
-    #         raise
-
-    #     return html
 
 
     @staticmethod
@@ -344,7 +314,7 @@ class Parser (HTMLParserBase):
         # strip empty class attributes
 
         for elem in xpath (self.xhtml,
-            "//xhtml:*[@class and normalize-space (@class) = '']"):
+                           "//xhtml:*[@class and normalize-space (@class) = '']"):
             del elem.attrib['class']
 
         # strip bogus header markup by Joe L.
@@ -354,6 +324,41 @@ class Parser (HTMLParserBase):
         for elem in xpath (self.xhtml, "//xhtml:h3"):
             if elem.text and elem.text.startswith ("E-text prepared by"):
                 elem.tag = NS.xhtml.p
+
+
+    def _make_coverpage_link (self):
+        """ Insert a <link rel="coverpage"> in the html head.
+
+        First we determine the coverpage url.  In HTML we find the
+        coverpage by appling these rules:
+
+          1. the image specified in <link rel='coverpage'>,
+          2. the image with an id of 'coverpage' or
+          3. the image with an url containing 'cover'
+          4. the image with an url containing 'title'
+
+        If one rule returns images we take the first one in document
+        order, else we proceed with the next rule.
+        """
+
+        coverpages = xpath (self.xhtml, "//xhtml:link[@rel='coverpage']")
+        for coverpage in coverpages:
+            url = coverpage.get ('src')
+            debug ("Found link to coverpage %s." % url)
+            return   # already provided by user
+
+        # look for a suitable candidate
+        coverpages = xpath (self.xhtml, "//xhtml:img[@id='coverpage']")
+        if not coverpages:
+            coverpages = xpath (self.xhtml, "//xhtml:img[contains (@src, 'cover')]")
+        if not coverpages:
+            coverpages = xpath (self.xhtml, "//xhtml:img[contains (@src, 'title')]")
+
+        for coverpage in coverpages:
+            for head in xpath (self.xhtml, "/xhtml:html/xhtml:head"):
+                url = coverpage.get ('src')
+                head.append (parsers.em.link (rel = 'coverpage', href = url))
+                debug ("Inserted link to coverpage %s." % url)
 
 
     def __parse (self, html):
@@ -382,8 +387,13 @@ class Parser (HTMLParserBase):
 
 
     def pre_parse (self):
-        """ Pre-parse a html ebook. Does a full parse because a
-        lightweight parse would be almost as much work. """
+        """
+        Pre-parse a html ebook.
+
+        Does a full parse because a lightweight parse would be almost
+        as much work.
+
+        """
 
         # cache
         if self.xhtml is not None:
@@ -414,6 +424,8 @@ class Parser (HTMLParserBase):
         self.xhtml.make_links_absolute (base_url = self.attribs.url)
 
         self._to_xhtml11 ()
+
+        self._make_coverpage_link ()
 
         debug ("Done parsing %s" % self.attribs.url)
 

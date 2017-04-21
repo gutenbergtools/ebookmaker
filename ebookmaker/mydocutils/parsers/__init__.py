@@ -32,7 +32,7 @@ from docutils.parsers.rst.directives import images
 
 from libgutenberg.Logger import error, warning, info, debug
 
-from ebookmaker.mydocutils import broken
+from ebookmaker.parsers import BROKEN
 from ebookmaker.mydocutils import nodes as mynodes
 from ebookmaker.mydocutils.transforms import parts
 
@@ -351,7 +351,7 @@ class Figure (images.Figure):
         self.options.setdefault ('align', 'center')
 
         if not self.arguments:
-            self.arguments.append (broken)
+            self.arguments.append (BROKEN)
             self.options.setdefault ('figwidth', '80%')
             self.options.setdefault ('width',    '5%')
 

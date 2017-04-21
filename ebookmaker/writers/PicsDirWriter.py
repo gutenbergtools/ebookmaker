@@ -14,7 +14,7 @@ Copies pics into local directory. Needed for HTML and Xetex.
 """
 
 
-import os
+import os.path
 
 import libgutenberg.GutenbergGlobals as gg
 from libgutenberg.Logger import info, debug, error
@@ -34,6 +34,8 @@ class Writer (writers.BaseWriter):
                 fn_dest = gg.make_url_relative (job.base_url, src_uri)
                 fn_dest = os.path.join (dest_dir, fn_dest)
 
+                # debug ('base_url =  %s, src_uri = %s' % (job.base_url, src_uri))
+
                 if gg.is_same_path (src_uri, fn_dest):
                     debug ('Not copying %s to %s: same file' % (src_uri, fn_dest))
                     continue
@@ -52,10 +54,10 @@ class Writer (writers.BaseWriter):
     def build (self, job):
         """ Build Pics file. """
 
-        dir = job.outputdir
+        dest_dir = job.outputdir
 
-        info ("Creating Pics directory in: %s" % dir)
+        info ("Creating Pics directory in: %s" % dest_dir)
 
-        self.copy_aux_files (job, dir)
+        self.copy_aux_files (job, dest_dir)
 
-        info ("Done Pics directory in: %s" % dir)
+        info ("Done Pics directory in: %s" % dest_dir)

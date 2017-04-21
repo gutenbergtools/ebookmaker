@@ -54,7 +54,7 @@ class BasePackager (object):
 class OneFileGzipPackager (BasePackager):
     """ Gzips one file. """
 
-    def package (self, job, aux_file_list = None):
+    def package (self, job):
         self.setup (job)
         filename = self.path_name_ext
         gzfilename = filename + GZIP_EXTENSION
@@ -70,60 +70,74 @@ class OneFileGzipPackager (BasePackager):
             error (what)
 
 
-class OneFileZipPackager (BasePackager):
+class ZipPackager (BasePackager):
+    """ Packages a zip file. """
+
+    @staticmethod
+    def create (zipfilename):
+        """ Create a zip file. """
+
+        info ('Creating Zip file: %s' % zipfilename)
+        return  zipfile.ZipFile (zipfilename, 'w', zipfile.ZIP_DEFLATED)
+
+
+    @staticmethod
+    def add (zip_, filename, memberfilename):
+        """ Add one file to the zip. """
+
+        try:
+            os.stat (filename)
+            dummy_name, ext = os.path.splitext (filename)
+            info ('  Adding file: %s as %s' % (filename, memberfilename))
+            zip_.write (filename, memberfilename,
+                        zipfile.ZIP_STORED if ext in ['.zip', '.png']
+                        else zipfile.ZIP_DEFLATED)
+        except OSError:
+            warning ('ZipPackager: Cannot add file %s', filename)
+
+
+class OneFileZipPackager (ZipPackager):
     """ Packages one file in zip of the same name. """
 
-    def package (self, job, aux_file_list = None):
+    def package (self, job):
         self.setup (job)
         filename = self.path_name_ext
         zipfilename = os.path.join (self.path, self.name) + '.zip'
         memberfilename = self.name + self.ext
 
-        info ('Creating Zip file: %s' % zipfilename)
-
-        try:
-            os.stat (filename)
-        except OSError:
-            # warning ('Packager: Cannot find file %s', filename)
-            return
-
-        zip_ = zipfile.ZipFile (zipfilename, 'w', zipfile.ZIP_DEFLATED)
-        info ('  Adding file: %s as %s' % (filename, memberfilename))
-        zip_.write (filename, memberfilename)
+        zip_ = self.create (zipfilename)
+        self.add (zip_, filename, memberfilename)
         zip_.close ()
 
         info ('Done Zip file: %s' % zipfilename)
 
 
-class HTMLishPackager (BasePackager):
+class HTMLishPackager (ZipPackager):
     """ Package a file with images. """
 
-    def package (self, job, aux_file_list = None):
+    def package (self, job):
         self.setup (job)
 
-        if aux_file_list is None:
+        try:
+            aux_file_list = list (job.spider.aux_file_iter ())
+        except AttributeError:
             aux_file_list = []
 
         filename = job.outputfile
         zipfilename = os.path.join (self.path, self.name) + '.zip'
         memberfilename = os.path.join (self.name, self.name) + self.ext
 
-        info ('Creating Zip file: %s' % zipfilename)
-
-        zip_ = zipfile.ZipFile (zipfilename, 'w', zipfile.ZIP_DEFLATED)
-        info ('  Adding file: %s as %s' % (filename, memberfilename))
-        zip_.write (filename, memberfilename)
+        zip_ = self.create (zipfilename)
+        self.add (zip_, filename, memberfilename)
 
         # now images
         for url in aux_file_list:
             rel_url = gg.make_url_relative (job.base_url, url)
             filename = os.path.join (self.path, rel_url)
             memberfilename = os.path.join (self.name, rel_url)
-            info ('  Adding file: %s as %s' % (filename, memberfilename))
-            zip_.write (filename, memberfilename)
+            self.add (zip_, filename, memberfilename)
 
         zip_.close ()
-
         info ('Done Zip file: %s' % zipfilename)
 
 
@@ -134,6 +148,8 @@ class PackagerFactory (object):
 
     @staticmethod
     def mk_key (type_, format_):
+        """ Make a key for the packager map. """
+
         return (type_ or '') + '/' + format_
 
 

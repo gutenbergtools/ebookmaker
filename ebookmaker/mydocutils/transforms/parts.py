@@ -1021,24 +1021,3 @@ class InheritTransform (docutils.transforms.Transform):
                 n.attributes = {'classes': list (passed_on_classes) } # HACK! Text has no attributes
             else:
                 self.recurse (node, n, passed_on_classes)
-
-
-# class ImageReplacer (docutils.transforms.Transform):
-#     """
-#     Replaces images with 'broken' image to minimize file size.
-
-#     """
-
-#     default_priority = 800
-
-#     def apply (self):
-#         broken_uri = urllib.parse.urljoin (self.document.settings.base_url, broken)
-#         for image in self.document.traverse (nodes.image):
-#             image['uri'] = broken_uri
-#             image['width'] = '5%'
-#             image['align'] = 'center'
-#             if isinstance (image.parent, nodes.figure):
-#                 figure = image.parent
-#                 figure['width'] = figure.attributes.get ('width', '80%')
-#                 if figure['width'] == 'image':
-#                     figure['width'] = '80%'

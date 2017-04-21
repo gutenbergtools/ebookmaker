@@ -29,6 +29,8 @@ from libgutenberg.GutenbergGlobals import NS, xpath
 from libgutenberg.MediaTypes import mediatypes as mt
 from libgutenberg.Logger import info, debug, error
 
+BROKEN = 'resource://ebookmaker.parsers/broken.png'
+
 RE_GUTENBERG    = re.compile (r'Project Gutenberg',         re.I)
 RE_AUTHOR       = re.compile (r"^Author:\s+(.+)$",          re.I | re.M)
 RE_TITLE        = re.compile (r"^Title:\s+(.+)$",           re.I | re.M)
@@ -68,6 +70,12 @@ BOGUS_CHARSET_NAMES = { 'iso-latin-1': 'iso-8859-1',
                         # python has bogus codec name
                         'macintosh'  : 'mac_roman',
                         }
+
+# exported
+em = ElementMaker (makeelement = lxml.html.xhtml_parser.makeelement,
+                   namespace = str (NS.xhtml),
+                   nsmap = { None: str (NS.xhtml) })
+
 
 class ParserAttributes (object): # pylint: disable=too-few-public-methods
     """ Object to hold attributes for the lifetime of a parser.
@@ -283,11 +291,6 @@ class ParserBase (object):
         return
 
 
-em = ElementMaker (makeelement = lxml.html.xhtml_parser.makeelement,
-                   namespace = str (NS.xhtml),
-                   nsmap = { None: str (NS.xhtml) })
-
-
 class HTMLParserBase (ParserBase):
     """ Base class for more HTMLish parsers.
 
@@ -330,27 +333,6 @@ class HTMLParserBase (ParserBase):
 
     def iterlinks (self):
         """ Return all links in document. """
-
-        # First we determine the coverpage url.  In HTML we find the
-        # coverpage by appling these rules:
-        #
-        #   1. the image specified in <link rel='coverpage'>,
-        #   2. the image with an id of 'coverpage' or
-        #   3. the image with an url containing 'cover'
-        #   4. the image with an url containing 'title'
-        #
-        # If one rule returns images we take the first one in document
-        # order, else we proceed with the next rule.
-
-        coverpages = xpath (self.xhtml, "//link[@rel='coverpage']")
-        if not coverpages:
-            coverpages = xpath (self.xhtml, "//img[@id='coverpage']")
-        if not coverpages:
-            coverpages = xpath (self.xhtml, "//img[contains (@src, 'cover')]")
-        if not coverpages:
-            coverpages = xpath (self.xhtml, "//img[contains (@src, 'title')]")
-        if coverpages:
-            coverpages[0].set ('rel', 'coverpage')
 
         # To keep an image even in non-image build specify
         # class="x-ebookmaker-important"
