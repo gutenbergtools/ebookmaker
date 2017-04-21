@@ -1,0 +1,74 @@
+#!/usr/bin/env python
+#  -*- mode: python; indent-tabs-mode: nil; -*- coding: iso-8859-1 -*-
+
+"""
+
+convert_unitame.py
+
+Copyright 2010,2014 by Marcello Perathoner
+
+Distributable under the GNU General Public License Version 3 or newer.
+
+Converts unitame.dat into UnitameData module.
+
+"""
+
+import codecs
+import unicodedata as ud
+
+# from addhd
+
+i2a = (
+"Euro","",",","f","\"","...","","","^","%","S","<","OE","","Z","",
+"","'","'","\"","\"","","-","--","~","(TM)","s",">","oe","","z","Y",
+" ","i","c","L","","Y","|","Sec.","\"","(C)","","\"","","-","(R)","-",
+" deg.","+-"," squared"," cubed","'"," mu","",".","","","","\"","1/4","1/2","3/4","?",
+"A","A","A","A","Ae","A","AE","C","E","E","E","E","I","I","I","I",
+"Eth","N","O","O","O","O","Oe","x","O","U","U","U","Ue","Y","","ss",
+"a","a","a","a","ae","a","ae","c","e","e","e","e","i","i","i","i",
+"eth","n","o","o","o","o","oe","/","o","u","u","u","ue","y","","y"
+)
+
+
+def strip_accents (s):
+    """ Strip accents from string. """
+    return ud.normalize ('NFKC',
+                         filter (lambda c: ud.category (c) != 'Mn',
+                                 ud.normalize ('NFKD', s)))
+
+fp = codecs.open ('unitame.dat', 'rU', 'iso-8859-1')
+
+print '''#!/usr/bin/env python
+#  -*- mode: python; indent-tabs-mode: nil; -*- coding: utf-8 -*-
+
+""" Converted from unitame.dat """
+
+from __future__ import unicode_literals
+
+unicode_to_iso_8859_1 = {'''
+
+for line in fp.readlines ():
+    line = line.strip ()
+    c, dummy, sub = line.split (';', 2)
+    c = "%c" % int (c, 16)
+    if sub and c != sub and strip_accents (c) != sub:
+        comment = ud.name (c)
+        if sub == "'":
+            sub = r"\'"
+        print ("    '%s': '%s', # %s" % (c, sub, comment)).encode ('utf-8')
+
+print "}\n\n"
+
+print "iso_8859_1_to_ascii = {"
+
+for n, sub in enumerate (i2a):
+    n = n + 0x80
+    if n > 0xa0:
+        c = unichr (n)
+        if sub and strip_accents (c) != sub:
+            comment = ud.name (c)
+            if sub == "'":
+                sub = r"\'"
+            print ("    '%s': '%s', # %s" % (c, sub, comment)).encode ('utf-8')
+
+print "}\n\n"

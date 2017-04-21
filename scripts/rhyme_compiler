@@ -1,0 +1,57 @@
+#!/usr/bin/env python
+#  -*- mode: python; indent-tabs-mode: nil; -*- coding: iso-8859-1 -*-
+
+"""
+
+ryhme_compiler.py
+
+Copyright 2009 by Marcello Perathoner
+
+Distributable under the GNU General Public License Version 3 or newer.
+
+This module produces a dbm file of rhyme stems.
+
+We use a very naive concept of rhyme: we preprocess the 'CMU
+Pronouncing Dictionary' (found at
+http://www.speech.cs.cmu.edu/cgi-bin/cmudict) and extract the phonemes
+for each word from the last stressed one to the end of the word.
+
+The result is stored in cmudict.db hashed by word.
+
+To compile:
+
+$ ./rhyme_compiler.py cmudict.0.7a
+
+
+"""
+
+import fileinput
+import re
+import gdbm
+
+dbm = gdbm.open ('cmudict.db', 'nf')
+
+RE_STRESSED = re.compile ('[a-z]+[12][^12]*$')
+
+# two example lines from cmudict
+#
+# PRONUNCIATION  P R OW0 N AH2 N S IY0 EY1 SH AH0 N
+# PRONUNCIATION(1)  P R AH0 N AH2 N S IY0 EY1 SH AH0 N
+
+for line in fileinput.input (openhook = fileinput.hook_encoded ("iso-8859-1")):
+    if line.startswith (';'):
+        continue
+
+    word, dummy_sep, phonemes = line.lower ().partition ('  ')
+
+    m = RE_STRESSED.search (phonemes)
+    if m:
+        phoneme = re.sub (r'[ 012]+', '-', m.group (0)) # remove stress marks
+        dbm[word.encode ('utf-8')] = phoneme.encode ('utf-8')
+
+        # print "%s %s\n" % (word, dbm[word])
+
+dbm.sync ()
+dbm.reorganize ()
+dbm.close ()
+

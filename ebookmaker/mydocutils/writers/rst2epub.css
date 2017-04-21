@@ -1,0 +1,45 @@
+/*
+Project Gutenberg EPUB docutils stylesheet.
+
+This stylesheet contains styles specific to EPUB.
+*/
+
+/* FONTS */
+
+/* mostly unsupported */
+.small-caps        { font-style: italic }
+.gesperrt          { font-style: italic }
+
+/* ALIGN */
+
+/* SECTIONS */
+
+/* reduce screen real estate waste */
+body               { margin: 1% }
+
+/* ugly hack to give more specifity.  because ADE chucks out the whole
+   stylesheet when it sees an !important */
+
+.first.first        { margin-top: 0; text-indent: 0 }
+.last.last          { margin-bottom: 0 }
+
+.no-page-break.no-page-break
+                    { page-break-before: avoid }
+
+/* PAGINATION */
+
+div.clearpage       { page-break-before: always; padding-top: 10% }
+div.cleardoublepage { page-break-before: right;  padding-top: 10%  }
+
+.vfill              { margin-top: 10% }
+h2.title            { margin-top: 10% }
+
+/* DIV */
+
+a                   { text-decoration: none }
+.toc-pageref        { display: none }
+
+/* DROPCAPS */
+
+span.dropcap        { line-height: 0 }
+img.dropcap         { vertical-align: bottom }

@@ -1,0 +1,2 @@
+broken = 'images/broken.png'
+
