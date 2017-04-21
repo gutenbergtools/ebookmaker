@@ -62,7 +62,7 @@ class Packager (ZipPackager):
             self.add (zip_, filename, memberfilename)
 
             # image files
-            for url in job.html_images_list:
+            for url in options.html_images_list:
                 rel_url = gg.make_url_relative (job.base_url, url)
                 filename = os.path.join (self.path, rel_url)
                 memberfilename = '%s/%s%s/%s' % (ebook_no, ebook_no, suffix, rel_url)

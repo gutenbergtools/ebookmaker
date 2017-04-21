@@ -1,6 +1,6 @@
 Metadata-Version: 1.1
 Name: ebookmaker
-Version: 0.4.0a3
+Version: 0.4.0a5
 Summary: The Project Gutenberg tool to generate EPUBs and other ebook formats.
 Home-page: http://pypi.python.org/pypi/ebookmaker/
 Author: Marcello Perathoner

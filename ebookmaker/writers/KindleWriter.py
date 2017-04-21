@@ -28,10 +28,6 @@ class Writer (BaseWriter):
     def build (self, job):
         """ Build kindle file from epub using amazon kindlegen. """
 
-        # Much unnecessary juggling of files here because
-        # brain-dead kindlegen doesn't understand unix pipes
-        # and can only output in current directory.
-
         info ("Creating Kindle file: %s" % os.path.join (job.outputdir, job.outputfile))
         info ("            ... from: %s" % job.url)
 
@@ -59,9 +55,9 @@ class Writer (BaseWriter):
 
         os.chdir (cwd)
 
-        regex = re.compile (r'^(\w+)\(prcgen\):')
-
         if kindlegen.returncode > 0:
+            regex = re.compile (r'^(\w+)\(prcgen\):')
+
             # pylint: disable=E1103
             msg = stderr.rstrip ()
             if msg:

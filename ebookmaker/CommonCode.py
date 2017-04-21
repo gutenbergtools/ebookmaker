@@ -12,6 +12,7 @@ Common code for EbookMaker and EbookConverter.
 
 """
 
+import os.path
 
 from six.moves import configparser
 
@@ -23,20 +24,20 @@ class Struct (object):
 class Job (object):
     """Hold 'globals' for a job.
 
-    A job is defined as one unit of work, preferably acting on one url
-    and with one set of parsers.
+    A job is defined as one unit of work, acting on one input url.
 
     """
 
-    def __init__ (self):
-        self.url = None
-        self.dc = None
-        self.types = []
-        self.outputdir = None
-        self.logfile = None
+    def __init__ (self, type_):
+        self.type = type_
+        self.maintype, self.subtype = os.path.splitext (self.type)
 
-        self.type = None
+        self.url = None
+        self.outputdir = None
         self.outputfile = None
+        self.logfile = None
+        self.dc = None
+
 
     def __str__ (self):
         l = []

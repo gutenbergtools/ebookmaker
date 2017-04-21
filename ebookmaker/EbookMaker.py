@@ -96,7 +96,7 @@ FILENAMES = {
 
 COVERPAGE_MIN_AREA = 200 * 200
 
-def make_output_filename (dc, type_):
+def make_output_filename (type_, dc):
     """ Make a suitable filename for output type. """
 
     if dc.project_gutenberg_id:
@@ -128,8 +128,11 @@ def elect_coverpage (spider):
             coverpage_found = True
 
 
-def get_dc (parser):
+def get_dc (url):
     """ Get DC for book. """
+
+    parser = ParserFactory.ParserFactory.create (url)
+    parser.parse ()
 
     dc = DublinCore.GutenbergDublinCore ()
     try:
@@ -151,7 +154,7 @@ def get_dc (parser):
         dc.project_gutenberg_id = None
         try:
             dc.load_from_parser (parser)
-        except (ValueError, UnicodeError):
+        except (ValueError, AttributeError, UnicodeError):
             pass
 
     dc.source = parser.attribs.url
@@ -353,77 +356,67 @@ def do_job (job):
 
     log_handler = None
     Logger.ebook = job.ebook
+    if job.logfile:
+        log_handler = open_log (os.path.join (job.outputdir, job.logfile))
 
-    for job.type in job.types:
+    debug ('=== Building %s ===' % job.type)
 
-        debug ('=== Building %s ===' % job.type)
-        if job.logfile:
-            log_handler = open_log (os.path.join (job.outputdir, job.logfile))
+    try:
+        if job.url:
+            spider = Spider.Spider ()
+            spider.include_urls += (options.include_urls or
+                                    [os.path.dirname (job.url) + '/*'])
 
-        job.maintype, job.subtype = os.path.splitext (job.type)
+            spider.include_mediatypes += options.include_mediatypes
+            if job.subtype == '.images' or job.type == 'rst.gen':
+                spider.include_mediatypes.append ('image/*')
 
-        try:
-            if job.url:
-                spider = Spider.Spider ()
-                spider.include_urls += (options.include_urls or
-                                        [os.path.dirname (job.url) + '/*'])
+            spider.exclude_urls += options.exclude_urls
 
-                spider.include_mediatypes += options.include_mediatypes
-                if job.subtype == '.images' or job.type == 'rst.gen':
-                    spider.include_mediatypes.append ('image/*')
+            spider.exclude_mediatypes += options.exclude_mediatypes
 
-                spider.exclude_urls += options.exclude_urls
+            spider.max_depth = options.max_depth or six.MAXSIZE
 
-                spider.exclude_mediatypes += options.exclude_mediatypes
+            for rewrite in options.rewrite:
+                from_url, to_url = rewrite.split ('>')
+                spider.add_redirection (from_url, to_url)
 
-                spider.max_depth = options.max_depth or six.MAXSIZE
+            attribs = parsers.ParserAttributes ()
+            attribs.url = job.url
+            attribs.id = 'start'
+            if options.input_mediatype:
+                attribs.orig_mediatype = attribs.HeaderElement.from_str (
+                    options.input_mediatype)
 
-                for rewrite in options.rewrite:
-                    from_url, to_url = rewrite.split ('>')
-                    spider.add_redirection (from_url, to_url)
+            spider.recursive_parse (attribs)
+            elect_coverpage (spider)
+            job.url = spider.redirect (job.url)
+            job.base_url = job.url
+            job.spider = spider
 
-                attribs = parsers.ParserAttributes ()
-                attribs.url = job.url
-                attribs.id = 'start'
-                if options.input_mediatype:
-                    attribs.orig_mediatype = attribs.HeaderElement.from_str (
-                        options.input_mediatype)
+        writer = WriterFactory.create (job.maintype)
+        writer.build (job)
 
-                spider.recursive_parse (attribs)
-                elect_coverpage (spider)
-                job.url = spider.redirect (job.url)
-                job.base_url = job.url
-                job.dc = job.dc or get_dc (spider.parsers[0]) # or id == 'start'
-                job.spider = spider
+        if options.validate:
+            writer.validate (job)
 
-            # FIXME: job should not contain temporary entries like outputfile or type
-            if len (job.types) > 1:
-                job.outputfile = None
-            job.outputfile = job.outputfile or make_output_filename (job.dc, job.type)
+        packager = PackagerFactory.create (options.packager, job.type)
+        if packager:
+            packager.package (job)
 
-            writer = WriterFactory.create (job.maintype)
-            writer.build (job)
+        if job.type == 'html.images':
+            # FIXME: hack for push packager
+            options.html_images_list = list (job.spider.aux_file_iter ())
 
-            if options.validate:
-                writer.validate (job)
+    except SkipOutputFormat as what:
+        warning ("%s" % what)
 
-            packager = PackagerFactory.create (options.packager, job.type)
-            if packager:
-                packager.package (job)
+    except Exception as what:
+        exception ("%s" % what)
 
-            if job.type == 'html.images':
-                # FIXME: hack for push packager
-                job.html_images_list = list (job.spider.aux_file_iter ())
-
-        except SkipOutputFormat as what:
-            warning ("%s" % what)
-
-        except Exception as what:
-            exception ("%s" % what)
-
-        if log_handler:
-            close_log (log_handler)
-            log_handler = None
+    if log_handler:
+        close_log (log_handler)
+        log_handler = None
 
 
 def config ():
@@ -474,14 +467,24 @@ def main ():
     if options.is_job_queue:
         job_queue = cPickle.load (sys.stdin.buffer) # read bytes
     else:
-        j = CommonCode.Job ()
-        j.ebook = options.ebook
-        j.url = options.url
-        j.types = options.types
-        j.outputdir = options.outputdir
-        j.outputfile = options.outputfile
-        j.html_images_list = []
-        job_queue = [j]
+        options.dc = get_dc (options.url)
+        job_queue = []
+        output_files = dict ()
+        for type_ in options.types:
+            job = CommonCode.Job (type_)
+            job.url = options.url
+            job.ebook = options.ebook
+            job.dc = options.dc
+            job.outputdir = options.outputdir
+            job.outputfile = options.outputfile or make_output_filename (type_, options.dc)
+            output_files[type_] = job.outputfile
+
+            if job.type == 'kindle.images':
+                job.url = os.path.join (job.outputdir, output_files['epub.images'])
+            elif job.type == 'kindle.noimages':
+                job.url = os.path.join (job.outputdir, output_files['epub.noimages'])
+
+            job_queue.append (job)
 
     for j in job_queue:
         do_job (j)
@@ -490,7 +493,7 @@ def main ():
     if packager:
         # HACK: the WWers ever only convert one ebook at a time
         job = job_queue[0]
-        job.outputfile = '%d-final.zip' % (job.dc.project_gutenberg_id)
+        job.outputfile = '%d-final.zip' % (options.dc.project_gutenberg_id)
         packager.package (job)
 
     return 0
