@@ -25,8 +25,10 @@ from libgutenberg.Logger import warning, info, debug
 from libgutenberg.MediaTypes import mediatypes as mt
 
 from ebookmaker import parsers
+from ebookmaker.CommonCode import Options
 from ebookmaker.parsers import HTMLParserBase
 
+options = Options()
 mediatypes = (mt.txt, )
 
 MAX_BEFORE = 5 # no. of empty lines that mark a <h1>

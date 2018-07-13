@@ -38,8 +38,10 @@ from ebookmaker import ParserFactory
 from ebookmaker import HTMLChunker
 # from ebookmaker import Spider
 from ebookmaker import writers
+from ebookmaker.CommonCode import Options
 from ebookmaker.Version import VERSION, GENERATOR
 
+options = Options()
 # pylint: disable=W0142
 
 MAX_CHUNK_SIZE  = 300 * 1024  # bytes

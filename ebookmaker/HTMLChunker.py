@@ -27,6 +27,9 @@ import libgutenberg.GutenbergGlobals as gg
 from libgutenberg.GutenbergGlobals import NS
 from libgutenberg.Logger import debug, error
 
+from ebookmaker.CommonCode import Options
+options = Options()
+
 # MAX_CHUNK_SIZE  = 300 * 1024  # bytes
 MAX_CHUNK_SIZE  = 100 * 1024  # bytes
 

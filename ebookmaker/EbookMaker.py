@@ -37,9 +37,10 @@ from ebookmaker import Spider
 from ebookmaker import WriterFactory
 from ebookmaker.packagers import PackagerFactory
 from ebookmaker import CommonCode
-
+from ebookmaker.CommonCode import Options
 from ebookmaker.Version import VERSION
 
+options = Options()
 
 CONFIG_FILES = ['/etc/ebookmaker.conf', os.path.expanduser ('~/.ebookmaker')]
 
@@ -417,7 +418,8 @@ def config ():
     CommonCode.add_common_options (ap, CONFIG_FILES[1])
     add_local_options (ap)
 
-    options = CommonCode.parse_config_and_args (
+    global options 
+    options.update(vars(CommonCode.parse_config_and_args (
         ap,
         CONFIG_FILES[0],
         {
@@ -428,9 +430,8 @@ def config ():
             'rhyming_dict': None,
             'timestamp': datetime.datetime.today ().isoformat ()[:19],
         }
-    )
+    )))
 
-    builtins.options = options
     builtins._ = CommonCode.null_translation
 
     if '://' not in options.url:

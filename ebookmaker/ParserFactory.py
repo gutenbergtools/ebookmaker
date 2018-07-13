@@ -22,9 +22,11 @@ import requests
 
 from libgutenberg.Logger import debug
 from libgutenberg import MediaTypes
+from ebookmaker.CommonCode import Options
 from ebookmaker.Version import VERSION
 from ebookmaker import parsers
 
+options = Options()
 parser_modules = {}
 
 def load_parsers ():
