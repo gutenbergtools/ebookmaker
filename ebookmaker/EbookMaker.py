@@ -23,7 +23,7 @@ import os.path
 import sys
 
 import six
-from six.moves import builtins, cPickle
+from six.moves import cPickle
 
 from libgutenberg.GutenbergGlobals import SkipOutputFormat
 import libgutenberg.GutenbergGlobals as gg
@@ -431,8 +431,6 @@ def config ():
             'timestamp': datetime.datetime.today ().isoformat ()[:19],
         }
     )))
-
-    builtins._ = CommonCode.null_translation
 
     if '://' not in options.url:
         options.url = os.path.abspath (options.url)

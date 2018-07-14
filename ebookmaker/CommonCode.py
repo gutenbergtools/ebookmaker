@@ -68,11 +68,6 @@ def add_dependencies (targets, deps, order = None):
     return targets
 
 
-def null_translation (s):
-    """ Translate into same language. :-) """
-    return s
-
-
 def add_common_options (ap, user_config_file):
     """ Add aptions common to all programs. """
 
