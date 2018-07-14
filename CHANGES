@@ -1,3 +1,8 @@
+0.4.1a1
+
+don't be using builtins as a backdoor global
+updates for distutils 0.14 compatibility
+
 0.4.0a2
 
 Fix legalese in PG boilerplate.

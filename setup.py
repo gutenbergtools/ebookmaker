@@ -38,7 +38,7 @@ setup (
         'chardet',
         'cherrypy',
         'cssutils',
-        'docutils',
+        'docutils>=0.14',
         'libgutenberg>=0.1.6',
         'lxml',
         'roman',
