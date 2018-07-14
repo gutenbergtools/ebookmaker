@@ -19,7 +19,9 @@ import sys
 from libgutenberg.Logger import info, debug, warning, error
 from libgutenberg.GutenbergGlobals import SkipOutputFormat
 from ebookmaker.writers import BaseWriter
+from ebookmaker.CommonCode import Options
 
+options = Options()
 
 class Writer (BaseWriter):
     """ Class for writing kindle files. """
