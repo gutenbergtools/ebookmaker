@@ -16,7 +16,7 @@ import os.path
 
 from six.moves import configparser
 
-from libgutenberg.GutenbergGlobals import Options
+from libgutenberg.CommonOptions import Options
 
 class Struct (object):
     pass
