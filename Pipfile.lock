@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "acae2b89d0233bc77591f753d01ab4d933ac69951a2bd2a0ce9f35bb355104c4"
+            "sha256": "86ea082515091c7c34a4f64d8baf44ceec7b5ae0a1c946235b8cc9bb37eae5e9"
         },
         "pipfile-spec": 6,
         "requires": {},
@@ -89,7 +89,7 @@
         "libgutenberg": {
             "editable": true,
             "git": "https://github.com/gutenbergtools/libgutenberg",
-            "ref": "6a5e829102bc3128c45580bf3a5fc1b30d5de5bb"
+            "ref": "89a2380072ce3db6122795a9944ed3ffa6215fbf"
         },
         "lxml": {
             "hashes": [
