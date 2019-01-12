@@ -16,19 +16,10 @@ import os.path
 
 from six.moves import configparser
 
+from libgutenberg.CommonOptions import Options
 
 class Struct (object):
     pass
-
-
-# options is a global set by argparse (note that it's not thread-safe)
-class Options:
-    __shared_state = {}
-    def __init__(self):
-        self.__dict__ = self.__shared_state
-        
-    def update(self, _dict):
-        self.__dict__.update(_dict)
 
 options = Options()
 

@@ -1,2 +1,2 @@
-VERSION = '0.4.0a5'
-GENERATOR = 'Ebookmaker %s by Marcello Perathoner <webmaster@gutenberg.org>'
+VERSION = '0.5.0'
+GENERATOR = 'Ebookmaker %s by Marcello Parathoner and Project Gutenberg'

@@ -1,15 +1,11 @@
 [[source]]
-
 url = "https://pypi.python.org/simple"
 verify_ssl = true
 name = "pypi"
 
-
 [dev-packages]
 
-
-
 [packages]
-
-"e1839a8" = {path = ".", editable = true}
-docutils = "==0.12"
+e1839a8 = {path = ".",editable = true}
+libgutenberg = {editable = true,git = "https://github.com/gutenbergtools/libgutenberg",ref = "89a2380072ce3db6122795a9944ed3ffa6215fbf"}
+ebookmaker = {editable = true,path = "."}
