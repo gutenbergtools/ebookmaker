@@ -1276,7 +1276,7 @@ class Writer (writers.HTMLishWriter):
                     chunker.split (xhtml, p.attribs)
 
             for p in job.spider.parsers:
-                if (hasattr(p, 'sheet') and (p.sheet != None)):
+                if hasattr(p, 'sheet') and p.sheet:
                     self.fix_incompatible_css (p.sheet)
                     p.rewrite_links (self.url2filename)
                     parsers.append (p)
