@@ -27,7 +27,7 @@ $ ./rhyme_compiler.py cmudict.0.7a
 
 import fileinput
 import re
-import gdbm
+from six.moves import dbm_gnu as gdbm
 
 dbm = gdbm.open ('cmudict.db', 'nf')
 

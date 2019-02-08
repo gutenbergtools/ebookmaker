@@ -140,16 +140,17 @@ class ParagraphMetrics (object):
     """ Calculates some metrics. """
 
     words = None
-
     try:
-        fn = options.config.RHYMING_DICT
-        if fn is not None:
-            from six.moves import dbm_gnu
-            words = dbm_gnu.open (fn)
-    except ImportError:
+        from six.moves import dbm_gnu
+        try:
+            fn = options.config.RHYMING_DICT
+            if fn is not None:
+            
+                words = dbm_gnu.open (fn)
+        except dbm_gnu.error:
+            warning ("File containing rhyming dictionary not found: %s" % fn)
+    except ModuleNotFoundError:
         warning ("No gnu dbm support found. Rhyming dictionary not used.")
-    except dbm_gnu.error:
-        warning ("File containing rhyming dictionary not found: %s" % fn)
 
     def __init__ (self, par):
         """ Calculate metrics about this paragraph. """
