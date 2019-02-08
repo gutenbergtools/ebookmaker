@@ -184,7 +184,7 @@ def add_local_options (ap):
     ap.add_argument (
         "--make",
         dest    = "types",
-        choices = CommonCode.add_dependencies (['all'], DEPENDENCIES),
+        choices = CommonCode.add_dependencies (['all', 'test'], DEPENDENCIES),
         default = [],
         action  = 'append',
         help    = "output type (default: all)")

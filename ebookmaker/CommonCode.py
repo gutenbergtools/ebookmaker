@@ -53,7 +53,7 @@ def add_dependencies (targets, deps, order = None):
 
     for target, deps in deps.items ():
         if target in targets:
-            targets += deps
+            targets = list(set(targets).union(deps))
     if order:
         return list (filter (targets.__contains__, order))
     return targets
