@@ -15,7 +15,7 @@ class TestFromHtm(unittest.TestCase):
         book_id = '43172'
         dir = os.path.join(self.sample_dir, book_id)
         htmfile = os.path.join(dir, '%s-h' % book_id, '%s-h.htm' % book_id)
-        cmd = 'ebookmaker --make=all --output-dir={dir} {htmfile}'.format(
+        cmd = 'ebookmaker --make=test --output-dir={dir} {htmfile}'.format(
             dir=dir,
             htmfile=htmfile,
         )
@@ -24,8 +24,6 @@ class TestFromHtm(unittest.TestCase):
 
         self.assertFalse(output)
         outs = [
-            "%s-kindle.mobi",
-            "%s-images-kindle.mobi",
             "%s-epub.epub",
             "%s-images-epub.epub",
             "%s-noimages-h.html",
