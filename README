@@ -26,10 +26,16 @@ Install
 =======
 
 (dev branch, editable install)
-pipenv install -e git+https://github.com/gutenbergtools/ebookmaker@dev#egg=ebookmaker
+`pipenv install -e git+https://github.com/gutenbergtools/ebookmaker@dev#egg=ebookmaker`
 
 Use the ebookmaker.conf file to pass a path to your kindlegen, tex, and groff programs if they're not in your PATH
 
 Sample invocation
 =================
-ebookmaker -v -v --make=epub.images --output-dir=/Documents/pg /Documents/library/58669/58669-h/58669-h.htm
+`ebookmaker -v -v --make=epub.images --output-dir=/Documents/pg /Documents/library/58669/58669-h/58669-h.htm`
+
+Test
+====
+use `python setup.py test`
+
+Travis-CI will run tests on branches committed in the gutenbergtools org
