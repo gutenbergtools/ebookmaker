@@ -39,12 +39,11 @@ setup (
         'cherrypy',
         'cssutils',
         'docutils>=0.14',
-        'libgutenberg>=0.2.0',
         'lxml',
         'roman',
         'requests',
         'six>=1.4.1',
-        'setuptools',
+        'libgutenberg>=0.3.0',
     ],
 
     package_data = {
