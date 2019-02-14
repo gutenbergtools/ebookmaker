@@ -1,3 +1,25 @@
+0.6.0 February 14, 2019
+
+- command line additions
+1. set cover url
+2. generate cove flag
+
+- cover should be first in reading order
+- covers can be png
+- added tests
+- added travis
+- fixed some import issues exposed by testing
+- expected conversion skipping is a warning, not an error
+- fixed issue when there's no stylesheet -- thanks to ray
+- stop putting silly tag attribute into html
+
+
+0.5.0 January 10, 2019
+
+Moved Borg options class to libgutenberg
+distutils --> setuptools
+
+
 0.4.1a1
 
 don't be using builtins as a backdoor global
