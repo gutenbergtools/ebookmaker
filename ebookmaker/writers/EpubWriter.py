@@ -678,7 +678,7 @@ class ContentOPF (object):
         for item in xpath (
                 self.manifest,
                 # cannot xpath for default namespace
-                "//*[local-name () = 'item' and starts-with (@media-type, 'image/jpeg') and @href = $url]",
+                "//*[local-name () = 'item' and (starts-with (@media-type, 'image/jpeg') or starts-with (@media-type, 'image/png')) and @href = $url]",
                 url = url):
 
             id_ = item.get ('id')
@@ -686,9 +686,17 @@ class ContentOPF (object):
 
         # else use default cover page image
         if id_ is None:
-            url = 'cover.jpg'
-            mediatype = mt.jpeg
-            ocf.add_bytes (url, resource_string ('ebookmaker.writers', url), mediatype)
+            ext = url.split('.')[-1]
+            try:
+                mediatype = getattr(mt, ext)
+            except AttributeError:
+                mediatype = mt.jpeg
+            try:
+                with open(url, 'r') as f:
+                    ocf.add_bytes (Writer.url2filename (url), f.read(), mediatype)
+            except IOError:
+                url = 'cover.jpg'
+                ocf.add_bytes (url, resource_string ('ebookmaker.writers', url), mediatype)
             id_ = self.manifest_item (url, mediatype)
 
         debug ("Adding coverpage id: %s url: %s" % (id_, url))
@@ -698,7 +706,7 @@ class ContentOPF (object):
 
         # register ADE style
         href = ocf.add_image_wrapper (Writer.url2filename (url), 'Cover')
-        self.spine_item (href, mt.xhtml, 'coverpage-wrapper', False, True)
+        self.spine_item (href, mt.xhtml, 'coverpage-wrapper', True, True)
         self.guide_item (href, 'cover', 'Cover')
 
 

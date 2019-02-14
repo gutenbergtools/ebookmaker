@@ -30,6 +30,7 @@ import libgutenberg.GutenbergGlobals as gg
 from libgutenberg.Logger import debug, warning, error, exception
 from libgutenberg import Logger, DublinCore
 from libgutenberg import MediaTypes as mt
+from libgutenberg import Cover
 
 from ebookmaker import parsers
 from ebookmaker import ParserFactory
@@ -94,6 +95,8 @@ FILENAMES = {
 
     'picsdir.noimages': '{id}-noimages.picsdir',   # do we need this ?
     'picsdir.images':   '{id}-images.picsdir',     # do we need this ?
+
+    'cover':            '{id}-cover.png'
 }
 
 COVERPAGE_MIN_AREA = 200 * 200
@@ -109,11 +112,10 @@ def make_output_filename (type_, dc):
         return FILENAMES[type_].format (id = gg.string_to_filename (dc.title)[:65])
 
 
-def elect_coverpage (spider):
+def elect_coverpage (spider, url):
     """ Find first coverpage candidate that is not too small. """
 
     coverpage_found = False
-
     for p in spider.parsers:
         if 'coverpage' in p.attribs.rel:
             if coverpage_found:
@@ -128,13 +130,38 @@ def elect_coverpage (spider):
                              (p.url, dimen[0], dimen[1]))
                     continue
             coverpage_found = True
-
+    if not coverpage_found and options.generate_cover :
+        dir = os.path.dirname (os.path.abspath (url))
+        debug ('generating cover in %s' % dir)
+        cover_url = generate_cover (dir)
+        cover_parser = ParserFactory.ParserFactory.create (cover_url)
+        cover_parser.attribs.rel.add ('coverpage')
+        cover_parser.pre_parse()
+        spider.parsers.append (cover_parser)
+        
+        
+        
+def generate_cover(dir):
+    try:
+        cover_image = Cover.draw (options.dc)
+        cover_url = os.path.join(dir, make_output_filename ('cover', options.dc))
+        with open (cover_url, 'wb+') as cover:
+            cover_image.save (cover)
+        return cover_url
+    except OSError:
+        error ("OSError, probably Cairo not installed.")
+        return None
 
 def get_dc (url):
     """ Get DC for book. """
 
     parser = ParserFactory.ParserFactory.create (url)
     parser.parse ()
+    
+    # this is needed because the the document is not parsed again
+    if options.coverpage_url:
+        parser._make_coverpage_link (coverpage_url=options.coverpage_url)
+
 
     dc = DublinCore.GutenbergDublinCore ()
     try:
@@ -309,6 +336,18 @@ def add_local_options (ap):
         help    = "PG internal use only: which packager to use (default: none)")
 
     ap.add_argument (
+        "--cover",
+        dest    = "coverpage_url",
+        default = None,
+        help    = "use the cover specified by an absolute url")
+
+    ap.add_argument (
+        "--generate_cover",
+        dest    = "generate_cover",
+        action  = "store_true",
+        help    = "if no cover is specified by the source, or as an argument, generate a cover")
+
+    ap.add_argument (
         "--jobs",
         dest    = "is_job_queue",
         action  = "store_true",
@@ -377,12 +416,13 @@ def do_job (job):
             attribs = parsers.ParserAttributes ()
             attribs.url = job.url
             attribs.id = 'start'
+            
             if options.input_mediatype:
                 attribs.orig_mediatype = attribs.HeaderElement.from_str (
                     options.input_mediatype)
 
             spider.recursive_parse (attribs)
-            elect_coverpage (spider)
+            elect_coverpage (spider, job.url)
             job.url = spider.redirect (job.url)
             job.base_url = job.url
             job.spider = spider
@@ -459,7 +499,7 @@ def main ():
     if options.is_job_queue:
         job_queue = cPickle.load (sys.stdin.buffer) # read bytes
     else:
-        options.dc = get_dc (options.url)
+        options.dc = get_dc (options.url) # this is when doc at url gets parsed!
         job_queue = []
         output_files = dict ()
         for type_ in options.types:

@@ -326,12 +326,13 @@ class Parser (HTMLParserBase):
                 elem.tag = NS.xhtml.p
 
 
-    def _make_coverpage_link (self):
+    def _make_coverpage_link (self, coverpage_url = None):
         """ Insert a <link rel="coverpage"> in the html head.
 
         First we determine the coverpage url.  In HTML we find the
         coverpage by appling these rules:
 
+          0. the image specified by the --cover command-line option
           1. the image specified in <link rel='coverpage'>,
           2. the image with an id of 'coverpage' or
           3. the image with an url containing 'cover'
@@ -342,6 +343,17 @@ class Parser (HTMLParserBase):
         """
 
         coverpages = xpath (self.xhtml, "//xhtml:link[@rel='coverpage']")
+        
+        if coverpage_url:
+            for coverpage in coverpages:
+                coverpage['src'] = coverpage_url
+                debug ("overrode link to coverpage with %s." % coverpage_url)
+            else:
+                for head in xpath (self.xhtml, "/xhtml:html/xhtml:head"):
+                    head.append (parsers.em.link (rel = 'coverpage', href = coverpage_url))
+                    debug ("Inserted link to coverpage %s." % coverpage_url)
+            return
+        
         for coverpage in coverpages:
             url = coverpage.get ('src')
             debug ("Found link to coverpage %s." % url)
