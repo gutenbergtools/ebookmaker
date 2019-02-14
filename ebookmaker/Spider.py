@@ -80,21 +80,21 @@ class Spider (object):
 
             # look for more documents to add to the queue
             debug ("Requesting iterlinks for: %s ..." % url)
-            for url, link_attr in parser.iterlinks ():
+            for url, elem in parser.iterlinks ():
 
                 new_attribs = parsers.ParserAttributes ()
                 new_attribs.url = urllib.parse.urldefrag (url)[0]
                 new_attribs.referrer = parser.attribs.url
 
-                for k, v in link_attr.items ():
-                    if k in ('tag', 'id', 'title'):
+                for k, v in elem.items ():
+                    if k in ('id', 'title'):
                         setattr (new_attribs, k, v)
                     elif k == 'type':
                         new_attribs.orig_mediatype = new_attribs.HeaderElement.from_str (v)
                     elif k == 'rel':
                         new_attribs.rel.update (v.lower ().split ())
 
-                tag = link_attr.get ('tag')
+                tag = elem.tag
                 if tag == NS.xhtml.a:
                     self.enqueue (queue, depth + 1, new_attribs, True)
                 elif tag == NS.xhtml.img:

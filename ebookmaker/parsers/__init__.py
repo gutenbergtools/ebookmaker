@@ -344,8 +344,7 @@ class HTMLParserBase (ParserBase):
         # iterate links
 
         for (elem, dummy_attribute, url, dummy_pos) in self.xhtml.iterlinks ():
-            elem.attrib['tag'] = elem.tag
-            yield url, elem.attrib
+            yield url, elem
 
 
     def rewrite_links (self, f):
