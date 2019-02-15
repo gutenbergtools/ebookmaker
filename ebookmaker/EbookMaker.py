@@ -226,6 +226,12 @@ def add_local_options (ap):
         "(0 == infinite) (default: %(default)s)")
 
     ap.add_argument (
+        "--strip_links",
+        dest    = "strip_links",
+        action  = "store_true",
+        help    = "strip  <a href='external address' /> links")
+
+    ap.add_argument (
         "--include",
         metavar = "GLOB",
         dest    = "include_urls",

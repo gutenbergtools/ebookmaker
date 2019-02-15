@@ -152,6 +152,7 @@ IMAGE_WRAPPER = """<?xml version="1.0"?>
   </body>
 </html>"""
 
+match_link_url = re.compile (r'^https?://', re.I)
 
 class OEBPSContainer (zipfile.ZipFile):
     """ Class representing an OEBPS Container. """
@@ -908,12 +909,13 @@ class Writer (writers.HTMLishWriter):
         are targets of links. EPUB does not allow that.
 
         """
-        for link in xpath (xhtml, '//xhtml:a[@href]'):
-            href = urllib.parse.urldefrag (link.get ('href'))[0]
-            if not manifest[href] in OPS_CONTENT_DOCUMENTS:
-                debug ("strip_links: Deleting <a> to non-ops-document-type: %s" % href)
-                del link.attrib['href']
-                continue
+        if options.strip_links:
+            for link in xpath (xhtml, '//xhtml:a[@href]'):
+                href = urllib.parse.urldefrag (link.get ('href'))[0]
+                if not manifest[href] in OPS_CONTENT_DOCUMENTS:
+                    debug ("strip_links: Deleting <a> to non-ops-document-type: %s" % href)
+                    del link.attrib['href']
+                    continue
 
 
     @staticmethod
@@ -1037,7 +1039,8 @@ class Writer (writers.HTMLishWriter):
 
 
         """
-
+        if match_link_url.match (url):
+            return url
         def escape (matchobj):
             """ Escape a char. """
             return '@%x' % ord (matchobj.group (0))
@@ -1284,10 +1287,12 @@ class Writer (writers.HTMLishWriter):
                     chunker.split (xhtml, p.attribs)
 
             for p in job.spider.parsers:
+                if str(p.attribs.mediatype) == 'text/css':
+                    p.parse()
                 if hasattr(p, 'sheet') and p.sheet:
                     self.fix_incompatible_css (p.sheet)
-                    p.rewrite_links (self.url2filename)
-                    parsers.append (p)
+                p.rewrite_links (self.url2filename)
+                parsers.append (p)
 
             # after splitting html into chunks we have to rewrite all
             # internal links in HTML
