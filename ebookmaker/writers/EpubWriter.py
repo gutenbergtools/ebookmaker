@@ -972,10 +972,12 @@ class Writer (writers.HTMLishWriter):
             try:
                 pre.tag = NS.xhtml.div
                 writers.HTMLishWriter.add_class (pre, 'pgmonospaced')
-                m = parsers.RE_GUTENBERG.search (pre.text)
-                if m:
-                    writers.HTMLishWriter.add_class (pre, 'pgheader')
-
+                try:
+                    m = parsers.RE_GUTENBERG.search (pre.text)
+                    if m:
+                        writers.HTMLishWriter.add_class (pre, 'pgheader')
+                except TypeError:
+                    pass
                 tail = pre.tail
                 s = etree.tostring (pre, encoding = six.text_type, with_tail=False)
                 s = s.replace ('>\n', '>')      # eliminate that empty first line
