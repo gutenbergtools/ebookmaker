@@ -28,9 +28,6 @@ class TestFromHtm(unittest.TestCase):
             "%s-images-epub.epub",
             "%s-noimages-h.html",
             "%s-h.html",
-            "%s.txt",
-            "%s-8.txt",
-            "%s-0.txt",
         ]
         for out in outs:
             self.assertTrue(os.path.exists(os.path.join(dir, out % book_id)))
@@ -53,9 +50,6 @@ class TestFromHtm(unittest.TestCase):
             "%s-images-epub.epub",
             "%s-noimages-h.html",
             "%s-h.html",
-            "%s.txt",
-            "%s-8.txt",
-            "%s-0.txt",
             "%s-cover.png",
         ]
         for out in outs:

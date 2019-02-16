@@ -47,7 +47,7 @@ CONFIG_FILES = ['/etc/ebookmaker.conf', os.path.expanduser ('~/.ebookmaker')]
 
 DEPENDENCIES = collections.OrderedDict ((
     ('all',             ('html', 'epub', 'kindle', 'pdf', 'txt', 'rst')),
-    ('test',            ('html', 'epub', 'pdf', 'txt', 'rst')),
+    ('test',            ('html', 'epub')),
     ('html',            ('html.images',    'html.noimages')),
     ('epub',            ('epub.images',    'epub.noimages')),
     ('kindle',          ('kindle.images',  'kindle.noimages')),
