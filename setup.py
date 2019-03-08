@@ -55,7 +55,7 @@ setup (
     },
 
     data_files = [
-        ('', ['CHANGES', 'README']),
+        ('', ['CHANGES', 'README.md']),
     ],
 
     # metadata for upload to PyPI
@@ -64,7 +64,7 @@ setup (
     maintainer = "Eric Hellman",
     maintainer_email = "eric@hellman.net",
     description = "The Project Gutenberg tool to generate EPUBs and other ebook formats.",
-    long_description = open ('README').read (),
+    long_description = open ('README.md').read (),
     license = "GPL v3",
     keywords = "ebook epub kindle pdf rst reST reStructuredText project gutenberg format conversion",
     url = "https://github.com/gutenbergtools/ebookmaker/",
