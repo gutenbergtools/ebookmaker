@@ -45,7 +45,7 @@ setup (
         'six>=1.4.1',
         'libgutenberg>=0.3.0',
     ],
-
+    
     package_data = {
         'ebookmaker.parsers': ['broken.png'],
         'ebookmaker.writers': ['cover.jpg'],
