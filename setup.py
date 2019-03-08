@@ -43,7 +43,7 @@ setup (
         'roman',
         'requests',
         'six>=1.4.1',
-        'libgutenberg>=0.3.0',
+        'libgutenberg[covers]>=0.3.0',
     ],
     
     package_data = {

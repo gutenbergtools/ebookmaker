@@ -26,7 +26,7 @@ Install
 =======
 
 (dev branch, editable install)
-`pipenv install -e git+https://github.com/gutenbergtools/libgutenberg.git@dev#egg=libgutenberg`
+`pipenv install -e git+https://github.com/gutenbergtools/libgutenberg.git@dev#egg=libgutenberg[covers]`
 `pipenv install -e git+https://github.com/gutenbergtools/ebookmaker@dev#egg=ebookmaker`
 
 Use the ebookmaker.conf file to pass a path to your kindlegen, tex, and groff programs if they're not in your PATH
