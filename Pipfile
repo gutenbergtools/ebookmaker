@@ -8,4 +8,4 @@ name = "pypi"
 [packages]
 e1839a8 = {path = ".",editable = true}
 ebookmaker = {editable = true,path = "."}
-libgutenberg = {editable = true,extras = ["covers"],git = "https://github.com/gutenbergtools/libgutenberg.git",ref = "dev"}
+libgutenberg = "*"

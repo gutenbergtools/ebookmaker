@@ -19,8 +19,7 @@ Tested with Python 3.6
 ## Install
 
 (dev branch, editable install)
-`pipenv install -e git+https://github.com/gutenbergtools/libgutenberg.git@dev#egg=libgutenberg[covers]`
-`pipenv install -e git+https://github.com/gutenbergtools/ebookmaker@dev#egg=ebookmaker`
+`pipenv install ebookmaker`
 
 Use the ebookmaker.conf file to pass a path to your kindlegen, tex, and groff programs if they're not in your PATH
 
@@ -44,14 +43,13 @@ Change directories to where you want to have your ebookmaker environment. Then, 
 
 `$ pipenv --three`
 
-Whenever you want to enter this environmet, move to this directory and do:
+Whenever you want to enter this environment, move to this directory and do:
 
 `$ pipenv shell`
  
 Install the gutenberg modules:
 
-`$ pipenv install -e git+https://github.com/gutenbergtools/libgutenberg.git@dev#egg=libgutenberg[covers]`
-`$ pipenv install -e git+https://github.com/gutenbergtools/ebookmaker@dev#egg=ebookmaker`
+`$ pipenv install ebookmaker`
 
 Check your install:
 
