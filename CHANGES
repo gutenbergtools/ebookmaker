@@ -1,3 +1,13 @@
+0.6.1 May 9, 2019
+
+- added strip_links command-line option. turn it off to stop EbookMaker from stripping links in EPUB and MOBI output
+- the test_htm not longer tries conversion to pdf or rst
+- fixed conversion failure when html contains '<pre><code /></pre>'
+- corrected install directions
+- readme is now markdown
+- fix python 3.6.7 compatibility issue when dbm_gnu not present
+- added tests for loading parsers, loaders and packagers
+
 0.6.0 February 14, 2019
 
 - command line additions
