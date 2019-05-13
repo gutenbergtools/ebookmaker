@@ -1,3 +1,7 @@
+0.6.2 May 10, 2019
+
+- updated libgutenberg requirement. itd DublinCore class depended on the installation of '_' that was removed in ebookmaker 0.4.1a1
+
 0.6.1 May 9, 2019
 
 - added strip_links command-line option. turn it off to stop EbookMaker from stripping links in EPUB and MOBI output
