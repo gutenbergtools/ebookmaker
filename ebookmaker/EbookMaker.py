@@ -158,7 +158,7 @@ def get_dc (url):
 
     dc.project_gutenberg_id = options.ebook or dc.project_gutenberg_id
     if dc.project_gutenberg_id:
-        dc.opf_identifier = ('http://www.gutenberg.org/ebooks/%d' % dc.project_gutenberg_id)
+        dc.opf_identifier = ('https://www.gutenberg.org/ebooks/%d' % dc.project_gutenberg_id)
     else:
         dc.opf_identifier = ('urn:mybooks:%s' %
                              hashlib.md5 (dc.source.encode ('utf-8')).hexdigest ())

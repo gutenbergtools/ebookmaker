@@ -125,7 +125,7 @@ class ParserFactory (object):
             url,
             stream = True,
             headers = {
-                'User-Agent': "EbookMaker/%s (+http://pypi.python.org/ebookmaker)" % VERSION
+                'User-Agent': "EbookMaker/%s (+https://pypi.python.org/ebookmaker)" % VERSION
             },
             proxies = options.config.PROXIES
         )

@@ -105,7 +105,7 @@ class VariablesTransform (docutils.transforms.Transform):
                 sub (variable, [ nodes.inline ('', getone ('PG.Credits', '')) ])
 
             elif name == 'pg.bibrec-url':
-                url = 'http://www.gutenberg.org/ebooks/%s' % getone ('PG.Id', '999999')
+                url = 'https://www.gutenberg.org/ebooks/%s' % getone ('PG.Id', '999999')
                 sub (variable, [ nodes.reference ('', '', nodes.inline ('', url), refuri = url) ])
 
             elif name in ('pg.copyrighted-header', 'pg.copyrighted-footer'):

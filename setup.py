@@ -67,7 +67,7 @@ setup (
     long_description = open ('README').read (),
     license = "GPL v3",
     keywords = "ebook epub kindle pdf rst reST reStructuredText project gutenberg format conversion",
-    url = "http://pypi.python.org/pypi/ebookmaker/",
+    url = "https://pypi.python.org/pypi/ebookmaker/",
 
     classifiers = [
         "Topic :: Text Processing",
