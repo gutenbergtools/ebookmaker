@@ -21,6 +21,9 @@ from libgutenberg.GutenbergGlobals import SkipOutputFormat
 
 from ebookmaker import ParserFactory
 from ebookmaker import writers
+from ebookmaker.CommonCode import Options
+
+options = Options()
 
 class Writer (writers.BaseWriter):
     """ Class to write PDF. """
