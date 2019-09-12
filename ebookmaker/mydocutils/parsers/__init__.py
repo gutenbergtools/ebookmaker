@@ -650,6 +650,7 @@ class Inliner (states.Inliner):
 
     def init_customizations (self, settings):
         """ Setting-based customizations; run when parsing begins. """
+        super().init_customizations (settings)
 
         # self.implicit_dispatch.append ((self.re_newline, self.newline))
         self.implicit_dispatch.append ((self.re_variable, self.variable))
@@ -737,6 +738,13 @@ class Inliner (states.Inliner):
             return [reference]
         else:
             raise states.MarkupMismatch
+
+# copy states.Inliner properties to Inliner so that init_customizations method works
+# this is needed because init_customizations depends on locals(), which seems like a bad practice
+#
+for prop, val in states.Inliner.__dict__.items():
+    if not prop.startswith('_'):
+        setattr(Inliner, prop, val)
 
 
 class Body (states.Body):
