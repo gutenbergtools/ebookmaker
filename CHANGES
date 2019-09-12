@@ -1,3 +1,8 @@
+0.6.3 September 12, 2019
+
+- fixed parsing of rst files in MyDocUtils
+- fixed undefined options in TxtWriter and PdfWriter
+
 0.6.2 May 10, 2019
 
 - updated libgutenberg requirement. itd DublinCore class depended on the installation of '_' that was removed in ebookmaker 0.4.1a1
