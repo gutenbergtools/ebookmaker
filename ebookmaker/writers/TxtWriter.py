@@ -24,6 +24,9 @@ from libgutenberg.GutenbergGlobals import SkipOutputFormat
 
 from ebookmaker import ParserFactory
 from ebookmaker import writers
+from ebookmaker.CommonCode import Options
+
+options = Options()
 
 # map some not-widely-supported characters to more common ones
 u2u = {
