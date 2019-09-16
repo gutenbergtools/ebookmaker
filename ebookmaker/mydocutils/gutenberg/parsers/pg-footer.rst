@@ -62,7 +62,7 @@ distribution of electronic works, by using or distributing this work
 (or any other work associated in any way with the phrase “Project
 Gutenberg”), you agree to comply with all the terms of the Full
 Project Gutenberg™ License available with this file or online at
-http://www.gutenberg.org/license.
+https://www.gutenberg.org/license.
 
 
 Section 1. General Terms of Use & Redistributing Project Gutenberg™ electronic works
@@ -131,7 +131,7 @@ performed, viewed, copied or distributed:
   and most other parts of the world at no cost and with almost no
   restrictions whatsoever. You may copy it, give it away or re-use it
   under the terms of the Project Gutenberg License included with this
-  eBook or online at http://www.gutenberg.org .  If you are not
+  eBook or online at https://www.gutenberg.org .  If you are not
   located in the United States, you'll have to check the laws of the
   country where you are located before using this ebook.
 
@@ -171,7 +171,7 @@ any word processing or hypertext form. However, if you provide access
 to or distribute copies of a Project Gutenberg™ work in a format other
 than “Plain Vanilla ASCII” or other format used in the official
 version posted on the official Project Gutenberg™ web site
-(http://www.gutenberg.org), you must, at no additional cost, fee or
+(https://www.gutenberg.org), you must, at no additional cost, fee or
 expense to the user, provide a copy, a means of exporting a copy, or a
 means of obtaining a copy upon request, of the work in its original
 “Plain Vanilla ASCII” or other form. Any alternate format must include
@@ -318,7 +318,7 @@ The Project Gutenberg Literary Archive Foundation is a non profit
 state of Mississippi and granted tax exempt status by the Internal
 Revenue Service. The Foundation's EIN or federal tax identification
 number is 64-6221541. Its 501(c)(3) letter is posted at
-http://www.gutenberg.org/fundraising/pglaf . Contributions to the
+https://www.gutenberg.org/fundraising/pglaf . Contributions to the
 Project Gutenberg Literary Archive Foundation are tax deductible to
 the full extent permitted by U.S.  federal laws and your state's laws.
 
@@ -355,7 +355,7 @@ considerable effort, much paperwork and many fees to meet and keep up
 with these requirements. We do not solicit donations in locations
 where we have not received written confirmation of compliance. To SEND
 DONATIONS or determine the status of compliance for any particular
-state visit http://www.gutenberg.org/fundraising/donate
+state visit https://www.gutenberg.org/fundraising/donate
 
 While we cannot and do not solicit contributions from states where we
 have not met the solicitation requirements, we know of no prohibition
@@ -369,7 +369,7 @@ outside the United States. U.S. laws alone swamp our small staff.
 Please check the Project Gutenberg Web pages for current donation
 methods and addresses. Donations are accepted in a number of other
 ways including checks, online payments and credit card donations. To
-donate, please visit: http://www.gutenberg.org/fundraising/donate
+donate, please visit: https://www.gutenberg.org/fundraising/donate
 
 
 Section 5. General Information About Project Gutenberg™ electronic works.
@@ -399,7 +399,7 @@ eBooks receiving new filenames and etext numbers.
 Most people start at our Web site which has the main PG search
 facility:
 
-  http://www.gutenberg.org
+  https://www.gutenberg.org
 
 This Web site includes information about Project Gutenberg™, including
 how to make donations to the Project Gutenberg Literary Archive
