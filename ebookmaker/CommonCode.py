@@ -76,12 +76,19 @@ def add_common_options (ap, user_config_file):
         default  = user_config_file,
         help     = "read config file (default: %(default)s)")
 
+def set_arg_defaults(ap, config_file):
+    # get default command-line args
+    cp = configparser.ConfigParser ()
+    cp.read (config_file)
+    if cp.has_section('default_args'):
+        ap.set_defaults(**dict(cp.items('default_args')))
 
 def parse_config_and_args (ap, sys_config, defaults = None):
 
+    # put command-line args into options
     options.update(vars(ap.parse_args ()))
 
-    cp = configparser.ConfigParser (defaults)
+    cp = configparser.ConfigParser ()
     cp.read ((sys_config, options.config_file))
 
     options.config = Struct ()
