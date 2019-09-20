@@ -80,8 +80,8 @@ def set_arg_defaults(ap, config_file):
     # get default command-line args
     cp = configparser.ConfigParser ()
     cp.read (config_file)
-    if cp.has_section('default_args'):
-        ap.set_defaults(**dict(cp.items('default_args')))
+    if cp.has_section('DEFAULT_ARGS'):
+        ap.set_defaults(**dict(cp.items('DEFAULT_ARGS')))
 
 def parse_config_and_args (ap, sys_config, defaults = None):
 
