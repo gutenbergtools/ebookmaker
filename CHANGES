@@ -1,3 +1,7 @@
+0.7.0 September 20, 2019
+
+- config files can now be used to provide defaults for most command line arguments.
+
 0.6.4 September 16, 2019
 
 - added updates so that gutenberg canonical url is always https
