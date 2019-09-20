@@ -13,7 +13,7 @@
    and most other parts of the world at no cost and with almost no
    restrictions whatsoever. You may copy it, give it away or re-use it
    under the terms of the `Project Gutenberg License`_ included with
-   this ebook or online at http://www.gutenberg.org/license. If you
+   this ebook or online at https://www.gutenberg.org/license. If you
    are not located in the United States, you'll have to check the laws
    of the country where you are located before using this ebook.
 

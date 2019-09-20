@@ -43,6 +43,8 @@ from ebookmaker.Version import VERSION
 
 options = Options()
 
+# store paths for system utilities in CONFIG_FILES[0]
+# store default command line args in [default_args] section of CONFIG_FILES[1]
 CONFIG_FILES = ['/etc/ebookmaker.conf', os.path.expanduser ('~/.ebookmaker')]
 
 DEPENDENCIES = collections.OrderedDict ((
@@ -187,7 +189,7 @@ def get_dc (url):
 
     dc.project_gutenberg_id = options.ebook or dc.project_gutenberg_id
     if dc.project_gutenberg_id:
-        dc.opf_identifier = ('http://www.gutenberg.org/ebooks/%d' % dc.project_gutenberg_id)
+        dc.opf_identifier = ('%sebooks/%d' % (gg.PG_URL, dc.project_gutenberg_id))
     else:
         dc.opf_identifier = ('urn:mybooks:%s' %
                              hashlib.md5 (dc.source.encode ('utf-8')).hexdigest ())
@@ -464,6 +466,7 @@ def config ():
     ap = argparse.ArgumentParser (prog = 'EbookMaker')
     CommonCode.add_common_options (ap, CONFIG_FILES[1])
     add_local_options (ap)
+    CommonCode.set_arg_defaults (ap, CONFIG_FILES[1])
 
     global options 
     options.update(vars(CommonCode.parse_config_and_args (
