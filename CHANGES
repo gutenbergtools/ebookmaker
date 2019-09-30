@@ -1,3 +1,8 @@
+0.7.1 September 30, 2019
+
+- fixed bug for pickled jobs; dc was previously passed silently via builtins in options 
+- fixed bug in cover generator when url is a file: url 
+
 0.7.0 September 20, 2019
 
 - config files can now be used to provide defaults for most command line arguments.
