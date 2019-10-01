@@ -133,6 +133,7 @@ def elect_coverpage (spider, url):
                     continue
             coverpage_found = True
     if not coverpage_found and options.generate_cover :
+        url = url[7:] if url.startswith ('file://') else url
         dir = os.path.dirname (os.path.abspath (url))
         debug ('generating cover in %s' % dir)
         cover_url = generate_cover (dir)
@@ -528,6 +529,7 @@ def main ():
             job_queue.append (job)
 
     for j in job_queue:
+        options.dc = j.dc
         do_job (j)
 
     packager = PackagerFactory.create (options.packager, 'push')
