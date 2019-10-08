@@ -137,10 +137,11 @@ def elect_coverpage (spider, url):
         dir = os.path.dirname (os.path.abspath (url))
         debug ('generating cover in %s' % dir)
         cover_url = generate_cover (dir)
-        cover_parser = ParserFactory.ParserFactory.create (cover_url)
-        cover_parser.attribs.rel.add ('coverpage')
-        cover_parser.pre_parse()
-        spider.parsers.append (cover_parser)
+        if cover_url:
+            cover_parser = ParserFactory.ParserFactory.create (cover_url)
+            cover_parser.attribs.rel.add ('coverpage')
+            cover_parser.pre_parse()
+            spider.parsers.append (cover_parser)
         
         
         
