@@ -147,13 +147,14 @@ def elect_coverpage (spider, url):
         
 def generate_cover(dir):
     try:
+        warning (options.dc.authors[0].marcrel)
         cover_image = Cover.draw (options.dc)
         cover_url = os.path.join(dir, make_output_filename ('cover', options.dc))
         with open (cover_url, 'wb+') as cover:
             cover_image.save (cover)
         return cover_url
     except OSError:
-        error ("OSError, probably Cairo not installed.")
+        error ("OSError, Cairo not installed or couldn't write file.")
         return None
 
 def get_dc (url):
