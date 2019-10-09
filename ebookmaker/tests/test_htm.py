@@ -54,10 +54,6 @@ class TestFromHtm(unittest.TestCase):
         ]
         for out in outs:
             self.assertTrue(os.path.exists(os.path.join(dir, out % book_id)))
-            os.remove(os.path.join(dir, out % book_id))
-        gencover = os.path.join(dir,  '%s-h' % book_id, "%s-cover.png" % book_id)
-        self.assertTrue(os.path.exists(gencover))
-        os.remove(gencover)
-                
+            os.remove(os.path.join(dir, out % book_id))                
             
         
