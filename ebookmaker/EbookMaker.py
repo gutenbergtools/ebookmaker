@@ -133,8 +133,11 @@ def elect_coverpage (spider, url):
                     continue
             coverpage_found = True
     if not coverpage_found and options.generate_cover :
-        url = url[7:] if url.startswith ('file://') else url
-        dir = os.path.dirname (os.path.abspath (url))
+        if options.outputdir:
+            dir = options.outputdir
+        else:
+            url = url[7:] if url.startswith ('file://') else url
+            dir = os.path.dirname (os.path.abspath (url))
         debug ('generating cover in %s' % dir)
         cover_url = generate_cover (dir)
         if cover_url:
@@ -147,7 +150,6 @@ def elect_coverpage (spider, url):
         
 def generate_cover(dir):
     try:
-        warning (options.dc.authors[0].marcrel)
         cover_image = Cover.draw (options.dc)
         cover_url = os.path.join(dir, make_output_filename ('cover', options.dc))
         with open (cover_url, 'wb+') as cover:
