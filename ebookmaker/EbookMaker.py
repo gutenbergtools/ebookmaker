@@ -534,6 +534,7 @@ def main ():
 
     for j in job_queue:
         options.dc = j.dc
+        options.outputdir = j.outputdir
         do_job (j)
 
     packager = PackagerFactory.create (options.packager, 'push')
