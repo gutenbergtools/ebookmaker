@@ -133,14 +133,18 @@ def elect_coverpage (spider, url):
                     continue
             coverpage_found = True
     if not coverpage_found and options.generate_cover :
-        url = url[7:] if url.startswith ('file://') else url
-        dir = os.path.dirname (os.path.abspath (url))
+        if options.outputdir:
+            dir = options.outputdir
+        else:
+            url = url[7:] if url.startswith ('file://') else url
+            dir = os.path.dirname (os.path.abspath (url))
         debug ('generating cover in %s' % dir)
         cover_url = generate_cover (dir)
-        cover_parser = ParserFactory.ParserFactory.create (cover_url)
-        cover_parser.attribs.rel.add ('coverpage')
-        cover_parser.pre_parse()
-        spider.parsers.append (cover_parser)
+        if cover_url:
+            cover_parser = ParserFactory.ParserFactory.create (cover_url)
+            cover_parser.attribs.rel.add ('coverpage')
+            cover_parser.pre_parse()
+            spider.parsers.append (cover_parser)
         
         
         
@@ -152,7 +156,7 @@ def generate_cover(dir):
             cover_image.save (cover)
         return cover_url
     except OSError:
-        error ("OSError, probably Cairo not installed.")
+        error ("OSError, Cairo not installed or couldn't write file.")
         return None
 
 def get_dc (url):
