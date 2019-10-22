@@ -1107,7 +1107,7 @@ class Writer (writers.HTMLishWriter):
             return # only the first one though
 
 
-    def shipout (self, job, parsers, ncx):
+    def shipout (self, job, parserlist, ncx):
         """ Build the zip file. """
 
         try:
@@ -1119,9 +1119,9 @@ class Writer (writers.HTMLishWriter):
 
             opf.metadata_item (job.dc)
 
-            # write out parsers
+            # write out parserlist
 
-            for p in parsers:
+            for p in parserlist:
                 try:
                     ocf.add_bytes (self.url2filename (p.attribs.url), p.serialize (),
                                    p.mediatype ())
@@ -1142,7 +1142,7 @@ class Writer (writers.HTMLishWriter):
             opf.toc_item ('toc.ncx')
             ocf.add_unicode ('toc.ncx', six.text_type (ncx))
 
-            for p in parsers:
+            for p in parserlist:
                 if 'coverpage' in p.attribs.rel:
                     opf.add_coverpage (ocf, p.attribs.url)
                     break
@@ -1198,7 +1198,7 @@ class Writer (writers.HTMLishWriter):
         """ Build epub """
 
         ncx = TocNCX (job.dc)
-        parsers = []
+        parserlist = []
         css_count = 0
 
         # add CSS parser
@@ -1225,7 +1225,7 @@ class Writer (writers.HTMLishWriter):
                         else:
                             np = p.resize_image (MAX_IMAGE_SIZE, MAX_IMAGE_DIMEN)
                         np.id = p.attribs.get ('id')
-                    parsers.append (np)
+                    parserlist.append (np)
 
             for p in job.spider.parsers:
                 if p.mediatype () in OPS_CONTENT_DOCUMENTS:
@@ -1294,7 +1294,7 @@ class Writer (writers.HTMLishWriter):
                 if hasattr(p, 'sheet') and p.sheet:
                     self.fix_incompatible_css (p.sheet)
                     p.rewrite_links (self.url2filename)
-                    parsers.append (p)
+                    parserlist.append (p)
 
             # after splitting html into chunks we have to rewrite all
             # internal links in HTML
@@ -1314,9 +1314,9 @@ class Writer (writers.HTMLishWriter):
             for chunk, attribs in chunker.chunks:
                 p = ParserFactory.ParserFactory.get (attribs)
                 p.xhtml = chunk
-                parsers.append (p)
+                parserlist.append (p)
 
-            self.shipout (job, parsers, ncx)
+            self.shipout (job, parserlist, ncx)
 
         except Exception as what:
             exception ("Error building Epub: %s" % what)
