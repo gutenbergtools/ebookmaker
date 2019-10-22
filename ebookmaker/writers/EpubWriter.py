@@ -302,7 +302,7 @@ class AdobePageMap (object):
                                  etree.tostring (root,
                                                  encoding = six.text_type,
                                                  pretty_print = True))
-        if options.verbose >= 2:
+        if options.verbose >= 3:
             debug (page_map)
         return page_map
 
@@ -377,7 +377,7 @@ class TocNCX (object):
                                                 doctype = gg.NCX_DOCTYPE,
                                                 encoding = six.text_type,
                                                 pretty_print = True))
-        if options.verbose >= 2:
+        if options.verbose >= 3:
             debug (toc_ncx)
         return toc_ncx
 
@@ -489,7 +489,7 @@ class ContentOPF (object):
         # now merge xmlns:opf and xmlns:
         content_opf = content_opf.replace ('lxml-bug-workaround', '')
 
-        if options.verbose >= 2:
+        if options.verbose >= 3:
             debug (content_opf)
         return content_opf
 
