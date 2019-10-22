@@ -132,7 +132,7 @@ def elect_coverpage (spider, url):
                              (p.url, dimen[0], dimen[1]))
                     continue
             coverpage_found = True
-    if not coverpage_found and options.generate_cover :
+    if spider.parsers and not coverpage_found and options.generate_cover :
         if options.outputdir:
             dir = options.outputdir
         else:
