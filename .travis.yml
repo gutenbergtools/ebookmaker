@@ -12,3 +12,4 @@ install:
   - 'pipenv install'
 
 script: python setup.py test
+
