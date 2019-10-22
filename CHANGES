@@ -1,8 +1,14 @@
-0.7.2 October 9, 2019
+0.7.4 October 21, 2019
+
+- fixed bug where a cover is always generated during conversion to kindle
+- epub generated files are now only saved to log for -v -v -v
+
+0.7.3 October 9, 2019
 
 - fixed bug where if generated cover can't be written, ebookfile is not made
 - when outputdir is specified, cover is written to outputdir
 - updated libgutenberg to support 'aut' in marcrel covers 
+- unloaded outputdir from job queue, as it had been passing in options
 
 0.7.1 September 30, 2019
 
