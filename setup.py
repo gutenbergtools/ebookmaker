@@ -4,7 +4,7 @@
 
 from setuptools import setup
 
-VERSION = '0.7.4'
+VERSION = '0.7.5'
 
 setup (
     name = 'ebookmaker',
@@ -43,7 +43,7 @@ setup (
         'roman',
         'requests',
         'six>=1.4.1',
-        'libgutenberg[covers]>=0.4.1',
+        'libgutenberg[covers]>=0.5.0',
     ],
     
     package_data = {

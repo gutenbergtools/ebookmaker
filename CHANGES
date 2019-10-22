@@ -1,3 +1,9 @@
+0.7.5 October 22, 2019
+
+- deconflicted an overloaded "parsers" variable
+- fix parse failure when an htm file links to valid xml (not xhtml)
+- updated libgutenberg to correctly handle music files.
+
 0.7.4 October 21, 2019
 
 - fixed bug where a cover is always generated during conversion to kindle
