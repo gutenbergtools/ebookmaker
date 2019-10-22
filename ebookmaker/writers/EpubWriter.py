@@ -1246,48 +1246,51 @@ class Writer (writers.HTMLishWriter):
                     else:
                         # make a copy so we can mess around
                         p.parse ()
-                        xhtml = copy.deepcopy (p.xhtml)
+                        xhtml = copy.deepcopy (p.xhtml) if hasattr (p, 'xhtml') else None
+                    if xhtml:
+                        strip_classes = self.get_classes_that_float (xhtml)
+                        strip_classes = strip_classes.intersection (STRIP_CLASSES)
+                        if strip_classes:
+                            self.strip_pagenumbers (xhtml, strip_classes)
 
-                    strip_classes = self.get_classes_that_float (xhtml)
-                    strip_classes = strip_classes.intersection (STRIP_CLASSES)
-                    if strip_classes:
-                        self.strip_pagenumbers (xhtml, strip_classes)
+                        # build up TOC
+                        # has side effects on xhtml
+                        ncx.toc += p.make_toc (xhtml)
 
-                    # build up TOC
-                    # has side effects on xhtml
-                    ncx.toc += p.make_toc (xhtml)
+                        self.insert_root_div (xhtml)
+                        self.fix_charset (xhtml)
+                        self.fix_style_elements (xhtml)
+                        self.reflow_pre (xhtml)
 
-                    self.insert_root_div (xhtml)
-                    self.fix_charset (xhtml)
-                    self.fix_style_elements (xhtml)
-                    self.reflow_pre (xhtml)
+                        # strip all links to items not in manifest
+                        p.strip_links (xhtml, job.spider.dict_urls_mediatypes ())
+                        self.strip_links (xhtml, job.spider.dict_urls_mediatypes ())
 
-                    # strip all links to items not in manifest
-                    p.strip_links (xhtml, job.spider.dict_urls_mediatypes ())
-                    self.strip_links (xhtml, job.spider.dict_urls_mediatypes ())
+                        self.strip_noepub (xhtml)
+                        # self.strip_rst_dropcaps (xhtml)
 
-                    self.strip_noepub (xhtml)
-                    # self.strip_rst_dropcaps (xhtml)
+                        self.fix_html_image_dimensions (xhtml)
+                        if coverpage_url:
+                            self.remove_coverpage (xhtml, coverpage_url)
 
-                    self.fix_html_image_dimensions (xhtml)
-                    if coverpage_url:
-                        self.remove_coverpage (xhtml, coverpage_url)
+                        # externalize and fix CSS
+                        for style in xpath (xhtml, '//xhtml:style'):
+                            self.add_external_css (
+                                job.spider, xhtml, style.text, "%d.css" % css_count)
+                            css_count += 1
+                            style.drop_tree ()
 
-                    # externalize and fix CSS
-                    for style in xpath (xhtml, '//xhtml:style'):
-                        self.add_external_css (
-                            job.spider, xhtml, style.text, "%d.css" % css_count)
-                        css_count += 1
-                        style.drop_tree ()
+                        self.add_external_css (job.spider, xhtml, None, 'pgepub.css')
 
-                    self.add_external_css (job.spider, xhtml, None, 'pgepub.css')
+                        self.add_meta_generator (xhtml)
 
-                    self.add_meta_generator (xhtml)
-
-                    debug ("Splitting %s ..." % p.attribs.url)
-                    chunker.next_id = 0
-                    chunker.split (xhtml, p.attribs)
-
+                        debug ("Splitting %s ..." % p.attribs.url)
+                        chunker.next_id = 0
+                        chunker.split (xhtml, p.attribs)
+                    else:
+                        # parsing xml worked, but it isn't xhtml. so we need to reset mediatype 
+                        # to something that isn't recognized as content
+                        p.attribs.mediatype = parsers.ParserAttributes.HeaderElement ('text/xml')
             for p in job.spider.parsers:
                 if str(p.attribs.mediatype) == 'text/css':
                     p.parse()
