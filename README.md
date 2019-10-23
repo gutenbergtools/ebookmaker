@@ -8,11 +8,18 @@ Also it builds HTML4, EPUB2, Kindle, and PDF files from reST sources.
 
 ## Prerequisites
 
-* Python2 >= 2.7 or Python3 >= 3.3
+* Python2 >= 2.7 or Python3 >= 3.6
 * HTMLTidy,
 * Kindlegen,
-* TexLive, and
-* groff.
+* TexLive (to build from TeX), and
+* groff (not sure when this is needed).
+
+For cover generation
+
+* Cairo https://www.cairographics.org/download/
+* Noto Sans and Noto Sans CJK 
+    * `yum install google-noto-sans-cjk-fonts`
+    * `yum install google-noto-sans-fonts`
 
 Tested with Python 3.6
 
@@ -21,11 +28,24 @@ Tested with Python 3.6
 (dev branch, editable install)
 `pipenv install ebookmaker`
 
-Use the ebookmaker.conf file to pass a path to your kindlegen, tex, and groff programs if they're not in your PATH
+Use the ebookmaker.conf file to pass a path to your kindlegen, tex, and groff programs 
+if they're not in your PATH. Edit the ebookmaker.conf and copy it to /etc/ebookmaker.conf to 
+reset the paths.
+Copy ebookmaker.conf to ~/.ebookmaker to override settings in /etc/ebookmaker.conf or to set default 
+command line options.
 
 ## Sample invocation
 
+(From the directory where you ran `pipenv install`)
+
+`pipenv shell`
 `ebookmaker -v -v --make=epub.images --output-dir=/Documents/pg /Documents/library/58669/58669-h/58669-h.htm`
+
+or
+
+`pipenv run ebookmaker -v -v --make=epub.images --output-dir=/Documents/pg /Documents/library/58669/58669-h/58669-h.htm`
+
+
 
 ## Test
 
