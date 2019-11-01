@@ -59,6 +59,8 @@ Install pipenv  (might be `pip install --user pipenv`, depending on your default
 
 `$ pip3 install --user pipenv`
 
+The default install location is `${HOME}/.local/bin`, so add this to your login shell's ${PATH} if needed.
+
 Change directories to where you want to have your ebookmaker environment. Then, to initialize a python 3 virtual environment, do
 
 `$ pipenv --three`
