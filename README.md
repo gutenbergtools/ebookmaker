@@ -47,13 +47,7 @@ or
 
 
 
-## Test
-
-Use `python setup.py test`
-
-Travis-CI will run tests on branches committed in the gutenbergtools org
-
-## new to pipenv?
+# new to pipenv?
 
 Install pipenv  (might be `pip install --user pipenv`, depending on your default python)
 
@@ -81,4 +75,20 @@ Check your install:
 Since you're in the shell, you can navigate to a book's directory and convert it:
 
 `$ ebookmaker -v -v --make=epub.images --ebook 10001 --title "The Luck of the Kid" --author "Ridgwell Cullum" luck-kid.html`
+
+## Test
+
+Install, as above.
+
+`$ cd ebookmaker` to whever you ran `$ pip install ebookmaker`
+
+then:
+
+`$ git checkout dev`
+
+`$ pipenv install -e .`
+
+`$ python setup.py test`
+
+Travis-CI will run tests on branches committed in the gutenbergtools org
 
