@@ -9,17 +9,17 @@ Also it builds HTML4, EPUB2, Kindle, and PDF files from reST sources.
 ## Prerequisites
 
 * Python2 >= 2.7 or Python3 >= 3.6
-* HTMLTidy,
-* Kindlegen,
+* HTMLTidy (http://binaries.html-tidy.org/),
+* Kindlegen (https://www.amazon.com/gp/feature.html/?docId=1000765211),
 * TexLive (to build from TeX), and
 * groff (not sure when this is needed).
 
 For cover generation
 
 * Cairo https://www.cairographics.org/download/
-* Noto Sans and Noto Sans CJK 
-    * `yum install google-noto-sans-cjk-fonts`
-    * `yum install google-noto-sans-fonts`
+* Noto Sans and Noto Sans CJK:
+    * CentOS or RedHat: `yum install google-noto-sans-cjk-fonts; yum install google-noto-sans-fonts`
+    * Ubuntu: `apt-get install fonts-noto-cjk fonts-noto`
 
 Tested with Python 3.6
 
@@ -47,17 +47,13 @@ or
 
 
 
-## Test
-
-Use `python setup.py test`
-
-Travis-CI will run tests on branches committed in the gutenbergtools org
-
-## new to pipenv?
+# new to pipenv?
 
 Install pipenv  (might be `pip install --user pipenv`, depending on your default python)
 
 `$ pip3 install --user pipenv`
+
+The default install location is `${HOME}/.local/bin`, so add this to your login shell's ${PATH} if needed.
 
 Change directories to where you want to have your ebookmaker environment. Then, to initialize a python 3 virtual environment, do
 
@@ -79,4 +75,20 @@ Check your install:
 Since you're in the shell, you can navigate to a book's directory and convert it:
 
 `$ ebookmaker -v -v --make=epub.images --ebook 10001 --title "The Luck of the Kid" --author "Ridgwell Cullum" luck-kid.html`
+
+## Test
+
+Install, as above.
+
+`$ cd ebookmaker` to whever you ran `$ pip install ebookmaker`
+
+then:
+
+`$ git checkout dev`
+
+`$ pipenv install -e .`
+
+`$ python setup.py test`
+
+Travis-CI will run tests on branches committed in the gutenbergtools org
 
