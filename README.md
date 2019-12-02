@@ -17,9 +17,9 @@ Also it builds HTML4, EPUB2, Kindle, and PDF files from reST sources.
 For cover generation
 
 * Cairo https://www.cairographics.org/download/
-* Noto Sans and Noto Sans CJK 
-    * `yum install google-noto-sans-cjk-fonts`
-    * `yum install google-noto-sans-fonts`
+* Noto Sans and Noto Sans CJK:
+    * CentOS or RedHat: `yum install google-noto-sans-cjk-fonts; yum install google-noto-sans-fonts`
+    * Ubuntu: `apt-get install fonts-noto-cjk fonts-noto`
 
 Tested with Python 3.6
 
