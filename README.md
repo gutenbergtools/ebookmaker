@@ -76,6 +76,14 @@ Since you're in the shell, you can navigate to a book's directory and convert it
 
 `$ ebookmaker -v -v --make=epub.images --ebook 10001 --title "The Luck of the Kid" --author "Ridgwell Cullum" luck-kid.html`
 
+## Update
+
+`$ cd ebookmaker` to whever you ran `$ pip install ebookmaker`
+
+then:
+
+`$ pipenv update ebookmaker`
+
 ## Test
 
 Install, as above.
