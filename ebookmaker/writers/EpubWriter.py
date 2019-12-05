@@ -1247,7 +1247,7 @@ class Writer (writers.HTMLishWriter):
                         # make a copy so we can mess around
                         p.parse ()
                         xhtml = copy.deepcopy (p.xhtml) if hasattr (p, 'xhtml') else None
-                    if xhtml:
+                    if xhtml is not None:
                         strip_classes = self.get_classes_that_float (xhtml)
                         strip_classes = strip_classes.intersection (STRIP_CLASSES)
                         if strip_classes:

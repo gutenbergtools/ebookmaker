@@ -105,6 +105,9 @@ class Writer (writers.BaseWriter):
 
         if hasattr (parser, 'rst2nroff'):
             data = self.groff (job, parser.rst2nroff (job, encoding), encoding)
+        elif hasattr (parser, 'xhtml') and parser.xhtml is not None:
+            info ("Plain text file %s aborted due to html input" % filename)
+            return
         else:
             data = parser.unicode_content ()
 
