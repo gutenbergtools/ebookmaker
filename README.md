@@ -25,7 +25,7 @@ Tested with Python 3.6
 
 ## Install
 
-(dev branch, editable install)
+(master branch, editable install)
 `pipenv install ebookmaker`
 
 Use the ebookmaker.conf file to pass a path to your kindlegen, tex, and groff programs 
@@ -92,7 +92,7 @@ Install, as above.
 
 then:
 
-`$ git checkout dev`
+`$ git checkout master`
 
 `$ pipenv install -e .`
 
