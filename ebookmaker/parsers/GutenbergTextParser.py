@@ -25,8 +25,10 @@ from libgutenberg.Logger import warning, info, debug
 from libgutenberg.MediaTypes import mediatypes as mt
 
 from ebookmaker import parsers
+from ebookmaker.CommonCode import Options
 from ebookmaker.parsers import HTMLParserBase
 
+options = Options()
 mediatypes = (mt.txt, )
 
 MAX_BEFORE = 5 # no. of empty lines that mark a <h1>
@@ -138,16 +140,19 @@ class ParagraphMetrics (object):
     """ Calculates some metrics. """
 
     words = None
-
-    try:
-        fn = options.config.RHYMING_DICT
-        if fn is not None:
+    if hasattr(options, 'config'):
+        try:
             from six.moves import dbm_gnu
-            words = dbm_gnu.open (fn)
-    except ImportError:
-        warning ("No gnu dbm support found. Rhyming dictionary not used.")
-    except dbm_gnu.error:
-        warning ("File containing rhyming dictionary not found: %s" % fn)
+            try:
+                fn = options.config.RHYMING_DICT
+                if fn is not None:
+                    words = dbm_gnu.open (fn)
+            except dbm_gnu.error:
+                warning ("File containing rhyming dictionary not found: %s" % fn)
+        except (ModuleNotFoundError, ImportError):
+            warning ("No gnu dbm support found. Rhyming dictionary not used.")
+    else:
+        warning ("No config found. Rhyming dictionary not used.")
 
     def __init__ (self, par):
         """ Calculate metrics about this paragraph. """

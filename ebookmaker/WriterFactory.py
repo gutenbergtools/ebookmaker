@@ -19,6 +19,9 @@ import os.path
 from pkg_resources import resource_listdir # pylint: disable=E0611
 
 from libgutenberg.Logger import error, debug
+from ebookmaker.CommonCode import Options
+
+options = Options()
 
 writers = {}
 

@@ -21,6 +21,9 @@ from libgutenberg.GutenbergGlobals import SkipOutputFormat
 
 from ebookmaker import ParserFactory
 from ebookmaker import writers
+from ebookmaker.CommonCode import Options
+
+options = Options()
 
 class Writer (writers.BaseWriter):
     """ Class to write PDF. """
@@ -37,7 +40,7 @@ class Writer (writers.BaseWriter):
         parser = ParserFactory.ParserFactory.create (inputfilename)
 
         if not hasattr (parser, 'rst2xetex'):
-            error ('PDFWriter can only work on a RSTParser.')
+            warning ('Skipping PDF Output because input mediatype is %s' % parser.mediatype())
             raise SkipOutputFormat
 
         # Brain-dead xetex doesn't understand unix pipes

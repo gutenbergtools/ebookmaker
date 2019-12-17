@@ -34,7 +34,7 @@ from libgutenberg.GutenbergGlobals import NS
 from libgutenberg.Logger import info, debug, warning, error
 from libgutenberg.MediaTypes import mediatypes as mt
 
-from ebookmaker import ParserFactory
+from ebookmaker import ParserFactory, parsers
 from ebookmaker.parsers import HTMLParser, BROKEN
 
 from ebookmaker.mydocutils import nodes as mynodes
@@ -122,37 +122,35 @@ class Parser (HTMLParser.Parser):
         # return coverpage even in no_images build
         if 'coverpage' in doc.meta_block:
             coverpage = doc.meta_block['coverpage']
-            yield coverpage[0], { 'tag': NS.xhtml.link, 'rel': 'coverpage' }
+            yield coverpage[0], parsers.em.link (rel = 'coverpage')
         else:
             for field in doc.traverse (nodes.field):
                 field_name, field_body = field.children
                 if field_name.astext () == 'coverpage':
-                    yield field_body.astext (), {
-                        'tag': NS.xhtml.link,
-                        'rel': 'coverpage'}
+                    yield field_body.astext (), parsers.em.link (rel = 'coverpage')
                     break
 
         # need broken.png for no_images build
-        # yield (BROKEN), {'tag': NS.xhtml.img, 'rel': 'important'})
+        # yield (BROKEN), parsers.em.img (rel = 'important')
 
         # anchor links
         for node in doc.traverse (nodes.reference):
             if 'uri' in node:
-                yield node['uri'], { 'tag': NS.xhtml.a }
+                yield node['uri'], parsers.em.a ()
 
         # images
         for node in doc.traverse (nodes.image):
-            d = { 'tag': NS.xhtml.img }
+            d = parsers.em.img ()
             # specify class important if you want to keep an image in a no_images build
             if 'important' in node.get ('classes', []):
-                d['rel'] = 'important'
+                d.set('rel', 'important')
             if 'uri' in node:
                 yield node['uri'], d
 
         # dropcap images
         for node in doc.traverse (nodes.pending):
             if 'image' in node.details:
-                yield node.details['image'], { 'tag': NS.xhtml.img }
+                yield node.details['image'], parsers.em.img ()
 
 
     def get_settings (self, components, defaults):

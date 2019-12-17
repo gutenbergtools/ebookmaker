@@ -16,10 +16,12 @@ import os.path
 
 from six.moves import configparser
 
+from libgutenberg.CommonOptions import Options
 
 class Struct (object):
     pass
 
+options = Options()
 
 class Job (object):
     """Hold 'globals' for a job.
@@ -51,15 +53,10 @@ def add_dependencies (targets, deps, order = None):
 
     for target, deps in deps.items ():
         if target in targets:
-            targets += deps
+            targets = list(set(targets).union(deps))
     if order:
         return list (filter (targets.__contains__, order))
     return targets
-
-
-def null_translation (s):
-    """ Translate into same language. :-) """
-    return s
 
 
 def add_common_options (ap, user_config_file):
@@ -79,12 +76,19 @@ def add_common_options (ap, user_config_file):
         default  = user_config_file,
         help     = "read config file (default: %(default)s)")
 
+def set_arg_defaults(ap, config_file):
+    # get default command-line args
+    cp = configparser.ConfigParser ()
+    cp.read (config_file)
+    if cp.has_section('DEFAULT_ARGS'):
+        ap.set_defaults(**dict(cp.items('DEFAULT_ARGS')))
 
 def parse_config_and_args (ap, sys_config, defaults = None):
 
-    options = ap.parse_args ()
+    # put command-line args into options
+    options.update(vars(ap.parse_args ()))
 
-    cp = configparser.ConfigParser (defaults)
+    cp = configparser.ConfigParser ()
     cp.read ((sys_config, options.config_file))
 
     options.config = Struct ()

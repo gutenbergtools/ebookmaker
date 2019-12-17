@@ -29,6 +29,10 @@ from libgutenberg.GutenbergGlobals import NS, xpath
 from libgutenberg.MediaTypes import mediatypes as mt
 from libgutenberg.Logger import info, debug, error
 
+from ebookmaker.CommonCode import Options
+
+options = Options()
+
 BROKEN = 'resource://ebookmaker.parsers/broken.png'
 
 RE_GUTENBERG    = re.compile (r'Project Gutenberg',         re.I)
@@ -344,8 +348,7 @@ class HTMLParserBase (ParserBase):
         # iterate links
 
         for (elem, dummy_attribute, url, dummy_pos) in self.xhtml.iterlinks ():
-            elem.attrib['tag'] = elem.tag
-            yield url, elem.attrib
+            yield url, elem
 
 
     def rewrite_links (self, f):
@@ -370,16 +373,17 @@ class HTMLParserBase (ParserBase):
     def strip_links (xhtml, manifest):
         """ Strip all links to urls not in manifest.
 
-        This includes <a href>, <link href> and <img src>
+        This includes  <link href> and <img src> and, if strip_links is set, <a href>.
         Assume links and urls are already made absolute.
 
         """
 
-        for link in xpath (xhtml, '//xhtml:a[@href]'):
-            href = urllib.parse.urldefrag (link.get ('href'))[0]
-            if href not in manifest:
-                debug ("strip_links: Deleting <a> to %s not in manifest." % href)
-                del link.attrib['href']
+        if options.strip_links:
+            for link in xpath (xhtml, '//xhtml:a[@href]'):
+                href = urllib.parse.urldefrag (link.get ('href'))[0]
+                if href not in manifest:
+                    debug ("strip_links: Deleting <a> to %s not in manifest." % href)
+                    del link.attrib['href']
 
         for link in xpath (xhtml, '//xhtml:link[@href]'):
             href = link.get ('href')

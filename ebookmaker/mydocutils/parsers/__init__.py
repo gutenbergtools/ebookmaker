@@ -29,6 +29,7 @@ from docutils.parsers.rst import Directive, directives, states, roles, frontend
 from docutils.parsers.rst.directives import body
 from docutils.parsers.rst.directives import tables
 from docutils.parsers.rst.directives import images
+from docutils.utils import punctuation_chars
 
 from libgutenberg.Logger import error, warning, info, debug
 
@@ -621,31 +622,35 @@ class Role:
 class Inliner (states.Inliner):
     """ Inliner that recognizes [pg n], [ln n], and [var x]. """
 
-    re_pageno = re.compile (states.Inliner.start_string_prefix +
-                            r"(\[pg!?\s*(?P<pageno>[-ivxlc\d]+)(?:\s+(?P<imgoff>[\d]+))?\])" +
-                            states.Inliner.end_string_suffix + r'\s*', re.IGNORECASE)
-    re_pageref = re.compile (states.Inliner.start_string_prefix +
-                            r"(\[pg\s*(?P<pageno>[-ivxlc\d]+)\]_)" +
-                            states.Inliner.end_string_suffix, re.IGNORECASE)
-    re_lineno = re.compile (states.Inliner.start_string_prefix +
-                            r"(\[ln!?\s*(?P<lineno>[\d]+)\])" +
-                            states.Inliner.end_string_suffix + r'\s*', re.IGNORECASE)
-    re_lineref = re.compile (states.Inliner.start_string_prefix +
-                            r"(\[ln\s*(?P<lineno>[\d]+)\]_)" +
-                            states.Inliner.end_string_suffix, re.IGNORECASE)
-    re_variable = re.compile (states.Inliner.start_string_prefix +
-                            r"(\[var\s+(?P<name>[-_\w\d]+)\])" +
-                            states.Inliner.end_string_suffix + r'\s*', re.IGNORECASE)
-    # re_newline = re.compile (states.Inliner.start_string_prefix +
-    #                         r"\[br\]" +
-    #                         states.Inliner.end_string_suffix)
-
     def __init__ (self):
+        self.start_string_prefix = (u'(^|(?<=\\s|[%s%s]))' %
+                               (punctuation_chars.openers,
+                                punctuation_chars.delimiters))
+        self.end_string_suffix = (u'($|(?=\\s|[\x00%s%s%s]))' %
+                             (punctuation_chars.closing_delimiters,
+                              punctuation_chars.delimiters,
+                              punctuation_chars.closers))
+        self.re_pageno = re.compile (self.start_string_prefix +
+                                r"(\[pg!?\s*(?P<pageno>[-ivxlc\d]+)(?:\s+(?P<imgoff>[\d]+))?\])" +
+                                self.end_string_suffix + r'\s*', re.IGNORECASE)
+        self.re_pageref = re.compile (self.start_string_prefix +
+                                r"(\[pg\s*(?P<pageno>[-ivxlc\d]+)\]_)" +
+                                self.end_string_suffix, re.IGNORECASE)
+        self.re_lineno = re.compile (self.start_string_prefix +
+                                r"(\[ln!?\s*(?P<lineno>[\d]+)\])" +
+                                self.end_string_suffix + r'\s*', re.IGNORECASE)
+        self.re_lineref = re.compile (self.start_string_prefix +
+                                r"(\[ln\s*(?P<lineno>[\d]+)\]_)" +
+                                self.end_string_suffix, re.IGNORECASE)
+        self.re_variable = re.compile (self.start_string_prefix +
+                                r"(\[var\s+(?P<name>[-_\w\d]+)\])" +
+                                self.end_string_suffix + r'\s*', re.IGNORECASE)
         states.Inliner.__init__ (self)
 
 
     def init_customizations (self, settings):
         """ Setting-based customizations; run when parsing begins. """
+        super().init_customizations (settings)
 
         # self.implicit_dispatch.append ((self.re_newline, self.newline))
         self.implicit_dispatch.append ((self.re_variable, self.variable))
@@ -733,6 +738,13 @@ class Inliner (states.Inliner):
             return [reference]
         else:
             raise states.MarkupMismatch
+
+# copy states.Inliner properties to Inliner so that init_customizations method works
+# this is needed because init_customizations depends on locals(), which seems like a bad practice
+#
+for prop, val in states.Inliner.__dict__.items():
+    if not prop.startswith('_'):
+        setattr(Inliner, prop, val)
 
 
 class Body (states.Body):

@@ -24,7 +24,9 @@ from libgutenberg.GutenbergGlobals import xpath
 from libgutenberg.Logger import info, debug, error, exception
 
 from ebookmaker import writers
+from ebookmaker.CommonCode import Options
 
+options = Options()
 
 class Writer (writers.HTMLishWriter):
     """ Class for writing HTML files. """

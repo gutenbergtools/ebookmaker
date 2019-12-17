@@ -23,13 +23,14 @@ import os.path
 import sys
 
 import six
-from six.moves import builtins, cPickle
+from six.moves import cPickle
 
 from libgutenberg.GutenbergGlobals import SkipOutputFormat
 import libgutenberg.GutenbergGlobals as gg
 from libgutenberg.Logger import debug, warning, error, exception
 from libgutenberg import Logger, DublinCore
 from libgutenberg import MediaTypes as mt
+from libgutenberg import Cover
 
 from ebookmaker import parsers
 from ebookmaker import ParserFactory
@@ -37,14 +38,18 @@ from ebookmaker import Spider
 from ebookmaker import WriterFactory
 from ebookmaker.packagers import PackagerFactory
 from ebookmaker import CommonCode
-
+from ebookmaker.CommonCode import Options
 from ebookmaker.Version import VERSION
 
+options = Options()
 
+# store paths for system utilities in CONFIG_FILES[0]
+# store default command line args in [default_args] section of CONFIG_FILES[1]
 CONFIG_FILES = ['/etc/ebookmaker.conf', os.path.expanduser ('~/.ebookmaker')]
 
 DEPENDENCIES = collections.OrderedDict ((
     ('all',             ('html', 'epub', 'kindle', 'pdf', 'txt', 'rst')),
+    ('test',            ('html', 'epub')),
     ('html',            ('html.images',    'html.noimages')),
     ('epub',            ('epub.images',    'epub.noimages')),
     ('kindle',          ('kindle.images',  'kindle.noimages')),
@@ -92,6 +97,8 @@ FILENAMES = {
 
     'picsdir.noimages': '{id}-noimages.picsdir',   # do we need this ?
     'picsdir.images':   '{id}-images.picsdir',     # do we need this ?
+
+    'cover':            '{id}-cover.png'
 }
 
 COVERPAGE_MIN_AREA = 200 * 200
@@ -107,11 +114,10 @@ def make_output_filename (type_, dc):
         return FILENAMES[type_].format (id = gg.string_to_filename (dc.title)[:65])
 
 
-def elect_coverpage (spider):
+def elect_coverpage (spider, url):
     """ Find first coverpage candidate that is not too small. """
 
     coverpage_found = False
-
     for p in spider.parsers:
         if 'coverpage' in p.attribs.rel:
             if coverpage_found:
@@ -126,13 +132,43 @@ def elect_coverpage (spider):
                              (p.url, dimen[0], dimen[1]))
                     continue
             coverpage_found = True
-
+    if spider.parsers and not coverpage_found and options.generate_cover :
+        if options.outputdir:
+            dir = options.outputdir
+        else:
+            url = url[7:] if url.startswith ('file://') else url
+            dir = os.path.dirname (os.path.abspath (url))
+        debug ('generating cover in %s' % dir)
+        cover_url = generate_cover (dir)
+        if cover_url:
+            cover_parser = ParserFactory.ParserFactory.create (cover_url)
+            cover_parser.attribs.rel.add ('coverpage')
+            cover_parser.pre_parse()
+            spider.parsers.append (cover_parser)
+        
+        
+        
+def generate_cover(dir):
+    try:
+        cover_image = Cover.draw (options.dc)
+        cover_url = os.path.join(dir, make_output_filename ('cover', options.dc))
+        with open (cover_url, 'wb+') as cover:
+            cover_image.save (cover)
+        return cover_url
+    except OSError:
+        error ("OSError, Cairo not installed or couldn't write file.")
+        return None
 
 def get_dc (url):
     """ Get DC for book. """
 
     parser = ParserFactory.ParserFactory.create (url)
     parser.parse ()
+    
+    # this is needed because the the document is not parsed again
+    if options.coverpage_url:
+        parser._make_coverpage_link (coverpage_url=options.coverpage_url)
+
 
     dc = DublinCore.GutenbergDublinCore ()
     try:
@@ -158,7 +194,7 @@ def get_dc (url):
 
     dc.project_gutenberg_id = options.ebook or dc.project_gutenberg_id
     if dc.project_gutenberg_id:
-        dc.opf_identifier = ('http://www.gutenberg.org/ebooks/%d' % dc.project_gutenberg_id)
+        dc.opf_identifier = ('%sebooks/%d' % (gg.PG_URL, dc.project_gutenberg_id))
     else:
         dc.opf_identifier = ('urn:mybooks:%s' %
                              hashlib.md5 (dc.source.encode ('utf-8')).hexdigest ())
@@ -182,7 +218,7 @@ def add_local_options (ap):
     ap.add_argument (
         "--make",
         dest    = "types",
-        choices = CommonCode.add_dependencies (['all'], DEPENDENCIES),
+        choices = CommonCode.add_dependencies (['all', 'test'], DEPENDENCIES),
         default = [],
         action  = 'append',
         help    = "output type (default: all)")
@@ -195,6 +231,12 @@ def add_local_options (ap):
         default = 1,
         help    = "go how many levels deep while recursively retrieving pages. " +
         "(0 == infinite) (default: %(default)s)")
+
+    ap.add_argument (
+        "--strip_links",
+        dest    = "strip_links",
+        action  = "store_true",
+        help    = "strip  <a href='external address' /> links")
 
     ap.add_argument (
         "--include",
@@ -307,6 +349,18 @@ def add_local_options (ap):
         help    = "PG internal use only: which packager to use (default: none)")
 
     ap.add_argument (
+        "--cover",
+        dest    = "coverpage_url",
+        default = None,
+        help    = "use the cover specified by an absolute url")
+
+    ap.add_argument (
+        "--generate_cover",
+        dest    = "generate_cover",
+        action  = "store_true",
+        help    = "if no cover is specified by the source, or as an argument, generate a cover")
+
+    ap.add_argument (
         "--jobs",
         dest    = "is_job_queue",
         action  = "store_true",
@@ -375,12 +429,13 @@ def do_job (job):
             attribs = parsers.ParserAttributes ()
             attribs.url = job.url
             attribs.id = 'start'
+            
             if options.input_mediatype:
                 attribs.orig_mediatype = attribs.HeaderElement.from_str (
                     options.input_mediatype)
 
             spider.recursive_parse (attribs)
-            elect_coverpage (spider)
+            elect_coverpage (spider, job.url)
             job.url = spider.redirect (job.url)
             job.base_url = job.url
             job.spider = spider
@@ -416,8 +471,10 @@ def config ():
     ap = argparse.ArgumentParser (prog = 'EbookMaker')
     CommonCode.add_common_options (ap, CONFIG_FILES[1])
     add_local_options (ap)
+    CommonCode.set_arg_defaults (ap, CONFIG_FILES[1])
 
-    options = CommonCode.parse_config_and_args (
+    global options 
+    options.update(vars(CommonCode.parse_config_and_args (
         ap,
         CONFIG_FILES[0],
         {
@@ -428,10 +485,7 @@ def config ():
             'rhyming_dict': None,
             'timestamp': datetime.datetime.today ().isoformat ()[:19],
         }
-    )
-
-    builtins.options = options
-    builtins._ = CommonCode.null_translation
+    )))
 
     if '://' not in options.url:
         options.url = os.path.abspath (options.url)
@@ -459,7 +513,7 @@ def main ():
     if options.is_job_queue:
         job_queue = cPickle.load (sys.stdin.buffer) # read bytes
     else:
-        options.dc = get_dc (options.url)
+        options.dc = get_dc (options.url) # this is when doc at url gets parsed!
         job_queue = []
         output_files = dict ()
         for type_ in options.types:
@@ -479,6 +533,8 @@ def main ():
             job_queue.append (job)
 
     for j in job_queue:
+        options.dc = j.dc
+        options.outputdir = j.outputdir
         do_job (j)
 
     packager = PackagerFactory.create (options.packager, 'push')

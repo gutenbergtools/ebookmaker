@@ -47,8 +47,11 @@ class Parser (ParserBase):
             return
 
         parser = cssutils.CSSParser ()
-        self.sheet = parser.parseUrl (self.attribs.url)
-
+        if self.fp:
+            self.sheet = parser.parseString (self.unicode_content())
+        else:
+            self.sheet = parser.parseUrl (self.attribs.url)
+            
         self.attribs.mediatype = parsers.ParserAttributes.HeaderElement ('text/css')
         self.unpack_media_handheld (self.sheet)
         self.lowercase_selectors (self.sheet)

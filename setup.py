@@ -2,9 +2,9 @@
 # ebookmaker distribution
 #
 
-from distutils.core import setup
+from setuptools import setup
 
-VERSION = '0.4.0a5'
+VERSION = '0.7.6'
 
 setup (
     name = 'ebookmaker',
@@ -38,15 +38,14 @@ setup (
         'chardet',
         'cherrypy',
         'cssutils',
-        'docutils',
-        'libgutenberg>=0.1.6',
+        'docutils>=0.14',
         'lxml',
         'roman',
         'requests',
         'six>=1.4.1',
-        'setuptools',
+        'libgutenberg[covers]>=0.5.0',
     ],
-
+    
     package_data = {
         'ebookmaker.parsers': ['broken.png'],
         'ebookmaker.writers': ['cover.jpg'],
@@ -56,18 +55,19 @@ setup (
     },
 
     data_files = [
-        ('', ['CHANGES', 'README']),
+        ('', ['CHANGES', 'README.md']),
     ],
 
     # metadata for upload to PyPI
 
     author = "Marcello Perathoner",
-    author_email = "webmaster@gutenberg.org",
+    maintainer = "Eric Hellman",
+    maintainer_email = "eric@hellman.net",
     description = "The Project Gutenberg tool to generate EPUBs and other ebook formats.",
-    long_description = open ('README').read (),
+    long_description = open ('README.md').read (),
     license = "GPL v3",
     keywords = "ebook epub kindle pdf rst reST reStructuredText project gutenberg format conversion",
-    url = "http://pypi.python.org/pypi/ebookmaker/",
+    url = "https://github.com/gutenbergtools/ebookmaker/",
 
     classifiers = [
         "Topic :: Text Processing",
@@ -75,9 +75,8 @@ setup (
         "Environment :: Console",
         "Operating System :: OS Independent",
         "Intended Audience :: Other Audience",
-        "Development Status :: 4 - Beta",
         "Programming Language :: Python",
-        "Programming Language :: Python :: 3.3",
+        "Programming Language :: Python :: 3.6",
     ],
 
     platforms = 'OS-independent'

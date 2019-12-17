@@ -24,6 +24,7 @@ import docutils.transforms.parts
 
 from libgutenberg.Logger import error, warning, info, debug
 from libgutenberg.DublinCore import DublinCore
+from libgutenberg.GutenbergGlobals import PG_URL
 from ebookmaker.mydocutils import nodes as mynodes
 
 # pylint: disable=W0142
@@ -105,7 +106,7 @@ class VariablesTransform (docutils.transforms.Transform):
                 sub (variable, [ nodes.inline ('', getone ('PG.Credits', '')) ])
 
             elif name == 'pg.bibrec-url':
-                url = 'http://www.gutenberg.org/ebooks/%s' % getone ('PG.Id', '999999')
+                url =  '%sebooks/%s' % (PG_URL, getone ('PG.Id', '999999'))
                 sub (variable, [ nodes.reference ('', '', nodes.inline ('', url), refuri = url) ])
 
             elif name in ('pg.copyrighted-header', 'pg.copyrighted-footer'):

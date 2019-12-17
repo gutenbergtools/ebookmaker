@@ -1,3 +1,87 @@
+0.7.6 December 2, 2019
+- disabled html to txt conversion because no conversion was being done
+- changed a truth eval of an etree element to silence deprecation warnings
+- corrected documentation of config behavior
+- better install documentation
+
+0.7.5 October 22, 2019
+
+- deconflicted an overloaded "parsers" variable
+- fix parse failure when an htm file links to valid xml (not xhtml)
+- updated libgutenberg to correctly handle music files.
+
+0.7.4 October 21, 2019
+
+- fixed bug where a cover is always generated during conversion to kindle
+- epub generated files are now only saved to log for -v -v -v
+
+0.7.3 October 9, 2019
+
+- fixed bug where if generated cover can't be written, ebookfile is not made
+- when outputdir is specified, cover is written to outputdir
+- updated libgutenberg to support 'aut' in marcrel covers 
+- unloaded outputdir from job queue, as it had been passing in options
+
+0.7.1 September 30, 2019
+
+- fixed bug for pickled jobs; dc was previously passed silently via builtins in options 
+- fixed bug in cover generator when url is a file: url 
+
+0.7.0 September 20, 2019
+
+- config files can now be used to provide defaults for most command line arguments.
+
+0.6.4 September 16, 2019
+
+- added updates so that gutenberg canonical url is always https
+- updated libgutenberg requirement
+
+0.6.3 September 12, 2019
+
+- fixed parsing of rst files in MyDocUtils
+- fixed undefined options in TxtWriter and PdfWriter
+
+0.6.2 May 10, 2019
+
+- updated libgutenberg requirement. itd DublinCore class depended on the installation of '_' that was removed in ebookmaker 0.4.1a1
+
+0.6.1 May 9, 2019
+
+- added strip_links command-line option. turn it off to stop EbookMaker from stripping links in EPUB and MOBI output
+- the test_htm not longer tries conversion to pdf or rst
+- fixed conversion failure when html contains '<pre><code /></pre>'
+- corrected install directions
+- readme is now markdown
+- fix python 3.6.7 compatibility issue when dbm_gnu not present
+- added tests for loading parsers, loaders and packagers
+
+0.6.0 February 14, 2019
+
+- command line additions
+1. set cover url
+2. generate cover flag
+
+- cover should be first in reading order
+- covers can be png
+- added tests
+- added travis
+- fixed some import issues exposed by testing
+- expected conversion skipping is a warning, not an error
+- fixed issue when there's no stylesheet -- thanks to ray
+- stop putting silly tag attribute into html
+
+
+0.5.0 January 10, 2019
+
+Moved Borg options class to libgutenberg
+distutils --> setuptools
+
+
+0.4.1a1
+
+don't be using builtins as a backdoor global
+updates for distutils 0.14 compatibility
+
 0.4.0a2
 
 Fix legalese in PG boilerplate.

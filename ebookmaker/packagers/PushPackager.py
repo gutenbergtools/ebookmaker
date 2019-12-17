@@ -19,8 +19,10 @@ import re
 from libgutenberg.Logger import info, error
 import libgutenberg.GutenbergGlobals as gg
 
+from ebookmaker.CommonCode import Options
 from ebookmaker.packagers import ZipPackager
 
+options = Options()
 TYPE = 'ww'
 FORMATS = ['push']
 

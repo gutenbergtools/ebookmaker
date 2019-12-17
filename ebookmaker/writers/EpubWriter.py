@@ -38,8 +38,10 @@ from ebookmaker import ParserFactory
 from ebookmaker import HTMLChunker
 # from ebookmaker import Spider
 from ebookmaker import writers
+from ebookmaker.CommonCode import Options
 from ebookmaker.Version import VERSION, GENERATOR
 
+options = Options()
 # pylint: disable=W0142
 
 MAX_CHUNK_SIZE  = 300 * 1024  # bytes
@@ -150,6 +152,7 @@ IMAGE_WRAPPER = """<?xml version="1.0"?>
   </body>
 </html>"""
 
+match_link_url = re.compile (r'^https?://', re.I)
 
 class OEBPSContainer (zipfile.ZipFile):
     """ Class representing an OEBPS Container. """
@@ -299,7 +302,7 @@ class AdobePageMap (object):
                                  etree.tostring (root,
                                                  encoding = six.text_type,
                                                  pretty_print = True))
-        if options.verbose >= 2:
+        if options.verbose >= 3:
             debug (page_map)
         return page_map
 
@@ -374,7 +377,7 @@ class TocNCX (object):
                                                 doctype = gg.NCX_DOCTYPE,
                                                 encoding = six.text_type,
                                                 pretty_print = True))
-        if options.verbose >= 2:
+        if options.verbose >= 3:
             debug (toc_ncx)
         return toc_ncx
 
@@ -486,7 +489,7 @@ class ContentOPF (object):
         # now merge xmlns:opf and xmlns:
         content_opf = content_opf.replace ('lxml-bug-workaround', '')
 
-        if options.verbose >= 2:
+        if options.verbose >= 3:
             debug (content_opf)
         return content_opf
 
@@ -676,7 +679,7 @@ class ContentOPF (object):
         for item in xpath (
                 self.manifest,
                 # cannot xpath for default namespace
-                "//*[local-name () = 'item' and starts-with (@media-type, 'image/jpeg') and @href = $url]",
+                "//*[local-name () = 'item' and (starts-with (@media-type, 'image/jpeg') or starts-with (@media-type, 'image/png')) and @href = $url]",
                 url = url):
 
             id_ = item.get ('id')
@@ -684,9 +687,17 @@ class ContentOPF (object):
 
         # else use default cover page image
         if id_ is None:
-            url = 'cover.jpg'
-            mediatype = mt.jpeg
-            ocf.add_bytes (url, resource_string ('ebookmaker.writers', url), mediatype)
+            ext = url.split('.')[-1]
+            try:
+                mediatype = getattr(mt, ext)
+            except AttributeError:
+                mediatype = mt.jpeg
+            try:
+                with open(url, 'r') as f:
+                    ocf.add_bytes (Writer.url2filename (url), f.read(), mediatype)
+            except IOError:
+                url = 'cover.jpg'
+                ocf.add_bytes (url, resource_string ('ebookmaker.writers', url), mediatype)
             id_ = self.manifest_item (url, mediatype)
 
         debug ("Adding coverpage id: %s url: %s" % (id_, url))
@@ -696,7 +707,7 @@ class ContentOPF (object):
 
         # register ADE style
         href = ocf.add_image_wrapper (Writer.url2filename (url), 'Cover')
-        self.spine_item (href, mt.xhtml, 'coverpage-wrapper', False, True)
+        self.spine_item (href, mt.xhtml, 'coverpage-wrapper', True, True)
         self.guide_item (href, 'cover', 'Cover')
 
 
@@ -898,12 +909,13 @@ class Writer (writers.HTMLishWriter):
         are targets of links. EPUB does not allow that.
 
         """
-        for link in xpath (xhtml, '//xhtml:a[@href]'):
-            href = urllib.parse.urldefrag (link.get ('href'))[0]
-            if not manifest[href] in OPS_CONTENT_DOCUMENTS:
-                debug ("strip_links: Deleting <a> to non-ops-document-type: %s" % href)
-                del link.attrib['href']
-                continue
+        if options.strip_links:
+            for link in xpath (xhtml, '//xhtml:a[@href]'):
+                href = urllib.parse.urldefrag (link.get ('href'))[0]
+                if not manifest[href] in OPS_CONTENT_DOCUMENTS:
+                    debug ("strip_links: Deleting <a> to non-ops-document-type: %s" % href)
+                    del link.attrib['href']
+                    continue
 
 
     @staticmethod
@@ -960,10 +972,12 @@ class Writer (writers.HTMLishWriter):
             try:
                 pre.tag = NS.xhtml.div
                 writers.HTMLishWriter.add_class (pre, 'pgmonospaced')
-                m = parsers.RE_GUTENBERG.search (pre.text)
-                if m:
-                    writers.HTMLishWriter.add_class (pre, 'pgheader')
-
+                try:
+                    m = parsers.RE_GUTENBERG.search (pre.text)
+                    if m:
+                        writers.HTMLishWriter.add_class (pre, 'pgheader')
+                except TypeError:
+                    pass
                 tail = pre.tail
                 s = etree.tostring (pre, encoding = six.text_type, with_tail=False)
                 s = s.replace ('>\n', '>')      # eliminate that empty first line
@@ -1027,7 +1041,8 @@ class Writer (writers.HTMLishWriter):
 
 
         """
-
+        if match_link_url.match (url):
+            return url
         def escape (matchobj):
             """ Escape a char. """
             return '@%x' % ord (matchobj.group (0))
@@ -1092,7 +1107,7 @@ class Writer (writers.HTMLishWriter):
             return # only the first one though
 
 
-    def shipout (self, job, parsers, ncx):
+    def shipout (self, job, parserlist, ncx):
         """ Build the zip file. """
 
         try:
@@ -1104,9 +1119,9 @@ class Writer (writers.HTMLishWriter):
 
             opf.metadata_item (job.dc)
 
-            # write out parsers
+            # write out parserlist
 
-            for p in parsers:
+            for p in parserlist:
                 try:
                     ocf.add_bytes (self.url2filename (p.attribs.url), p.serialize (),
                                    p.mediatype ())
@@ -1127,7 +1142,7 @@ class Writer (writers.HTMLishWriter):
             opf.toc_item ('toc.ncx')
             ocf.add_unicode ('toc.ncx', six.text_type (ncx))
 
-            for p in parsers:
+            for p in parserlist:
                 if 'coverpage' in p.attribs.rel:
                     opf.add_coverpage (ocf, p.attribs.url)
                     break
@@ -1183,7 +1198,7 @@ class Writer (writers.HTMLishWriter):
         """ Build epub """
 
         ncx = TocNCX (job.dc)
-        parsers = []
+        parserlist = []
         css_count = 0
 
         # add CSS parser
@@ -1210,7 +1225,7 @@ class Writer (writers.HTMLishWriter):
                         else:
                             np = p.resize_image (MAX_IMAGE_SIZE, MAX_IMAGE_DIMEN)
                         np.id = p.attribs.get ('id')
-                    parsers.append (np)
+                    parserlist.append (np)
 
             for p in job.spider.parsers:
                 if p.mediatype () in OPS_CONTENT_DOCUMENTS:
@@ -1231,53 +1246,58 @@ class Writer (writers.HTMLishWriter):
                     else:
                         # make a copy so we can mess around
                         p.parse ()
-                        xhtml = copy.deepcopy (p.xhtml)
+                        xhtml = copy.deepcopy (p.xhtml) if hasattr (p, 'xhtml') else None
+                    if xhtml is not None:
+                        strip_classes = self.get_classes_that_float (xhtml)
+                        strip_classes = strip_classes.intersection (STRIP_CLASSES)
+                        if strip_classes:
+                            self.strip_pagenumbers (xhtml, strip_classes)
 
-                    strip_classes = self.get_classes_that_float (xhtml)
-                    strip_classes = strip_classes.intersection (STRIP_CLASSES)
-                    if strip_classes:
-                        self.strip_pagenumbers (xhtml, strip_classes)
+                        # build up TOC
+                        # has side effects on xhtml
+                        ncx.toc += p.make_toc (xhtml)
 
-                    # build up TOC
-                    # has side effects on xhtml
-                    ncx.toc += p.make_toc (xhtml)
+                        self.insert_root_div (xhtml)
+                        self.fix_charset (xhtml)
+                        self.fix_style_elements (xhtml)
+                        self.reflow_pre (xhtml)
 
-                    self.insert_root_div (xhtml)
-                    self.fix_charset (xhtml)
-                    self.fix_style_elements (xhtml)
-                    self.reflow_pre (xhtml)
+                        # strip all links to items not in manifest
+                        p.strip_links (xhtml, job.spider.dict_urls_mediatypes ())
+                        self.strip_links (xhtml, job.spider.dict_urls_mediatypes ())
 
-                    # strip all links to items not in manifest
-                    p.strip_links (xhtml, job.spider.dict_urls_mediatypes ())
-                    self.strip_links (xhtml, job.spider.dict_urls_mediatypes ())
+                        self.strip_noepub (xhtml)
+                        # self.strip_rst_dropcaps (xhtml)
 
-                    self.strip_noepub (xhtml)
-                    # self.strip_rst_dropcaps (xhtml)
+                        self.fix_html_image_dimensions (xhtml)
+                        if coverpage_url:
+                            self.remove_coverpage (xhtml, coverpage_url)
 
-                    self.fix_html_image_dimensions (xhtml)
-                    if coverpage_url:
-                        self.remove_coverpage (xhtml, coverpage_url)
+                        # externalize and fix CSS
+                        for style in xpath (xhtml, '//xhtml:style'):
+                            self.add_external_css (
+                                job.spider, xhtml, style.text, "%d.css" % css_count)
+                            css_count += 1
+                            style.drop_tree ()
 
-                    # externalize and fix CSS
-                    for style in xpath (xhtml, '//xhtml:style'):
-                        self.add_external_css (
-                            job.spider, xhtml, style.text, "%d.css" % css_count)
-                        css_count += 1
-                        style.drop_tree ()
+                        self.add_external_css (job.spider, xhtml, None, 'pgepub.css')
 
-                    self.add_external_css (job.spider, xhtml, None, 'pgepub.css')
+                        self.add_meta_generator (xhtml)
 
-                    self.add_meta_generator (xhtml)
-
-                    debug ("Splitting %s ..." % p.attribs.url)
-                    chunker.next_id = 0
-                    chunker.split (xhtml, p.attribs)
-
+                        debug ("Splitting %s ..." % p.attribs.url)
+                        chunker.next_id = 0
+                        chunker.split (xhtml, p.attribs)
+                    else:
+                        # parsing xml worked, but it isn't xhtml. so we need to reset mediatype 
+                        # to something that isn't recognized as content
+                        p.attribs.mediatype = parsers.ParserAttributes.HeaderElement ('text/xml')
             for p in job.spider.parsers:
-                if hasattr (p, 'sheet'):
+                if str(p.attribs.mediatype) == 'text/css':
+                    p.parse()
+                if hasattr(p, 'sheet') and p.sheet:
                     self.fix_incompatible_css (p.sheet)
                     p.rewrite_links (self.url2filename)
-                    parsers.append (p)
+                    parserlist.append (p)
 
             # after splitting html into chunks we have to rewrite all
             # internal links in HTML
@@ -1297,9 +1317,9 @@ class Writer (writers.HTMLishWriter):
             for chunk, attribs in chunker.chunks:
                 p = ParserFactory.ParserFactory.get (attribs)
                 p.xhtml = chunk
-                parsers.append (p)
+                parserlist.append (p)
 
-            self.shipout (job, parsers, ncx)
+            self.shipout (job, parserlist, ncx)
 
         except Exception as what:
             exception ("Error building Epub: %s" % what)
