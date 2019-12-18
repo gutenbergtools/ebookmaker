@@ -128,8 +128,9 @@ def elect_coverpage (spider, url):
                 dimen = p.get_image_dimen ()
                 if (dimen[0] * dimen[1]) < COVERPAGE_MIN_AREA:
                     p.attribs.rel.remove ('coverpage')
+                    p_url = p.url if hasattr (p, 'url') else ''
                     warning ("removed coverpage candidate %s because too small (%d x %d)" %
-                             (p.url, dimen[0], dimen[1]))
+                             (p_url, dimen[0], dimen[1]))
                     continue
             coverpage_found = True
     if spider.parsers and not coverpage_found and options.generate_cover :
