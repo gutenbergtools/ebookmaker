@@ -17,7 +17,7 @@ import os.path
 from six.moves import urllib
 import six
 
-from pkg_resources import resource_listdir # pylint: disable=E0611
+from pkg_resources import resource_listdir, resource_stream # pylint: disable=E0611
 import requests
 
 from libgutenberg.Logger import debug
@@ -162,15 +162,15 @@ class ParserFactory (object):
 
         # resource://python.package/filename.ext
 
-        o = urllib.parse.urlsplit (url)
-        package = o.host
+        o = urllib.parse.urlsplit (orig_url)
+        package = o.hostname
         filename = o.path
         fp = resource_stream (package, filename)
         attribs.orig_mediatype = attribs.HeaderElement (MediaTypes.guess_type (filename))
 
         debug ("... got mediatype %s from guess_type" % str (attribs.orig_mediatype))
         attribs.orig_url = orig_url
-        attribs.url = url
+        attribs.url = orig_url
         return fp
 
 
