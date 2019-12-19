@@ -1,3 +1,9 @@
+0.7.7 December 19, 2019
+
+- fixed bugs in ParserFactory that raised exceptions for parsers built from package-supplied
+  resources
+- fixed bug that raised exceptions when a cover was rejected for being too small
+
 0.7.6 December 2, 2019
 - disabled html to txt conversion because no conversion was being done
 - changed a truth eval of an etree element to silence deprecation warnings
