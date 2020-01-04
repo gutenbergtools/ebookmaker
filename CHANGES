@@ -1,3 +1,8 @@
+0.7.8 January 4, 2020
+
+- updated libgutenberg to 0.5.1
+- added warning when mediatype of a linked file cannot be determined
+
 0.7.7 December 19, 2019
 
 - fixed bugs in ParserFactory that raised exceptions for parsers built from package-supplied
