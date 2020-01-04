@@ -20,7 +20,7 @@ from six.moves import urllib
 
 import libgutenberg.GutenbergGlobals as gg
 from libgutenberg.GutenbergGlobals import NS
-from libgutenberg.Logger import debug
+from libgutenberg.Logger import debug, warning
 from libgutenberg import MediaTypes
 
 from ebookmaker import parsers
@@ -157,6 +157,7 @@ class Spider (object):
             if mediatype:
                 attribs.orig_mediatype = attribs.HeaderElement (mediatype)
             else:
+                warning ('Mediatype could not be determined from url %s' % attribs.url)
                 return True # always include if mediatype unknown
 
         mediatype = attribs.orig_mediatype.value
