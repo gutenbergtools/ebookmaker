@@ -854,8 +854,10 @@ class Writer (writers.HTMLishWriter):
                                     'background-attachment', 'background-repeat'):
                         debug ("Dropping property %s" % p.name)
                         rule.style.removeProperty (p.name)
-                    elif p.value.endswith ('px'):
-                        rule.style.removeProperty (p.name)
+
+                    # support for px measurement is now universal
+                    # elif p.value.endswith ('px'):
+                        # rule.style.removeProperty (p.name)
 
         # debug ("exit fix_incompatible_css")
 
