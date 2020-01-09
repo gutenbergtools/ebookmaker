@@ -104,18 +104,17 @@ class Parser (ParserBase):
 
     def get_image_dimen (self):
         if self.dimen is None:
-            image = Image.open (six.BytesIO (self.image_data))
-            self.dimen = image.size
+            if self.image_data:
+                image = Image.open (six.BytesIO (self.image_data))
+                self.dimen = image.size
+            else:
+                self.dimen = (0, 0)  # broken image
         return self.dimen
 
 
     def pre_parse (self):
         if self.image_data is None:
             self.image_data = self.bytes_content ()
-
-        # FIXME: why did we need this?
-        #if self.image_data is None:
-        #    self.broken_image ()
 
 
     def parse (self):

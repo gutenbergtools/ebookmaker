@@ -204,6 +204,8 @@ class ParserBase (object):
         """ Get document content as raw bytes. """
 
         if self.buffer is None:
+            if self.fp is None:
+                return b''
             try:
                 debug ("Fetching %s ..." % self.attribs.url)
                 self.buffer = self.fp.read ()

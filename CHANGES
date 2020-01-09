@@ -1,3 +1,7 @@
+0.7.9 January 6, 2020
+
+- Ebookmaker was failing to make epubs if a linked file was missing. Now it emits an Error message to the log with url of missing file, but goes ahead and makes an epub without it.
+
 0.7.8 January 4, 2020
 
 - updated libgutenberg to 0.5.1
