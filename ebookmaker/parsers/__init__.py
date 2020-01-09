@@ -227,7 +227,11 @@ class ParserBase (object):
                     self.decode ('windows-1252'))
 
             if not data:
-                raise UnicodeError ("Text in Klingon encoding ... giving up.")
+                if data == '':
+                    info ('Continuing parse despite missing file')
+                    self.unicode_buffer = ''
+                else:
+                    raise UnicodeError ("Text in Klingon encoding ... giving up.")
 
             # normalize line-endings
             if '\r' in data or '\u2028' in data:

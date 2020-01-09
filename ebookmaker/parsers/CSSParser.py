@@ -50,7 +50,11 @@ class Parser (ParserBase):
         if self.fp:
             self.sheet = parser.parseString (self.unicode_content())
         else:
-            self.sheet = parser.parseUrl (self.attribs.url)
+            try:
+                self.sheet = parser.parseUrl (self.attribs.url)
+            except ValueError:
+                logging.error ('Missing file: %s' % self.attribs.url)
+                return
             
         self.attribs.mediatype = parsers.ParserAttributes.HeaderElement ('text/css')
         self.unpack_media_handheld (self.sheet)

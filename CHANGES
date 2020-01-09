@@ -1,3 +1,13 @@
+0.7.10 January 9, 2020
+
+- build failures on our production system suggest that the parser's output for empty style elements may be os-dependent. Parser now handles style elements with null text.
+- allow the build to succeed even if a css file is missing
+- allow px only in border properties. see discussion below
+- fix false encoding error (complaining about "Klingon") when content file is missing
+
+Ebookmaker has been removing any css rules that use 'px' measurements. 'px' measurements are discouraged in css styles for epub because of poor scaling when user changes font size. However fixed lengths are still useful in properties such as table borders. see discussion on DP forum:
+https://www.pgdp.net/phpBB3/viewtopic.php?f=3&t=41237&p=1188773&hilit=windymilla#p1188746
+
 0.7.9 January 6, 2020
 
 - Ebookmaker was failing to make epubs if a linked file was missing. Now it emits an Error message to the log with url of missing file, but goes ahead and makes an epub without it.

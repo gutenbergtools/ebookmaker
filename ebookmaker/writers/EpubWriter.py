@@ -854,7 +854,8 @@ class Writer (writers.HTMLishWriter):
                                     'background-attachment', 'background-repeat'):
                         debug ("Dropping property %s" % p.name)
                         rule.style.removeProperty (p.name)
-                    elif p.value.endswith ('px'):
+                    elif 'border' not in p.name and 'px' in p.value:
+                        debug ("Dropping property with px value %s" % p.name)
                         rule.style.removeProperty (p.name)
 
         # debug ("exit fix_incompatible_css")
@@ -869,14 +870,15 @@ class Writer (writers.HTMLishWriter):
 
         for style in xpath (xhtml, "//xhtml:style"):
             p = parsers.CSSParser.Parser ()
-            p.parse_string (style.text)
+            if style.text: # try to fix os-dependent empty style bug 
+                p.parse_string (style.text)
 
-            for rule in p.sheet:
-                if rule.type == rule.STYLE_RULE:
-                    for p in rule.style:
-                        if p.name in ('float', 'position'):
-                            classes.update (regex.findall (rule.selectorList.selectorText))
-                            break
+                for rule in p.sheet:
+                    if rule.type == rule.STYLE_RULE:
+                        for p in rule.style:
+                            if p.name in ('float', 'position'):
+                                classes.update (regex.findall (rule.selectorList.selectorText))
+                                break
 
         return classes
 
@@ -889,13 +891,14 @@ class Writer (writers.HTMLishWriter):
 
         for style in xpath (xhtml, "//xhtml:style"):
             p = parsers.CSSParser.Parser ()
-            p.parse_string (style.text)
-            try:
-                # pylint: disable=E1103
-                style.text = p.sheet.cssText.decode ('utf-8')
-            except (ValueError, UnicodeError):
-                debug ("CSS:\n%s" % p.sheet.cssText)
-                raise
+            if style.text: # try to fix os-dependent empty style bug
+                p.parse_string (style.text)
+                try:
+                    # pylint: disable=E1103
+                    style.text = p.sheet.cssText.decode ('utf-8')
+                except (ValueError, UnicodeError):
+                    debug ("CSS:\n%s" % p.sheet.cssText)
+                    raise
 
         # debug ("exit fix_style_elements")
 
