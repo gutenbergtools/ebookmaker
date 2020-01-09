@@ -20,7 +20,7 @@ import six
 from pkg_resources import resource_listdir, resource_stream # pylint: disable=E0611
 import requests
 
-from libgutenberg.Logger import debug
+from libgutenberg.Logger import debug, error
 from libgutenberg import MediaTypes
 from ebookmaker.CommonCode import Options
 from ebookmaker.Version import VERSION
@@ -144,10 +144,14 @@ class ParserFactory (object):
         """ Open a local file for parsing. """
 
         url = orig_url
-        if url.startswith ('file://'):
-            fp = open (url[7:], "rb")
-        else:
-            fp = open (url, "rb")
+        try:
+            if url.startswith ('file://'):
+                fp = open (url[7:], "rb")
+            else:
+                fp = open (url, "rb")
+        except FileNotFoundError:
+            fp = None
+            error ('Missing file: %s' % url)
         attribs.orig_mediatype = attribs.HeaderElement (MediaTypes.guess_type (url))
 
         debug ("... got mediatype %s from guess_type" % str (attribs.orig_mediatype))
