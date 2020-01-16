@@ -36,17 +36,28 @@ class Writer (BaseWriter):
         try:
             cwd = os.getcwd ()
             os.chdir (job.outputdir)
-
-            kindlegen = subprocess.Popen (
-                [
-                    options.config.MOBIGEN,
-                    '-o', os.path.basename (job.outputfile),
-                    job.url
-                ],
-                stdin=subprocess.PIPE,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE
-            )
+            if 'ebook-convert' in options.config.MOBIGEN:
+                kindlegen = subprocess.Popen (
+                    [
+                        options.config.MOBIGEN,
+                        job.url,
+                        os.path.basename (job.outputfile),
+                    ],
+                    stdin=subprocess.PIPE,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE
+                )
+            else:
+                kindlegen = subprocess.Popen (
+                    [
+                        options.config.MOBIGEN,
+                        '-o', os.path.basename (job.outputfile),
+                        job.url
+                    ],
+                    stdin=subprocess.PIPE,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE
+                )
 
         except OSError as what:
             os.chdir (cwd)
