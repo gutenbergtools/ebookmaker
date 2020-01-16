@@ -124,11 +124,12 @@ class Spider (object):
             if depth >= self.max_depth:
                 return
             if not self.is_included_url (attribs):
+                warning ('External link in %s: %s' % (attribs.referrer, attribs.url))
                 return
         if not self.is_included_mediatype (attribs) and not self.is_included_relation (attribs):
             return
         elif not self.is_included_url (attribs):
-            error ('Failed for embedded media from disallowed location: %s' % attribs.url)
+            error ('Failed for embedded media in %s from disallowed location: %s' % (attribs.referrer, attribs.url))
             return
 
         queue.append ((depth, attribs))
