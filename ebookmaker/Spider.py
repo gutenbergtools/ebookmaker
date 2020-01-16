@@ -20,7 +20,7 @@ from six.moves import urllib
 
 import libgutenberg.GutenbergGlobals as gg
 from libgutenberg.GutenbergGlobals import NS
-from libgutenberg.Logger import debug, warning
+from libgutenberg.Logger import debug, warning, error
 from libgutenberg import MediaTypes
 
 from ebookmaker import parsers
@@ -126,6 +126,9 @@ class Spider (object):
             if not self.is_included_url (attribs):
                 return
         if not self.is_included_mediatype (attribs) and not self.is_included_relation (attribs):
+            return
+        elif not self.is_included_url (attribs):
+            error ('Failed for embedded media from disallowed location: %s' % attribs.url)
             return
 
         queue.append ((depth, attribs))
