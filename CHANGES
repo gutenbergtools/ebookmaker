@@ -1,3 +1,11 @@
+0.8.0 January 10, 2020
+- support ebook-convert tool from Calibre as alternative to kindlegen
+
+    To use calibre instead of kindlegen
+
+    1. install calibre
+    2. change MOBIGEN setting to 'ebook-convert' or the path to ebook-convert
+
 0.7.10 January 9, 2020
 
 - build failures on our production system suggest that the parser's output for empty style elements may be os-dependent. Parser now handles style elements with null text.
