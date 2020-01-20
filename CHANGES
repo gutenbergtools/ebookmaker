@@ -1,3 +1,12 @@
+0.8.2 January 16, 2020
+- refined embedded media error message to include referrer
+- added external link warning
+
+0.8.1 January 15, 2020
+- Ebookmaker has been downloading and including in epubs embedded media from arbitrary websites, for example, images. This has caused build errors when a remote site goes away. ebookmaker has command line parameters that allow include and exclude urls that have governed document files; these same rules now apply to media files.
+
+  In general, PG books should not embed media from other sites.
+
 0.8.0 January 10, 2020
 - support ebook-convert tool from Calibre as alternative to kindlegen
 
