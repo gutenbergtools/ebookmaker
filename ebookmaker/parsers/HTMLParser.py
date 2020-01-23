@@ -346,7 +346,7 @@ class Parser (HTMLParserBase):
         
         if coverpage_url:
             for coverpage in coverpages:
-                coverpage['src'] = coverpage_url
+                coverpage.set('href', coverpage_url)
                 debug ("overrode link to coverpage with %s." % coverpage_url)
             else:
                 for head in xpath (self.xhtml, "/xhtml:html/xhtml:head"):
