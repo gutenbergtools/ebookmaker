@@ -525,7 +525,7 @@ class Translator (writers.Translator):
 
     def output_noindent (self):
         if not self.indent_p:
-            self.context.append ('{\\noindent}%\n')
+            self.context.append ('{\\noindent}\n')
             self.indent_p = True
 
     def ta (self, indent, text):
