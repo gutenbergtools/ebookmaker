@@ -386,7 +386,7 @@ class Parser (HTMLParserBase):
         try:
             return etree.fromstring (
                 html,
-                lxml.html.XHTMLParser (),
+                lxml.html.XHTMLParser (huge_tree=True),
                 base_url = self.attribs.url)
         except etree.ParseError as what:
             # cannot try HTML parser because we depend on correct xhtml namespace
