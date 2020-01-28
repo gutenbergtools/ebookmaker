@@ -455,7 +455,7 @@ class Translator (writers.Translator):
         self.register_class ('inline', 'xx-large',    r'{\Huge\strut{',         r'}}')
         self.register_class ('inline', 'x-large',     r'{\LARGE\strut{',        r'}}')
         self.register_class ('inline', 'large',       r'{\Large\strut{',        r'}}')
-        self.register_class ('inline', 'medium',      r'{\normalsize ',   r'}}')
+        self.register_class ('inline', 'medium',      r'{\normalsize{ ',   r'}}')
         self.register_class ('inline', 'small',       r'{\footnotesize{', r'}}')
         self.register_class ('inline', 'x-small',     r'{\scriptsize{',   r'}}')
         self.register_class ('inline', 'xx-small',    r'{\tiny{',         r'}}')
@@ -525,7 +525,7 @@ class Translator (writers.Translator):
 
     def output_noindent (self):
         if not self.indent_p:
-            self.context.append ('{\\noindent}%\n')
+            self.context.append ('{\\noindent}\n')
             self.indent_p = True
 
     def ta (self, indent, text):
