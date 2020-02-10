@@ -1,3 +1,7 @@
+0.8.7 February 10, 2020
+- fixed issue causing failed build when file encoding doesn't match plateform default
+- fixed issue where cover set on command line is excluded in build.
+
 0.8.6 February 6, 2020
 - fixed issue where covers aren't set when source is txt
 
