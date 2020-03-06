@@ -128,7 +128,7 @@ class Spider (object):
                 return
         if not self.is_included_mediatype (attribs) and not self.is_included_relation (attribs):
             return
-        elif not self.is_included_url (attribs):
+        elif not self.is_included_url (attribs) and not self.is_included_relation (attribs):
             error ('Failed for embedded media in %s from disallowed location: %s' % (attribs.referrer, attribs.url))
             return
 

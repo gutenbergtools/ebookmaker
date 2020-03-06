@@ -684,3 +684,14 @@ class Parser (HTMLParserBase):
                 body.append (p)
 
         self.pars = []
+
+    def _make_coverpage_link (self, coverpage_url = None):
+        """ Insert a <link rel="coverpage"> in the html head
+        using the image specified by the --cover command-line option
+        """
+        
+        if coverpage_url:
+            for head in xpath (self.xhtml, "/xhtml:html/xhtml:head"):
+                head.append (parsers.em.link (rel = 'coverpage', href = coverpage_url))
+                debug ("Inserted link to coverpage %s." % coverpage_url)
+            return
