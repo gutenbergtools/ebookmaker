@@ -1,3 +1,8 @@
+0.8.8 March 6, 2020
+- fixed issue preventing chunking when text file is latin-1
+- fixed failure when source links to a directory
+- improved parse error message
+
 0.8.7 February 10, 2020
 - fixed issue causing failed build when file encoding doesn't match plateform default
 - fixed issue where cover set on command line is excluded in build.
