@@ -152,6 +152,9 @@ class ParserFactory (object):
         except FileNotFoundError:
             fp = None
             error ('Missing file: %s' % url)
+        except IsADirectoryError:
+            fp = None
+            error ('Missing file is a directory: %s' % url)
         attribs.orig_mediatype = attribs.HeaderElement (MediaTypes.guess_type (url))
 
         debug ("... got mediatype %s from guess_type" % str (attribs.orig_mediatype))
