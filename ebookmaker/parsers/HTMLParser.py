@@ -20,6 +20,7 @@ from six.moves import urllib
 import lxml.html
 from lxml import etree
 from lxml.builder import ElementMaker
+from lxml.etree import XMLSyntaxError
 
 from libgutenberg.GutenbergGlobals import NS, xpath
 from libgutenberg.Logger import info, debug, warning, error
@@ -390,7 +391,7 @@ class Parser (HTMLParserBase):
                 base_url = self.attribs.url)
         except etree.ParseError as what:
             # cannot try HTML parser because we depend on correct xhtml namespace
-            error ("etree.fromstring says: %s" % what)
+            error ("Failed to parse file because: %s" % what)
             m = re.search (r'line\s(\d+),', str (what))
             if m:
                 lineno = int (m.group (1))
