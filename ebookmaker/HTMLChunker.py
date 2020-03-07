@@ -189,7 +189,12 @@ class HTMLChunker (object):
                 if not isinstance (child, etree.ElementBase):
                     # comments, processing instructions etc.
                     continue
-                child_size = len (etree.tostring (child, encoding='utf-8'))
+
+                # size measurement doesn't need to be exact
+                try:
+                    child_size = len (etree.tostring (child, encoding='utf-8'))
+                except etree.SerialisationError:
+                    child_size = len (etree.tostring (child, encoding='latin_1'))
 
                 try:
                     tags = [child.tag + '.' + c for c in child.attrib['class'].split ()]
