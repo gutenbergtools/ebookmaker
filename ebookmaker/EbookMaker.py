@@ -411,7 +411,7 @@ def do_job (job):
         if job.url:
             spider = Spider.Spider ()
             spider.include_urls += (options.include_urls or
-                                    [os.path.dirname (job.url) + '/*'])
+                                    [os.path.dirname (job.url) + os.path.sep + '*'])
 
             spider.include_mediatypes += options.include_mediatypes
             if job.subtype == '.images' or job.type == 'rst.gen':
