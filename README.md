@@ -47,7 +47,7 @@ or
 
 
 
-# new to pipenv?
+## new to pipenv?
 
 Install pipenv  (might be `pip install --user pipenv`, depending on your default python)
 
@@ -99,4 +99,24 @@ then:
 `$ python setup.py test`
 
 Travis-CI will run tests on branches committed in the gutenbergtools org
+
+## Run Ebookmaker on Windows Machine 
+
+1) Tried to use Python 2.7 under Guiguts folder – unable to install pip.
+2) Installed Python 3.7.4 from python.org
+3) Add system environment variable: Right-click “My Computer”, then Properties, then Advanced, then Environment variables, then New. Call the variable PYTHON_HOME, and set it to the Python folder.
+4) Edit the Path variable and add to the end of it “;%PYTHON_HOME%\;%PYTHON_HOME%\Scripts\”
+5) Check by starting a new command window and typing “python”. It should run your version of Python. Quit python with ^Z & Enter.
+6) In command window, type “pip3 install --user pipenv”. Script may warn it has put scripts into a folder such as C:\Users\myname\AppData\Roaming\Python\Python37\Scripts, and to add this to the Path environment variable. Do this – don’t forget the semicolon before the new folder name! (Possibly might work instead to just copy the newly installed files from where they were installed into your main python scripts folder, i.e. %PYTHON_HOME%\Scripts ?)
+7) Close old command window and start a new (to get the new path)
+8) Create a folder for ebookmaker, e.g. C:\DP\ebookmaker
+9) In command window, go to the new folder
+10) Type “pipenv --three” (note double hyphen) – it will create a “virtual environment”, with a new folder, something like “C:\Users\myname\.virtualenvs\ebookmaker-cgaQuYhi”
+11) Type “pipenv shell” – prompt will change while in virtual environment
+12) Type “pipenv install ebookmaker” – takes a while to install
+13) Download GTK+ to get Cairo. Precompiled Win32 binaries are here: http://ftp.gnome.org/pub/gnome/binaries ... _win32.zip
+14) Unzip this to a folder, e.g. C:\DP\gtk and add C:\DP\gtk\bin to the Path environment variable.
+15) Exit command window and start a new one to get new path
+16) Go to the ebookmaker folder, C:\DP\ebookmaker
+17) Type “pipenv run python C:\Users\myname\.virtualenvs\ebookmaker-cgaQuYhi\Scripts\ebookmaker --version” to check ebookmaker version.
 
