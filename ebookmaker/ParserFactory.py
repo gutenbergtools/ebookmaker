@@ -91,10 +91,10 @@ class ParserFactory (object):
         scheme = urllib.parse.urlsplit (url).scheme
         if scheme == 'resource':
             fp = cls.open_resource (url, attribs)
-        elif scheme in ('file', ''):
-            fp = cls.open_file (url, attribs)
-        else:
+        elif scheme in ('http', 'https'):
             fp = cls.open_url (url, attribs)
+        else:
+            fp = cls.open_file (url, attribs)
 
         if attribs.url in cls.parsers:
             # reuse parser because parsing may be expensive, eg. reST docs
