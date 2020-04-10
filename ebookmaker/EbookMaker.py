@@ -133,7 +133,10 @@ def elect_coverpage (spider, url):
                              (p_url, dimen[0], dimen[1]))
                     continue
             coverpage_found = True
-    if spider.parsers and not coverpage_found and options.generate_cover :
+    if spider.parsers and not coverpage_found and options.generate_cover:
+        if not hasattr(Cover, 'cairo'):
+            warning('Cairo not installed, cover generation disabled')
+            retrun
         if options.outputdir:
             dir = options.outputdir
         else:
