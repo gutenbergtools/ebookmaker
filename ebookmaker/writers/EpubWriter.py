@@ -165,8 +165,7 @@ class OEBPSContainer (zipfile.ZipFile):
         """
 
         self.zipfilename = filename
-        self.oebps_path = oebps_path if oebps_path else 'OEBPS/'
-
+        self.oebps_path = oebps_path if oebps_path else 'OEBPS'
         info ('Creating Epub file: %s' % filename)
 
         # open zipfile
