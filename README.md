@@ -120,4 +120,4 @@ Travis-CI will run tests on branches committed in the gutenbergtools org
 16. Type `pipenv run python ebookmaker --version` to check ebookmaker version. If this doesn't work (it should, but didn't work for us) try:
     - Look in `C:\Users\myname\.virtualenvs\` and find the name of your virtualev it should be something like `ebookmaker-cgaQuYhi`
     - Type `pipenv run python C:\Users\myname\.virtualenvs\<name of vitualenv>\Scripts\ebookmaker --version` to check ebookmaker version. 
-
+17. If there's error like like no "cairo" or "cairo-2" found, check if your libcairo and libcairo-2 path exist. If they do, edit dlopen in  _init_.py in cairocffi package. Return the path found by ctypes.util.find_library directly instead of calling ffi.dlopen(path).
