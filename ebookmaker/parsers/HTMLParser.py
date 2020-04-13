@@ -135,29 +135,30 @@ class Parser (HTMLParserBase):
         html = parsers.RE_HTML_CHARSET.sub ('; charset=utf-8', html)
 
         # convert to xhtml
-        tidy = subprocess.Popen (
-            ["tidy",
-             "-utf8",
-             "-clean",
-             "--wrap",             "0",
-             # "--drop-font-tags",   "y",
-             # "--drop-proprietary-attributes", "y",
-             # "--add-xml-space",    "y",
-             "--output-xhtml",     "y",
-             "--numeric-entities", "y",
-             "--merge-divs",       "n", # keep poetry indentation
-             "--merge-spans",      "n",
-             "--add-xml-decl",     "n",
-             "--doctype",          "strict",
-             "--anchor-as-name",   "n",
-             "--enclose-text",     "y" ],
+        try:
+            tidy = subprocess.Popen (
+                ["tidy",
+                 "-utf8",
+                 "-clean",
+                 "--wrap",             "0",
+                 # "--drop-font-tags",   "y",
+                 # "--drop-proprietary-attributes", "y",
+                 # "--add-xml-space",    "y",
+                 "--output-xhtml",     "y",
+                 "--numeric-entities", "y",
+                 "--merge-divs",       "n", # keep poetry indentation
+                 "--merge-spans",      "n",
+                 "--add-xml-decl",     "n",
+                 "--doctype",          "strict",
+                 "--anchor-as-name",   "n",
+                 "--enclose-text",     "y" ],
 
-            stdin = subprocess.PIPE,
-            stdout = subprocess.PIPE,
-            stderr = subprocess.PIPE)
-
-        # print (html.encode ('utf-8'))
-        # sys.exit ()
+                stdin = subprocess.PIPE,
+                stdout = subprocess.PIPE,
+                stderr = subprocess.PIPE)
+        except FileNotFoundError:
+            error ("Can't find Tidy; conversion likely to fail.")
+            return html
 
         (html, stderr) = tidy.communicate (html.encode ('utf-8'))
 
