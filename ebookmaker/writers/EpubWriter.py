@@ -165,7 +165,7 @@ class OEBPSContainer (zipfile.ZipFile):
         """
 
         self.zipfilename = filename
-        self.oebps_path = oebps_path if oebps_path else 'OEBPS'
+        self.oebps_path = oebps_path if oebps_path else 'OEBPS/'
         info ('Creating Epub file: %s' % filename)
 
         # open zipfile
@@ -1054,7 +1054,7 @@ class Writer (writers.HTMLishWriter):
         url = os.path.normpath (url)
         url = url.replace ('/', '@')
         url = re.sub ('[\\|/:?"*<>\u0000-\u001F]', escape, url)
-
+        url = url.replace ('\\', '@')
         # url = url.translate (string.maketrans (':?', '+@')) # windows stupidity
 
         return url
