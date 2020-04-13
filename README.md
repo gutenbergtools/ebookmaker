@@ -102,7 +102,7 @@ Travis-CI will run tests on branches committed in the gutenbergtools org
 
 ## Notes running Ebookmaker on Windows Machine (adapted from @windymilla)
 
-1. Install Python 3.6+ from python.org
+1. Install Python 3.6+ from python.org. Install HTML Tidy - it doesn't come preinstalled on Windows. Add it to the path.
 2. Add system environment variable: Right-click "My Computer", then Properties, then Advanced, then Environment variables, then New. Call the variable PYTHON_HOME, and set it to the Python folder.
 3. Edit the Path variable and add to the end of it `;%PYTHON_HOME%\;%PYTHON_HOME%\Scripts\`
 4. Check by starting a new command window and typing `python`. It should run your version of Python. Quit python with `^Z` & Enter.
