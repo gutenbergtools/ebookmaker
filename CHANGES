@@ -1,3 +1,9 @@
+0.8.9 April 13, 2020
+- fixed issues preventing successful deployments on Windows
+- added logging for books deeper than max_depth
+- improved documentation for tidy and cairo prerequisites
+- added install-on-windows notes
+
 0.8.8 March 6, 2020
 - fixed issue preventing chunking when text file is latin-1
 - fixed failure when source links to a directory
