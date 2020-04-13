@@ -122,6 +122,7 @@ class Spider (object):
 
         if is_doc:
             if depth >= self.max_depth:
+                error ('Omitted file %s due to depth > max_depth' % attribs.url)
                 return
             if not self.is_included_url (attribs):
                 warning ('External link in %s: %s' % (attribs.referrer, attribs.url))
