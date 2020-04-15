@@ -30,7 +30,7 @@ import libgutenberg.GutenbergGlobals as gg
 from libgutenberg.Logger import debug, warning, error, exception
 from libgutenberg import Logger, DublinCore
 from libgutenberg import MediaTypes as mt
-from libgutenberg import Cover
+#from libgutenberg import Cover
 
 from ebookmaker import parsers
 from ebookmaker import ParserFactory
@@ -136,7 +136,7 @@ def elect_coverpage(spider, url):
     if spider.parsers and not coverpage_found and options.generate_cover:
         if not hasattr(Cover, 'cairo'):
             warning('Cairo not installed, cover generation disabled')
-            retrun
+            return
         if options.outputdir:
             dir = options.outputdir
         else:
