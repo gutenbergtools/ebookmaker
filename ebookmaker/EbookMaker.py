@@ -30,7 +30,7 @@ import libgutenberg.GutenbergGlobals as gg
 from libgutenberg.Logger import debug, warning, error, exception
 from libgutenberg import Logger, DublinCore
 from libgutenberg import MediaTypes as mt
-#from libgutenberg import Cover
+from libgutenberg import Cover
 
 from ebookmaker import parsers
 from ebookmaker import ParserFactory
