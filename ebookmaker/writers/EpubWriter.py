@@ -1114,7 +1114,7 @@ class Writer (writers.HTMLishWriter):
 
         try:
             ocf = OEBPSContainer (
-                os.path.join (job.outputdir, job.outputfile),
+                os.path.join (os.path.abspath(job.outputdir), job.outputfile),
                 ('%d/' % options.ebook if options.ebook else None))
 
             opf = ContentOPF ()
@@ -1174,7 +1174,7 @@ class Writer (writers.HTMLishWriter):
 
         debug ("Validating %s ..." % job.outputfile)
 
-        filename = os.path.join (job.outputdir,
+        filename = os.path.join (os.path.abspath(job.outputdir),
                                  job.outputfile)
 
         for validator in (options.config.EPUB_VALIDATOR, options.config.EPUB_PREFLIGHT):
@@ -1238,7 +1238,7 @@ class Writer (writers.HTMLishWriter):
 
                         if options.verbose >= 2:
                             # write html to disk for debugging
-                            debugfilename = os.path.join (job.outputdir,
+                            debugfilename = os.path.join (os.path.abspath(job.outputdir),
                                                           job.outputfile)
                             debugfilename = os.path.splitext (debugfilename)[0] + '.' + \
                                 job.maintype + '.debug.html'
