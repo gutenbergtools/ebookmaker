@@ -406,7 +406,7 @@ def do_job(job):
     log_handler = None
     Logger.ebook = job.ebook
     if job.logfile:
-        log_handler = open_log(os.path.join(job.outputdir, job.logfile))
+        log_handler = open_log(os.path.join(os.path.abspath(job.outputdir), job.logfile))
 
     debug('=== Building %s ===' % job.type)
 
@@ -532,11 +532,11 @@ def main():
             job.outputdir = options.outputdir
             job.outputfile = options.outputfile or make_output_filename(type_, options.dc)
             output_files[type_] = job.outputfile
-
+            absoutputdir = os.path.abspath(job.outputdir)
             if job.type == 'kindle.images':
-                job.url = os.path.join(job.outputdir, output_files['epub.images'])
+                job.url = os.path.join(absoutputdir, output_files['epub.images'])
             elif job.type == 'kindle.noimages':
-                job.url = os.path.join(job.outputdir, output_files['epub.noimages'])
+                job.url = os.path.join(absoutputdir, output_files['epub.noimages'])
 
             job_queue.append(job)
 

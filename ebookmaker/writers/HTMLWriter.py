@@ -49,7 +49,7 @@ class Writer (writers.HTMLishWriter):
     def build (self, job):
         """ Build HTML file. """
 
-        htmlfilename = os.path.join (job.outputdir,
+        htmlfilename = os.path.join (os.path.abspath(job.outputdir),
                                      job.outputfile)
         try:
             os.remove (htmlfilename)
@@ -91,8 +91,6 @@ class Writer (writers.HTMLishWriter):
                                            xml_declaration = True)
 
                     self.write_with_crlf (htmlfilename, html)
-
-            # self.copy_aux_files (job.outputdir)
 
             info ("Done HTML file: %s" % htmlfilename)
 

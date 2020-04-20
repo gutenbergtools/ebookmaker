@@ -26,7 +26,7 @@ class Writer (writers.BaseWriter):
     def build (self, job):
         """ Build RST file. """
 
-        filename = os.path.join (job.outputdir, job.outputfile)
+        filename = os.path.join (os.path.abspath(job.outputdir), job.outputfile)
 
         info ("Creating RST file: %s" % filename)
 

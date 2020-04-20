@@ -54,7 +54,7 @@ class Writer (writers.BaseWriter):
     def build (self, job):
         """ Build Pics file. """
 
-        dest_dir = job.outputdir
+        dest_dir = os.path.abspath(job.outputdir)
 
         info ("Creating Pics directory in: %s" % dest_dir)
 

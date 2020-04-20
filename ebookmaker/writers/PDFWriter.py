@@ -32,7 +32,7 @@ class Writer (writers.BaseWriter):
         """ Build PDF file. """
 
         inputfilename  = job.url
-        outputfilename = os.path.join (job.outputdir, job.outputfile)
+        outputfilename = os.path.join (os.path.abspath(job.outputdir), job.outputfile)
 
         debug ("Inputfile: %s" % inputfilename)
         info ("Creating PDF file: %s" % outputfilename)
@@ -61,7 +61,7 @@ class Writer (writers.BaseWriter):
 
         try:
             cwd = os.getcwd ()
-            os.chdir (job.outputdir)
+            os.chdir (os.path.abspath(job.outputdir))
 
             _xetex = subprocess.Popen ([options.config.XELATEX,
                                         "-output-directory", job.outputdir,
