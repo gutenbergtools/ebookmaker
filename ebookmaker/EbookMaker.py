@@ -48,21 +48,21 @@ options = Options()
 CONFIG_FILES = ['/etc/ebookmaker.conf', os.path.expanduser('~/.ebookmaker')]
 
 DEPENDENCIES = collections.OrderedDict((
-    ('all',             ('html', 'epub', 'kindle', 'pdf', 'txt', 'rst')),
-    ('test',            ('html', 'epub')),
-    ('html',            ('html.images',    'html.noimages')),
-    ('epub',            ('epub.images',    'epub.noimages')),
-    ('kindle',          ('kindle.images',  'kindle.noimages')),
-    ('pdf',             ('pdf.images',     'pdf.noimages')),
-    ('txt',             ('txt.utf-8',      'txt.iso-8859-1', 'txt.us-ascii')),
-    ('rst',             ('rst.gen', )),
+    ('all', ('html', 'epub', 'kindle', 'pdf', 'txt', 'rst')),
+    ('test', ('html', 'epub')),
+    ('html', ('html.images', 'html.noimages')),
+    ('epub', ('epub.images', 'epub.noimages')),
+    ('kindle', ('kindle.images', 'kindle.noimages')),
+    ('pdf', ('pdf.images', 'pdf.noimages')),
+    ('txt', ('txt.utf-8', 'txt.iso-8859-1', 'txt.us-ascii')),
+    ('rst', ('rst.gen', )),
     ('kindle.noimages', ('epub.noimages', )),
-    ('kindle.images',   ('epub.images', )),
-    ('html.noimages',   ('picsdir.noimages', )),
-    ('html.images',     ('picsdir.images', )),
-    ('pdf.noimages',    ('picsdir.noimages', )),
-    ('pdf.images',      ('picsdir.images', )),
-    ('rst.gen',         ('picsdir.images', )),
+    ('kindle.images', ('epub.images', )),
+    ('html.noimages', ('picsdir.noimages', )),
+    ('html.images', ('picsdir.images', )),
+    ('pdf.noimages', ('picsdir.noimages', )),
+    ('pdf.images', ('picsdir.images', )),
+    ('rst.gen', ('picsdir.images', )),
 ))
 
 BUILD_ORDER = """
@@ -77,28 +77,28 @@ pdf.images pdf.noimages
 qrcode rdf facebook twitter null""".split()
 
 FILENAMES = {
-    'html.noimages':    '{id}-noimages-h.html',
-    'html.images':      '{id}-h.html',
+    'html.noimages': '{id}-noimages-h.html',
+    'html.images': '{id}-h.html',
 
-    'epub.noimages':    '{id}-epub.epub',
-    'epub.images':      '{id}-images-epub.epub',
+    'epub.noimages': '{id}-epub.epub',
+    'epub.images': '{id}-images-epub.epub',
 
-    'kindle.noimages':  '{id}-kindle.mobi',
-    'kindle.images':    '{id}-images-kindle.mobi',
+    'kindle.noimages': '{id}-kindle.mobi',
+    'kindle.images': '{id}-images-kindle.mobi',
 
-    'pdf.noimages':     '{id}-pdf.pdf',
-    'pdf.images':       '{id}-images-pdf.pdf',
+    'pdf.noimages': '{id}-pdf.pdf',
+    'pdf.images': '{id}-images-pdf.pdf',
 
-    'txt.utf-8':        '{id}-0.txt',
-    'txt.iso-8859-1':   '{id}-8.txt',
-    'txt.us-ascii':     '{id}.txt',
+    'txt.utf-8': '{id}-0.txt',
+    'txt.iso-8859-1': '{id}-8.txt',
+    'txt.us-ascii': '{id}.txt',
 
-    'rst.gen':          '{id}-rst.rst',
+    'rst.gen': '{id}-rst.rst',
 
-    'picsdir.noimages': '{id}-noimages.picsdir',   # do we need this ?
-    'picsdir.images':   '{id}-images.picsdir',     # do we need this ?
+    'picsdir.noimages': '{id}-noimages.picsdir',  # do we need this ?
+    'picsdir.images': '{id}-images.picsdir',  # do we need this ?
 
-    'cover':            '{id}-cover.png'
+    'cover': '{id}-cover.png'
 }
 
 COVERPAGE_MIN_AREA = 200 * 200
@@ -108,10 +108,9 @@ def make_output_filename(type_, dc):
 
     if dc.project_gutenberg_id:
         # PG book: use PG naming convention
-        return FILENAMES[type_].format(id = dc.project_gutenberg_id)
-    else:
-        # not a PG ebook
-        return FILENAMES[type_].format(id = gg.string_to_filename(dc.title)[:65])
+        return FILENAMES[type_].format(id=dc.project_gutenberg_id)
+    # not a PG ebook
+    return FILENAMES[type_].format(id=gg.string_to_filename(dc.title)[:65])
 
 
 def elect_coverpage(spider, url):
@@ -130,7 +129,7 @@ def elect_coverpage(spider, url):
                     p.attribs.rel.remove('coverpage')
                     p_url = p.url if hasattr(p, 'url') else ''
                     warning("removed coverpage candidate %s because too small (%d x %d)" %
-                             (p_url, dimen[0], dimen[1]))
+                            (p_url, dimen[0], dimen[1]))
                     continue
             coverpage_found = True
     if spider.parsers and not coverpage_found and options.generate_cover:
@@ -216,171 +215,171 @@ def add_local_options(ap):
     ap.add_argument(
         '--version',
         action='version',
-        version = "%%(prog)s %s" % VERSION
+        version="%%(prog)s %s" % VERSION
     )
 
     ap.add_argument(
         "--make",
-        dest    = "types",
-        choices = CommonCode.add_dependencies(['all', 'test'], DEPENDENCIES),
-        default = [],
-        action  = 'append',
-        help    = "output type (default: all)")
+        dest="types",
+        choices=CommonCode.add_dependencies(['all', 'test'], DEPENDENCIES),
+        default=[],
+        action='append',
+        help="output type (default: all)")
 
     ap.add_argument(
         "--max-depth",
-        metavar = "LEVELS",
-        dest    = "max_depth",
-        type    = int,
-        default = 1,
-        help    = "go how many levels deep while recursively retrieving pages. " +
+        metavar="LEVELS",
+        dest="max_depth",
+        type=int,
+        default=1,
+        help="go how many levels deep while recursively retrieving pages. "
         "(0 == infinite) (default: %(default)s)")
 
     ap.add_argument(
         "--strip_links",
-        dest    = "strip_links",
-        action  = "store_true",
-        help    = "strip  <a href='external address' /> links")
+        dest="strip_links",
+        action="store_true",
+        help="strip  <a href='external address' /> links")
 
     ap.add_argument(
         "--include",
-        metavar = "GLOB",
-        dest    = "include_urls",
-        default = [],
-        action  = "append",
-        help    = "include urls (repeat for more) (default: urls under the same directory)")
+        metavar="GLOB",
+        dest="include_urls",
+        default=[],
+        action="append",
+        help="include urls (repeat for more) (default: urls under the same directory)")
 
     ap.add_argument(
         "--exclude",
-        metavar = "GLOB",
-        dest    = "exclude_urls",
-        default = [],
-        action  = "append",
-        help    = "exclude urls from included urls (repeat for more) (default: none)")
+        metavar="GLOB",
+        dest="exclude_urls",
+        default=[],
+        action="append",
+        help="exclude urls from included urls (repeat for more) (default: none)")
 
     ap.add_argument(
         "--include-mediatype",
-        metavar = "GLOB/GLOB",
-        dest    = "include_mediatypes",
-        default = mt.TEXT_MEDIATYPES | mt.AUX_MEDIATYPES,
-        action  = "append",
-        help    = "include mediatypes (repeat for more) (eg. 'image/*') " +
+        metavar="GLOB/GLOB",
+        dest="include_mediatypes",
+        default=mt.TEXT_MEDIATYPES | mt.AUX_MEDIATYPES,
+        action="append",
+        help="include mediatypes (repeat for more) (eg. 'image/*') "
         "(default: most common text mediatypes)")
 
     ap.add_argument(
         "--exclude-mediatype",
-        metavar = "GLOB/GLOB",
-        dest    = "exclude_mediatypes",
-        default = [],
-        action  = "append",
-        help    = "exclude this mediatype from included mediatypes " +
+        metavar="GLOB/GLOB",
+        dest="exclude_mediatypes",
+        default=[],
+        action="append",
+        help="exclude this mediatype from included mediatypes "
         "(repeat for more)")
 
     ap.add_argument(
         "--input-mediatype",
-        metavar = "MEDIATYPE",
-        dest    = "input_mediatype",
-        default = None,
-        help    = "mediatype of input url (default: http response else file extension)")
+        metavar="MEDIATYPE",
+        dest="input_mediatype",
+        default=None,
+        help="mediatype of input url (default: http response else file extension)")
 
     ap.add_argument(
         "--mediatype-from-extension",
-        dest    = "mediatype_from_extension",
-        action  = "store_true",
-        default = False,
-        help    = "guess all mediatypes from file extension, overrides http response")
+        dest="mediatype_from_extension",
+        action="store_true",
+        default=False,
+        help="guess all mediatypes from file extension, overrides http response")
 
     ap.add_argument(
         "--rewrite",
-        metavar = "from>to",
-        dest    = "rewrite",
-        default = [],
-        action  = "append",
-        help    = "rewrite url eg. 'http://www.example.org/>http://www.example.org/index.html'")
+        metavar="from>to",
+        dest="rewrite",
+        default=[],
+        action="append",
+        help="rewrite url eg. 'http://www.example.org/>http://www.example.org/index.html'")
 
     ap.add_argument(
         "--title",
-        dest    = "title",
-        default = None,
-        help    = "ebook title (default: from meta)")
+        dest="title",
+        default=None,
+        help="ebook title (default: from meta)")
 
     ap.add_argument(
         "--author",
-        dest    = "author",
-        default = None,
-        help    = "author (default: from meta)")
+        dest="author",
+        default=None,
+        help="author (default: from meta)")
 
     ap.add_argument(
         "--ebook",
-        dest    = "ebook",
-        type    = int,
-        default = 0,
-        help    = "ebook no. (default: from meta)")
+        dest="ebook",
+        type=int,
+        default=0,
+        help="ebook no. (default: from meta)")
 
     ap.add_argument(
         "--output-dir",
-        metavar  = "OUTPUT_DIR",
-        dest    = "outputdir",
-        default = "./",
-        help    = "output directory (default: ./)")
+        metavar="OUTPUT_DIR",
+        dest="outputdir",
+        default="./",
+        help="output directory (default: ./)")
 
     ap.add_argument(
         "--output-file",
-        metavar  = "OUTPUT_FILE",
-        dest    = "outputfile",
-        default = None,
-        help    = "output file (default: <title>.epub)")
+        metavar="OUTPUT_FILE",
+        dest="outputfile",
+        default=None,
+        help="output file (default: <title>.epub)")
 
     ap.add_argument(
         "--validate",
-        dest     = "validate",
-        action   = "count",
-        help     = "validate epub through epubcheck")
+        dest="validate",
+        action="count",
+        help="validate epub through epubcheck")
 
     ap.add_argument(
         "--section",
-        metavar  = "TAG.CLASS",
-        dest     = "section_tags",
-        default  = [],
-        action   = "append",
-        help     = "split epub on TAG.CLASS")
+        metavar="TAG.CLASS",
+        dest="section_tags",
+        default=[],
+        action="append",
+        help="split epub on TAG.CLASS")
 
     ap.add_argument(
         "--packager",
-        dest    = "packager",
-        choices = ['ww', 'gzip'],
-        default = None,
-        help    = "PG internal use only: which packager to use (default: none)")
+        dest="packager",
+        choices=['ww', 'gzip'],
+        default=None,
+        help="PG internal use only: which packager to use (default: none)")
 
     ap.add_argument(
         "--cover",
-        dest    = "coverpage_url",
-        default = None,
-        help    = "use the cover specified by an absolute url")
+        dest="coverpage_url",
+        default=None,
+        help="use the cover specified by an absolute url")
 
     ap.add_argument(
         "--generate_cover",
-        dest    = "generate_cover",
-        action  = "store_true",
-        help    = "if no cover is specified by the source, or as an argument, generate a cover")
+        dest="generate_cover",
+        action="store_true",
+        help="if no cover is specified by the source, or as an argument, generate a cover")
 
     ap.add_argument(
         "--jobs",
-        dest    = "is_job_queue",
-        action  = "store_true",
-        help    = "PG internal use only: read pickled job queue from stdin")
+        dest="is_job_queue",
+        action="store_true",
+        help="PG internal use only: read pickled job queue from stdin")
 
     ap.add_argument(
         "--extension-package",
-        metavar  = "PYTHON_PACKAGE",
-        dest    = "extension_packages",
-        default = [],
-        action  = "append",
-        help    = "PG internal use only: load extensions from package")
+        metavar="PYTHON_PACKAGE",
+        dest="extension_packages",
+        default=[],
+        action="append",
+        help="PG internal use only: load extensions from package")
 
     ap.add_argument(
         "url",
-        help    = "url of file to convert")
+        help="url of file to convert")
 
 
 def open_log(path):
@@ -413,10 +412,10 @@ def do_job(job):
     try:
         if job.url:
             spider = Spider.Spider()
-            if job.url[:4]=='http':
+            if job.url[:4] == 'http':
                 sep = '/'
             else:
-                sep=os.path.sep
+                sep = os.path.sep
             spider.include_urls += (options.include_urls or
                                     [os.path.dirname(job.url) + sep + '*'])
 
@@ -476,7 +475,7 @@ def do_job(job):
 def config():
     """ Process config files and commandline params. """
 
-    ap = argparse.ArgumentParser(prog = 'EbookMaker')
+    ap = argparse.ArgumentParser(prog='EbookMaker')
     CommonCode.add_common_options(ap, CONFIG_FILES[1])
     add_local_options(ap)
     CommonCode.set_arg_defaults(ap, CONFIG_FILES[1])
