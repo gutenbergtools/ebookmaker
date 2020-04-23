@@ -20,6 +20,7 @@ import datetime
 import hashlib
 import logging
 import os.path
+import posixpath
 import sys
 
 import six
@@ -412,12 +413,9 @@ def do_job(job):
     try:
         if job.url:
             spider = Spider.Spider()
-            if job.url[:4] == 'http':
-                sep = '/'
-            else:
-                sep = os.path.sep
+            dirpath = os.path.dirname(job.url)  # platform native path
             spider.include_urls += (options.include_urls or
-                                    [os.path.dirname(job.url) + sep + '*'])
+                                    [posixpath.abspath(dirpath) + '/*']) # use for parser only
 
             spider.include_mediatypes += options.include_mediatypes
             if job.subtype == '.images' or job.type == 'rst.gen':

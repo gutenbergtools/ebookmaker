@@ -11,6 +11,7 @@ Distributable under the GNU General Public License Version 3 or newer.
 
 """
 
+import posixpath
 import re
 import subprocess
 import sys
@@ -439,7 +440,9 @@ class Parser (HTMLParserBase):
             self.xhtml = self.__parse (html)     # let exception bubble up
 
         self._fix_anchors () # needs relative paths
-        self.xhtml.make_links_absolute (base_url = self.attribs.url)
+
+        # to work on Windows, change backslash to slash; later, use os.path.abspath to switch back
+        self.xhtml.make_links_absolute (base_url = posixpath.abspath(self.attribs.url))
 
         self._to_xhtml11 ()
 
