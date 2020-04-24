@@ -145,8 +145,8 @@ class ParserFactory(object):
 
         url = orig_url
         try:
-            if url.startswith('file://'):
-                fp = open(url[7:], "rb")
+            if url.startswith('file:/'):
+                fp = open(url[6:], "rb")
             else:
                 fp = open(os.path.abspath(url), "rb")
         except FileNotFoundError:

@@ -14,6 +14,7 @@ Distributable under the GNU General Public License Version 3 or newer.
 from __future__ import unicode_literals
 
 import re
+import posixpath
 
 import chardet
 from cherrypy.lib import httputil
@@ -80,6 +81,15 @@ em = ElementMaker (makeelement = lxml.html.xhtml_parser.makeelement,
                    namespace = str (NS.xhtml),
                    nsmap = { None: str (NS.xhtml) })
 
+def webify_url(url):
+    """ make the url for a parser, accounting for platform """
+    if url.startswith('http'):
+        return url
+    if url.startswith('file:/'):
+        url = url[6:]
+    return posixpath.abspath(url)
+     
+
 
 class ParserAttributes (object): # pylint: disable=too-few-public-methods
     """ Object to hold attributes for the lifetime of a parser.
@@ -109,6 +119,7 @@ class ParserAttributes (object): # pylint: disable=too-few-public-methods
         self.orig_mediatype = None
         self.id = None
         self.rel = set ()
+        self.referrer = None
 
 
     def update (self, more_attribs):

@@ -20,7 +20,6 @@ import datetime
 import hashlib
 import logging
 import os.path
-import posixpath
 import sys
 
 import six
@@ -140,7 +139,7 @@ def elect_coverpage(spider, url):
         if options.outputdir:
             dir = options.outputdir
         else:
-            url = url[7:] if url.startswith('file://') else url
+            url = url[6:] if url.startswith('file:/') else url
             dir = os.path.dirname(os.path.abspath(url))
         debug('generating cover in %s' % dir)
         cover_url = generate_cover(dir)
@@ -415,7 +414,7 @@ def do_job(job):
             spider = Spider.Spider()
             dirpath = os.path.dirname(job.url)  # platform native path
             spider.include_urls += (options.include_urls or
-                                    [posixpath.abspath(dirpath) + '/*']) # use for parser only
+                                    [parsers.webify_url(dirpath) + '/*']) # use for parser only
 
             spider.include_mediatypes += options.include_mediatypes
             if job.subtype == '.images' or job.type == 'rst.gen':
@@ -432,7 +431,7 @@ def do_job(job):
                 spider.add_redirection(from_url, to_url)
 
             attribs = parsers.ParserAttributes()
-            attribs.url = job.url
+            attribs.url = parsers.webify_url(job.url)
             attribs.id = 'start'
 
             if options.input_mediatype:
