@@ -441,7 +441,7 @@ class Parser (HTMLParserBase):
         self._fix_anchors () # needs relative paths
 
         # to work on Windows, change backslash to slash; later, use os.path.abspath to switch back
-        self.xhtml.make_links_absolute (base_url = webify_url(self.attribs.url))
+        self.xhtml.make_links_absolute (base_url = self.attribs.url)
 
         self._to_xhtml11 ()
 
