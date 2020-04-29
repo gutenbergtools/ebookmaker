@@ -11,7 +11,6 @@ Distributable under the GNU General Public License Version 3 or newer.
 
 """
 
-import posixpath
 import re
 import subprocess
 import sys
@@ -28,7 +27,7 @@ from libgutenberg.Logger import info, debug, warning, error
 from libgutenberg.MediaTypes import mediatypes as mt
 
 from ebookmaker import parsers
-from ebookmaker.parsers import HTMLParserBase
+from ebookmaker.parsers import HTMLParserBase, webify_url
 
 mediatypes = ('text/html', mt.xhtml)
 
@@ -442,7 +441,7 @@ class Parser (HTMLParserBase):
         self._fix_anchors () # needs relative paths
 
         # to work on Windows, change backslash to slash; later, use os.path.abspath to switch back
-        self.xhtml.make_links_absolute (base_url = posixpath.abspath(self.attribs.url))
+        self.xhtml.make_links_absolute (base_url = webify_url(self.attribs.url))
 
         self._to_xhtml11 ()
 
