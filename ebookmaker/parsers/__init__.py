@@ -14,7 +14,6 @@ Distributable under the GNU General Public License Version 3 or newer.
 from __future__ import unicode_literals
 
 import re
-import posixpath
 
 import chardet
 from cherrypy.lib import httputil
@@ -87,7 +86,7 @@ def webify_url(url):
         return url
     if url.startswith('file:/'):
         url = url[6:]
-    return posixpath.abspath(url)
+    return os.path.abspath(url).replace(os.path.sep, '/')
 
 
 
