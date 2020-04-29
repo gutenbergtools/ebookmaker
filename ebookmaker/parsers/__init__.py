@@ -14,7 +14,7 @@ Distributable under the GNU General Public License Version 3 or newer.
 from __future__ import unicode_literals
 
 import re
-
+import os
 import chardet
 from cherrypy.lib import httputil
 import six
