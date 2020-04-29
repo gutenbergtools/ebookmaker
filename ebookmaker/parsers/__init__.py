@@ -82,10 +82,10 @@ em = ElementMaker(makeelement=lxml.html.xhtml_parser.makeelement,
 
 def webify_url(url):
     """ make the url for a parser, accounting for platform """
-    if url.startswith('http'):
+    if re.search(r'^https?://', url):
         return url
-    if url.startswith('file:/'):
-        url = url[6:]
+    if re.search(r'^[a-zA-z]:', url):
+        return 'file:///' + url.replace(os.path.sep, '/')
     return os.path.abspath(url).replace(os.path.sep, '/')
 
 

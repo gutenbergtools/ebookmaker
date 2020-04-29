@@ -145,10 +145,12 @@ class ParserFactory(object):
 
         url = orig_url
         try:
-            if url.startswith('file:/'):
+            if url.startswith('file:///'):
+                fp = open(url[8:], "rb")
+            elif url.startswith('file:/'):
                 fp = open(url[6:], "rb")
             else:
-                fp = open(os.path.abspath(url), "rb")
+                fp = open(url, "rb")
         except FileNotFoundError:
             fp = None
             error('Missing file: %s' % url)
