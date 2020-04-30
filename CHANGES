@@ -1,7 +1,21 @@
+0.8.10 April 30, 2020
+- fixed numerous file path nits on Windows
+    - kindlegen
+    - figsdir
+    - cover
+    - pdf
+- PEP8 delinted:
+    - EbookMaker.py
+    - ParserFactory.py
+    - Spider.py
+    - parsers/__init__.py
+    - writers/EpubWriter.py
+
 0.8.9 April 13, 2020
 - fixed issues preventing successful deployments on Windows
 - added logging for books deeper than max_depth
 - improved documentation for tidy and cairo prerequisites
+- try to catch  and report exceptions when tidy and cairo aren't installed
 - added install-on-windows notes
 
 0.8.8 March 6, 2020
