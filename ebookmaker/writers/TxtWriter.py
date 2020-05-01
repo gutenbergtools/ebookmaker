@@ -49,7 +49,7 @@ class Writer (writers.BaseWriter):
 
         nroff = nroff.encode (encoding)
         nrofffilename = os.path.join (
-            job.outputdir,
+            os.path.abspath(job.outputdir),
             os.path.splitext (job.outputfile)[0] + '.nroff')
 
         # write nroff file for debugging

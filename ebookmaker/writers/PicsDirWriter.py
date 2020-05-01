@@ -19,6 +19,7 @@ import os.path
 import libgutenberg.GutenbergGlobals as gg
 from libgutenberg.Logger import info, debug, error
 
+from ebookmaker.parsers import webify_url
 from ebookmaker import writers
 
 
@@ -31,7 +32,7 @@ class Writer (writers.BaseWriter):
         for p in job.spider.parsers:
             if hasattr (p, 'resize_image'):
                 src_uri = p.attribs.url
-                fn_dest = gg.make_url_relative (job.base_url, src_uri)
+                fn_dest = gg.make_url_relative (webify_url(job.base_url), src_uri)
                 fn_dest = os.path.join (dest_dir, fn_dest)
 
                 # debug ('base_url =  %s, src_uri = %s' % (job.base_url, src_uri))
@@ -54,7 +55,7 @@ class Writer (writers.BaseWriter):
     def build (self, job):
         """ Build Pics file. """
 
-        dest_dir = job.outputdir
+        dest_dir = os.path.abspath(job.outputdir)
 
         info ("Creating Pics directory in: %s" % dest_dir)
 

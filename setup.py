@@ -4,7 +4,7 @@
 
 from setuptools import setup
 
-VERSION = '0.8.8'
+VERSION = '0.8.10'
 
 setup (
     name = 'ebookmaker',
@@ -64,7 +64,8 @@ setup (
     maintainer = "Eric Hellman",
     maintainer_email = "eric@hellman.net",
     description = "The Project Gutenberg tool to generate EPUBs and other ebook formats.",
-    long_description = open ('README.md').read (),
+    long_description = open ('README.md', encoding='utf-8').read (),
+    long_description_content_type = 'text/markdown',
     license = "GPL v3",
     keywords = "ebook epub kindle pdf rst reST reStructuredText project gutenberg format conversion",
     url = "https://github.com/gutenbergtools/ebookmaker/",

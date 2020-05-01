@@ -47,7 +47,7 @@ or
 
 
 
-# new to pipenv?
+## new to pipenv?
 
 Install pipenv  (might be `pip install --user pipenv`, depending on your default python)
 
@@ -70,7 +70,7 @@ Install the gutenberg modules:
 Check your install:
 
 `$ ebookmaker --version`
-`EbookMaker 0.6.0`
+`EbookMaker 0.9.0`
 
 Since you're in the shell, you can navigate to a book's directory and convert it:
 
@@ -100,3 +100,24 @@ then:
 
 Travis-CI will run tests on branches committed in the gutenbergtools org
 
+## Notes running Ebookmaker on Windows Machine (adapted from @windymilla)
+
+1. Install Python 3.6+ from python.org. Install HTML Tidy - it doesn't come preinstalled on Windows. Add it to the path.
+2. Add system environment variable: Right-click "My Computer", then Properties, then Advanced, then Environment variables, then New. Call the variable PYTHON_HOME, and set it to the Python folder.
+3. Edit the Path variable and add to the end of it `;%PYTHON_HOME%\;%PYTHON_HOME%\Scripts\`
+4. Check by starting a new command window and typing `python`. It should run your version of Python. Quit python with `^Z` & Enter.
+5. In command window, type `pip3 install --user pipenv`. Script may warn it has put scripts into a folder such as `C:\Users\myname\AppData\Roaming\Python\Python37\Scripts`, and to add this to the Path environment variable. Do this – don't forget the semicolon before the new folder name! (Possibly might work instead to just copy the newly installed files from where they were installed into your main python scripts folder, i.e. `%PYTHON_HOME%\Scripts` ?)
+6. Close old command window and start a new (to get the new path)
+7. Create a folder for ebookmaker, e.g. `C:\DP\ebookmaker`
+8. In command window, go to the new folder
+9. Type `pipenv --three` (note double hyphen) – it will create a "virtual environment", with a new folder, something like `C:\Users\myname\.virtualenvs\ebookmaker-cgaQuYhi`
+10. Type `pipenv shell` – prompt will change while in virtual environment
+11. Type `pipenv install ebookmaker` – takes a while to install
+12. Download GTK+ to get Cairo. Precompiled Win32 binaries are here: http://ftp.gnome.org/pub/gnome/binaries ... _win32.zip
+13. Unzip this to a folder, e.g. `C:\DP\gtk` and add `C:\DP\gtk\bin` to the Path environment variable.
+14. Exit command window and start a new one to get new path
+15. Go to the ebookmaker folder, `C:\DP\ebookmaker`
+16. Type `pipenv run python ebookmaker --version` to check ebookmaker version. If this doesn't work (it should, but didn't work for us) try:
+    - Look in `C:\Users\myname\.virtualenvs\` and find the name of your virtualev it should be something like `ebookmaker-cgaQuYhi`
+    - Type `pipenv run python C:\Users\myname\.virtualenvs\<name of vitualenv>\Scripts\ebookmaker --version` to check ebookmaker version. 
+17. If there's error like like no "cairo" or "cairo-2" found, check if your libcairo and libcairo-2 path exist. If they do, edit dlopen in  _init_.py in cairocffi package. Return the path found by ctypes.util.find_library directly instead of calling ffi.dlopen(path).

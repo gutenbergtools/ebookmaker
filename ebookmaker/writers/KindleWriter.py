@@ -30,12 +30,15 @@ class Writer (BaseWriter):
     def build (self, job):
         """ Build kindle file from epub using amazon kindlegen. """
 
-        info ("Creating Kindle file: %s" % os.path.join (job.outputdir, job.outputfile))
+        # kindlegen needs localized paths
+        outputdir = os.path.abspath(job.outputdir)
+
+        info ("Creating Kindle file: %s" % os.path.join (outputdir, job.outputfile))
         info ("            ... from: %s" % job.url)
 
         try:
             cwd = os.getcwd ()
-            os.chdir (job.outputdir)
+            os.chdir (outputdir)
             if 'ebook-convert' in options.config.MOBIGEN:
                 kindlegen = subprocess.Popen (
                     [
@@ -99,5 +102,4 @@ class Writer (BaseWriter):
                     else:
                         error (line)
 
-        info ("Done Kindle file: %s" % os.path.join (
-            job.outputdir, job.outputfile))
+        info ("Done Kindle file: %s" % os.path.join (outputdir, job.outputfile))

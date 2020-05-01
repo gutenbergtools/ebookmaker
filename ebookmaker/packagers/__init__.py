@@ -41,7 +41,7 @@ class BasePackager (object):
     def setup (self, job):
         """ Setup """
 
-        self.path_name_ext = os.path.join (job.outputdir, job.outputfile)
+        self.path_name_ext = os.path.join(os.path.abspath(job.outputdir), job.outputfile)
         self.path, name = os.path.split (self.path_name_ext)
         self.name, self.ext = os.path.splitext (name)
 

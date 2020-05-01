@@ -27,11 +27,11 @@ from ebookmaker import parsers
 from ebookmaker import ParserFactory
 
 
-class Spider (object):
+class Spider(object):
     """ A very rudimentary web spider. """
 
-    def __init__ (self):
-        self.parsed_urls = set ()
+    def __init__(self):
+        self.parsed_urls = set()
         self.parsers = []
         self.redirection_map = {}
 
@@ -42,7 +42,7 @@ class Spider (object):
         self.max_depth = 1
 
 
-    def recursive_parse (self, root_attribs):
+    def recursive_parse(self, root_attribs):
         """ Do a recursive parse starting from url.
 
         Do a breadth-first traversal. Assuming the first page contains
@@ -53,146 +53,147 @@ class Spider (object):
 
         queue = []
 
-        debug ("Start of retrieval")
+        debug("Start of retrieval")
 
         # enqueue root url
 
-        self.enqueue (queue, 0, root_attribs, True)
+        self.enqueue(queue, 0, root_attribs, True)
 
         while queue:
-            depth, attribs = queue.pop (0)
+            depth, attribs = queue.pop(0)
 
-            url = self.redirect (attribs.url)
+            url = self.redirect(attribs.url)
             if url in self.parsed_urls:
                 continue
 
-            parser = ParserFactory.ParserFactory.create (url, attribs)
+            parser = ParserFactory.ParserFactory.create(url, attribs)
 
             # Maybe the url was redirected to something we already have?
             url = parser.attribs.url
             if url in self.parsed_urls:
                 continue
-            self.parsed_urls.add (url)
+            self.parsed_urls.add(url)
 
-            self.add_redirection (parser.attribs.orig_url, url)
-            parser.pre_parse ()
-            self.parsers.append (parser)
+            self.add_redirection(parser.attribs.orig_url, url)
+            parser.pre_parse()
+            self.parsers.append(parser)
 
             # look for more documents to add to the queue
-            debug ("Requesting iterlinks for: %s ..." % url)
-            for url, elem in parser.iterlinks ():
+            debug("Requesting iterlinks for: %s ..." % url)
+            for url, elem in parser.iterlinks():
 
-                new_attribs = parsers.ParserAttributes ()
-                new_attribs.url = urllib.parse.urldefrag (url)[0]
+                new_attribs = parsers.ParserAttributes()
+                new_attribs.url = urllib.parse.urldefrag(url)[0]
                 new_attribs.referrer = parser.attribs.url
 
-                for k, v in elem.items ():
+                for k, v in elem.items():
                     if k in ('id', 'title'):
-                        setattr (new_attribs, k, v)
+                        setattr(new_attribs, k, v)
                     elif k == 'type':
-                        new_attribs.orig_mediatype = new_attribs.HeaderElement.from_str (v)
+                        new_attribs.orig_mediatype = new_attribs.HeaderElement.from_str(v)
                     elif k == 'rel':
-                        new_attribs.rel.update (v.lower ().split ())
+                        new_attribs.rel.update(v.lower().split())
 
                 tag = elem.tag
                 if tag == NS.xhtml.a:
-                    self.enqueue (queue, depth + 1, new_attribs, True)
+                    self.enqueue(queue, depth + 1, new_attribs, True)
                 elif tag == NS.xhtml.img:
-                    self.enqueue (queue, depth, new_attribs, False)
+                    self.enqueue(queue, depth, new_attribs, False)
                 elif tag == NS.xhtml.link:
-                    if new_attribs.rel.intersection ( ('stylesheet', 'coverpage') ):
-                        self.enqueue (queue, depth, new_attribs, False)
+                    if new_attribs.rel.intersection(('stylesheet', 'coverpage')):
+                        self.enqueue(queue, depth, new_attribs, False)
                     else:
-                        self.enqueue (queue, depth + 1, new_attribs, True)
+                        self.enqueue(queue, depth + 1, new_attribs, True)
                 elif tag == NS.xhtml.object:
-                    self.enqueue (queue, depth, new_attribs, False)
+                    self.enqueue(queue, depth, new_attribs, False)
 
-        debug ("End of retrieval")
+        debug("End of retrieval")
 
         # rewrite redirected urls
         if self.redirection_map:
             for parser in self.parsers:
-                parser.remap_links (self.redirection_map)
+                parser.remap_links(self.redirection_map)
 
-        self.topological_sort ()
+        self.topological_sort()
 
 
-    def enqueue (self, queue, depth, attribs, is_doc):
+    def enqueue(self, queue, depth, attribs, is_doc):
         """ Enque url for parsing. """
-
         if is_doc:
+            if not self.is_included_url(attribs):
+                warning('External link in %s: %s' % (attribs.referrer, attribs.url))
+                return
             if depth >= self.max_depth:
+                error('Omitted file %s due to depth > max_depth' % attribs.url)
                 return
-            if not self.is_included_url (attribs):
-                warning ('External link in %s: %s' % (attribs.referrer, attribs.url))
-                return
-        if not self.is_included_mediatype (attribs) and not self.is_included_relation (attribs):
+        if not self.is_included_mediatype(attribs) and not self.is_included_relation(attribs):
             return
-        elif not self.is_included_url (attribs) and not self.is_included_relation (attribs):
-            error ('Failed for embedded media in %s from disallowed location: %s' % (attribs.referrer, attribs.url))
+        elif not self.is_included_url(attribs) and not self.is_included_relation(attribs):
+            error('Failed for embedded media in %s from disallowed location: %s'
+                  % (attribs.referrer, attribs.url))
             return
 
-        queue.append ((depth, attribs))
+        queue.append((depth, attribs))
 
 
-    def is_included_url (self, attribs):
+    def is_included_url(self, attribs):
         """ Return True if this document is eligible. """
 
         url = attribs.url
 
-        included = any ([fnmatch.fnmatchcase (url, x) for x in self.include_urls])
-        excluded = any ([fnmatch.fnmatchcase (url, x) for x in self.exclude_urls])
+        included = any([fnmatch.fnmatchcase(url, x) for x in self.include_urls])
+        excluded = any([fnmatch.fnmatchcase(url, x) for x in self.exclude_urls])
 
         if included and not excluded:
             return True
 
         if excluded:
-            debug ("Dropping excluded %s" % url)
+            debug("Dropping excluded %s" % url)
         if not included:
-            debug ("Dropping not included %s" % url)
+            debug("Dropping not included %s" % url)
         return False
 
 
-    def is_included_mediatype (self, attribs):
+    def is_included_mediatype(self, attribs):
         """ Return True if this document is eligible. """
 
         if attribs.orig_mediatype is None:
-            mediatype = MediaTypes.guess_type (attribs.url)
+            mediatype = MediaTypes.guess_type(attribs.url)
             if mediatype:
-                attribs.orig_mediatype = attribs.HeaderElement (mediatype)
+                attribs.orig_mediatype = attribs.HeaderElement(mediatype)
             else:
-                warning ('Mediatype could not be determined from url %s' % attribs.url)
+                warning('Mediatype could not be determined from url %s' % attribs.url)
                 return True # always include if mediatype unknown
 
         mediatype = attribs.orig_mediatype.value
 
-        included = any ([fnmatch.fnmatch (mediatype, pattern)
-                         for pattern in self.include_mediatypes])
-        excluded = any ([fnmatch.fnmatch (mediatype, pattern)
-                         for pattern in self.exclude_mediatypes])
+        included = any([fnmatch.fnmatch(mediatype, pattern)
+                        for pattern in self.include_mediatypes])
+        excluded = any([fnmatch.fnmatch(mediatype, pattern)
+                        for pattern in self.exclude_mediatypes])
 
         if included and not excluded:
             return True
 
         if excluded:
-            debug ("Dropping excluded mediatype %s" % mediatype)
+            debug("Dropping excluded mediatype %s" % mediatype)
         if not included:
-            debug ("Dropping not included mediatype %s" % mediatype)
+            debug("Dropping not included mediatype %s" % mediatype)
 
         return False
 
 
-    def is_included_relation (self, attribs):
+    def is_included_relation(self, attribs):
         """ Return True if this document is eligible. """
 
-        keep = attribs.rel.intersection ( ('coverpage', 'important') )
+        keep = attribs.rel.intersection(('coverpage', 'important'))
         if keep:
-            debug ("Not dropping after all because of rel.")
+            debug("Not dropping after all because of rel.")
 
         return keep
 
 
-    def topological_sort (self):
+    def topological_sort(self):
         """ Do a topological sort of documents using <link rel='next'> """
 
         relnext = [(p.attribs.referrer, p.attribs.url)
@@ -200,26 +201,26 @@ class Spider (object):
         if relnext:
             try:
                 d = {}
-                for order, url in enumerate (gg.topological_sort (relnext)):
+                for order, url in enumerate(gg.topological_sort(relnext)):
                     d[url] = order
-                    debug ("%s order %d" % (url, order))
+                    debug("%s order %d" % (url, order))
                 for parser in self.parsers:
-                    parser.order = d.get (parser.attribs.url, 999999)
-                self.parsers.sort (key = lambda p: p.order)
+                    parser.order = d.get(parser.attribs.url, 999999)
+                self.parsers.sort(key=lambda p: p.order)
 
             except Exception:
                 pass
 
 
-    def add_redirection (self, from_url, to_url):
+    def add_redirection(self, from_url, to_url):
         """ Remember this redirection. """
 
         if from_url != to_url:
             self.redirection_map[from_url] = to_url
-            debug ("Adding redirection from %s to %s" % (from_url, to_url))
+            debug("Adding redirection from %s to %s" % (from_url, to_url))
 
 
-    def redirect (self, url):
+    def redirect(self, url):
         """
         Redirect url.
 
@@ -227,17 +228,17 @@ class Spider (object):
         to find the 200 url.
 
         """
-        return self.redirection_map.get (url, url)
+        return self.redirection_map.get(url, url)
 
 
-    def dict_urls_mediatypes (self):
+    def dict_urls_mediatypes(self):
         """ Return a dict of all parsed urls and mediatypes. """
-        return dict ([(p.attribs.url, p.mediatype ()) for p in self.parsers])
+        return dict([(p.attribs.url, p.mediatype()) for p in self.parsers])
 
 
-    def aux_file_iter (self):
+    def aux_file_iter(self):
         """ Iterate over image files. Return absolute urls. """
 
         for p in self.parsers:
-            if hasattr (p, 'resize_image'):
+            if hasattr(p, 'resize_image'):
                 yield p.attribs.url
