@@ -138,8 +138,11 @@ def elect_coverpage(spider, url):
             return
         if options.outputdir:
             dir = options.outputdir
-        else:
+        elif:
             url = url[8:] if url.startswith('file:///') else url
+            dir = os.path.dirname(os.path.abspath(url))
+        else:
+            url = url[6:] if url.startswith('file:/') else url
             dir = os.path.dirname(os.path.abspath(url))
         debug('generating cover in %s' % dir)
         cover_url = generate_cover(dir)
