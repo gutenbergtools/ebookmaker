@@ -145,18 +145,20 @@ class ParserFactory(object):
 
         url = orig_url
         try:
-            if url.startswith('file:///'):
-                fp = open(url[8:], "rb")
-            elif url.startswith('file:/'):
-                fp = open(url[6:], "rb")
-            else:
-                fp = open(url, "rb")
+            fp = urllib.request.urlopen(url)
         except FileNotFoundError:
             fp = None
             error('Missing file: %s' % url)
         except IsADirectoryError:
             fp = None
             error('Missing file is a directory: %s' % url)
+        except ValueError:  # just a path
+            try:
+                fp = open(url, 'rb')
+            except:
+                fp = None
+                error('Missing file: %s' % url)
+            
         attribs.orig_mediatype = attribs.HeaderElement(MediaTypes.guess_type(url))
 
         debug("... got mediatype %s from guess_type" % str(attribs.orig_mediatype))

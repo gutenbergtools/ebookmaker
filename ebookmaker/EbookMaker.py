@@ -20,6 +20,7 @@ import datetime
 import hashlib
 import logging
 import os.path
+import re
 import sys
 
 import six
@@ -138,11 +139,11 @@ def elect_coverpage(spider, url):
             return
         if options.outputdir:
             dir = options.outputdir
-        elif:
-            url = url[8:] if url.startswith('file:///') else url
-            dir = os.path.dirname(os.path.abspath(url))
+        elif url.startswith('file://'):
+            dir = os.path.dirname(os.path.abspath(url[7:]))
+        elif url.startswith('file:'):
+            dir = os.path.dirname(os.path.abspath(url[5:]))
         else:
-            url = url[6:] if url.startswith('file:/') else url
             dir = os.path.dirname(os.path.abspath(url))
         debug('generating cover in %s' % dir)
         cover_url = generate_cover(dir)
@@ -494,7 +495,7 @@ def config():
         }
     )))
 
-    if '://' not in options.url:
+    if not re.search(r'^(https?|file):', options.url):
         options.url = os.path.abspath(options.url)
 
 

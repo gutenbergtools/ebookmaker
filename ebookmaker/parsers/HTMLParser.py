@@ -27,7 +27,7 @@ from libgutenberg.Logger import info, debug, warning, error
 from libgutenberg.MediaTypes import mediatypes as mt
 
 from ebookmaker import parsers
-from ebookmaker.parsers import HTMLParserBase, webify_url
+from ebookmaker.parsers import HTMLParserBase
 
 mediatypes = ('text/html', mt.xhtml)
 
