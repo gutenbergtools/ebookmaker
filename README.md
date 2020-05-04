@@ -121,3 +121,5 @@ Travis-CI will run tests on branches committed in the gutenbergtools org
     - Look in `C:\Users\myname\.virtualenvs\` and find the name of your virtualev it should be something like `ebookmaker-cgaQuYhi`
     - Type `pipenv run python C:\Users\myname\.virtualenvs\<name of vitualenv>\Scripts\ebookmaker --version` to check ebookmaker version. 
 17. If there's error like like no "cairo" or "cairo-2" found, check if your libcairo and libcairo-2 path exist. If they do, edit dlopen in  _init_.py in cairocffi package. Return the path found by ctypes.util.find_library directly instead of calling ffi.dlopen(path).
+18. If command input directory, such as `--output-dir=`, has folder name that contains space, use `"` for it, like `--output-dir="C:\your foldername"`. 
+19. Directory input for ebookmaker on Windows MUST end with foldername instead of `\` on Linux/Mac or erorr will be raised.
