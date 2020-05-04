@@ -13,6 +13,7 @@ Distributable under the GNU General Public License Version 3 or newer.
 
 
 import os.path
+import re
 
 from six.moves import urllib
 import six
@@ -140,28 +141,36 @@ class ParserFactory(object):
 
 
     @classmethod
-    def open_file(cls, orig_url, attribs):
+    def open_file(cls, url, attribs):
         """ Open a local file for parsing. """
-
-        url = orig_url
-        try:
-            if url.startswith('file:///'):
-                fp = open(url[8:], "rb")
-            elif url.startswith('file:/'):
-                fp = open(url[6:], "rb")
-            else:
-                fp = open(url, "rb")
-        except FileNotFoundError:
-            fp = None
-            error('Missing file: %s' % url)
-        except IsADirectoryError:
-            fp = None
-            error('Missing file is a directory: %s' % url)
+        def open_file_from_path(path):
+            try:
+                return open(url, 'rb')
+            except FileNotFoundError:
+                error('Missing file: %s' % url)
+            except IsADirectoryError:
+                error('Missing file is a directory: %s' % url)
+            return None
+            
+        if re.search(r'^([a-zA-z]:|/)', url):
+            fp = open_file_from_path(url)
+        else:
+            try:
+                # handles all the flavors of file: urls, including on windows
+                fp = urllib.request.urlopen(url)
+            except FileNotFoundError:
+                fp = None
+                error('Missing file: %s' % url)
+            except IsADirectoryError:
+                fp = None
+                error('Missing file is a directory: %s' % url)
+            except ValueError:  # just a relative path?
+                fp = open_file_from_path(url)
+            
         attribs.orig_mediatype = attribs.HeaderElement(MediaTypes.guess_type(url))
 
         debug("... got mediatype %s from guess_type" % str(attribs.orig_mediatype))
-        attribs.orig_url = orig_url
-        attribs.url = url
+        attribs.orig_url = attribs.url = url
         return fp
 
 

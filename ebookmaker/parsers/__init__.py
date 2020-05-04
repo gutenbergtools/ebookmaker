@@ -84,9 +84,14 @@ def webify_url(url):
     """ make the url for a parser, accounting for platform """
     if re.search(r'^https?://', url):
         return url
+    if url.startswith('file:'):
+        return url
     if re.search(r'^[a-zA-z]:', url):
         return 'file:///' + url.replace(os.path.sep, '/')
-    return os.path.abspath(url).replace(os.path.sep, '/')
+    url = os.path.abspath(url).replace(os.path.sep, '/')
+    if url.startswith('/'):
+        url = url[1:]
+    return 'file:///' + url
 
 
 
