@@ -13,6 +13,7 @@ Distributable under the GNU General Public License Version 3 or newer.
 
 
 import os.path
+import re
 
 from six.moves import urllib
 import six
