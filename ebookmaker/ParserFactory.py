@@ -140,24 +140,31 @@ class ParserFactory(object):
 
 
     @classmethod
-    def open_file(cls, orig_url, attribs):
+    def open_file(cls, url, attribs):
         """ Open a local file for parsing. """
-
-        url = orig_url
-        try:
-            fp = urllib.request.urlopen(url)
-        except FileNotFoundError:
-            fp = None
-            error('Missing file: %s' % url)
-        except IsADirectoryError:
-            fp = None
-            error('Missing file is a directory: %s' % url)
-        except ValueError:  # just a path
+        def open_file_from_path(path):
             try:
-                fp = open(url, 'rb')
-            except:
+                return open(url, 'rb')
+            except FileNotFoundError:
+                error('Missing file: %s' % url)
+            except IsADirectoryError:
+                error('Missing file is a directory: %s' % url)
+            return None
+            
+        if re.search(r'^([a-zA-z]:|/)', url):
+            fp = open_file_from_path(url)
+        else:
+            try:
+                # handles all the flavors of file: urls, including on windows
+                fp = urllib.request.urlopen(url)
+            except FileNotFoundError:
                 fp = None
                 error('Missing file: %s' % url)
+            except IsADirectoryError:
+                fp = None
+                error('Missing file is a directory: %s' % url)
+            except ValueError:  # just a relative path?
+                fp = open_file_from_path(url)
             
         attribs.orig_mediatype = attribs.HeaderElement(MediaTypes.guess_type(url))
 
