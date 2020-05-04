@@ -90,7 +90,7 @@ def webify_url(url):
         return 'file:///' + url.replace(os.path.sep, '/')
     url = os.path.abspath(url).replace(os.path.sep, '/')
     if url.startswith('/'):
-        url = url[:1]
+        url = url[1:]
     return 'file:///' + url
 
 

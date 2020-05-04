@@ -1043,6 +1043,8 @@ class Writer(writers.HTMLishWriter):
         """
         if match_link_url.match(url):
             return url
+        if url.startswith('file://'):
+            url = url[7:]
         def escape(matchobj):
             """ Escape a char. """
             return '@%x' % ord(matchobj.group(0))
