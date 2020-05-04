@@ -169,8 +169,7 @@ class ParserFactory(object):
         attribs.orig_mediatype = attribs.HeaderElement(MediaTypes.guess_type(url))
 
         debug("... got mediatype %s from guess_type" % str(attribs.orig_mediatype))
-        attribs.orig_url = orig_url
-        attribs.url = url
+        attribs.orig_url = attribs.url = url
         return fp
 
 
