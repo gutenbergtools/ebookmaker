@@ -181,7 +181,7 @@ class Parser (HTMLParserBase):
                     error (line)
 
         if tidy.returncode == 2:
-            raise ValueError ('Tidy tried valiently, but the patient died.")
+            raise ValueError ("Tidy tried valiently, but the patient died.")
 
         return html.decode ('utf-8')
 
