@@ -110,24 +110,19 @@ Travis-CI will run tests on branches committed in the gutenbergtools org
 6. Close old command window and start a new (to get the new path)
 7. Create a folder for ebookmaker, e.g. `C:\DP\ebookmaker`
 8. In command window, go to the new folder
-9. Type `pipenv --three` (note double hyphen) – it will create a "virtual environment", with a new folder, something like `C:\Users\myname\.virtualenvs\ebookmaker-cgaQuYhi`
-10. Type `pipenv shell` – prompt will change while in virtual environment
-11. Type `pipenv install ebookmaker` – takes a while to install
-12. (Optional - only if you need ebookmaker to generate a book cover for you) Download GTK+ to get Cairo. Precompiled Win32 binaries are here: http://ftp.gnome.org/pub/gnome/binaries ... _win32.zip
-13. (Optional) Unzip this to a folder, e.g. `C:\DP\gtk` and add `C:\DP\gtk\bin` to the Path environment variable.
-14. (Optional) Exit command window and start a new one to get new path
-15. Go to the ebookmaker folder, `C:\DP\ebookmaker`
-16. Type `pipenv run python ebookmaker --version` to check ebookmaker version. If this doesn't work (it should, but didn't work for us) try:
-    - Look in `C:\Users\myname\.virtualenvs\` and find the name of your virtualev it should be something like `ebookmaker-cgaQuYhi`
+9. Type `pipenv install ebookmaker` – takes a while to install. It will also create a "virtual environment", with a new folder, something like `C:\Users\myname\.virtualenvs\ebookmaker-cgaQuYhi`
+10. (Optional - only if you need ebookmaker to create a book cover for you because you are not providing one)
+    Download GTK+ to get Cairo. Precompiled Win32 binaries are here: http://ftp.gnome.org/pub/gnome/binaries ... _win32.zip
+    Unzip this to a folder, e.g. `C:\DP\gtk` and add `C:\DP\gtk\bin` to the Path environment variable.
+    Exit command window and start a new one to get new path
+    Go to the ebookmaker folder, `C:\DP\ebookmaker`
+11. Type `pipenv run python ebookmaker --version` to check ebookmaker version. If this doesn't work (it should, but didn't work for us) try:
+    - Look in `C:\Users\myname\.virtualenvs\` and find the name of your virtualenv - it should be something like `ebookmaker-cgaQuYhi`
     - Type `pipenv run python C:\Users\myname\.virtualenvs\<name of virtualenv>\Scripts\ebookmaker --version` to check ebookmaker version. 
-17. (Should not happen now Cairo is optional) If there's error like like no "cairo" or "cairo-2" found, check if your libcairo and libcairo-2 path exist. If they do, edit dlopen in  _init_.py in cairocffi package. Return the path found by ctypes.util.find_library directly instead of calling ffi.dlopen(path).
-18. If folder/file name contains space, pathnames muse be enclosed in `"`, like `--output-dir="C:\your foldername"`. 
-19. Directory for ebookmaker on Windows MUST NOT end with trailing `\` or error will be raised. If running bat file from within Guiguts, this means you should use `--output-dir=$D` rather than `$d` (Guiguts versions > 1.0.25)
-20. Example bat file for use with Guiguts:
-      `cd C:\DP\ebookmaker`
-      `pipenv run python C:\Users\myname\.virtualenvs\ebookmaker-cgaQuYhi\Scripts\ebookmaker -v --make=epub.images --make=kindle.images --output-dir=%1 --title=%2 %3`
-21. Corresponding "external program" setup within Guiguts (versions > 1.0.25):
-      `c:\dp\ebookmaker\run_ebookmaker.bat $D $f $d$f$e` 
-22. Corresponding "external program" setup within Guiguts (versions <= 1.0.25 - folder/filenames MUST NOT contain spaces):
-      `c:\dp\ebookmaker\run_ebookmaker.bat $d $f $d$f$e` 
-
+12. (Should not happen now Cairo is optional) If there's error like like no "cairo" or "cairo-2" found, check if your libcairo and libcairo-2 path exist. If they do, edit dlopen in  _init_.py in cairocffi package. Return the path found by ctypes.util.find_library directly instead of calling ffi.dlopen(path).
+13. If folder/file name contains space, pathnames muse be enclosed in `"`, like `--output-dir="C:\your foldername"`. If pathname is quoted, it MUST NOT end with trailing `\` or error will be raised. If running bat file from within Guiguts, this means you should use `$d.` rather than `$d` (i.e. a dot after $d so quoted pathname will end in `\."` rather than `\"`) when passing it as a value for the output-dir argument.
+14. Example run_ebookmaker.bat file for use with Guiguts:
+      cd C:\DP\ebookmaker
+      pipenv run python C:\Users\myname\.virtualenvs\ebookmaker-cgaQuYhi\Scripts\ebookmaker -v --make=epub.images --make=kindle.images --output-dir=%1 --title=%2 %3
+15. Corresponding "external program" setup within Guiguts:
+      `c:\dp\ebookmaker\run_ebookmaker.bat $d. $f $d$f$e`
