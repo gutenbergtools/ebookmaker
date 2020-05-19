@@ -44,16 +44,14 @@ from ebookmaker.Version import VERSION, GENERATOR
 options = Options()
 
 MAX_CHUNK_SIZE = 300 * 1024  # bytes
-
-MAX_IMAGE_SIZE = 127 * 1024  # in bytes
+MAX_NOIMAGE_SIZE = 64 * 1024 - 1 # bytes, used for covers and important images in "noimages epubs"
+MAX_IMAGE_SIZE = 512 * 1024 - 1  # in bytes, used for Kindle, too.
+LINKED_IMAGE_SIZE = 1024 * 1024 - 1  # in bytes
 
 MAX_IMAGE_DIMEN = (800, 1280)  # in pixels
-MAX_COVER_DIMEN = (800, 1280)  # in pixels
+LINKED_IMAGE_DIMEN = (5000, 5000)  # in pixels
+MAX_COVER_DIMEN = MAX_IMAGE_DIMEN
 
-MAX_IMAGE_SIZE_KINDLE = 127 * 1024  # in bytes
-
-MAX_IMAGE_DIMEN_KINDLE = (1200, 1920)  # Kindle Fire HD 8.9" in pixels
-MAX_COVER_DIMEN_KINDLE = (1200, 1920)  #
 
 # iPhone 3G:    320x480x?
 # Kindle 2:     600x800x16
@@ -1197,18 +1195,20 @@ class Writer(writers.HTMLishWriter):
             for p in job.spider.parsers:
                 if hasattr(p, 'resize_image'):
                     if 'coverpage' in p.attribs.rel:
-                        if job.maintype == 'kindle':
-                            np = p.resize_image(MAX_IMAGE_SIZE_KINDLE,
-                                                MAX_COVER_DIMEN_KINDLE, 'jpeg')
+                        if job.subtype == '.noimages':
+                            np = p.resize_image(MAX_NOIMAGE_SIZE, MAX_COVER_DIMEN)
                         else:
                             np = p.resize_image(MAX_IMAGE_SIZE, MAX_COVER_DIMEN)
                         np.id = p.attribs.get('id', 'coverpage')
                         coverpage_url = p.attribs.url
-                    else:
-                        if job.maintype == 'kindle':
-                            np = p.resize_image(MAX_IMAGE_SIZE_KINDLE, MAX_IMAGE_DIMEN_KINDLE)
+                    elif 'linked_image' in p.attribs.rel:
+                        if job.subtype == '.noimages':
+                            np = p.resize_image(MAX_NOIMAGE_SIZE, LINKED_IMAGE_DIMEN)
                         else:
-                            np = p.resize_image(MAX_IMAGE_SIZE, MAX_IMAGE_DIMEN)
+                            np = p.resize_image(LINKED_IMAGE_SIZE, LINKED_IMAGE_DIMEN)
+                        np.id = p.attribs.get('id')
+                    else:
+                        np = p.resize_image(MAX_IMAGE_SIZE, MAX_IMAGE_DIMEN)
                         np.id = p.attribs.get('id')
                     parserlist.append(np)
 
