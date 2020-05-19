@@ -2,7 +2,7 @@ IMAGES AND COVERS
 
 As of EbookMaker 0.9, image filesize and dimension limits are being set differently.
 
-EbookMaker now considers three types of images it finds in html, and handles them differently from other images:
+EbookMaker now considers three types of images it finds in html, and handles them each differently.:
 
 1. inline images
     `<img src="unicorn.png" alt="Image of a Unicorn" />`
@@ -41,6 +41,8 @@ Suggested Guidelines for cover and image submissions to Project Gutenberg:
 1. Submitted cover images should be at least 625 x 1000 px and ideally larger. The should be not exceed 1MB in size unless specified by a coverpage relation.
 
 2. Submitted images should be less than 256KB for inline images and less than 1MB for linked images.
+
+3. Display sizes for images should be set using relative units i.e. `ems`, and Project Gutenberg does not need to restrict pixel sizes for submitted images.
 
 
 
