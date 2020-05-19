@@ -158,12 +158,9 @@ class ParserFactory(object):
             try:
                 # handles all the flavors of file: urls, including on windows
                 fp = urllib.request.urlopen(url)
-            except FileNotFoundError:
+            except urllib.error.URLError as what:
                 fp = None
-                error('Missing file: %s' % url)
-            except IsADirectoryError:
-                fp = None
-                error('Missing file is a directory: %s' % url)
+                error('Missing file: %s' % what.reason)
             except ValueError:  # just a relative path?
                 fp = open_file_from_path(url)
             

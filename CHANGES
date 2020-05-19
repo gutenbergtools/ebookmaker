@@ -1,3 +1,6 @@
+0.8.12 May 5, 2020
+- corrected the exception to catch for missing files
+
 0.8.11 May 4, 2020
 - It turns out that ebookmaker gets called both with bare paths and file: urls depending on ebookconverter config files. So 0.8.10 broke on the production machine, though it seemed just fine on mac and windows. So we went back to the drawing board to figure out how to support posix and windows, with or without windows mount points (not sure if that's the right term), file:/// urls and bare paths. We also figured out some issues involving spaces in paths.
 
