@@ -188,7 +188,7 @@ class OEBPSContainer(zipfile.ZipFile):
         """ Add file to zip from bytes string. """
 
         i = self.zi(name)
-        if mediatype and mediatype in (mt.png, mt.gif, mt.jpeg):
+        if mediatype and mediatype in parsers.ImageParser.mediatypes:
             i.compress_type = zipfile.ZIP_STORED
         self.writestr(i, bytes_)
 
