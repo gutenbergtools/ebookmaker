@@ -134,22 +134,6 @@ OPS_CONTENT_DOCUMENTS = set((
     'application/xml',
 ))
 
-IMAGE_WRAPPER = """<?xml version="1.0"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <title>{title}</title>
-    <style type="text/css">
-       div {{ text-align: center }}
-       img {{ max-width: 100%; }}
-    </style>
-  </head>
-  <body>
-    <div>
-      <img src="{src}" alt="{title}" />
-    </div>
-  </body>
-</html>"""
 
 match_link_url = re.compile(r'^https?://', re.I)
 
@@ -268,7 +252,7 @@ class OEBPSContainer(zipfile.ZipFile):
         filename = 'wrap%04d.html' % self.wrappers
         self.wrappers += 1
         self.add_bytes(filename,
-                       IMAGE_WRAPPER.format(src=img_url, title=img_title),
+                       parsers.IMAGE_WRAPPER.format(src=img_url, title=img_title),
                        mt.xhtml)
         return filename
 
