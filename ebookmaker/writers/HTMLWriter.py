@@ -9,7 +9,8 @@ Copyright 2009 by Marcello Perathoner
 
 Distributable under the GNU General Public License Version 3 or newer.
 
-Writes an HTML file
+Writes one HTML file. Currently used only for RST input. 
+Needs revision to use with multi-file books and HTML input.
 
 """
 
@@ -91,7 +92,7 @@ class Writer (writers.HTMLishWriter):
                                            xml_declaration = True)
 
                     self.write_with_crlf (htmlfilename, html)
-
+                    break
             info ("Done HTML file: %s" % htmlfilename)
 
         except Exception as what:
