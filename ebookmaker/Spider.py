@@ -118,7 +118,7 @@ class Spider(object):
 
 
     def enqueue(self, queue, depth, attribs, is_doc):
-        """ Enque url for parsing. """
+        """ Enqueue url for parsing."""
         if is_doc:
             if not self.is_included_url(attribs):
                 warning('External link in %s: %s' % (attribs.referrer, attribs.url))
