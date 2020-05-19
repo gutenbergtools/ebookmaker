@@ -24,7 +24,7 @@ from libgutenberg.Logger import debug, warning, error
 from libgutenberg import MediaTypes
 
 from ebookmaker import parsers
-from ebookmaker import ParserFactory
+from ebookmaker.ParserFactory import ParserFactory
 
 
 class Spider(object):
@@ -66,7 +66,7 @@ class Spider(object):
             if url in self.parsed_urls:
                 continue
 
-            parser = ParserFactory.ParserFactory.create(url, attribs)
+            parser = ParserFactory.create(url, attribs)
 
             # Maybe the url was redirected to something we already have?
             url = parser.attribs.url
