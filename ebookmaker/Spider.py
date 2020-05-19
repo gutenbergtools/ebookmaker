@@ -136,6 +136,11 @@ class Spider(object):
         queue.append((depth, attribs))
 
 
+    def is_image(self, attribs):
+        """ Return True if png, gif, or jpg. """
+        return self.get_mediatype(attribs) in parsers.ImageParser.mediatypes
+
+
     def is_included_url(self, attribs):
         """ Return True if this document is eligible. """
 
@@ -154,18 +159,24 @@ class Spider(object):
         return False
 
 
-    def is_included_mediatype(self, attribs):
-        """ Return True if this document is eligible. """
-
+    def get_mediatype(self, attribs):
+        """ Get mediatype out of attribs, guessing if needed. """
         if attribs.orig_mediatype is None:
             mediatype = MediaTypes.guess_type(attribs.url)
             if mediatype:
                 attribs.orig_mediatype = attribs.HeaderElement(mediatype)
             else:
-                warning('Mediatype could not be determined from url %s' % attribs.url)
-                return True # always include if mediatype unknown
+                return None
+        return attribs.orig_mediatype.value
 
-        mediatype = attribs.orig_mediatype.value
+
+    def is_included_mediatype(self, attribs):
+        """ Return True if this document is eligible. """
+
+        mediatype = self.get_mediatype(attribs)
+        if not mediatype:
+            warning('Mediatype could not be determined from url %s' % attribs.url)
+            return True # always include if mediatype unknown
 
         included = any([fnmatch.fnmatch(mediatype, pattern)
                         for pattern in self.include_mediatypes])
