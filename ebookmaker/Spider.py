@@ -96,7 +96,19 @@ class Spider(object):
 
                 tag = elem.tag
                 if tag == NS.xhtml.a:
-                    self.enqueue(queue, depth + 1, new_attribs, True)
+                    if self.is_image(new_attribs) and self.is_included_url(new_attribs):
+                        # need to wrap an image
+                        wrapper_parser = parsers.WrapperParser.Parser(new_attribs)
+                        self.parsed_urls.add(wrapper_parser.attribs.url)
+                        ParserFactory.parsers[wrapper_parser.attribs.url] = wrapper_parser
+                        self.parsers.append(wrapper_parser)
+                        elem.set('href', wrapper_parser.attribs.url)
+                        new_attribs.referrer = wrapper_parser.attribs.url
+                        elem.set('title', wrapper_parser.attribs.title)
+                        self.enqueue(queue, depth, new_attribs, False)
+                    else:
+                        self.enqueue(queue, depth + 1, new_attribs, True)
+                        
                 elif tag == NS.xhtml.img:
                     self.enqueue(queue, depth, new_attribs, False)
                 elif tag == NS.xhtml.link:
@@ -197,7 +209,7 @@ class Spider(object):
     def is_included_relation(self, attribs):
         """ Return True if this document is eligible. """
 
-        keep = attribs.rel.intersection(('coverpage', 'important'))
+        keep = attribs.rel.intersection(('coverpage', 'important', 'linked_image'))
         if keep:
             debug("Not dropping after all because of rel.")
 
