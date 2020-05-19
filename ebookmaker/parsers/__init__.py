@@ -141,11 +141,12 @@ class ParserAttributes(object): # pylint: disable=too-few-public-methods
         self.id = None
         self.rel = set()
         self.referrer = None
+        self.title = None
 
 
     def update(self, more_attribs):
         for k, v in vars(more_attribs).items():
-            if v is not None:
+            if v:
                 setattr(self, k, v)
 
 
