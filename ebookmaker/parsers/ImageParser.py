@@ -22,32 +22,31 @@ from pkg_resources import resource_string # pylint: disable=E0611
 
 from libgutenberg.Logger import debug, error
 from libgutenberg.MediaTypes import mediatypes as mt
-from ebookmaker import parsers
 from ebookmaker.parsers import ParserBase, BROKEN
 from ebookmaker.ParserFactory import ParserFactory
 
 mediatypes = (mt.jpeg, mt.png, mt.gif)
 
-class Parser (ParserBase):
+class Parser(ParserBase):
     """Parse an image.
 
     And maybe resize it for ePub packaging.
 
     """
 
-    def __init__ (self, attribs = None):
-        ParserBase.__init__ (self, attribs)
+    def __init__(self, attribs=None):
+        ParserBase.__init__(self, attribs)
         self.image_data = None
         self.dimen = None
 
 
-    def resize_image (self, max_size, max_dimen, output_format = None):
+    def resize_image(self, max_size, max_dimen, output_format=None):
         """ Create a new parser with a resized image. """
 
         def scale_image(image, scale):
             was = ''
             if scale < 1.0:
-                dimen = (int (image.size[0] * scale), int(image.size[1] * scale))
+                dimen = (int(image.size[0] * scale), int(image.size[1] * scale))
                 was = "(was %d x %d scale=%.2f) " % (image.size[0], image.size[1], scale)
                 image = image.resize(dimen, Image.ANTIALIAS)
             return was, image
@@ -60,7 +59,7 @@ class Parser (ParserBase):
                 image.save(buf, 'jpeg', quality=quality)
             return buf.getvalue()
 
-        new_parser = Parser ()
+        new_parser = Parser()
 
         try:
             unsized_image = Image.open(six.BytesIO(self.image_data))
@@ -73,15 +72,15 @@ class Parser (ParserBase):
             if format_ == 'jpeg' and unsized_image.mode.lower() != 'rgb':
                 unsized_image = unsized_image.convert('RGB')
 
-            if 'dpi' in image.info:
-                del image.info['dpi']
+            if 'dpi' in unsized_image.info:
+                del unsized_image.info['dpi']
 
             # maybe resize image
 
             # find scaling factor
             scale = 1.0
-            scale = min (scale, max_dimen[0] / float (image.size[0]))
-            scale = min (scale, max_dimen[1] / float (image.size[1]))
+            scale = min(scale, max_dimen[0] / float(unsized_image.size[0]))
+            scale = min(scale, max_dimen[1] / float(unsized_image.size[1]))
 
             was, image = scale_image(unsized_image, scale)
             data = get_image_data(image, format_)
@@ -102,43 +101,39 @@ class Parser (ParserBase):
                             break
 
             comment = "Image: %d x %d size=%d %s" % (
-                        image.size[0], image.size[1], len (data), was)
-            debug (comment)
+                image.size[0], image.size[1], len(data), was
+            )
+            debug(comment)
 
             new_parser.image_data = data
-            new_parser.dimen = tuple (image.size)
+            new_parser.dimen = tuple(image.size)
 
-            new_parser.attribs = copy.copy (self.attribs)
+            new_parser.attribs = copy.copy(self.attribs)
             new_parser.attribs.comment = comment
             new_parser.fp = self.fp
 
         except IOError as what:
-            error ("Could not resize image: %s" % what)
-            return ParserFactory.create (BROKEN)
+            error("Could not resize image: %s" % what)
+            return ParserFactory.create(BROKEN)
 
         return new_parser
 
 
-    def get_image_dimen (self):
+    def get_image_dimen(self):
         if self.dimen is None:
             if self.image_data:
-                image = Image.open (six.BytesIO (self.image_data))
+                image = Image.open(six.BytesIO(self.image_data))
                 self.dimen = image.size
             else:
                 self.dimen = (0, 0)  # broken image
         return self.dimen
 
 
-    def pre_parse (self):
+    def pre_parse(self):
         if self.image_data is None:
-            self.image_data = self.bytes_content ()
+            self.image_data = self.bytes_content()
 
 
-    def parse (self):
-        """ Parse the image. """
-        pass
-
-
-    def serialize (self):
+    def serialize(self):
         """ Serialize the image. """
         return self.image_data
