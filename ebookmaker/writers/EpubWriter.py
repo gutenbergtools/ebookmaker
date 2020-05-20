@@ -45,7 +45,7 @@ options = Options()
 
 MAX_CHUNK_SIZE = 300 * 1024  # bytes
 MAX_NOIMAGE_SIZE = 64 * 1024 - 1 # bytes, used for covers and important images in "noimages epubs"
-MAX_IMAGE_SIZE = 512 * 1024 - 1  # in bytes, used for Kindle, too.
+MAX_IMAGE_SIZE = 256 * 1024 - 1  # in bytes, used for Kindle, too.
 LINKED_IMAGE_SIZE = 1024 * 1024 - 1  # in bytes
 
 MAX_IMAGE_DIMEN = (800, 1280)  # in pixels
