@@ -75,7 +75,7 @@ class ParserFactory(object):
     @classmethod
     def create(cls, url, attribs=None):
         """ Create an appropriate parser. """
-
+        url = parsers.webify_url(url)
         if attribs is None:
             attribs = parsers.ParserAttributes()
 
