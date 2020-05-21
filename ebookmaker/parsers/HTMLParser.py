@@ -357,7 +357,7 @@ class Parser (HTMLParserBase):
             return
         
         for coverpage in coverpages:
-            url = coverpage.get ('src')
+            url = coverpage.get ('href')
             debug ("Found link to coverpage %s." % url)
             return   # already provided by user
 
