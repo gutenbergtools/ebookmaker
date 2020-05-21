@@ -105,7 +105,7 @@ class Spider(object):
                         elem.set('href', wrapper_parser.attribs.url)
                         new_attribs.referrer = wrapper_parser.attribs.url
                         elem.set('title', wrapper_parser.attribs.title)
-                        self.enqueue(queue, depth, new_attribs, False)
+                        self.enqueue(queue, depth + 1, new_attribs, False)
                     else:
                         self.enqueue(queue, depth + 1, new_attribs, True)
                         

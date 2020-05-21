@@ -19,12 +19,9 @@ mediatypes = ()
 class Parser(HTMLParserBase):
 
     def __init__(self, attribs):
-        HTMLParserBase.__init__(self)
-
-        self.attribs.update(attribs)
-        attribs.rel.add('linked_image')
+        HTMLParserBase.__init__(self, attribs)
+        self.attribs.orig_mediatype = self.attribs.mediatype
         self.src = self.attribs.url
-        self.attribs.referrer = attribs.referrer
         self.attribs.url = self.wrapper_url(self.attribs.url)
         self.attribs.orig_url = self.attribs.url
         if not self.attribs.title:
@@ -35,9 +32,8 @@ class Parser(HTMLParserBase):
             base_url=self.attribs.url
         )
 
-
-    def bytes_content(self):
-        return bytes(self.unicode_content(self), 'utf-8')
+        # mark the image for treatment as a linked image
+        attribs.rel.add('linked_image')
 
 
     def unicode_content(self):
