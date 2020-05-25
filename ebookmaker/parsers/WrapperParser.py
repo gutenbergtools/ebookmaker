@@ -12,6 +12,7 @@ Distributable under the GNU General Public License Version 3 or newer.
 """
 import lxml
 
+from copy import copy
 from ebookmaker.parsers import HTMLParserBase, IMAGE_WRAPPER
 
 mediatypes = ()
@@ -19,7 +20,7 @@ mediatypes = ()
 class Parser(HTMLParserBase):
 
     def __init__(self, attribs):
-        HTMLParserBase.__init__(self, attribs)
+        HTMLParserBase.__init__(self, copy(attribs))
         self.attribs.orig_mediatype = self.attribs.mediatype
         self.src = self.attribs.url
         self.attribs.url = self.wrapper_url(self.attribs.url)
@@ -34,6 +35,8 @@ class Parser(HTMLParserBase):
 
         # mark the image for treatment as a linked image
         attribs.rel.add('linked_image')
+        # set the referrer for the image to this wrapper
+        attribs.referrer = self.attribs.url
 
 
     def unicode_content(self):
