@@ -41,7 +41,9 @@ class Parser(HTMLParserBase):
 
     def unicode_content(self):
         """ wrapper page content """
-        return IMAGE_WRAPPER.format(src=self.src, title=self.attribs.title)
+        frag = ('#%s' % self.attribs.id) if self.attribs.id else ''
+        backlink = '<br /><a href="%s%s" title="back" >back</a>' % (self.attribs.referrer, frag)
+        return IMAGE_WRAPPER.format(src=self.src, title=self.attribs.title, backlink=backlink)
 
 
     def wrapper_url(self, img_url):

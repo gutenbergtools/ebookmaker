@@ -250,7 +250,7 @@ class OEBPSContainer(zipfile.ZipFile):
         filename = 'wrap%04d.html' % self.wrappers
         self.wrappers += 1
         self.add_bytes(filename,
-                       parsers.IMAGE_WRAPPER.format(src=img_url, title=img_title),
+                       parsers.IMAGE_WRAPPER.format(src=img_url, title=img_title, backlink=""),
                        mt.xhtml)
         return filename
 

@@ -80,14 +80,11 @@ IMAGE_WRAPPER = """<?xml version="1.0"?>
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <title>{title}</title>
-    <style type="text/css">
-       div {{ text-align: center }}
-       img {{ max-width: 100%; }}
-    </style>
   </head>
   <body>
-    <div>
-      <img src="{src}" alt="{title}" />
+    <div style="text-align: center">
+      <img src="{src}" alt="{title}" style="max-width: 100%; " />
+      {backlink}
     </div>
   </body>
 </html>"""
