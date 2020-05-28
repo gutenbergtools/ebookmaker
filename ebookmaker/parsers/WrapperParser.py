@@ -48,6 +48,8 @@ class Parser(HTMLParserBase):
 
     def wrapper_url(self, img_url):
         """ make the wrapper url. """
+        if self.attribs.id:
+            return '%s.%s.wrap.html' % (img_url, self.attribs.id)
         return img_url + '.wrap.html'
 
 
