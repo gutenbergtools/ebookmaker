@@ -69,7 +69,7 @@ class Parser(ParserBase):
                 format_ = output_format
             if format_ == 'gif':
                 format_ = 'png'
-            if format_ == 'jpeg' and unsized_image.mode.lower() != 'rgb':
+            if format_ == 'jpeg' and unsized_image.mode.lower() not in ('rgb', 'l'):
                 unsized_image = unsized_image.convert('RGB')
 
             if 'dpi' in unsized_image.info:
@@ -97,9 +97,9 @@ class Parser(ParserBase):
                     for quality in (90, 85, 80, 70, 60, 50, 40, 30, 20, 10):
                         data = get_image_data(image, format_, quality=quality)
                         if len(data) <= max_size:
-                            was += 'q=%d' % quality
                             break
 
+                    was += 'q=%d' % quality
             comment = "Image: %d x %d size=%d %s" % (
                 image.size[0], image.size[1], len(data), was
             )
