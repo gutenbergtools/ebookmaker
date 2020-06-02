@@ -48,7 +48,7 @@ MAX_NOIMAGE_SIZE = 64 * 1024 - 1 # bytes, used for covers and important images i
 MAX_IMAGE_SIZE = 256 * 1024 - 1  # in bytes, used for Kindle, too.
 LINKED_IMAGE_SIZE = 1024 * 1024 - 1  # in bytes
 
-MAX_IMAGE_DIMEN = (800, 1280)  # in pixels
+MAX_IMAGE_DIMEN = (5000, 5000)  # in pixels
 LINKED_IMAGE_DIMEN = (5000, 5000)  # in pixels
 MAX_COVER_DIMEN = MAX_IMAGE_DIMEN
 
