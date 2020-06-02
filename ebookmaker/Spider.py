@@ -96,7 +96,8 @@ class Spider(object):
 
                 tag = elem.tag
                 if tag == NS.xhtml.a:
-                    if self.is_image(new_attribs) and self.is_included_url(new_attribs):
+                    if self.is_image(new_attribs) and self.is_included_url(new_attribs) and \
+                            self.is_included_mediatype(new_attribs):
                         # need to wrap an image
                         wrapper_parser = parsers.WrapperParser.Parser(new_attribs)
                         self.parsed_urls.add(wrapper_parser.attribs.url)
