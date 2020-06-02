@@ -29,7 +29,7 @@ Images submitted for use in HTML should be sized and compressed so that load tim
 
 Ebookmaker 0.9 has relaxed some limits on image sizes used inside EPUB and Kindle, considering advances in device power and network speed. Before version 0.9, any image or cover larger than 128KB was compressed to  fit under 128KB. Similarly, images and covers wider than 800 px or taller than 1280 px were proportionately scaled down to fit. In version 0.9, the limits depend on the type of the image. 
 
-- inline images are compressed if they are larger than 256KB and scaled if they are larger than 800x1280.
+- inline images are compressed if they are larger than 256KB and scaled if they are larger than 5000 x 5000.
 - linked images and cover images are compressed if they are larger than 1MB and scaled if they are larger than 5000x5000
 
 Industry specifications for book cover images have changed in the last few years. Amazon now requires that commercial ebook covers have _minimum_ dimensions of "at least 1200 pixels in width or 1800 pixels in height." They're more relaxed for self-published covers; KDP suggests minimum dimensions of 625 x 1000 px and ideal dimensions of 1600 x 2560. New Project Gutenberg books should have covers of quality commensurate with industry practice.
