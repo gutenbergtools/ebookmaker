@@ -100,9 +100,10 @@ class Spider(object):
                             self.is_included_mediatype(new_attribs):
                         # need to wrap an image
                         wrapper_parser = parsers.WrapperParser.Parser(new_attribs)
-                        self.parsed_urls.add(wrapper_parser.attribs.url)
-                        ParserFactory.parsers[wrapper_parser.attribs.url] = wrapper_parser
-                        self.parsers.append(wrapper_parser)
+                        if wrapper_parser.attribs.url not in self.parsed_urls:
+                            ParserFactory.parsers[wrapper_parser.attribs.url] = wrapper_parser
+                            self.parsers.append(wrapper_parser)
+                            self.parsed_urls.add(wrapper_parser.attribs.url)
                         elem.set('href', wrapper_parser.attribs.url)
                         new_attribs.referrer = wrapper_parser.attribs.url
                         elem.set('title', wrapper_parser.attribs.title)
