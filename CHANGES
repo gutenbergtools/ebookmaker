@@ -1,3 +1,20 @@
+0.9.0 June 2, 2020
+Image handling has changed starting with 0.9
+- linked images (image files as targets of links) are now wrapped in html, fixing display in ADE.
+- linked images are compressed to 1MB if possible (changed from 128K)
+- inline images are compressed to 256K if possible (changed from 128K)
+- all images are limited to 5000x5000 pixels (was 800 x 1280)
+- PNG images are scaled to meet the image filesize targets (previously no scaling of PNG images)
+- L format JPEG images (greyscale) are no longer converter to RBG
+- generated covers are no 1200 x 1800
+- covers and "important" images in noimages builds are scaled to 64K (previously no scaling)
+
+General bug fixes
+- eliminated double parsing due to first pass using raw paths
+- when tidy fails, the (huge) error trace is only logged once.
+- generated html is no longer overwritten by empty results
+
+
 0.8.12 May 5, 2020
 - corrected the exception to catch for missing files
 

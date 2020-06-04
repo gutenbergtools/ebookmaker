@@ -44,16 +44,14 @@ from ebookmaker.Version import VERSION, GENERATOR
 options = Options()
 
 MAX_CHUNK_SIZE = 300 * 1024  # bytes
+MAX_NOIMAGE_SIZE = 64 * 1024 - 1 # bytes, used for covers and important images in "noimages epubs"
+MAX_IMAGE_SIZE = 256 * 1024 - 1  # in bytes, used for Kindle, too.
+LINKED_IMAGE_SIZE = 1024 * 1024 - 1  # in bytes
 
-MAX_IMAGE_SIZE = 127 * 1024  # in bytes
+MAX_IMAGE_DIMEN = (5000, 5000)  # in pixels
+LINKED_IMAGE_DIMEN = (5000, 5000)  # in pixels
+MAX_COVER_DIMEN = MAX_IMAGE_DIMEN
 
-MAX_IMAGE_DIMEN = (800, 1280)  # in pixels
-MAX_COVER_DIMEN = (800, 1280)  # in pixels
-
-MAX_IMAGE_SIZE_KINDLE = 127 * 1024  # in bytes
-
-MAX_IMAGE_DIMEN_KINDLE = (1200, 1920)  # Kindle Fire HD 8.9" in pixels
-MAX_COVER_DIMEN_KINDLE = (1200, 1920)  #
 
 # iPhone 3G:    320x480x?
 # Kindle 2:     600x800x16
@@ -134,22 +132,6 @@ OPS_CONTENT_DOCUMENTS = set((
     'application/xml',
 ))
 
-IMAGE_WRAPPER = """<?xml version="1.0"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <title>{title}</title>
-    <style type="text/css">
-       div {{ text-align: center }}
-       img {{ max-width: 100%; }}
-    </style>
-  </head>
-  <body>
-    <div>
-      <img src="{src}" alt="{title}" />
-    </div>
-  </body>
-</html>"""
 
 match_link_url = re.compile(r'^https?://', re.I)
 
@@ -204,7 +186,7 @@ class OEBPSContainer(zipfile.ZipFile):
         """ Add file to zip from bytes string. """
 
         i = self.zi(name)
-        if mediatype and mediatype in (mt.png, mt.gif, mt.jpeg):
+        if mediatype and mediatype in parsers.ImageParser.mediatypes:
             i.compress_type = zipfile.ZIP_STORED
         self.writestr(i, bytes_)
 
@@ -268,7 +250,7 @@ class OEBPSContainer(zipfile.ZipFile):
         filename = 'wrap%04d.html' % self.wrappers
         self.wrappers += 1
         self.add_bytes(filename,
-                       IMAGE_WRAPPER.format(src=img_url, title=img_title),
+                       parsers.IMAGE_WRAPPER.format(src=img_url, title=img_title, backlink=""),
                        mt.xhtml)
         return filename
 
@@ -1213,18 +1195,20 @@ class Writer(writers.HTMLishWriter):
             for p in job.spider.parsers:
                 if hasattr(p, 'resize_image'):
                     if 'coverpage' in p.attribs.rel:
-                        if job.maintype == 'kindle':
-                            np = p.resize_image(MAX_IMAGE_SIZE_KINDLE,
-                                                MAX_COVER_DIMEN_KINDLE, 'jpeg')
+                        if job.subtype == '.noimages':
+                            np = p.resize_image(MAX_NOIMAGE_SIZE, MAX_COVER_DIMEN)
                         else:
                             np = p.resize_image(MAX_IMAGE_SIZE, MAX_COVER_DIMEN)
                         np.id = p.attribs.get('id', 'coverpage')
                         coverpage_url = p.attribs.url
-                    else:
-                        if job.maintype == 'kindle':
-                            np = p.resize_image(MAX_IMAGE_SIZE_KINDLE, MAX_IMAGE_DIMEN_KINDLE)
+                    elif 'linked_image' in p.attribs.rel:
+                        if job.subtype == '.noimages':
+                            np = p.resize_image(MAX_NOIMAGE_SIZE, LINKED_IMAGE_DIMEN)
                         else:
-                            np = p.resize_image(MAX_IMAGE_SIZE, MAX_IMAGE_DIMEN)
+                            np = p.resize_image(LINKED_IMAGE_SIZE, LINKED_IMAGE_DIMEN)
+                        np.id = p.attribs.get('id')
+                    else:
+                        np = p.resize_image(MAX_IMAGE_SIZE, MAX_IMAGE_DIMEN)
                         np.id = p.attribs.get('id')
                     parserlist.append(np)
 

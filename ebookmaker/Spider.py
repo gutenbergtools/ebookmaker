@@ -24,7 +24,7 @@ from libgutenberg.Logger import debug, warning, error
 from libgutenberg import MediaTypes
 
 from ebookmaker import parsers
-from ebookmaker import ParserFactory
+from ebookmaker.ParserFactory import ParserFactory
 
 
 class Spider(object):
@@ -66,7 +66,7 @@ class Spider(object):
             if url in self.parsed_urls:
                 continue
 
-            parser = ParserFactory.ParserFactory.create(url, attribs)
+            parser = ParserFactory.create(url, attribs)
 
             # Maybe the url was redirected to something we already have?
             url = parser.attribs.url
@@ -96,7 +96,21 @@ class Spider(object):
 
                 tag = elem.tag
                 if tag == NS.xhtml.a:
-                    self.enqueue(queue, depth + 1, new_attribs, True)
+                    if self.is_image(new_attribs) and self.is_included_url(new_attribs) and \
+                            self.is_included_mediatype(new_attribs):
+                        # need to wrap an image
+                        wrapper_parser = parsers.WrapperParser.Parser(new_attribs)
+                        if wrapper_parser.attribs.url not in self.parsed_urls:
+                            ParserFactory.parsers[wrapper_parser.attribs.url] = wrapper_parser
+                            self.parsers.append(wrapper_parser)
+                            self.parsed_urls.add(wrapper_parser.attribs.url)
+                        elem.set('href', wrapper_parser.attribs.url)
+                        new_attribs.referrer = wrapper_parser.attribs.url
+                        elem.set('title', wrapper_parser.attribs.title)
+                        self.enqueue(queue, depth + 1, new_attribs, False)
+                    else:
+                        self.enqueue(queue, depth + 1, new_attribs, True)
+                        
                 elif tag == NS.xhtml.img:
                     self.enqueue(queue, depth, new_attribs, False)
                 elif tag == NS.xhtml.link:
@@ -118,7 +132,7 @@ class Spider(object):
 
 
     def enqueue(self, queue, depth, attribs, is_doc):
-        """ Enque url for parsing. """
+        """ Enqueue url for parsing."""
         if is_doc:
             if not self.is_included_url(attribs):
                 warning('External link in %s: %s' % (attribs.referrer, attribs.url))
@@ -134,6 +148,11 @@ class Spider(object):
             return
 
         queue.append((depth, attribs))
+
+
+    def is_image(self, attribs):
+        """ Return True if png, gif, or jpg. """
+        return self.get_mediatype(attribs) in parsers.ImageParser.mediatypes
 
 
     def is_included_url(self, attribs):
@@ -154,18 +173,24 @@ class Spider(object):
         return False
 
 
-    def is_included_mediatype(self, attribs):
-        """ Return True if this document is eligible. """
-
+    def get_mediatype(self, attribs):
+        """ Get mediatype out of attribs, guessing if needed. """
         if attribs.orig_mediatype is None:
             mediatype = MediaTypes.guess_type(attribs.url)
             if mediatype:
                 attribs.orig_mediatype = attribs.HeaderElement(mediatype)
             else:
-                warning('Mediatype could not be determined from url %s' % attribs.url)
-                return True # always include if mediatype unknown
+                return None
+        return attribs.orig_mediatype.value
 
-        mediatype = attribs.orig_mediatype.value
+
+    def is_included_mediatype(self, attribs):
+        """ Return True if this document is eligible. """
+
+        mediatype = self.get_mediatype(attribs)
+        if not mediatype:
+            warning('Mediatype could not be determined from url %s' % attribs.url)
+            return True # always include if mediatype unknown
 
         included = any([fnmatch.fnmatch(mediatype, pattern)
                         for pattern in self.include_mediatypes])
@@ -186,7 +211,7 @@ class Spider(object):
     def is_included_relation(self, attribs):
         """ Return True if this document is eligible. """
 
-        keep = attribs.rel.intersection(('coverpage', 'important'))
+        keep = attribs.rel.intersection(('coverpage', 'important', 'linked_image'))
         if keep:
             debug("Not dropping after all because of rel.")
 

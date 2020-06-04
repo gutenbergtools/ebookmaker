@@ -157,7 +157,7 @@ def elect_coverpage(spider, url):
 
 def generate_cover(dir):
     try:
-        cover_image = Cover.draw(options.dc)
+        cover_image = Cover.draw(options.dc, cover_width=1200, cover_height=1800)
         cover_url = os.path.join(dir, make_output_filename('cover', options.dc))
         with open(cover_url, 'wb+') as cover:
             cover_image.save(cover)

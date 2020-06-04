@@ -181,7 +181,7 @@ class Parser (HTMLParserBase):
                     error (line)
 
         if tidy.returncode == 2:
-            raise ValueError (stderr)
+            raise ValueError ("Tidy tried valiently, but the patient died.")
 
         return html.decode ('utf-8')
 
@@ -357,7 +357,7 @@ class Parser (HTMLParserBase):
             return
         
         for coverpage in coverpages:
-            url = coverpage.get ('src')
+            url = coverpage.get ('href')
             debug ("Found link to coverpage %s." % url)
             return   # already provided by user
 
