@@ -18,11 +18,11 @@ import copy
 import six
 from PIL import Image
 
-from pkg_resources import resource_string # pylint: disable=E0611
+from pkg_resources import resource_stream # pylint: disable=E0611
 
 from libgutenberg.Logger import debug, error
 from libgutenberg.MediaTypes import mediatypes as mt
-from ebookmaker.parsers import ParserBase, BROKEN
+from ebookmaker.parsers import ParserBase
 from ebookmaker.ParserFactory import ParserFactory
 
 mediatypes = (mt.jpeg, mt.png, mt.gif)
@@ -114,7 +114,11 @@ class Parser(ParserBase):
 
         except IOError as what:
             error("Could not resize image: %s" % what)
-            return ParserFactory.create(BROKEN)
+            new_parser.attribs = copy.copy(self.attribs)
+            fp = resource_stream('ebookmaker.parsers', 'broken.png')
+            new_parser.image_data = fp.read()
+            fp.close()
+            
 
         return new_parser
 

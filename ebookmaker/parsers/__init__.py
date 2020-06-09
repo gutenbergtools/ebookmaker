@@ -100,6 +100,8 @@ def webify_url(url):
         return url
     if url.startswith('file:'):
         return url
+    if url.startswith('resource:'):
+        return url
     if re.search(r'^[a-zA-z]:', url):
         return 'file:///' + url.replace(os.path.sep, '/')
     url = os.path.abspath(url).replace(os.path.sep, '/')
