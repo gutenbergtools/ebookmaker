@@ -32,6 +32,10 @@ class Writer (writers.BaseWriter):
         for p in job.spider.parsers:
             if hasattr (p, 'resize_image'):
                 src_uri = p.attribs.url
+                if src_uri.startswith(webify_url(dest_dir)):
+                    debug ('Not copying %s to %s: already there' % (src_uri, dest_dir))
+                    continue
+
                 fn_dest = gg.make_url_relative (webify_url(job.base_url), src_uri)
                 fn_dest = os.path.join (dest_dir, fn_dest)
 
