@@ -83,7 +83,7 @@ IMAGE_WRAPPER = """<?xml version="1.0"?>
   </head>
   <body>
     <div style="text-align: center">
-      <img src="{src}" alt="{title}" style="max-width: 100%; " />
+      <img src="{src}" alt={title} style="max-width: 100%; " />
       {backlink}
     </div>
   </body>
