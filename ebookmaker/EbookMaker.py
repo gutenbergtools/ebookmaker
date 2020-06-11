@@ -517,6 +517,7 @@ def main():
     options.types = options.types or ['all']
     options.types = CommonCode.add_dependencies(options.types, DEPENDENCIES, BUILD_ORDER)
     debug("Building types: %s" % ' '.join(options.types))
+    start_time = datetime.datetime.now()
 
     ParserFactory.load_parsers()
     WriterFactory.load_writers()
@@ -556,6 +557,8 @@ def main():
         job.outputfile = '%d-final.zip' % (options.dc.project_gutenberg_id)
         packager.package(job)
 
+    end_time = datetime.datetime.now()
+    info(' Finished jobs. Total time: %s' % (end_time - start_time))
     return 0
 
 
