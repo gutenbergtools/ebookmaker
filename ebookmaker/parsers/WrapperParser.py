@@ -60,3 +60,8 @@ class Parser(HTMLParserBase):
 
     def make_toc(self, xhtml):
         return []
+
+
+    def iterlinks(self): # pylint: disable=R0201
+        """ no further parsing """
+        return []

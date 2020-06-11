@@ -118,7 +118,6 @@ class Parser(ParserBase):
             fp = resource_stream('ebookmaker.parsers', 'broken.png')
             new_parser.image_data = fp.read()
             fp.close()
-            
 
         return new_parser
 
@@ -137,6 +136,8 @@ class Parser(ParserBase):
         if self.image_data is None:
             self.image_data = self.bytes_content()
 
+    def parse(self):
+        pass
 
     def serialize(self):
         """ Serialize the image. """
