@@ -1,3 +1,11 @@
+0.9.1
+Minor bug fix and optimization.
+- picsdir builds weren't recognizing when it was copying files to themselves
+- "broken" images are now inserted when an image is missing
+- title attribute in wrappers needed escaping
+- build times are now reported to logs
+- small optimization with preparse on image parsers
+
 0.9.0 June 2, 2020
 Image handling has changed starting with 0.9
 - linked images (image files as targets of links) are now wrapped in html, fixing display in ADE.
