@@ -10,13 +10,15 @@ Also it builds HTML4, EPUB2, Kindle, and PDF files from reST sources.
 
 * Python2 >= 2.7 or Python3 >= 3.6
 * HTMLTidy (http://binaries.html-tidy.org/),
-* Kindlegen (https://www.amazon.com/gp/feature.html/?docId=1000765211) or Calibre (https://calibre-ebook.com/)
+* Kindlegen (https://www.amazon.com/gp/feature.html/?docId=1000765211) or
+  Calibre (https://calibre-ebook.com/)
 * TexLive (to build from TeX), and
 * groff (not sure when this is needed).
 
 For cover generation
 
 * Cairo https://www.cairographics.org/download/
+    * Ubuntu: `apt-get install libcairo2`
 * Noto Sans and Noto Sans CJK:
     * CentOS or RedHat: `yum install google-noto-sans-cjk-fonts; yum install google-noto-sans-fonts`
     * Ubuntu: `apt-get install fonts-noto-cjk fonts-noto`
@@ -25,80 +27,105 @@ Tested with Python 3.6
 
 ## Install
 
-(master branch, editable install)
-`pipenv install ebookmaker`
+EBookMaker is a python library requiring Python >= 3.6. Before starting,
+confirm you are using Python 3.6 or later with:
 
-Use the ebookmaker.conf file to pass a path to your kindlegen, tex, and groff programs 
-if they're not in your PATH. Edit the ebookmaker.conf and copy it to /etc/ebookmaker.conf to 
-reset the paths.
-Copy ebookmaker.conf to ~/.ebookmaker to override settings in /etc/ebookmaker.conf or to set default 
-command line options.
+```
+python3 --version
+```
+
+EBookMaker can easily be installed with `pip3`:
+
+```
+pip3 install --user ebookmaker
+```
+
+This will place `ebookmaker` in `~/.local/bin`. It's recommended that you place
+that directory on your shell's PATH to make running EBookMaker easier.
+
+## Configure
+
+EBookMaker uses a `ebookmaker.conf` file to pass the location of `kindlegen`,
+`tex`, and `groff` programs as well as other settings. You can place this file
+in either `/etc/ebookmaker.conf` or `~/.ebookmaker`, the latter will override
+settings in the former.
+
+See [`ebookmaker.conf`](https://github.com/gutenbergtools/ebookmaker/blob/master/ebookmaker.conf)
+for an example configuration file.
 
 ## Sample invocation
 
-(From the directory where you ran `pipenv install`)
+```
+ebookmaker -v -v --make=epub.images --output-dir=/Documents/pg /Documents/library/58669/58669-h/58669-h.htm
+```
 
-`pipenv shell`
-`ebookmaker -v -v --make=epub.images --output-dir=/Documents/pg /Documents/library/58669/58669-h/58669-h.htm`
+## Updating
 
-or
+To get the latest version of EBookMaker, use `pip3` to upgrade to the latest:
 
-`pipenv run ebookmaker -v -v --make=epub.images --output-dir=/Documents/pg /Documents/library/58669/58669-h/58669-h.htm`
+```
+pip3 install --upgrade ebookmaker
+```
 
+## Developing ebookmaker
 
+To do development on EBookMaker, it's recommended you use
+[pipenv](https://pipenv.pypa.io/en/latest/). This tool creates a virtual
+environment and installs the package locally from the checkout. This allows
+local edits to the file to be live while still ensuring that all package
+dependencies are pulled from `setup.py` just as they would be for a real
+install.
 
-## new to pipenv?
+### Create virtual environment with pipenv
 
-Install pipenv  (might be `pip install --user pipenv`, depending on your default python)
+Install pipenv with Python 3 (might be `pip install --user pipenv`, depending on
+your system's default Python version).
 
-`$ pip3 install --user pipenv`
+```
+$ pip3 install --user pipenv
+```
 
 The default install location is `${HOME}/.local/bin`, so add this to your login shell's ${PATH} if needed.
 
-Change directories to where you want to have your ebookmaker environment. Then, to initialize a python 3 virtual environment, do
+Change directories to where the ebookmaker source code is checked out. Then
+create the python 3 virtual environment with:
 
-`$ pipenv --three`
+```
+$ pipenv install
+```
+
+This creates the virtual environment and installs the package dependencies from
+`Pipfile`, most notable of which is the ebookmaker package from the disk in
+editable mode. This allows you to update files in `ebookmaker/` and have those
+changes be live:
 
 Whenever you want to enter this environment, move to this directory and do:
 
-`$ pipenv shell`
- 
-Install the gutenberg modules:
-
-`$ pipenv install ebookmaker`
+```
+$ pipenv shell
+```
 
 Check your install:
 
-`$ ebookmaker --version`
-`EbookMaker 0.9.0`
+```
+$ ebookmaker --version
+EbookMaker 0.9.0
+```
 
 Since you're in the shell, you can navigate to a book's directory and convert it:
 
-`$ ebookmaker -v -v --make=epub.images --ebook 10001 --title "The Luck of the Kid" --author "Ridgwell Cullum" luck-kid.html`
+```
+$ ebookmaker -v -v --make=epub.images --ebook 10001 --title "The Luck of the Kid" --author "Ridgwell Cullum" luck-kid.html
+```
 
-## Update
+### Test
 
-`$ cd ebookmaker` to whever you ran `$ pipenv install ebookmaker`
+In your pipenv virtual environment:
+```
+$ python setup.py test
+```
 
-then:
-
-`$ pipenv update ebookmaker`
-
-## Test
-
-Install, as above.
-
-`$ cd ebookmaker` to whever you ran `$ pip install ebookmaker`
-
-then:
-
-`$ git checkout master`
-
-`$ pipenv install -e .`
-
-`$ python setup.py test`
-
-Travis-CI will run tests on branches committed in the gutenbergtools org
+Travis-CI will run these tests on branches committed in the gutenbergtools org.
 
 ## Notes running Ebookmaker on Windows Machine (adapted from @windymilla)
 
