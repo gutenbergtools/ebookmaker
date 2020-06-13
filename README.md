@@ -8,7 +8,7 @@ Also it builds HTML4, EPUB2, Kindle, and PDF files from reST sources.
 
 ## Prerequisites
 
-* Python2 >= 2.7 or Python3 >= 3.6
+* Python3 >= 3.6
 * HTMLTidy (http://binaries.html-tidy.org/),
 * Kindlegen (https://www.amazon.com/gp/feature.html/?docId=1000765211) or Calibre (https://calibre-ebook.com/)
 * TexLive (to build from TeX), and
