@@ -100,6 +100,37 @@ then:
 
 Travis-CI will run tests on branches committed in the gutenbergtools org
 
+## MacOS
+
+EBookMaker installs easily on MacOS with the Python 3 and Cairo included with
+[Homebrew](https://brew.sh). After installing Homebrew:
+
+```
+brew install python3
+brew install cairo
+```
+
+Then install EBookMaker:
+
+```
+pip3 install --user ebookmaker
+```
+
+The script to start ebookmaker will be placed into your user's local Python
+package directory which will not be on your path. You can add it to your path
+with:
+
+```
+echo 'export PATH=$PATH:~/Library/Python/3.7/bin' >> ~/.profile
+```
+
+After closing and reopening a terminal window, `ebookmaker` should be on your
+path and usable:
+
+```
+ebookmaker --version
+```
+
 ## Notes running Ebookmaker on Windows Machine (adapted from @windymilla)
 
 1. Install Python 3.6+ from python.org. Install HTML Tidy if you don't have it already. It doesn't come preinstalled on Windows, but if you have Guiguts installed, you should find it in a folder such as `C:\DP\guiguts-win\tools\tidy`. Add it to the path. Do the same for Kindlegen.
