@@ -43,8 +43,12 @@ setup (
         'roman',
         'requests',
         'six>=1.4.1',
-        'libgutenberg[covers]>=0.5.1',
+        'libgutenberg>=0.5.1',
     ],
+
+    extras_require = {
+        'covers': ['libgutenberg[covers]>=0.5.1'],
+    },
     
     package_data = {
         'ebookmaker.parsers': ['broken.png'],
