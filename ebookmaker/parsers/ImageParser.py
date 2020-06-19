@@ -51,7 +51,7 @@ class Parser(ParserBase):
                 image = image.resize(dimen, Image.ANTIALIAS)
             return was, image
 
-        def get_image_data(image, format_, quality=95):
+        def get_image_data(image, format_, quality='keep'):
             buf = six.BytesIO()
             if format_ == 'png':
                 image.save(buf, 'png', optimize=True)
