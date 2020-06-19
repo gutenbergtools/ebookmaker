@@ -1,4 +1,11 @@
-0.9.1
+0.9.2 June 19, 2020
+- note that EbookMaker in no longer installable in Python 2.7 (thanks cpeel)
+- clean up pipfile and gitignore pipfile.lock (thanks cpeel)
+- fixed bug where filepaths need escape in HTML
+- fixed issue where compression was expanding compressed jpegs (thanks choward)
+- adde EBOK flag in MOBI when using ebook-convert (thanks rfrank)
+
+0.9.1 June 11, 2020
 Minor bug fix and optimization.
 - picsdir builds weren't recognizing when it was copying files to themselves
 - "broken" images are now inserted when an image is missing
@@ -13,8 +20,8 @@ Image handling has changed starting with 0.9
 - inline images are compressed to 256K if possible (changed from 128K)
 - all images are limited to 5000x5000 pixels (was 800 x 1280)
 - PNG images are scaled to meet the image filesize targets (previously no scaling of PNG images)
-- L format JPEG images (greyscale) are no longer converter to RBG
-- generated covers are no 1200 x 1800
+- L format JPEG images (greyscale) are no longer converter to RBG (thanks rfrank)
+- generated covers are now 1200 x 1800
 - covers and "important" images in noimages builds are scaled to 64K (previously no scaling)
 
 General bug fixes
