@@ -4,7 +4,7 @@
 
 from setuptools import setup
 
-VERSION = '0.9.0'
+VERSION = '0.9.2'
 
 setup (
     name = 'ebookmaker',

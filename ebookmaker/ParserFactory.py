@@ -179,7 +179,7 @@ class ParserFactory(object):
 
         o = urllib.parse.urlsplit(orig_url)
         package = o.hostname
-        filename = o.path
+        filename = o.path[1:]
         fp = resource_stream(package, filename)
         attribs.orig_mediatype = attribs.HeaderElement(MediaTypes.guess_type(filename))
 

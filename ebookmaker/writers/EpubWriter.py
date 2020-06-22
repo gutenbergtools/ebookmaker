@@ -22,6 +22,7 @@ import time
 import os
 import copy
 import subprocess
+from xml.sax.saxutils import quoteattr
 
 import six
 from six.moves import urllib
@@ -246,7 +247,7 @@ class OEBPSContainer(zipfile.ZipFile):
 
     def add_image_wrapper(self, img_url, img_title):
         """ Add a HTML file wrapping img_url. """
-
+        img_title = quoteattr(img_title)
         filename = 'wrap%04d.html' % self.wrappers
         self.wrappers += 1
         self.add_bytes(filename,

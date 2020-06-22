@@ -10,6 +10,8 @@ Copyright 2020 by Eric Hellman
 Distributable under the GNU General Public License Version 3 or newer.
 
 """
+from xml.sax.saxutils import escape, quoteattr
+
 import lxml
 
 from copy import copy
@@ -42,8 +44,12 @@ class Parser(HTMLParserBase):
     def unicode_content(self):
         """ wrapper page content """
         frag = ('#%s' % self.attribs.id) if self.attribs.id else ''
-        backlink = '<br /><a href="%s%s" title="back" >back</a>' % (self.attribs.referrer, frag)
-        return IMAGE_WRAPPER.format(src=self.src, title=self.attribs.title, backlink=backlink)
+        backlink = '<br /><a href="%s%s" title="back" >back</a>' % (
+            escape(self.attribs.referrer), frag)
+        return IMAGE_WRAPPER.format(
+            src=escape(self.src),
+            title=quoteattr(self.attribs.title),
+            backlink=backlink)
 
 
     def wrapper_url(self, img_url):
@@ -55,3 +61,4 @@ class Parser(HTMLParserBase):
 
     def make_toc(self, xhtml):
         return []
+

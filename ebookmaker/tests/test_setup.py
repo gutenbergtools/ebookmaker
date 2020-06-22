@@ -19,6 +19,7 @@ from ebookmaker.CommonCode import Options
 from ebookmaker.EbookMaker import config
 from ebookmaker.EbookMaker import DEPENDENCIES, BUILD_ORDER
 from ebookmaker.packagers import PackagerFactory
+from ebookmaker.parsers import BROKEN
 
 options = Options()
 
@@ -33,9 +34,18 @@ class TestLoad(unittest.TestCase):
  
     def test_parsers(self):
         ParserFactory.load_parsers()
+        pf = ParserFactory.ParserFactory()
+        
+        # check parser created from resource
+        broken_parser = pf.create(BROKEN)
+        self.assertTrue(hasattr(broken_parser, 'resize_image'))
+        broken_parser.pre_parse()
+        self.assertTrue(len(broken_parser.image_data) > 0)
+        self.assertTrue(broken_parser.get_image_dimen()[0] > 0)
 
     def test_writers(self):
         WriterFactory.load_writers()
 
     def test_packagers(self):
         PackagerFactory.load_packagers()
+

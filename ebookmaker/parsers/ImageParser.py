@@ -18,11 +18,11 @@ import copy
 import six
 from PIL import Image
 
-from pkg_resources import resource_string # pylint: disable=E0611
+from pkg_resources import resource_stream # pylint: disable=E0611
 
 from libgutenberg.Logger import debug, error
 from libgutenberg.MediaTypes import mediatypes as mt
-from ebookmaker.parsers import ParserBase, BROKEN
+from ebookmaker.parsers import ParserBase
 from ebookmaker.ParserFactory import ParserFactory
 
 mediatypes = (mt.jpeg, mt.png, mt.gif)
@@ -51,7 +51,7 @@ class Parser(ParserBase):
                 image = image.resize(dimen, Image.ANTIALIAS)
             return was, image
 
-        def get_image_data(image, format_, quality=95):
+        def get_image_data(image, format_, quality='keep'):
             buf = six.BytesIO()
             if format_ == 'png':
                 image.save(buf, 'png', optimize=True)
@@ -114,7 +114,10 @@ class Parser(ParserBase):
 
         except IOError as what:
             error("Could not resize image: %s" % what)
-            return ParserFactory.create(BROKEN)
+            new_parser.attribs = copy.copy(self.attribs)
+            fp = resource_stream('ebookmaker.parsers', 'broken.png')
+            new_parser.image_data = fp.read()
+            fp.close()
 
         return new_parser
 
@@ -133,6 +136,8 @@ class Parser(ParserBase):
         if self.image_data is None:
             self.image_data = self.bytes_content()
 
+    def parse(self):
+        pass
 
     def serialize(self):
         """ Serialize the image. """

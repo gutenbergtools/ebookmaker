@@ -83,7 +83,7 @@ IMAGE_WRAPPER = """<?xml version="1.0"?>
   </head>
   <body>
     <div style="text-align: center">
-      <img src="{src}" alt="{title}" style="max-width: 100%; " />
+      <img src="{src}" alt={title} style="max-width: 100%; " />
       {backlink}
     </div>
   </body>
@@ -99,6 +99,8 @@ def webify_url(url):
     if re.search(r'^https?://', url):
         return url
     if url.startswith('file:'):
+        return url
+    if url.startswith('resource:'):
         return url
     if re.search(r'^[a-zA-z]:', url):
         return 'file:///' + url.replace(os.path.sep, '/')

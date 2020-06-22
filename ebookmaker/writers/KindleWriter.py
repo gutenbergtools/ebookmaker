@@ -45,6 +45,7 @@ class Writer (BaseWriter):
                         options.config.MOBIGEN,
                         job.url,
                         os.path.basename (job.outputfile),
+                        '--personal-doc="[EBOK]"',
                     ],
                     stdin=subprocess.PIPE,
                     stdout=subprocess.PIPE,

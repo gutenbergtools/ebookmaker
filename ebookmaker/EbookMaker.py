@@ -22,13 +22,14 @@ import logging
 import os.path
 import re
 import sys
+import datetime
 
 import six
 from six.moves import cPickle
 
 from libgutenberg.GutenbergGlobals import SkipOutputFormat
 import libgutenberg.GutenbergGlobals as gg
-from libgutenberg.Logger import debug, warning, error, exception
+from libgutenberg.Logger import debug, info, warning, error, exception
 from libgutenberg import Logger, DublinCore
 from libgutenberg import MediaTypes as mt
 from libgutenberg import Cover
@@ -412,7 +413,7 @@ def do_job(job):
         log_handler = open_log(os.path.join(os.path.abspath(job.outputdir), job.logfile))
 
     debug('=== Building %s ===' % job.type)
-
+    start_time = datetime.datetime.now()
     try:
         if job.url:
             spider = Spider.Spider()
@@ -468,6 +469,9 @@ def do_job(job):
     except Exception as what:
         exception("%s" % what)
 
+    end_time = datetime.datetime.now()
+    info(' %s made in %s' % (job.type, end_time - start_time))
+
     if log_handler:
         close_log(log_handler)
         log_handler = None
@@ -513,6 +517,7 @@ def main():
     options.types = options.types or ['all']
     options.types = CommonCode.add_dependencies(options.types, DEPENDENCIES, BUILD_ORDER)
     debug("Building types: %s" % ' '.join(options.types))
+    start_time = datetime.datetime.now()
 
     ParserFactory.load_parsers()
     WriterFactory.load_writers()
@@ -552,6 +557,8 @@ def main():
         job.outputfile = '%d-final.zip' % (options.dc.project_gutenberg_id)
         packager.package(job)
 
+    end_time = datetime.datetime.now()
+    info(' Finished jobs. Total time: %s' % (end_time - start_time))
     return 0
 
 
