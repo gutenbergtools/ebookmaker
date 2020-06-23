@@ -52,7 +52,10 @@ class Parser(ParserBase):
             return was, image
 
         def get_image_data(image, format_, quality='keep'):
+            """ Format is the output format, not necessarily the input format """
             buf = six.BytesIO()
+            if image.format != 'JPEG' and quality == 'keep':
+                quality = 90
             if format_ == 'png':
                 image.save(buf, 'png', optimize=True)
             else:
