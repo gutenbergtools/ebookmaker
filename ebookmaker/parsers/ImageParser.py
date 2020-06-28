@@ -59,7 +59,13 @@ class Parser(ParserBase):
             if format_ == 'png':
                 image.save(buf, 'png', optimize=True)
             else:
-                image.save(buf, 'jpeg', quality=quality)
+                try:
+                    image.save(buf, 'jpeg', quality=quality)
+                except ValueError as e:
+                    if quality == 'keep' and 'quantization' in str(e):
+                        image.save(buf, 'jpeg', quality=90)
+                    else:
+                        raise e
             return buf.getvalue()
 
         new_parser = Parser()
