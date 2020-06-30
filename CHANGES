@@ -1,3 +1,13 @@
+0.9.4 June 30, 2020
+- handle invalid quantization table in jpeg files when using quality 'keep'
+- respect rel="nofollow" attribute: this allows authors to link to an alternate version file in html without duplicating content in the EPUB file.
+- set wrappers to nonlinear in spine.
+- fixed bugs and ugliness in toc generation
+  - when the same header level is consecutive, only one toc item is generated. (We see this used to make multiline heads or titles)
+  - toc normalization made a hash of the toc. Now the toc is normalized in the epubwriter, not in the parser.
+  - add display:block to standard css sheet to prevent hidden headings from breaking kindlegen
+- added a configuration option to use calibre (or whatever!) for non-supported in kindleget languages.
+
 0.9.3 June 23, 2020
 - Fix reversion in 0.9.2 which caused CoverWriter in EbookConverter to fail. (It uses ImageParser to convert images from PNG to JPEG
 - add a test to check this
