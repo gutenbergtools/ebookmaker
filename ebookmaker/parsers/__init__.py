@@ -453,6 +453,15 @@ class HTMLParserBase(ParserBase):
                 yield 'pgepubid%05d' % i
                 i += 1
 
+        def get_header_text(header):
+            """ clean header text """
+            text = gg.normalize(etree.tostring(header,
+                                               method="text",
+                                               encoding=six.text_type,
+                                               with_tail=False))
+
+            return header.get('title', text).strip()
+
         idg = id_generator()
 
         def get_id(elem):
@@ -462,7 +471,6 @@ class HTMLParserBase(ParserBase):
             return elem.get('id')
 
         toc = []
-        last_depth = 0
 
         for header in xpath(
                 xhtml,
@@ -473,12 +481,12 @@ class HTMLParserBase(ParserBase):
                 '//xhtml:p[contains (@class, "topic-title")]'
             ):
 
-            text = gg.normalize(etree.tostring(header,
-                                               method="text",
-                                               encoding=six.text_type,
-                                               with_tail=False))
+            previous = header.getprevious()
+            if previous is not None and previous.tag == header.tag:
+                # consecutive headers get combined
+                continue
 
-            text = header.get('title', text).strip()
+            text = get_header_text(header)
 
             if not text:
                 # so <h2 title=""> may be used to suppress TOC entry
@@ -498,12 +506,12 @@ class HTMLParserBase(ParserBase):
                 except ValueError:
                     depth = 2 # avoid top level
 
-                # fix bogus header numberings
-                if depth > last_depth + 1:
-                    depth = last_depth + 1
-
-                last_depth = depth
-
+                #join consecutive headers
+                next = header.getnext()
+                while next is not None and next.tag == header.tag:
+                    text = (text + ' ' + get_header_text(next)).strip()
+                    next = next.getnext()
+                    
                 # if <h*> is first element of a <div> use <div> instead
                 parent = header.getparent()
                 if (parent.tag == NS.xhtml.div and

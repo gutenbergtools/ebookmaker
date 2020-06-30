@@ -82,6 +82,15 @@ class Spider(object):
             debug("Requesting iterlinks for: %s ..." % url)
             for url, elem in parser.iterlinks():
 
+                if elem.get('rel') == 'nofollow':
+                    # remove link to content not followed
+                    elem.tag = 'span'
+                    elem.set('data-nofolllow-href', elem.get('href'))
+                    del elem.attrib['href']
+                    del elem.attrib['rel']
+                    warning('not followed: %s' % url)
+                    continue
+
                 new_attribs = parsers.ParserAttributes()
                 new_attribs.url = urllib.parse.urldefrag(url)[0]
                 new_attribs.referrer = parser.attribs.url

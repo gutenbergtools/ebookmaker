@@ -27,6 +27,7 @@ class Parser(HTMLParserBase):
         self.src = self.attribs.url
         self.attribs.url = self.wrapper_url(self.attribs.url)
         self.attribs.orig_url = self.attribs.url
+        self.attribs.nonlinear = True
         if not self.attribs.title:
             self.attribs.title = 'linked image'
         self.xhtml = lxml.etree.fromstring(

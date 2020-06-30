@@ -42,6 +42,9 @@ class TestLoad(unittest.TestCase):
         broken_parser.pre_parse()
         self.assertTrue(len(broken_parser.image_data) > 0)
         self.assertTrue(broken_parser.get_image_dimen()[0] > 0)
+        
+        # check conversion to jpeg
+        broken_parser.resize_image(16 * 1024, (66, 100), output_format='jpeg')
 
     def test_writers(self):
         WriterFactory.load_writers()

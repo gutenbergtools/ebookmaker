@@ -22,13 +22,23 @@ from ebookmaker.writers import BaseWriter
 from ebookmaker.CommonCode import Options
 
 options = Options()
+no_kindlegen_langs = ['ceb', 'eo', 'fur', 'ia', 'ilo', 'iu', 'mi', 'nah', 'nap', 'oc', 'oji', 'tl']
 
 class Writer (BaseWriter):
     """ Class for writing kindle files. """
 
 
     def build (self, job):
-        """ Build kindle file from epub using amazon kindlegen. """
+        """ Build kindle file from epub using amazon kindlegen or calibre. """
+
+        if job.dc.languages:
+            if job.dc.languages[0].id in no_kindlegen_langs:
+                mobimaker = options.config.MOBILANG
+            else:
+                mobimaker = options.config.MOBIGEN
+        if not mobimaker:
+            info('no mobimaker available')
+            return
 
         # kindlegen needs localized paths
         outputdir = os.path.abspath(job.outputdir)
@@ -39,10 +49,10 @@ class Writer (BaseWriter):
         try:
             cwd = os.getcwd ()
             os.chdir (outputdir)
-            if 'ebook-convert' in options.config.MOBIGEN:
+            if 'ebook-convert' in mobimaker:
                 kindlegen = subprocess.Popen (
                     [
-                        options.config.MOBIGEN,
+                        mobimaker,
                         job.url,
                         os.path.basename (job.outputfile),
                         '--personal-doc="[EBOK]"',
@@ -54,7 +64,7 @@ class Writer (BaseWriter):
             else:
                 kindlegen = subprocess.Popen (
                     [
-                        options.config.MOBIGEN,
+                        mobimaker,
                         '-o', os.path.basename (job.outputfile),
                         job.url
                     ],
@@ -65,7 +75,7 @@ class Writer (BaseWriter):
 
         except OSError as what:
             os.chdir (cwd)
-            error ("KindleWriter: %s %s" % (options.config.MOBIGEN, what))
+            error ("KindleWriter: %s %s" % (mobimaker, what))
             raise SkipOutputFormat
 
         (stdout, stderr) = kindlegen.communicate ()

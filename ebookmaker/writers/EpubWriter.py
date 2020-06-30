@@ -86,7 +86,8 @@ body, body.tei.tei-text {
    }
 div, p, pre, h1, h2, h3, h4, h5, h6 {
    margin-left: 0;
-   margin-right: 0
+   margin-right: 0;
+   display: block
    }
 div.pgebub-root-div {
    margin: 0
@@ -288,6 +289,34 @@ class AdobePageMap(object):
         return page_map
 
 
+class OutlineFixer(object):
+    """ Class that fixes outline levels. """
+
+    def __init__(self):
+        self.stack = [(0,0),]
+        self.last = 0
+
+    def level(self, in_level):
+        if in_level < 1:
+            return in_level
+        (promotion, from_level) = self.stack[-1]
+        if in_level > self.last + 1:
+            # needs promotion
+            more_promotion = in_level - self.last - 1
+            new_promotion = promotion + more_promotion
+            self.last = in_level
+            self.stack.append((new_promotion, in_level))
+            return in_level - new_promotion
+        elif in_level < from_level:
+            # close out promotion
+            self.last = from_level - promotion - 1
+            self.stack.pop()
+            return self.level(in_level)
+        else:
+            self.last = in_level
+            return in_level - promotion
+
+
 class TocNCX(object):
     """ Class that builds toc.ncx. """
 
@@ -308,6 +337,12 @@ class TocNCX(object):
         tocdepth = 1
 
         if self.toc:
+            # normalize toc so that it starts with an h1 and doesn't jump down more than one 
+            # level at a time
+            fixer = OutlineFixer()
+            for t in self.toc:
+                t[2] = fixer.level(t[2])
+
             # flatten toc if it contains only one top-level entry
             top_level_entries = sum(t[2] == 1 for t in self.toc)
             if top_level_entries < 2:
@@ -542,7 +577,8 @@ class ContentOPF(object):
         """ Add item to spine and manifest from parser. """
         if hasattr(p.attribs, 'comment'):
             self.manifest.append(etree.Comment(p.attribs.comment))
-        return self.spine_item(p.attribs.url, p.mediatype(), p.attribs.id)
+        return self.spine_item(p.attribs.url, p.mediatype(), p.attribs.id,
+                               linear=not hasattr(p.attribs, 'nonlinear'))
 
 
     def toc_item(self, url):
