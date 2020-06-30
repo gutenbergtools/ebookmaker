@@ -542,7 +542,8 @@ class ContentOPF(object):
         """ Add item to spine and manifest from parser. """
         if hasattr(p.attribs, 'comment'):
             self.manifest.append(etree.Comment(p.attribs.comment))
-        return self.spine_item(p.attribs.url, p.mediatype(), p.attribs.id)
+        return self.spine_item(p.attribs.url, p.mediatype(), p.attribs.id,
+                               linear=not hasattr(p.attribs, 'nonlinear'))
 
 
     def toc_item(self, url):
