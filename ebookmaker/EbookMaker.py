@@ -493,6 +493,7 @@ def config():
             'proxies' : None,
             'xelatex' : 'xelatex',
             'mobigen' : 'kindlegen',
+            'mobilang': '',
             'groff'   : 'groff',
             'rhyming_dict': None,
             'timestamp': datetime.datetime.today().isoformat()[:19],
