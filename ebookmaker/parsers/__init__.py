@@ -471,7 +471,6 @@ class HTMLParserBase(ParserBase):
             return elem.get('id')
 
         toc = []
-        last_depth = 0
 
         for header in xpath(
                 xhtml,
@@ -506,12 +505,6 @@ class HTMLParserBase(ParserBase):
                     depth = int(header.tag[-1:])
                 except ValueError:
                     depth = 2 # avoid top level
-
-                # fix bogus header numberings
-                if depth > last_depth + 1:
-                    depth = last_depth + 1
-
-                last_depth = depth
 
                 #join consecutive headers
                 next = header.getnext()
