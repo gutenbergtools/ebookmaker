@@ -296,6 +296,8 @@ class OutlineFixer(object):
         self.last = 0
 
     def level(self, in_level):
+        if in_level < 1:
+            return in_level
         (promotion, from_level) = self.stack[-1]
         if in_level > self.last + 1:
             # needs promotion
