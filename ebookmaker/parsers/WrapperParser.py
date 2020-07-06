@@ -63,3 +63,9 @@ class Parser(HTMLParserBase):
     def make_toc(self, xhtml):
         return []
 
+
+    def iterlinks(self):
+        """ only return the image """
+        for iterlink in super(Parser, self).iterlinks():
+            if iterlink[1].tag == 'img':
+                yield iterlink
