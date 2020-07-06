@@ -1,3 +1,6 @@
+0.9.5 July 6, 2020
+- fixed minor issue where the spider was getting confused when iterating on WrapperParsers.
+
 0.9.4 June 30, 2020
 - handle invalid quantization table in jpeg files when using quality 'keep'
 - respect rel="nofollow" attribute: this allows authors to link to an alternate version file in html without duplicating content in the EPUB file.
