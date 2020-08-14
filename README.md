@@ -78,7 +78,7 @@ Since you're in the shell, you can navigate to a book's directory and convert it
 
 ## Update
 
-`$ cd ebookmaker` to whever you ran `$ pipenv install ebookmaker`
+`$ cd ebookmaker` to wherever you ran `$ pipenv install ebookmaker`
 
 then:
 
@@ -88,7 +88,7 @@ then:
 
 Install, as above.
 
-`$ cd ebookmaker` to whever you ran `$ pip install ebookmaker`
+`$ cd ebookmaker` to wherever you ran `$ pip install ebookmaker`
 
 then:
 
