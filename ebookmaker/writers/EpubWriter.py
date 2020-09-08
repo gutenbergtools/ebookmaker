@@ -1279,6 +1279,9 @@ class Writer(writers.HTMLishWriter):
                         # has side effects on xhtml
                         ncx.toc += p.make_toc(xhtml)
 
+                        # allows authors to customize css for epub
+                        self.add_body_class (xhtml, 'x-ebookmaker')
+
                         self.insert_root_div(xhtml)
                         self.fix_charset(xhtml)
                         self.fix_style_elements(xhtml)

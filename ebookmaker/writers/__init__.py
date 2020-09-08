@@ -118,6 +118,14 @@ class HTMLishWriter (BaseWriter):
                 style.tail = '\n'
                 head.append (style)
 
+    @staticmethod
+    def add_body_class (xhtml, classname):
+        """ Add a class to the body element. """
+
+        if classname and xhtml is not None:
+            for body in gg.xpath (xhtml, '//xhtml:body'):
+                HTMLishWriter.add_class (body, classname)
+
 
     def add_external_css (self, spider, xhtml, css_as_string, url):
         """ Add external stylesheet to html. """
