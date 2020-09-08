@@ -22,7 +22,8 @@ from ebookmaker.writers import BaseWriter
 from ebookmaker.CommonCode import Options
 
 options = Options()
-no_kindlegen_langs = ['ceb', 'eo', 'fur', 'ia', 'ilo', 'iu', 'mi', 'nah', 'nap', 'oc', 'oji', 'tl']
+no_kindlegen_langs = ['ceb', 'eo', 'fur', 'ia', 'ilo', 'iu', 'mi',
+                      'myn', 'nah', 'nap', 'oc', 'oji', 'tl']
 
 class Writer (BaseWriter):
     """ Class for writing kindle files. """
