@@ -293,7 +293,7 @@ class OutlineFixer(object):
     """ Class that fixes outline levels. """
 
     def __init__(self):
-        self.stack = [(0,0),]
+        self.stack = [(0, 0),]
         self.last = 0
 
     def level(self, in_level):
@@ -337,7 +337,7 @@ class TocNCX(object):
         tocdepth = 1
 
         if self.toc:
-            # normalize toc so that it starts with an h1 and doesn't jump down more than one 
+            # normalize toc so that it starts with an h1 and doesn't jump down more than one
             # level at a time
             fixer = OutlineFixer()
             for t in self.toc:
@@ -1280,7 +1280,7 @@ class Writer(writers.HTMLishWriter):
                         ncx.toc += p.make_toc(xhtml)
 
                         # allows authors to customize css for epub
-                        self.add_body_class (xhtml, 'x-ebookmaker')
+                        self.add_body_class(xhtml, 'x-ebookmaker')
 
                         self.insert_root_div(xhtml)
                         self.fix_charset(xhtml)
