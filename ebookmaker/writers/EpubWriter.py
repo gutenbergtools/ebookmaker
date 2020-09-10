@@ -849,12 +849,13 @@ class Writer(writers.HTMLishWriter):
     def fix_incompatible_css(sheet):
         """ Strip CSS properties and values that are not EPUB compatible. """
 
-        # debug("enter fix_incompatible_css")
+        cssclass = re.compile(r'\.(-?[_a-zA-Z]+[_a-zA-Z0-9-]*)')
 
         for rule in sheet:
             if rule.type == rule.STYLE_RULE:
+                ruleclasses = list(cssclass.findall(rule.selectorList.selectorText))
                 for p in list(rule.style):
-                    if p.name == 'float':
+                    if p.name == 'float' and "x-ebookmaker" not in ruleclasses:
                         debug("Dropping property %s" % p.name)
                         rule.style.removeProperty('float')
                         rule.style.removeProperty('width')
