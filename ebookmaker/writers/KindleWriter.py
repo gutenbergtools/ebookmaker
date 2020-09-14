@@ -22,13 +22,14 @@ from ebookmaker.writers import BaseWriter
 from ebookmaker.CommonCode import Options
 
 options = Options()
-no_kindlegen_langs = ['ceb', 'eo', 'fur', 'ia', 'ilo', 'iu', 'mi', 'nah', 'nap', 'oc', 'oji', 'tl']
+no_kindlegen_langs = ['ceb', 'eo', 'fur', 'ia', 'ilo', 'iu', 'mi',
+                      'myn', 'nah', 'nap', 'oc', 'oji', 'tl']
 
-class Writer (BaseWriter):
+class Writer(BaseWriter):
     """ Class for writing kindle files. """
 
 
-    def build (self, job):
+    def build(self, job):
         """ Build kindle file from epub using amazon kindlegen or calibre. """
 
         if job.dc.languages:
@@ -43,18 +44,18 @@ class Writer (BaseWriter):
         # kindlegen needs localized paths
         outputdir = os.path.abspath(job.outputdir)
 
-        info ("Creating Kindle file: %s" % os.path.join (outputdir, job.outputfile))
-        info ("            ... from: %s" % job.url)
+        info("Creating Kindle file: %s" % os.path.join(outputdir, job.outputfile))
+        info("            ... from: %s" % job.url)
 
         try:
-            cwd = os.getcwd ()
-            os.chdir (outputdir)
+            cwd = os.getcwd()
+            os.chdir(outputdir)
             if 'ebook-convert' in mobimaker:
-                kindlegen = subprocess.Popen (
+                kindlegen = subprocess.Popen(
                     [
                         mobimaker,
                         job.url,
-                        os.path.basename (job.outputfile),
+                        os.path.basename(job.outputfile),
                         '--personal-doc="[EBOK]"',
                     ],
                     stdin=subprocess.PIPE,
@@ -62,10 +63,10 @@ class Writer (BaseWriter):
                     stderr=subprocess.PIPE
                 )
             else:
-                kindlegen = subprocess.Popen (
+                kindlegen = subprocess.Popen(
                     [
                         mobimaker,
-                        '-o', os.path.basename (job.outputfile),
+                        '-o', os.path.basename(job.outputfile),
                         job.url
                     ],
                     stdin=subprocess.PIPE,
@@ -74,43 +75,43 @@ class Writer (BaseWriter):
                 )
 
         except OSError as what:
-            os.chdir (cwd)
-            error ("KindleWriter: %s %s" % (mobimaker, what))
+            os.chdir(cwd)
+            error("KindleWriter: %s %s" % (mobimaker, what))
             raise SkipOutputFormat
 
-        (stdout, stderr) = kindlegen.communicate ()
+        (stdout, stderr) = kindlegen.communicate()
 
-        os.chdir (cwd)
+        os.chdir(cwd)
 
         if kindlegen.returncode > 0:
-            regex = re.compile (r'^(\w+)\(prcgen\):')
+            regex = re.compile(r'^(\w+)\(prcgen\):')
 
             # pylint: disable=E1103
-            msg = stderr.rstrip ()
+            msg = stderr.rstrip()
             if msg:
-                msg = msg.decode (sys.stderr.encoding)
-                error (msg)
-            msg = stdout.rstrip ()
-            msg = msg.decode (sys.stdout.encoding)
-            for line in msg.splitlines ():
-                match = regex.match (line)
+                msg = msg.decode(sys.stderr.encoding)
+                error(msg)
+            msg = stdout.rstrip()
+            msg = msg.decode(sys.stdout.encoding)
+            for line in msg.splitlines():
+                match = regex.match(line)
                 if match:
-                    sline = regex.sub ("", line)
-                    g = match.group (1).lower ()
+                    sline = regex.sub("", line)
+                    g = match.group(1).lower()
                     if g == 'info':
                         if sline == 'MOBI File generated with WARNINGS!':
                             # we knew that already
                             continue
-                        # info ("kindlegen: %s" % sline)
+                        # info("kindlegen: %s" % sline)
                     elif g == 'warning':
-                        if sline.startswith ('Cover is too small'):
+                        if sline.startswith('Cover is too small'):
                             continue
                         if sline == 'Cover not specified':
                             continue
-                        warning ("kindlegen: %s" % sline)
+                        warning("kindlegen: %s" % sline)
                     elif g == 'error':
-                        error ("kindlegen: %s" % sline)
+                        error("kindlegen: %s" % sline)
                     else:
-                        error (line)
+                        error(line)
 
-        info ("Done Kindle file: %s" % os.path.join (outputdir, job.outputfile))
+        info("Done Kindle file: %s" % os.path.join(outputdir, job.outputfile))

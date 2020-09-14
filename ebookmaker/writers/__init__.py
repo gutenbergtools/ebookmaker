@@ -29,7 +29,7 @@ from ebookmaker import ParserFactory
 from ebookmaker.Version import VERSION, GENERATOR
 
 
-class BaseWriter (object):
+class BaseWriter(object):
     """
     Base class for EpubWriter, PluckerWriter, ...
 
@@ -37,22 +37,22 @@ class BaseWriter (object):
 
     """
 
-    def build (self, job):
+    def build(self, job):
         """ override this in a real writer """
         pass
 
 
     @staticmethod
-    def write_with_crlf (filename, bytes_):
+    def write_with_crlf(filename, bytes_):
         # \r\n is PG standard
-        bytes_ = b'\r\n'.join (bytes_.splitlines ()) + b'\r\n'
+        bytes_ = b'\r\n'.join(bytes_.splitlines()) + b'\r\n'
 
         # open binary so windows doesn't add another \r
-        with open (filename, 'wb') as fp:
-            fp.write (bytes_)
+        with open(filename, 'wb') as fp:
+            fp.write(bytes_)
 
 
-    def validate (self): # pylint: disable=R0201
+    def validate(self): # pylint: disable=R0201
         """ Validate the output with some (external) tool.
 
         Override this in a real writer.
@@ -61,77 +61,85 @@ class BaseWriter (object):
         return 0
 
 
-    def sync (self):
+    def sync(self):
         """  Override this if you need to sync before program exit. """
         pass
 
 
-    def make_links_relative (self, xhtml, base_url):
+    def make_links_relative(self, xhtml, base_url):
         """ Make absolute links in xhtml relative to base_url. """
 
-        debug ("Making links relative to: %s" % base_url)
-        xhtml.rewrite_links (partial (gg.make_url_relative, base_url))
+        debug("Making links relative to: %s" % base_url)
+        xhtml.rewrite_links(partial(gg.make_url_relative, base_url))
 
 
 
-em = ElementMaker (namespace = str (gg.NS.xhtml),
-                   nsmap = { None: str (gg.NS.xhtml) })
+em = ElementMaker(namespace=str(gg.NS.xhtml),
+                  nsmap={None: str(gg.NS.xhtml)})
 
 
-class HTMLishWriter (BaseWriter):
+class HTMLishWriter(BaseWriter):
     """ Base class for writers with HTMLish contents. """
 
     @staticmethod
-    def add_class (elem, class_):
+    def add_class(elem, class_):
         """ Add a class to html element. """
 
-        classes = elem.get ('class', '').split ()
-        classes.append (class_)
-        elem.set ('class', ' '.join (classes))
+        classes = elem.get('class', '').split()
+        classes.append(class_)
+        elem.set('class', ' '.join(classes))
 
 
     @staticmethod
-    def add_meta (xhtml, name, content):
+    def add_meta(xhtml, name, content):
         """ Add a meta tag. """
 
-        for head in gg.xpath (xhtml, '//xhtml:head'):
-            meta = em.meta (name = name, content = content)
+        for head in gg.xpath(xhtml, '//xhtml:head'):
+            meta = em.meta(name=name, content=content)
             meta.tail = '\n'
-            head.append (meta)
+            head.append(meta)
 
 
     @staticmethod
-    def add_meta_generator (xhtml):
+    def add_meta_generator(xhtml):
         """ Add our piss mark. """
 
-        HTMLishWriter.add_meta (xhtml, 'generator', GENERATOR % VERSION)
+        HTMLishWriter.add_meta(xhtml, 'generator', GENERATOR % VERSION)
 
 
     @staticmethod
-    def add_internal_css (xhtml, css_as_string):
+    def add_internal_css(xhtml, css_as_string):
         """ Add internal stylesheet to html. """
 
         if css_as_string and xhtml is not None:
-            css_as_string = '\n' + css_as_string.strip (' \n') + '\n'
-            for head in gg.xpath (xhtml, '//xhtml:head'):
-                style = em.style (css_as_string, type = 'text/css')
+            css_as_string = '\n' + css_as_string.strip(' \n') + '\n'
+            for head in gg.xpath(xhtml, '//xhtml:head'):
+                style = em.style(css_as_string, type='text/css')
                 style.tail = '\n'
-                head.append (style)
+                head.append(style)
+
+    @staticmethod
+    def add_body_class(xhtml, classname):
+        """ Add a class to the body element. """
+
+        if classname and xhtml is not None:
+            for body in gg.xpath(xhtml, '//xhtml:body'):
+                HTMLishWriter.add_class(body, classname)
 
 
-    def add_external_css (self, spider, xhtml, css_as_string, url):
+    def add_external_css(self, spider, xhtml, css_as_string, url):
         """ Add external stylesheet to html. """
 
         if css_as_string:
-            attribs = parsers.ParserAttributes ()
-            attribs.orig_mediatype = attribs.HeaderElement ('text/css')
+            attribs = parsers.ParserAttributes()
+            attribs.orig_mediatype = attribs.HeaderElement('text/css')
             attribs.url = attribs.orig_url = url
-            p = ParserFactory.ParserFactory.get (attribs)
-            p.parse_string (css_as_string)
-            spider.parsers.append (p)
+            p = ParserFactory.ParserFactory.get(attribs)
+            p.parse_string(css_as_string)
+            spider.parsers.append(p)
 
         if xhtml is not None:
-            for head in gg.xpath (xhtml, '//xhtml:head'):
-                link = em.link (href = url, rel = 'stylesheet', type = 'text/css')
+            for head in gg.xpath(xhtml, '//xhtml:head'):
+                link = em.link(href=url, rel='stylesheet', type='text/css')
                 link.tail = '\n'
-                head.append (link)
+                head.append(link)

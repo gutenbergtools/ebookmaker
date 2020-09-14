@@ -1,3 +1,12 @@
+0.9.6 September 8, 2020
+- added 'x-ebookmaker' class to epub body elements. There are now 4 "x-ebookmaker" classes
+    - css can now apply styles that are triggered by being a descendent of .x-ebookmaker. This addition is meant to replace the 'mobile' @media query that is deprecated in HTML 5
+    - the 'x-ebookmaker-important' class on on image element tells ebookmaker not to remove the image, even in no-images builds.
+    - the 'x-ebookmaker-drop' class tells ebookmaker to remove an element and its descendents from ebook builds.
+    - the 'x-ebookmaker-pageno' class is applied to some span elements whose content has been stripped because they use a class that indicates they represent page numbers: pagenum pageno page pb folionum foliono
+- added mayan as a language not supported by kindlegen
+- typos fixed in README - thanks Joseph Koshy
+
 0.9.5 July 6, 2020
 - fixed minor issue where the spider was getting confused when iterating on WrapperParsers.
 
