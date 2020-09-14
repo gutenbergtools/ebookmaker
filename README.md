@@ -21,6 +21,15 @@ For cover generation
     * CentOS or RedHat: `yum install google-noto-sans-cjk-fonts; yum install google-noto-sans-fonts`
     * Ubuntu: `apt-get install fonts-noto-cjk fonts-noto`
 
+For RST conversion
+
+* Libertinus Serif and Libertinus Sans https://github.com/alerque/libertinus
+    * For Linux, 
+        * Download the latest release https://github.com/alerque/libertinus/releases/latest
+        * unzip, put .otf files into ~/.fonts 
+        * update font catalog `fc-cache -f -v`
+* DejaVu Sans Mono https://dejavu-fonts.github.io/
+
 Tested with Python 3.6
 
 ## Install
