@@ -11,7 +11,7 @@ Also it builds HTML4, EPUB2, Kindle, and PDF files from reST sources.
 * Python3 >= 3.6
 * HTMLTidy (http://binaries.html-tidy.org/),
 * Kindlegen (https://www.amazon.com/gp/feature.html/?docId=1000765211) or Calibre (https://calibre-ebook.com/)
-* TexLive (to build from TeX), and
+* TexLive (to build from TeX and rst), and
 * groff (not sure when this is needed).
 
 For cover generation
