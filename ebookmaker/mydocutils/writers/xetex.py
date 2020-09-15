@@ -41,8 +41,8 @@ XETEX_PREAMBLE = r"""% -*- mode: tex -*- coding: utf-8 -*-
 \usepackage{xltxtra}
 
 \defaultfontfeatures{Scale=MatchLowercase}
-\setmainfont[Numbers=OldStyle]{Linux Libertine O}
-\setsansfont{Linux Biolinum O}
+\setmainfont{Libertinus Serif}
+\setsansfont{Libertinus Sans}
 \setmonofont[HyphenChar=None]{DejaVu Sans Mono}
 
 \usepackage{calc}
