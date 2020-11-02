@@ -11,7 +11,7 @@ Also it builds HTML4, EPUB2, Kindle, and PDF files from reST sources.
 * Python3 >= 3.6
 * HTMLTidy (http://binaries.html-tidy.org/),
 * Kindlegen (https://www.amazon.com/gp/feature.html/?docId=1000765211) or Calibre (https://calibre-ebook.com/)
-* TexLive (to build from TeX), and
+* TexLive (to build from TeX and rst), and
 * groff (not sure when this is needed).
 
 For cover generation
@@ -20,6 +20,15 @@ For cover generation
 * Noto Sans and Noto Sans CJK:
     * CentOS or RedHat: `yum install google-noto-sans-cjk-fonts; yum install google-noto-sans-fonts`
     * Ubuntu: `apt-get install fonts-noto-cjk fonts-noto`
+
+For RST conversion
+
+* Libertinus Serif and Libertinus Sans https://github.com/alerque/libertinus
+    * For Linux, 
+        * Download the latest release https://github.com/alerque/libertinus/releases/latest
+        * unzip, put .otf files into ~/.fonts 
+        * update font catalog `fc-cache -f -v`
+* DejaVu Sans Mono https://dejavu-fonts.github.io/
 
 Tested with Python 3.6
 

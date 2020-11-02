@@ -1,6 +1,12 @@
+0.9.7 September 14, 2020
+- changed font for rst conversion. Linux Libertine was unmaintained since 2012 and no package was available for CENTOS8. We switched to the closest replacement, Libertinus https://github.com/alerque/libertinus
+- added documentation about configuration for rst conversion
+- the deprecated 'handheld' @media query was being used to prevent ebookmaker from stripping floats. to preserve this feature, ebookmaker no longer strips floats when the css selector contains the x-ebookmaker class. Most likely, float stripping was originally needed because html pages were designed before the advent of EPUB. Today, we can assume that if the html designer uses the x-ebookmaker class, they've considered the impact of the float on the generated EPUB.
+- assorted delinting
+
 0.9.6 September 8, 2020
 - added 'x-ebookmaker' class to epub body elements. There are now 4 "x-ebookmaker" classes
-    - css can now apply styles that are triggered by being a descendent of .x-ebookmaker. This addition is meant to replace the 'mobile' @media query that is deprecated in HTML 5
+    - css can now apply styles that are triggered by being a descendent of .x-ebookmaker. This addition is meant to replace the 'handheld' @media query that is deprecated in HTML 5
     - the 'x-ebookmaker-important' class on on image element tells ebookmaker not to remove the image, even in no-images builds.
     - the 'x-ebookmaker-drop' class tells ebookmaker to remove an element and its descendents from ebook builds.
     - the 'x-ebookmaker-pageno' class is applied to some span elements whose content has been stripped because they use a class that indicates they represent page numbers: pagenum pageno page pb folionum foliono
