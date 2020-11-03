@@ -1,5 +1,6 @@
 0.10.0 November 2, 2020
-- SVG files are now considered images and included in EPUBs. They were being discarded. SVG files are not scaled or compressed by ebookmaker- the renderer should be able to auto-scale.
+- SVG files are now considered images and included in EPUBs. They were being discarded. SVG files are not scaled or compressed by ebookmaker - the renderer should be able to auto-scale. This appears to fix kindlegen failures associated with svg images.
+- fixed the rst test
 
 
 0.9.7 September 14, 2020
