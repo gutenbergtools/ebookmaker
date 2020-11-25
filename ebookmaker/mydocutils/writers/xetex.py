@@ -232,8 +232,8 @@ class FootnotesTransform (transforms.Transform):
     def apply (self, **kwargs):
         # reversed () makes footnotes inside of footnotes come out in
         # the right order
-        for footnote_reference in reversed (
-            self.document.traverse (nodes.footnote_reference)):
+        footnote_refs = list (self.document.traverse (nodes.footnote_reference))
+        for footnote_reference in reversed (footnote_refs):
             if 'refid' not in footnote_reference:
                 # further references to footnote
                 continue

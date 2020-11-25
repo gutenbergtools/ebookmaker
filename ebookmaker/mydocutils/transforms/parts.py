@@ -202,8 +202,8 @@ class TocEntryTransform (docutils.transforms.Transform):
             lambda x: isinstance (x, (nodes.title, nodes.caption)), ascend = 1, descend = 1)
 
         details = self.startnode.details
-        if len (iter_):
-            title = iter_[0]
+        for node in iter_:
+            title = node
             title['toc_entry'] = details['content']
 
             # copy depth
@@ -212,7 +212,7 @@ class TocEntryTransform (docutils.transforms.Transform):
                 if isinstance (section, nodes.section):
                     section['toc_depth'] = details['toc_depth']
                     # debug ("Setting toc_depth: %d" % section['toc_depth'])
-
+            break
         self.startnode.parent.remove (self.startnode)
 
 
