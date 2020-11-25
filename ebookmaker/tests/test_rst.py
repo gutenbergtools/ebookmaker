@@ -25,12 +25,8 @@ class TestFromRst(unittest.TestCase):
         self.assertFalse(output)
         outs = [
             "%s-pdf.pdf",
-            "%s-h.html",
             "%s-cover.png",
             "%s-images-pdf.pdf",
-            "%s-epub.epub",
-            "%s-images-epub.epub",
-            "%s-noimages-h.html",
         ]
         for out in outs:
             self.assertTrue(os.path.exists(os.path.join(dir, out % book_id)))

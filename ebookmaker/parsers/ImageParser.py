@@ -25,7 +25,7 @@ from libgutenberg.MediaTypes import mediatypes as mt
 from ebookmaker.parsers import ParserBase
 from ebookmaker.ParserFactory import ParserFactory
 
-mediatypes = (mt.jpeg, mt.png, mt.gif)
+mediatypes = (mt.jpeg, mt.png, mt.gif, mt.svg)
 
 class Parser(ParserBase):
     """Parse an image.
@@ -67,6 +67,10 @@ class Parser(ParserBase):
                     else:
                         raise e
             return buf.getvalue()
+        
+        # can't do anything with SVG files
+        if self.attribs.url.endswith('.svg'):
+            return self
 
         new_parser = Parser()
 

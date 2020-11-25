@@ -162,7 +162,7 @@ class Spider(object):
 
 
     def is_image(self, attribs):
-        """ Return True if png, gif, or jpg. """
+        """ Return True if png, gif, svg or jpg. """
         return self.get_mediatype(attribs) in parsers.ImageParser.mediatypes
 
 

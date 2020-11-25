@@ -1,3 +1,7 @@
+0.10.0 November 2, 2020
+- SVG files are now considered images and included in EPUBs. They were being discarded. SVG files are not scaled or compressed by ebookmaker- the renderer should be able to auto-scale.
+
+
 0.9.7 September 14, 2020
 - changed font for rst conversion. Linux Libertine was unmaintained since 2012 and no package was available for CENTOS8. We switched to the closest replacement, Libertinus https://github.com/alerque/libertinus
 - added documentation about configuration for rst conversion
