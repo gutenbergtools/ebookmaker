@@ -317,10 +317,9 @@ The Project Gutenberg Literary Archive Foundation is a non profit
 501(c)(3) educational corporation organized under the laws of the
 state of Mississippi and granted tax exempt status by the Internal
 Revenue Service. The Foundation's EIN or federal tax identification
-number is 64-6221541. Its 501(c)(3) letter is posted at
-https://www.gutenberg.org/fundraising/pglaf . Contributions to the
-Project Gutenberg Literary Archive Foundation are tax deductible to
-the full extent permitted by U.S.  federal laws and your state's laws.
+number is 64-6221541. Contributions to the Project Gutenberg Literary
+Archive Foundation are tax deductible to the full extent permitted by
+U.S. federal laws and your state's laws.
 
 The Foundation's principal office is in Fairbanks, Alaska, with the
 mailing address: PO Box 750175, Fairbanks, AK 99775, but its
@@ -328,7 +327,7 @@ volunteers and employees are scattered throughout numerous
 locations. Its business office is located at 809 North 1500 West, Salt
 Lake City, UT 84116, (801) 596-1887, email business@pglaf.org. Email
 contact links and up to date contact information can be found at the
-Foundation's web site and official page at http://www.pglaf.org
+Foundation's web site and official page at www.gutenberg.org/contact
 
 For additional contact information:
 
@@ -355,7 +354,7 @@ considerable effort, much paperwork and many fees to meet and keep up
 with these requirements. We do not solicit donations in locations
 where we have not received written confirmation of compliance. To SEND
 DONATIONS or determine the status of compliance for any particular
-state visit https://www.gutenberg.org/fundraising/donate
+state visit https://www.gutenberg.org/donate
 
 While we cannot and do not solicit contributions from states where we
 have not met the solicitation requirements, we know of no prohibition
@@ -369,14 +368,13 @@ outside the United States. U.S. laws alone swamp our small staff.
 Please check the Project Gutenberg Web pages for current donation
 methods and addresses. Donations are accepted in a number of other
 ways including checks, online payments and credit card donations. To
-donate, please visit: https://www.gutenberg.org/fundraising/donate
+donate, please visit: https://www.gutenberg.org/donate
 
 
 Section 5. General Information About Project Gutenberg™ electronic works.
-`````````````````````````````````````````````````````````````````````````
+````````````````````````````````````````````````````````````````````````
 
-
-Professor Michael S. Hart is the originator of the Project Gutenberg™
+Professor Michael S. Hart was the originator of the Project Gutenberg™
 concept of a library of electronic works that could be freely shared
 with anyone. For thirty years, he produced and distributed Project
 Gutenberg™ eBooks with only a loose network of volunteer support.
@@ -387,15 +385,6 @@ the U.S. unless a copyright notice is included. Thus, we do not
 necessarily keep eBooks in compliance with any particular paper
 edition.
 
-Each eBook is in a subdirectory of the same number as the eBook's
-eBook number, often in several formats including plain vanilla ASCII,
-compressed (zipped), HTML and others.
-
-Corrected *editions* of our eBooks replace the old file and take over
-the old filename and etext number. The replaced older file is
-renamed. *Versions* based on separate sources are treated as new
-eBooks receiving new filenames and etext numbers.
-
 Most people start at our Web site which has the main PG search
 facility:
 
@@ -405,3 +394,4 @@ This Web site includes information about Project Gutenberg™, including
 how to make donations to the Project Gutenberg Literary Archive
 Foundation, how to help produce our new eBooks, and how to subscribe
 to our email newsletter to hear about new eBooks.
+
