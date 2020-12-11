@@ -81,7 +81,9 @@ class Spider(object):
             # look for more documents to add to the queue
             debug("Requesting iterlinks for: %s ..." % url)
             for url, elem in parser.iterlinks():
-
+                url = urllib.parse.urldefrag(url)[0]
+                if url == parser.attribs.url or url in self.parsed_urls:
+                    continue
                 if elem.get('rel') == 'nofollow':
                     # remove link to content not followed
                     elem.tag = 'span'
@@ -92,7 +94,7 @@ class Spider(object):
                     continue
 
                 new_attribs = parsers.ParserAttributes()
-                new_attribs.url = urllib.parse.urldefrag(url)[0]
+                new_attribs.url = url
                 new_attribs.referrer = parser.attribs.url
 
                 for k, v in elem.items():
