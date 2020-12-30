@@ -1001,7 +1001,7 @@ class Writer(writers.HTMLishWriter):
                 tail = pre.tail
                 s = etree.tostring(pre, encoding=six.text_type, with_tail=False)
                 s = s.replace('>\n', '>')      # eliminate that empty first line
-                s = s.replace('\n', '<br/>')
+                s = s.replace('\n', '\n<br/>')
                 s = re.sub('  +', nbsp, s)
                 div = etree.fromstring(s)
                 div.tail = tail
