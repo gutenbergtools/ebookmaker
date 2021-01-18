@@ -372,7 +372,7 @@ donate, please visit: https://www.gutenberg.org/donate
 
 
 Section 5. General Information About Project Gutenberg™ electronic works.
-````````````````````````````````````````````````````````````````````````
+`````````````````````````````````````````````````````````````````````````
 
 Professor Michael S. Hart was the originator of the Project Gutenberg™
 concept of a library of electronic works that could be freely shared
