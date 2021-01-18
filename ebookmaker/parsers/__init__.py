@@ -27,7 +27,7 @@ from lxml.builder import ElementMaker
 import libgutenberg.GutenbergGlobals as gg
 from libgutenberg.GutenbergGlobals import NS, xpath
 from libgutenberg.MediaTypes import mediatypes as mt
-from libgutenberg.Logger import info, debug, error
+from libgutenberg.Logger import info, debug, warning, error
 
 from ebookmaker.CommonCode import Options
 
@@ -496,9 +496,12 @@ class HTMLParserBase(ParserBase):
                 toc.append(["%s#%s" % (self.attribs.url, get_id(header)), text, -1])
             else:
                 # header
-                if text.lower().startswith('by '):
+                if ((text.lower().startswith('by ')
+                     or text.lower() == ('by'))
+                    and 'x-ebookmaker-important' not in header.get('class', '')):
                     # common error in PG: <h2>by Lewis Carroll</h2> should
                     # yield no TOC entry
+                    warning('dropping by-heading in %s: %s', self.attribs.url, text.lower())
                     continue
 
                 try:
