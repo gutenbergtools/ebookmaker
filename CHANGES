@@ -1,3 +1,11 @@
+0.10.2 January 18, 2020
+- corrected text in PG footer for RST - thanks Roger Frank. Note that boilerplate generation is being revised for v0.11
+- when reflowing pre, don't make it one long line. This was causing problems in the Kobo reader.
+- don't drop a heading that starts with "by " if class 'x-ebookmaker-important' is on it.
+- also log headings that are dropped because they start with "by "
+- fix bug in anchor fixing where if an <a> tag had both id and name attributes, both were deleted.
+- delinting
+
 0.10.1 November 25, 2020
 - fixed minor issue where "too deep" errors were emitted for self-links. Thanks to rfrank for the error report.
 - fixed deprecation warning from Docutils; should be ok for Docutils > 0.1 
