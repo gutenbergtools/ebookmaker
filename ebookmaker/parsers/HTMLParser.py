@@ -189,14 +189,20 @@ class Parser (HTMLParserBase):
     def _fix_anchors (self):
         """ Move name to id and fix hrefs and ids. """
 
+        def ids_and_names(xhtml):
+            """iterator that runs over id attributes and name attributes"""
+            for node in xpath (xhtml, "//xhtml:*[@id]"):
+                yield node
+            for node in xpath (xhtml, "//xhtml:a[@name]"):
+                yield node
+            
         # move anchor name to id
         # 'id' values are more strict than 'name' values
         # try to fix ill-formed ids
 
         seen_ids = set ()
 
-        for anchor in (xpath (self.xhtml, "//xhtml:a[@name]") +
-                       xpath (self.xhtml, "//xhtml:*[@id]")):
+        for anchor in ids_and_names(self.xhtml):
             id_ = anchor.get ('id') or anchor.get ('name')
 
             if 'name' in anchor.attrib:
