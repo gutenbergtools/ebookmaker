@@ -498,7 +498,7 @@ class HTMLParserBase(ParserBase):
                 # header
                 if ((text.lower().startswith('by ')
                      or text.lower() == ('by'))
-                    and 'x-ebookmaker-important' not in header.get('class', '')):
+                        and 'x-ebookmaker-important' not in header.get('class', '')):
                     # common error in PG: <h2>by Lewis Carroll</h2> should
                     # yield no TOC entry
                     warning('dropping by-heading in %s: %s', self.attribs.url, text.lower())
@@ -514,7 +514,7 @@ class HTMLParserBase(ParserBase):
                 while next is not None and next.tag == header.tag:
                     text = (text + ' ' + get_header_text(next)).strip()
                     next = next.getnext()
-                    
+
                 # if <h*> is first element of a <div> use <div> instead
                 parent = header.getparent()
                 if (parent.tag == NS.xhtml.div and
