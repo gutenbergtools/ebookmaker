@@ -9,9 +9,6 @@ Copyright 2009 by Marcello Perathoner
 
 Distributable under the GNU General Public License Version 3 or newer.
 
-Writes one HTML file. Currently used only for RST input.
-Needs revision to use with multi-file books and HTML input.
-
 """
 
 
@@ -22,16 +19,17 @@ from lxml import etree
 
 import libgutenberg.GutenbergGlobals as gg
 from libgutenberg.GutenbergGlobals import xpath
-from libgutenberg.Logger import info, exception
+from libgutenberg.Logger import debug, exception, info
 
 from ebookmaker import writers
 from ebookmaker.CommonCode import Options
+from ebookmaker.parsers import webify_url
 
 options = Options()
 
 class Writer(writers.HTMLishWriter):
     """ Class for writing HTML files. """
-
+    mainsourceurl = None
 
     def add_dublincore(self, job, tree):
         """ Add dublin core metadata to <head>. """
@@ -46,57 +44,88 @@ class Writer(writers.HTMLishWriter):
                 e.tail = '\n'
                 head.append(e)
 
+    def outputfileurl(self, job, url):
+        """ make the output path for the parser """
+
+        # the first html doc is the main file
+        self.mainsourceurl = self.mainsourceurl if self.mainsourceurl else url
+        relativeURL = gg.make_url_relative(self.mainsourceurl, url)
+        if not relativeURL:
+            relativeURL = os.path.basename(url)
+        info("source: %s relative: %s", url, relativeURL)
+        return os.path.join(os.path.abspath(job.outputdir), relativeURL)
+        
 
     def build(self, job):
         """ Build HTML file. """
 
-        htmlfilename = os.path.join(os.path.abspath(job.outputdir),
+        jobfilename = os.path.join(os.path.abspath(job.outputdir),
                                     job.outputfile)
         try:
-            os.remove(htmlfilename)
+            os.remove(jobfilename)
         except OSError:
             pass
 
-        try:
-            info("Creating HTML file: %s" % htmlfilename)
+        info("Creating HTML file: %s" % jobfilename)
 
-            for p in job.spider.parsers:
-                # Do html only. The images were copied earlier by PicsDirWriter.
+        for p in job.spider.parsers:
+            # Do html only. The images were copied earlier by PicsDirWriter.
 
-                xhtml = None
-                if hasattr(p, 'rst2html'):
-                    xhtml = p.rst2html(job)
-                elif hasattr(p, 'xhtml'):
-                    p.parse()
-                    xhtml = copy.deepcopy(p.xhtml)
+            outfile = self.outputfileurl(job, p.attribs.url)
+            
+            if p.attribs.url.startswith(webify_url(job.outputdir)):
+                debug('%s is same as %s: already there' 
+                      % (p.attribs.url, job.outputdir))
+                continue
+            if gg.is_same_path(p.attribs.url, outfile):
+                debug('%s is same as %s: should not overwrite source' 
+                      % (p.attribs.url, outfile))
+                continue
+            
+            gg.mkdir_for_filename(outfile)
 
+            xhtml = None
+            if hasattr(p, 'rst2html'):
+                xhtml = p.rst2html(job)
+                self.make_links_relative(xhtml, p.attribs.url)
+            elif hasattr(p, 'xhtml'):
+                p.parse()
+                xhtml = copy.deepcopy(p.xhtml)
+            else:
+                p.parse()
+
+            try:
                 if xhtml is not None:
-                    self.make_links_relative(xhtml, p.attribs.url)
-
                     self.add_dublincore(job, xhtml)
 
                     # makes iphones zoom in
                     self.add_meta(xhtml, 'viewport', 'width=device-width')
                     self.add_meta_generator(xhtml)
 
-                    # This writer has currently to deal only with RST
-                    # input.  The RST writer has a workaround that
-                    # avoids writing empty elements.  So we don't need
-                    # the same ugly workaround as the EPUB writer,
-                    # that has to deal with HTML input too.
                     html = etree.tostring(xhtml,
-                                          method='xml',
-                                          doctype=gg.XHTML_DOCTYPE,
+                                          method='html',
                                           encoding='utf-8',
-                                          pretty_print=True,
-                                          xml_declaration=True)
+                                          pretty_print=True)
 
-                    self.write_with_crlf(htmlfilename, html)
-                    break
-            info("Done HTML file: %s" % htmlfilename)
+                    self.write_with_crlf(outfile, html)
+                    info("Done generating HTML file: %s" % outfile)
+                else:
+                    #images and css files
+                    try:
+                        with open(outfile, 'wb') as fp_dest:
+                            fp_dest.write(p.serialize())
+                    except IOError as what:
+                        error('Cannot copy %s to %s: %s' % (job.attribs.url, outfile, what))
 
-        except Exception as what:
-            exception("Error building HTML %s: %s" % (htmlfilename, what))
-            if os.access(htmlfilename, os.W_OK):
-                os.remove(htmlfilename)
-            raise what
+            except Exception as what:
+                exception("Error building HTML %s: %s" % (outfile, what))
+                if os.access(outfile, os.W_OK):
+                    os.remove(outfile)
+                raise what
+
+        # for when the main source file name is not the desired generated source file name
+        if not os.access(jobfilename, os.F_OK):
+            os.link(self.outputfileurl(job, self.mainsourceurl), jobfilename)
+        
+        info("Done generating HTML: %s" % jobfilename)
+
