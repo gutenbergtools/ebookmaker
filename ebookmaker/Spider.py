@@ -99,7 +99,7 @@ class Spider(object):
                 url = urllib.parse.urldefrag(url)[0]
                 if url == parser.attribs.url or url in self.parsed_urls:
                     continue
-                if elem.get('rel') == 'nofollow':
+                if elem.get('rel') == 'nofollow' and self.jobtype in ('epub.images',):
                     # remove link to content not followed
                     elem.tag = 'span'
                     elem.set('data-nofolllow-href', elem.get('href'))
