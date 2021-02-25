@@ -13,7 +13,7 @@ Rudimentary Web Spider
 
 """
 
-
+import os.path
 import fnmatch
 
 from six.moves import urllib
@@ -24,22 +24,37 @@ from libgutenberg.Logger import debug, warning, error
 from libgutenberg import MediaTypes
 
 from ebookmaker import parsers
+from ebookmaker.CommonCode import Options
 from ebookmaker.ParserFactory import ParserFactory
 
+options = Options()
 
 class Spider(object):
     """ A very rudimentary web spider. """
 
-    def __init__(self):
+    def __init__(self, job):
         self.parsed_urls = set()
         self.parsers = []
         self.redirection_map = {}
 
+        dirpath = os.path.dirname(job.url)  # platform native path
+        # use for parser only
         self.include_urls = []
-        self.exclude_urls = []
+        self.include_urls += options.include_urls or [parsers.webify_url(dirpath) + '/*']
+
         self.include_mediatypes = []
+        self.include_mediatypes += options.include_mediatypes
+        if job.subtype == '.images' or job.type == 'rst.gen':
+            self.include_mediatypes.append('image/*')
+
+        self.exclude_urls = []
+        self.exclude_urls += options.exclude_urls
+
         self.exclude_mediatypes = []
-        self.max_depth = 1
+        self.exclude_mediatypes += options.exclude_mediatypes
+
+        self.max_depth = options.max_depth or six.MAXSIZE
+        self.jobtype = job.type
 
 
     def recursive_parse(self, root_attribs):

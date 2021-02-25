@@ -416,20 +416,7 @@ def do_job(job):
     start_time = datetime.datetime.now()
     try:
         if job.url:
-            spider = Spider.Spider()
-            dirpath = os.path.dirname(job.url)  # platform native path
-            spider.include_urls += (options.include_urls or
-                                    [parsers.webify_url(dirpath) + '/*']) # use for parser only
-
-            spider.include_mediatypes += options.include_mediatypes
-            if job.subtype == '.images' or job.type == 'rst.gen':
-                spider.include_mediatypes.append('image/*')
-
-            spider.exclude_urls += options.exclude_urls
-
-            spider.exclude_mediatypes += options.exclude_mediatypes
-
-            spider.max_depth = options.max_depth or six.MAXSIZE
+            spider = Spider.Spider(job)
 
             for rewrite in options.rewrite:
                 from_url, to_url = rewrite.split('>')
