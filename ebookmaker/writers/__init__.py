@@ -76,6 +76,7 @@ class BaseWriter(object):
 
 em = ElementMaker(namespace=str(gg.NS.xhtml),
                   nsmap={None: str(gg.NS.xhtml)})
+em = ElementMaker()
 
 
 class HTMLishWriter(BaseWriter):

@@ -103,7 +103,8 @@ class Writer(writers.HTMLishWriter):
                     self.add_meta_generator(xhtml)
 
                     html = etree.tostring(xhtml,
-                                          method='html',
+                                          doctype=gg.XHTML_DOCTYPE,
+                                          method='xml',
                                           encoding='utf-8',
                                           pretty_print=True)
 
