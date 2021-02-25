@@ -847,11 +847,19 @@ class Writer(writers.HTMLishWriter):
 
     @staticmethod
     def fix_incompatible_css(sheet):
-        """ Strip CSS properties and values that are not EPUB compatible. """
+        """ Strip CSS properties and values that are not EPUB compatible. 
+            Unpack "media handheld" rules
+        """
 
         cssclass = re.compile(r'\.(-?[_a-zA-Z]+[_a-zA-Z0-9-]*)')
 
         for rule in sheet:
+            if rule.type == rule.MEDIA_RULE:
+                if rule.media.mediaText.find ('handheld') > -1:
+                    debug ("Unpacking CSS @media handheld rule.")
+                    rule.media.mediaText = 'all'
+                    info("replacing  @media handheld rule with @media all")
+
             if rule.type == rule.STYLE_RULE:
                 ruleclasses = list(cssclass.findall(rule.selectorList.selectorText))
                 for p in list(rule.style):

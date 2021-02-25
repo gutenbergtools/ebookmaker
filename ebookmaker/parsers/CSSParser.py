@@ -57,7 +57,6 @@ class Parser (ParserBase):
                 return
             
         self.attribs.mediatype = parsers.ParserAttributes.HeaderElement ('text/css')
-        self.unpack_media_handheld (self.sheet)
         self.lowercase_selectors (self.sheet)
 
 
@@ -71,7 +70,6 @@ class Parser (ParserBase):
         self.sheet = parser.parseString (s)
 
         self.attribs.mediatype = parsers.ParserAttributes.HeaderElement ('text/css')
-        self.unpack_media_handheld (self.sheet)
         self.lowercase_selectors (self.sheet)
 
 
@@ -82,17 +80,6 @@ class Parser (ParserBase):
             if rule.type == rule.STYLE_RULE:
                 for prop in rule.style:
                     yield prop
-
-
-    @staticmethod
-    def unpack_media_handheld (sheet):
-        """ unpack a @media handheld rule """
-        for rule in sheet:
-            if rule.type == rule.MEDIA_RULE:
-                if rule.media.mediaText.find ('handheld') > -1:
-                    debug ("Unpacking CSS @media handheld rule.")
-                    rule.media.mediaText = 'all'
-                    rule.insertRule (cssutils.css.CSSComment ('/* was @media handheld */'), 0)
 
 
     @staticmethod
