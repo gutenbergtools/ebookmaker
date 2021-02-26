@@ -1,3 +1,6 @@
+0.10.3 February 25, 2020
+- added rendering for <q>: ebookmaker will now change all <q> tags to <span> for epub builds, keeping any attributes on the tags. curly quotes will be added inside the spans, double for top level q and single for all q nest in other qs.
+
 0.10.2 January 18, 2020
 - corrected text in PG footer for RST - thanks Roger Frank. Note that boilerplate generation is being revised for v0.11
 - when reflowing pre, don't make it one long line. This was causing problems in the Kobo reader.
