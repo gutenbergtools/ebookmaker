@@ -19,6 +19,8 @@ import six
 import lxml
 from lxml import etree
 
+from pkg_resources import resource_string 
+
 import libgutenberg.GutenbergGlobals as gg
 from libgutenberg.GutenbergGlobals import xpath, Struct, NS
 from libgutenberg.Logger import warning, info, debug
@@ -66,6 +68,14 @@ RE_P_SMELLS   = re.compile ("|".join (P_SMELLS), re.I)
 RE_PRE_SMELLS = re.compile ("|".join (PRE_SMELLS), re.I)
 
 SUBJECTS = set ('header verse quote center right'.split ())
+
+SPECIALS = {
+        ord('&'): '&amp;',
+        ord('<'): '&lt;',
+        ord('>'): '&gt;',
+        ord('"'): '&#x22;',
+        0xa0:     '&#xa0;',
+        }
 
 def about_same (f1, f2):
     """ Return True if f1 and f2 are about as big. """
@@ -617,6 +627,14 @@ class Parser (HTMLParserBase):
         debug ("GutenbergTextParser.pre_parse () ...")
 
 
+    def css_content (self):
+        default_css = resource_string (
+            'ebookmaker.mydocutils.writers', 'rst2all.css').decode ('utf-8')
+        default_css += resource_string (
+            'ebookmaker.mydocutils.writers', 'rst2html.css').decode ('utf-8')
+        return default_css.translate (SPECIALS)
+
+
     def parse (self):
         """ Parse the plain text.
 
@@ -671,7 +689,8 @@ class Parser (HTMLParserBase):
                 em.meta (**{ 'http-equiv': 'Content-Style-Type',
                              'content': 'text/css' }),
                 em.meta (**{ 'http-equiv': 'Content-Type',
-                             'content': mt.xhtml + '; charset=utf-8' })
+                             'content': mt.xhtml + '; charset=utf-8' }),
+                em.script (self.css_content (), **{ 'type': 'text/css'})
             ),
             em.body ()
         )
