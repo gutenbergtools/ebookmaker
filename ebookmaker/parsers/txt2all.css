@@ -1,0 +1,63 @@
+/* ************************************************************************
+ * classless css copied from https://www.pgdp.net/wiki/CSS_Cookbook/Styles
+ * ********************************************************************** */
+/* ************************************************************************
+ * set the body margins to allow whitespace along sides of window
+ * ********************************************************************** */
+	body { margin-left:8%; width:85%; /* == margin-left:7% */ }
+/* ************************************************************************
+ * set the indention, spacing, and leading for body paragraphs.
+ * ********************************************************************** */
+	p { /* all paragraphs unless overridden */
+		margin-top: 1em;	/* inter-paragraph space */
+		margin-bottom: 0;	/* use only top-margin for spacing */
+		line-height: 1.4em;	/* interline spacing ("leading") */
+	}
+	body > p { /* paras at <body> level - not in <div> or <table>  */
+		text-align: justify; /* or left?? */
+		text-indent: 1em;	/* first-line indent */
+	}
+	/* suppress indentation on paragraphs following heads  */
+	h2+p, h3+p, h4+p { text-indent: 0; }
+	/* tighter spacing for list item paragraphs */
+	dd, li {
+		margin-top: 0.25em; margin-bottom:0;
+		line-height: 1.2em; /* a bit closer than p's */
+	}
+/* ************************************************************************
+ * Head 2 is for chapter heads. 
+ * ********************************************************************** */
+	h2 {
+		/* text-align:center;  left-aligned by default. */
+		margin-top:3em;		/* extra space above.. */
+		margin-bottom: 2em;	/* ..and below */
+		clear: both;		/* don't let sidebars overlap */
+	}
+/* ************************************************************************
+ * Head 3 is for main-topic heads.
+ * ********************************************************************** */
+	h3 {
+			/* text-align:center;  left-aligned by default. */
+			margin-top: 2em;	/* extra space above but not below */
+			font-weight: normal; /* override default of bold */
+			clear: both; /* don't let sidebars overlap */
+	}
+/* ************************************************************************
+ * Styling the default HR and some special-purpose ones.
+ * Default rule centered and clear of floats; sized for thought-breaks
+ * ********************************************************************** */
+	hr {
+		width:45%;			/* adjust to ape original work */
+		margin-top: 1em;	/* space above & below */
+		margin-bottom: 1em;
+		margin-left: auto;  /* these two ensure a.. */
+		margin-right: auto; /* ..centered rule */
+		clear: both;		/* don't let sidebars & floats overlap rule */
+	}
+/* ************************************************************************
+ * Images and captions
+ * ********************************************************************** */
+	img { /* the default inline image has */
+		border: 1px solid black; /* a thin black line border.. */
+		padding: 6px; /* ..spaced a bit out from the graphic */
+		} 

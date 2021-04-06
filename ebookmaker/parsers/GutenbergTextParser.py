@@ -629,9 +629,7 @@ class Parser (HTMLParserBase):
 
     def css_content (self):
         default_css = resource_string (
-            'ebookmaker.mydocutils.writers', 'rst2all.css').decode ('utf-8')
-        default_css += resource_string (
-            'ebookmaker.mydocutils.writers', 'rst2html.css').decode ('utf-8')
+            'ebookmaker.parsers', 'txt2all.css').decode ('utf-8')
         return default_css.translate (SPECIALS)
 
 
@@ -690,7 +688,7 @@ class Parser (HTMLParserBase):
                              'content': 'text/css' }),
                 em.meta (**{ 'http-equiv': 'Content-Type',
                              'content': mt.xhtml + '; charset=utf-8' }),
-                em.script (self.css_content (), **{ 'type': 'text/css'})
+                em.style (self.css_content (), **{ 'type': 'text/css'})
             ),
             em.body ()
         )
