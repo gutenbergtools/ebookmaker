@@ -4,7 +4,7 @@
 
 from setuptools import setup
 
-VERSION = '0.10.4'
+VERSION = '0.10.5'
 
 setup (
     name = 'ebookmaker',
@@ -47,7 +47,7 @@ setup (
     ],
     
     package_data = {
-        'ebookmaker.parsers': ['broken.png'],
+        'ebookmaker.parsers': ['broken.png', '*.css'],
         'ebookmaker.writers': ['cover.jpg'],
         'ebookmaker.mydocutils.parsers': ['*.rst'],
         'ebookmaker.mydocutils.writers': ['*.css'],

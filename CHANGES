@@ -1,3 +1,6 @@
+0.10.5 April 7, 2020
+    - fixed packaging error
+
 0.10.4 April 6, 2020
 - add a minimal css stylesheet to the html generated for txt files
 - delint
