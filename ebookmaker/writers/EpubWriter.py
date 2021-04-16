@@ -927,6 +927,25 @@ class Writer(writers.HTMLishWriter):
 
         # debug("exit fix_style_elements")
 
+    @staticmethod
+    def render_q(xhtml):
+        """ replace q elements with span surrounded by curly quotes. """
+        def surround(elem, before, after):
+            elem.text = before + elem.text if elem.text else before
+            if len(elem):
+                elem[-1].tail = elem[-1].tail + after if elem[-1].tail else after
+            else:
+                elem.text = elem.text +after
+
+        # nested quotes
+        for q in xpath(xhtml, "//xhtml:q//xhtml:q"):
+            q.tag = "span"
+            surround(q, '‘', '’')
+        # un-nested quotes
+        for q in xpath(xhtml, "//xhtml:q"):
+            q.tag = "span"
+            surround(q, '“', '”')
+
 
     @staticmethod
     def strip_links(xhtml, manifest):
@@ -1294,7 +1313,12 @@ class Writer(writers.HTMLishWriter):
                         self.insert_root_div(xhtml)
                         self.fix_charset(xhtml)
                         self.fix_style_elements(xhtml)
-                        self.reflow_pre(xhtml)
+                        
+                        if job.subtype in ('.images', '.noimages'):
+                            # omit for future subtype '.v3'
+                            self.reflow_pre(xhtml)
+                            self.render_q(xhtml)
+                            
 
                         # strip all links to items not in manifest
                         p.strip_links(xhtml, job.spider.dict_urls_mediatypes())
