@@ -12,8 +12,9 @@ Distributable under the GNU General Public License Version 3 or newer.
 """
 
 
-import os
 import copy
+import os
+from urllib.parse import urlparse
 
 from lxml import etree
 
@@ -29,7 +30,6 @@ options = Options()
 
 class Writer(writers.HTMLishWriter):
     """ Class for writing HTML files. """
-    mainsourceurl = None
 
     def add_dublincore(self, job, tree):
         """ Add dublin core metadata to <head>. """
@@ -47,26 +47,42 @@ class Writer(writers.HTMLishWriter):
     def outputfileurl(self, job, url):
         """ make the output path for the parser """
 
-        # the first html doc is the main file
-        self.mainsourceurl = self.mainsourceurl if self.mainsourceurl else url
-        relativeURL = gg.make_url_relative(self.mainsourceurl, url)
-        if not relativeURL:
+        if not job.main:
+            # this is the main file
+            job.main = url
+            jobfilename = os.path.join(os.path.abspath(job.outputdir),
+                                    job.outputfile)
+
+            info("Creating HTML file: %s" % jobfilename)
+
             relativeURL = os.path.basename(url)
+            if relativeURL != job.outputfile:
+                # need to change the name for main file
+                debug('changing %s to   %s', relativeURL, job.outputfile)
+                job.link_map[relativeURL] = jobfilename
+                relativeURL = job.outputfile
+
+        else:
+            relativeURL = gg.make_url_relative(job.main, url)
+
         info("source: %s relative: %s", url, relativeURL)
         return os.path.join(os.path.abspath(job.outputdir), relativeURL)
-        
+
 
     def build(self, job):
         """ Build HTML file. """
 
-        jobfilename = os.path.join(os.path.abspath(job.outputdir),
-                                    job.outputfile)
-        try:
-            os.remove(jobfilename)
-        except OSError:
-            pass
-
-        info("Creating HTML file: %s" % jobfilename)
+        def rewrite_links(job, node):
+            """ only needed if the mainsource filename has been changed """
+            for renamed_path in job.link_map: 
+                for link in node.xpath('//xhtml:*[@href]', namespaces=gg.NSMAP):
+                    old_link = link.get('href')
+                    parsed_url = urlparse(old_link)
+                    if os.path.basename(parsed_url.path) == renamed_path:
+                        new_path = parsed_url.path[0:-len(renamed_path)]
+                        new_link = job.link_map[renamed_path]
+                        new_link = '%s%s#%s' % (new_path, new_link, parsed_url.fragment)
+                        link.set('href', new_link)
 
         for p in job.spider.parsers:
             # Do html only. The images were copied earlier by PicsDirWriter.
@@ -88,9 +104,14 @@ class Writer(writers.HTMLishWriter):
             if hasattr(p, 'rst2html'):
                 xhtml = p.rst2html(job)
                 self.make_links_relative(xhtml, p.attribs.url)
+                rewrite_links(xhtml)
+
             elif hasattr(p, 'xhtml'):
                 p.parse()
                 xhtml = copy.deepcopy(p.xhtml)
+                self.make_links_relative(xhtml, p.attribs.url)
+                rewrite_links(job, xhtml)
+
             else:
                 p.parse()
 
@@ -124,9 +145,5 @@ class Writer(writers.HTMLishWriter):
                     os.remove(outfile)
                 raise what
 
-        # for when the main source file name is not the desired generated source file name
-        if not os.access(jobfilename, os.F_OK):
-            os.link(self.outputfileurl(job, self.mainsourceurl), jobfilename)
-        
-        info("Done generating HTML: %s" % jobfilename)
+        info("Done generating HTML: %s" % job.outputfile)
 
