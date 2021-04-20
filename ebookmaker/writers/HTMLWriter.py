@@ -20,7 +20,7 @@ from lxml import etree
 
 import libgutenberg.GutenbergGlobals as gg
 from libgutenberg.GutenbergGlobals import xpath
-from libgutenberg.Logger import debug, exception, info
+from libgutenberg.Logger import debug, exception, info, error
 
 from ebookmaker import writers
 from ebookmaker.CommonCode import Options
@@ -50,8 +50,7 @@ class Writer(writers.HTMLishWriter):
         if not job.main:
             # this is the main file
             job.main = url
-            jobfilename = os.path.join(os.path.abspath(job.outputdir),
-                                    job.outputfile)
+            jobfilename = os.path.join(os.path.abspath(job.outputdir), job.outputfile)
 
             info("Creating HTML file: %s" % jobfilename)
 
@@ -74,7 +73,7 @@ class Writer(writers.HTMLishWriter):
 
         def rewrite_links(job, node):
             """ only needed if the mainsource filename has been changed """
-            for renamed_path in job.link_map: 
+            for renamed_path in job.link_map:
                 for link in node.xpath('//xhtml:*[@href]', namespaces=gg.NSMAP):
                     old_link = link.get('href')
                     parsed_url = urlparse(old_link)
@@ -88,23 +87,23 @@ class Writer(writers.HTMLishWriter):
             # Do html only. The images were copied earlier by PicsDirWriter.
 
             outfile = self.outputfileurl(job, p.attribs.url)
-            
+
             if p.attribs.url.startswith(webify_url(job.outputdir)):
-                debug('%s is same as %s: already there' 
+                debug('%s is same as %s: already there'
                       % (p.attribs.url, job.outputdir))
                 continue
             if gg.is_same_path(p.attribs.url, outfile):
-                debug('%s is same as %s: should not overwrite source' 
+                debug('%s is same as %s: should not overwrite source'
                       % (p.attribs.url, outfile))
                 continue
-            
+
             gg.mkdir_for_filename(outfile)
 
             xhtml = None
             if hasattr(p, 'rst2html'):
                 xhtml = p.rst2html(job)
                 self.make_links_relative(xhtml, p.attribs.url)
-                rewrite_links(xhtml)
+                rewrite_links(job, xhtml)
 
             elif hasattr(p, 'xhtml'):
                 p.parse()
@@ -146,4 +145,3 @@ class Writer(writers.HTMLishWriter):
                 raise what
 
         info("Done generating HTML: %s" % job.outputfile)
-
