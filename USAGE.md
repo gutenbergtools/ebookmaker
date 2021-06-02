@@ -4,7 +4,7 @@ Ebookmaker has to reliably make EPUB and MOBI for over 60,000 different titles e
 
 ## Crawling
 
-Ebookmaker starts with a document file path or URL, and then follows links and images to a depth determined by the `--max_depth` setting. It only follows links that are in the same directory or below; anything in the same directory linked by the will be included in the ebook it tries to build. The `*.noimages` filetype builds (for example, `--make=epub.noimages`) exclude images. If you don't want the ebook to include a resource that your HTML links to, use the `rel='nofollow'` attribute of the `a` tag.
+Ebookmaker starts with a document file path or URL, and then follows links and images to a depth determined by the `--max_depth` setting. It only follows links that are in the same directory or below; anything in the same directory linked by the starting page will be included in the ebook it tries to build. The `*.noimages` filetype builds (for example, `--make=epub.noimages`) exclude images. If you don't want the ebook to include a resource that your HTML links to, use the `rel='nofollow'` attribute of the `a` tag.
 
 The crawl from the starting page determines the reading order for the ebook. If the starting page links to another html page, the content from that page will be placed after the starting page in the reading order. For this reason, it's simpler to put all the content on a single page. Multi-page HTML books should convert well if attention is paid to the reading order implied by the starting page.
 
