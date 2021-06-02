@@ -4,7 +4,7 @@ Ebookmaker has to reliably make EPUB and MOBI for over 60,000 different titles e
 
 ## Crawling
 
-Ebookmaker starts with a document file path or URL, and the follows links and images to a depth determined by the `--max_depth` setting. It only follows links that are in the same directory or below; anything in the same directory linked by the will be included in the ebook it tries to build. The --noimages setting results in exclusion of images. If you don't want the ebook to include a resource that your HTML links to, use the `rel='nofollow'` attribute of the `a` tag.
+Ebookmaker starts with a document file path or URL, and the follows links and images to a depth determined by the `--max_depth` setting. It only follows links that are in the same directory or below; anything in the same directory linked by the will be included in the ebook it tries to build. The `*.noimages` filetyps exclude images. If you don't want the ebook to include a resource that your HTML links to, use the `rel='nofollow'` attribute of the `a` tag.
 
 The crawl from the starting page determines the reading order for the ebook. If the starting page links to another html page, the content from that page will be placed after the starting page in the reading order. For this reason, it's simpler to put all the content on a single page. Multi-page HTML books should convert well if attention is paid to the reading order implied by the starting page.
 
@@ -30,10 +30,10 @@ Content hidden by the `display:none` css directive can create havoc with ebook g
 
 ## Special classes
 
-Ebookmaker recognizes a number of special classes that can be used to modify its HTML conversion. There are 4 "x-ebookmaker" classes:
+Ebookmaker recognizes a number of special classes that can be used to modify its HTML conversion. There are 4 "`x-ebookmaker`" classes:
 
- - Ebookmaker adds the class `x-ebookmaker` to the `body` element inside the epubs it builds. This can be then be used by css so styles that are only active insude an ebook file. This class replaces a deprecated 'handheld' @media query.
- - The `x-ebookmaker-important` class on an image element tells ebookmaker not to remove the image, even in no-images builds.
+ - Ebookmaker adds the class `x-ebookmaker` to the `body` element inside the EPUBs it builds. This can be then be used by css to make styles that are only active inside an ebook file. This class replaces a deprecated 'handheld' @media query.
+ - The `x-ebookmaker-important` class on an image element tells ebookmaker not to remove the image, even in `*.noimages` builds.
  - The `x-ebookmaker-drop` class tells ebookmaker to remove an element and its descendents from ebook builds. Don't use this class to prevent a file from being crawled - use `rel='nofollow'` instead.
  - As described above, Ebookmaker adds the `x-ebookmaker-pageno` class to  elements whose content has been stripped because they use a class that indicates they represent page numbers.
 
