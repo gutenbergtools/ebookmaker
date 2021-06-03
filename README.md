@@ -1,9 +1,11 @@
-# EbookMaker
+# Ebookmaker
 
 
-EbookMaker is the tool used for format conversion at Project Gutenberg.
+Ebookmaker is the tool used for format conversion at Project Gutenberg.
 It builds EPUB2 and Kindle files from HTML.
 Also it builds HTML4, EPUB2, Kindle, and PDF files from reST sources.
+
+If you are preparing HTML for use with Ebookmaker, the [Usage Notes](USAGE.md) may be of interest.
 
 
 ## Prerequisites
@@ -53,7 +55,6 @@ command line options.
 or
 
 `pipenv run ebookmaker -v -v --make=epub.images --output-dir=/Documents/pg /Documents/library/58669/58669-h/58669-h.htm`
-
 
 
 ## new to pipenv?
