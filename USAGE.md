@@ -28,6 +28,11 @@ Ebookmaker uses HTML heading elements to generate a table of contents. To play n
 
 Content hidden by the `display:none` css directive can create havoc with ebook generation. For example, MOBI generation _will_ fail if the target of a link is hidden. Authors of HTML for Ebookmaker should refrain from using `display:none` and should check that all ebook formats convert as expected.
 
+## Images and Covers
+
+HTML authors can control the image that Ebookmaker uses for ebook files. If there is no suitable cover image, Ebookmaker will generate one. Images are scaled if they are "too big". It's a bit complicated, so there's [a separate page](docs/images.md) that tries to explain it all.
+
+
 ## Special classes
 
 Ebookmaker recognizes a number of special classes that can be used to modify its HTML conversion. There are 4 "`x-ebookmaker`" classes:
