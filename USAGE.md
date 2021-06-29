@@ -30,7 +30,7 @@ Content hidden by the `display:none` css directive can create havoc with ebook g
 
 ## Images and Covers
 
-HTML authors can control the image that Ebookmaker uses for ebook files. If there is no suitable cover image, Ebookmaker will generate one. Images are scaled if they are "too big". It's a bit complicated, so there's [a separate page](docs/images.md) that tries to explain it all.
+HTML authors can control the image that Ebookmaker uses as a cover for ebook files. If there is no suitable cover image, Ebookmaker will generate one. Images are scaled if they are "too big". It's a bit complicated, so there's [a separate page](docs/images.md) that tries to explain it all.
 
 
 ## Special classes
