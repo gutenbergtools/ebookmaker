@@ -14,8 +14,7 @@ Distributable under the GNU General Public License Version 3 or newer.
 
 import copy
 import os
-from urllib.parse import urlparse
-
+from urllib.parse import urlparse, urljoin
 from lxml import etree
 
 import libgutenberg.GutenbergGlobals as gg
@@ -24,12 +23,17 @@ from libgutenberg.Logger import debug, exception, info, error
 
 from ebookmaker import writers
 from ebookmaker.CommonCode import Options
+from ebookmaker.writers import em
 from ebookmaker.parsers import webify_url
 
 options = Options()
 
 class Writer(writers.HTMLishWriter):
     """ Class for writing HTML files. """
+
+    def add_version(self, job, tree):
+        for root in gg.xpath(xhtml, '//xhtml:html'):
+            root['version'] = "XHTML+RDFa 1.1"
 
     def add_dublincore(self, job, tree):
         """ Add dublin core metadata to <head>. """
@@ -43,6 +47,19 @@ class Writer(writers.HTMLishWriter):
             for e in job.dc.to_html():
                 e.tail = '\n'
                 head.append(e)
+
+    def add_moremeta(self, job, tree, url):
+        
+        self.add_prop(tree, "og:title", job.dc.title)
+
+        for dcmitype in job.dc.dcmitypes:
+            self.add_prop(tree, "og:type", dcmitype.id)
+        info(job.main)
+        web_url = urljoin(job.dc.canonical_url, job.outputfile)
+        self.add_prop(tree, "og:url", web_url)
+        canonical_cover_name = 'pg%s.cover.medium.jpg' % job.dc.project_gutenberg_id
+        cover_url = urljoin(job.dc.canonical_url, canonical_cover_name)
+        self.add_prop(tree, "og:image", cover_url)
 
     def outputfileurl(self, job, url):
         """ make the output path for the parser """
@@ -121,9 +138,10 @@ class Writer(writers.HTMLishWriter):
                     # makes iphones zoom in
                     self.add_meta(xhtml, 'viewport', 'width=device-width')
                     self.add_meta_generator(xhtml)
+                    self.add_moremeta(job, xhtml, p.attribs.url)
 
                     html = etree.tostring(xhtml,
-                                          doctype=gg.XHTML_DOCTYPE,
+                                          doctype=gg.XHTML_RDFa_DOCTYPE,
                                           method='xml',
                                           encoding='utf-8',
                                           pretty_print=True)

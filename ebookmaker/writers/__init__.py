@@ -97,6 +97,15 @@ class HTMLishWriter(BaseWriter):
             meta.tail = '\n'
             head.append(meta)
 
+    @staticmethod
+    def add_prop(xhtml, prop, content):
+        """ Add a property meta tag. """
+
+        for head in gg.xpath(xhtml, '//xhtml:head'):
+            meta = em.meta(property=prop, content=content)
+            meta.tail = '\n'
+            head.append(meta)
+
 
     @staticmethod
     def add_meta_generator(xhtml):
