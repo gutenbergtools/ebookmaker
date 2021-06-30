@@ -10,7 +10,7 @@ Copyright 2009 by Marcello Perathoner
 Distributable under the GNU General Public License Version 3 or newer.
 
 """
-
+import os
 import re
 import subprocess
 import sys
@@ -27,6 +27,7 @@ from libgutenberg.MediaTypes import mediatypes as mt
 from ebookmaker import parsers
 from ebookmaker.parsers import HTMLParserBase
 
+TIDYCONF = os.path.join(os.path.dirname(__file__), 'tidy.conf')
 mediatypes = ('text/html', mt.xhtml)
 
 RE_XMLDECL = re.compile(r'<\?xml[^?]+\?>\s*')
@@ -135,22 +136,7 @@ class Parser(HTMLParserBase):
         # convert to xhtml
         try:
             tidy = subprocess.Popen(
-                ["tidy",
-                 "-utf8",
-                 "-clean",
-                 "--wrap", "0",
-                 # "--drop-font-tags", "y",
-                 # "--drop-proprietary-attributes", "y",
-                 # "--add-xml-space", "y",
-                 "--output-xhtml", "y",
-                 "--numeric-entities", "y",
-                 "--merge-divs", "n", # keep poetry indentation
-                 "--merge-spans", "n",
-                 "--add-xml-decl", "n",
-                 "--doctype", "strict",
-                 "--anchor-as-name", "n",
-                 "--enclose-text", "y"],
-
+                ["tidy", "-config", TIDYCONF, "-utf8"],
                 stdin=subprocess.PIPE,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE)
