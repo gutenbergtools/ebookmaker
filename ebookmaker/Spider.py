@@ -102,7 +102,7 @@ class Spider(object):
                 if elem.get('rel') == 'nofollow' and self.jobtype in ('epub.images',):
                     # remove link to content not followed
                     elem.tag = 'span'
-                    elem.set('data-nofolllow-href', elem.get('href'))
+                    elem.set('data-nofollow-href', elem.get('href'))
                     del elem.attrib['href']
                     del elem.attrib['rel']
                     warning('not followed: %s' % url)

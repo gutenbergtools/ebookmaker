@@ -1000,6 +1000,15 @@ class Writer(writers.HTMLishWriter):
             e.tag = NS.xhtml.span
             e.text = e.get('alt', '')
 
+    @staticmethod
+    def strip_data_attribs(xhtml):
+        """ Parser leaves some data elements for HTML. Epubcheck doesn't like these.
+        """
+        for e in xpath(xhtml, "//@*[starts-with(name(), 'data')]/.."):
+            for key in e.attrib.keys():
+                if key.startswith('data-'):
+                    del e.attrib[key]
+
 
     @staticmethod
     def reflow_pre(xhtml):
@@ -1323,6 +1332,7 @@ class Writer(writers.HTMLishWriter):
                         # strip all links to items not in manifest
                         p.strip_links(xhtml, job.spider.dict_urls_mediatypes())
                         self.strip_links(xhtml, job.spider.dict_urls_mediatypes())
+                        self.strip_data_attribs(xhtml)
 
                         self.strip_noepub(xhtml)
                         # self.strip_rst_dropcaps(xhtml)
