@@ -1,11 +1,29 @@
-0.10.4 April 6, 2020
+0.11.0 June 30. 2021
+This version of ebookmaker generates HTML for all types of input. Because the generated html is moved to a new directory, linked files also need to be moved. Because the generated file has a different name, back-links need to be changed
+
+- Don't stop generating html with first html file.
+- Don't generate wrapper files when spidering to generate html
+- Move @media handling to EpubWriter, not in parser.
+- Also copy css and images to target directory
+- Don't rewrite urls on output; they're already relative
+- Let Spider follow "nofollow" links; instead have EpubWriter remove the nofollow links and corresponding files
+- added USAGE.md to provide better documentation for html authors preparing files for Ebookmaker
+- removed data-* attributes for epub because these attributes are not allowed in EPUB 2.0.1 and files were thus failing EpubCheck
+- add RDFa data and schema.org metadata to head element of generated HTML for better SEO and facebook unfurls
+- now using the doctype declaration for XHTML+RDFa 1.1 for generated HTML from libgutenberg >= 0.7.1
+- added a tidy config to eliminate dependence on system configured tidy and to turn off drop-empty-elements, an option not available at the command line. Dropping empty spans/divs was having unexpected effects on css rendering; easily worked around, but confusing for producers.
+
+Boilerplate generation will follow in v0.12
+
+
+0.10.4 April 6, 2021
 - add a minimal css stylesheet to the html generated for txt files
 - delint
 
-0.10.3 February 25, 2020
+0.10.3 February 25, 2021
 - added rendering for <q>: ebookmaker will now change all <q> tags to <span> for epub builds, keeping any attributes on the tags. curly quotes will be added inside the spans, double for top level q and single for all q nest in other qs.
 
-0.10.2 January 18, 2020
+0.10.2 January 18, 2021
 - corrected text in PG footer for RST - thanks Roger Frank. Note that boilerplate generation is being revised for v0.11
 - when reflowing pre, don't make it one long line. This was causing problems in the Kobo reader.
 - don't drop a heading that starts with "by " if class 'x-ebookmaker-important' is on it.
