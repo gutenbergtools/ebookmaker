@@ -28,6 +28,7 @@ import six
 from six.moves import cPickle
 
 from libgutenberg.GutenbergGlobals import SkipOutputFormat
+from libgutenberg import GutenbergDatabase
 import libgutenberg.GutenbergGlobals as gg
 from libgutenberg.Logger import debug, info, warning, error, exception
 from libgutenberg import Logger, DublinCore
@@ -115,7 +116,7 @@ def make_output_filename(type_, dc):
     return FILENAMES[type_].format(id=gg.string_to_filename(dc.title)[:65])
 
 
-def elect_coverpage(spider, url):
+def elect_coverpage(spider, url, dc):
     """ Find first coverpage candidate that is not too small. """
 
     coverpage_found = False
@@ -147,7 +148,7 @@ def elect_coverpage(spider, url):
         else:
             dir = os.path.dirname(os.path.abspath(url))
         debug('generating cover in %s' % dir)
-        cover_url = generate_cover(dir)
+        cover_url = generate_cover(dir, dc)
         if cover_url:
             cover_parser = ParserFactory.ParserFactory.create(cover_url)
             cover_parser.attribs.rel.add('coverpage')
@@ -156,10 +157,10 @@ def elect_coverpage(spider, url):
 
 
 
-def generate_cover(dir):
+def generate_cover(dir, dc):
     try:
-        cover_image = Cover.draw(options.dc, cover_width=1200, cover_height=1800)
-        cover_url = os.path.join(dir, make_output_filename('cover', options.dc))
+        cover_image = Cover.draw(dc, cover_width=1200, cover_height=1800)
+        cover_url = os.path.join(dir, make_output_filename('cover', dc))
         with open(cover_url, 'wb+') as cover:
             cover_image.save(cover)
         return cover_url
@@ -431,7 +432,7 @@ def do_job(job):
                     options.input_mediatype)
 
             spider.recursive_parse(attribs)
-            elect_coverpage(spider, job.url)
+            elect_coverpage(spider, job.url, dc)
             job.url = spider.redirect(job.url)
             job.base_url = job.url
             job.spider = spider
@@ -490,7 +491,6 @@ def config():
     if not re.search(r'^(https?|file):', options.url):
         options.url = os.path.abspath(options.url)
 
-
 def main():
     """ Main program. """
 
@@ -514,16 +514,16 @@ def main():
     if options.is_job_queue:
         job_queue = cPickle.load(sys.stdin.buffer) # read bytes
     else:
-        options.dc = get_dc(options.url) # this is when doc at url gets parsed!
+        dc = get_dc(options.url) # this is when doc at url gets parsed!
         job_queue = []
         output_files = dict()
         for type_ in options.types:
             job = CommonCode.Job(type_)
             job.url = options.url
             job.ebook = options.ebook
-            job.dc = options.dc
+            job.dc = dc
             job.outputdir = options.outputdir
-            job.outputfile = options.outputfile or make_output_filename(type_, options.dc)
+            job.outputfile = options.outputfile or make_output_filename(type_, dc)
             output_files[type_] = job.outputfile
             absoutputdir = os.path.abspath(job.outputdir)
             if job.type == 'kindle.images':
@@ -534,7 +534,6 @@ def main():
             job_queue.append(job)
 
     for j in job_queue:
-        options.dc = j.dc
         options.outputdir = j.outputdir
         do_job(j)
 
@@ -542,7 +541,7 @@ def main():
     if packager:
         # HACK: the WWers ever only convert one ebook at a time
         job = job_queue[0]
-        job.outputfile = '%d-final.zip' % (options.dc.project_gutenberg_id)
+        job.outputfile = '%d-final.zip' % (dc.project_gutenberg_id)
         packager.package(job)
 
     end_time = datetime.datetime.now()

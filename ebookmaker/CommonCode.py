@@ -39,6 +39,8 @@ class Job (object):
         self.outputfile = None
         self.logfile = None
         self.dc = None
+        self.source = None
+        self.opf_identifier = None
         self.main = None
         self.link_map = {}
 
