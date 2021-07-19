@@ -537,7 +537,7 @@ def main():
 
     for j in job_queue:
         dc = get_dc(j) # this is when doc at job.url gets parsed!
-        j.outputfile = j.outputfile or options.outputfile or make_output_filename(type_, dc)
+        j.outputfile = j.outputfile or options.outputfile or make_output_filename(j.type, dc)
         options.outputdir = j.outputdir
         j.dc = dc
         do_job(j)
