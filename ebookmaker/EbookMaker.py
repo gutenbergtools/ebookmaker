@@ -28,7 +28,7 @@ import six
 from six.moves import cPickle
 
 from libgutenberg.GutenbergGlobals import SkipOutputFormat
-from libgutenberg import GutenbergDatabase
+from libgutenberg import DublinCoreMapping
 import libgutenberg.GutenbergGlobals as gg
 from libgutenberg.Logger import debug, info, warning, error, exception
 from libgutenberg import Logger, DublinCore
@@ -168,11 +168,17 @@ def generate_cover(dir, dc):
         error("OSError, Cairo not installed or couldn't write file.")
         return None
 
-def get_dc(url):
+def get_dc(job):
     """ Get DC for book. """
-
+    url =  job.url
     parser = ParserFactory.ParserFactory.create(url)
     parser.parse()
+    if options.is_job_queue:
+        dc = DublinCoreMapping.DublinCoreObject()
+        dc.load_from_database(job.ebook)
+        dc.source = job.source
+        dc.opf_identifier = job.opf_identifier
+        return dc
 
     # this is needed because the the document is not parsed again
     if options.coverpage_url:
@@ -427,12 +433,13 @@ def do_job(job):
             attribs.url = parsers.webify_url(job.url)
             attribs.id = 'start'
 
+
             if options.input_mediatype:
                 attribs.orig_mediatype = attribs.HeaderElement.from_str(
                     options.input_mediatype)
 
             spider.recursive_parse(attribs)
-            elect_coverpage(spider, job.url, dc)
+            elect_coverpage(spider, job.url, job.dc)
             job.url = spider.redirect(job.url)
             job.base_url = job.url
             job.spider = spider
@@ -514,16 +521,13 @@ def main():
     if options.is_job_queue:
         job_queue = cPickle.load(sys.stdin.buffer) # read bytes
     else:
-        dc = get_dc(options.url) # this is when doc at url gets parsed!
         job_queue = []
         output_files = dict()
         for type_ in options.types:
             job = CommonCode.Job(type_)
             job.url = options.url
             job.ebook = options.ebook
-            job.dc = dc
             job.outputdir = options.outputdir
-            job.outputfile = options.outputfile or make_output_filename(type_, dc)
             output_files[type_] = job.outputfile
             absoutputdir = os.path.abspath(job.outputdir)
             if job.type == 'kindle.images':
@@ -534,7 +538,10 @@ def main():
             job_queue.append(job)
 
     for j in job_queue:
+        dc = get_dc(j) # this is when doc at job.url gets parsed!
+        j.outputfile = j.outputfile or options.outputfile or make_output_filename(type_, dc)
         options.outputdir = j.outputdir
+        j.dc = dc
         do_job(j)
 
     packager = PackagerFactory.create(options.packager, 'push')
