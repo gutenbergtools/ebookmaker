@@ -99,7 +99,7 @@ class Writer (writers.BaseWriter):
 
         encoding = job.subtype.strip ('.')
 
-        info ("Creating plain text file: %s" % filename)
+        info ("Creating plain text file: %s from %s", filename, job.url)
 
         parser = ParserFactory.ParserFactory.create (job.url)
 
