@@ -1,3 +1,13 @@
+0.11.1 July 19. 2021
+Fixes for Ebookconverter compatibility. 0.11.0 was never deployed.
+
+- stop using old dc object, no use only ORM for db access
+- since the ORM dc object contains a session, it can't be pickled. But EbookConverter sends a pickled job queue to EbookConverter to process, presumably to enable processing on multiple servers. So job queues no longer can contain dc objects. EbookMaker now gets a new (ORM) dc object for every job. 
+- when making txt output, EBM was relying on not also generating html except for rst. so now we check directly for txt source when creating.
+- assorted delinting
+
+
+
 0.11.0 June 30. 2021
 This version of ebookmaker generates HTML for all types of input. Because the generated html is moved to a new directory, linked files also need to be moved. Because the generated file has a different name, back-links need to be changed
 
