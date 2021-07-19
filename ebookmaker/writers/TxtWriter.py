@@ -103,9 +103,15 @@ class Writer (writers.BaseWriter):
 
         parser = ParserFactory.ParserFactory.create (job.url)
 
+        # don't make txt file unless the source is txt of some encoding
+        has_txt_source = 'text/plain' in str(parser.attribs.orig_mediatype)
+        is_html_source = not has_txt_source and \
+                         hasattr (parser, 'xhtml') and \
+                         parser.xhtml is not None
+
         if hasattr (parser, 'rst2nroff'):
             data = self.groff (job, parser.rst2nroff (job, encoding), encoding)
-        elif hasattr (parser, 'xhtml') and parser.xhtml is not None:
+        elif is_html_source:
             info ("Plain text file %s aborted due to html input" % filename)
             return
         else:
