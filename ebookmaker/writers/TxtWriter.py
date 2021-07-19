@@ -33,92 +33,92 @@ u2u = {
     0x2010: '-',  # unicode HYPHEN to HYPHEN-MINUS. Many Windows fonts lack this.
     }
 
-class Writer (writers.BaseWriter):
+class Writer(writers.BaseWriter):
     """ Class to write PG plain text. """
 
-    def groff (self, job, nroff, encoding = 'utf-8'):
+    def groff(self, job, nroff, encoding='utf-8'):
         """ Process thru groff.
 
         Takes and returns unicode strings!
 
         """
 
-        device = { 'utf-8': 'utf8',
-                   'iso-8859-1': 'latin1',
-                   'us-ascii': 'ascii' }[encoding]
+        device = {'utf-8': 'utf8',
+                  'iso-8859-1': 'latin1',
+                  'us-ascii': 'ascii'}[encoding]
 
-        nroff = nroff.encode (encoding)
-        nrofffilename = os.path.join (
+        nroff = nroff.encode(encoding)
+        nrofffilename = os.path.join(
             os.path.abspath(job.outputdir),
-            os.path.splitext (job.outputfile)[0] + '.nroff')
+            os.path.splitext(job.outputfile)[0] + '.nroff')
 
         # write nroff file for debugging
         if options.verbose >= 2:
-            with open (nrofffilename, 'wb') as fp:
-                fp.write (nroff)
+            with open(nrofffilename, 'wb') as fp:
+                fp.write(nroff)
         else:
             try:
                 # remove debug files from previous runs
-                os.remove (nrofffilename)
+                os.remove(nrofffilename)
             except OSError:
                 pass
 
         # call groff
         try:
-            _groff = subprocess.Popen ([options.config.GROFF,
+            _groff = subprocess.Popen([options.config.GROFF,
                                        "-t",             # preprocess with tbl
                                        "-K", device,     # input encoding
                                        "-T", device],    # output device
-                                      stdin = subprocess.PIPE,
-                                      stdout = subprocess.PIPE,
-                                      stderr = subprocess.PIPE)
+                                      stdin=subprocess.PIPE,
+                                      stdout=subprocess.PIPE,
+                                      stderr=subprocess.PIPE)
         except OSError:
-            error ("TxtWriter: executable not found: %s" % options.config.GROFF)
+            error("TxtWriter: executable not found: %s" % options.config.GROFF)
             raise SkipOutputFormat
 
-        (txt, stderr) = _groff.communicate (nroff)
+        (txt, stderr) = _groff.communicate(nroff)
 
         # pylint: disable=E1103
-        for line in stderr.splitlines ():
-            line = line.decode (sys.stderr.encoding)
-            line = line.strip ()
+        for line in stderr.splitlines():
+            line = line.decode(sys.stderr.encoding)
+            line = line.strip()
             if 'error' in line:
-                error ("groff: %s" % line)
+                error("groff: %s" % line)
             elif 'warn' in line:
                 if options.verbose >= 1:
-                    warning ("groff: %s" % line)
+                    warning("groff: %s" % line)
 
-        txt = txt.decode (encoding)
-        return txt.translate (u2u) # fix nroff idiosyncracies
+        txt = txt.decode(encoding)
+        return txt.translate(u2u) # fix nroff idiosyncracies
 
 
-    def build (self, job):
+    def build(self, job):
         """ Build TXT file. """
 
-        filename = os.path.join (job.outputdir, job.outputfile)
+        filename = os.path.join(job.outputdir, job.outputfile)
 
-        encoding = job.subtype.strip ('.')
+        encoding = job.subtype.strip('.')
 
-        info ("Creating plain text file: %s from %s", filename, job.url)
+        info("Creating plain text file: %s from %s", filename, job.url)
 
-        parser = ParserFactory.ParserFactory.create (job.url)
+        parser = ParserFactory.ParserFactory.create(job.url)
 
         # don't make txt file unless the source is txt of some encoding
         has_txt_source = 'text/plain' in str(parser.attribs.orig_mediatype)
         is_html_source = not has_txt_source and \
-                         hasattr (parser, 'xhtml') and \
+                         hasattr(parser, 'xhtml') and \
                          parser.xhtml is not None
 
-        if hasattr (parser, 'rst2nroff'):
-            data = self.groff (job, parser.rst2nroff (job, encoding), encoding)
+        if hasattr(parser, 'rst2nroff'):
+            data = self.groff(job, parser.rst2nroff(job, encoding), encoding)
         elif is_html_source:
-            info ("Plain text file %s aborted due to html input" % filename)
+            info("Plain text file %s aborted due to html input" % filename)
             return
         else:
-            data = parser.unicode_content ()
+            data = parser.unicode_content()
 
-        data = data.encode ('utf_8_sig' if encoding == 'utf-8' else encoding, 'unitame')
+        data = data.encode('utf_8_sig' if encoding == 'utf-8' else encoding, 'unitame')
 
-        self.write_with_crlf (filename, data)
+        self.write_with_crlf(filename, data)
 
-        info ("Done plain text file: %s" % filename)
+        info("Done plain text file: %s" % filename)

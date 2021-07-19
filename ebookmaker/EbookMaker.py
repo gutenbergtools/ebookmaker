@@ -22,9 +22,7 @@ import logging
 import os.path
 import re
 import sys
-import datetime
 
-import six
 from six.moves import cPickle
 
 from libgutenberg.GutenbergGlobals import SkipOutputFormat
@@ -170,7 +168,7 @@ def generate_cover(dir, dc):
 
 def get_dc(job):
     """ Get DC for book. """
-    url =  job.url
+    url = job.url
     parser = ParserFactory.ParserFactory.create(url)
     parser.parse()
     if options.is_job_queue:

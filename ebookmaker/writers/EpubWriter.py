@@ -483,8 +483,8 @@ class ContentOPF(object):
     def __unicode__(self):
         """ Serialize content.opf as unicode string. """
 
-        assert len(self.manifest), 'No manifest item in content.opf.'
-        assert len(self.spine), 'No spine item in content.opf.'
+        assert len(self.manifest) > 0, 'No manifest item in content.opf.'
+        assert len(self.spine) > 0, 'No spine item in content.opf.'
         assert 'toc' in self.spine.attrib, 'No TOC item in content.opf.'
 
         package = self.opf.package(
@@ -492,7 +492,7 @@ class ContentOPF(object):
         package.append(self.metadata)
         package.append(self.manifest)
         package.append(self.spine)
-        if len(self.guide):
+        if len(self.guide) > 0:
             package.append(self.guide)
 
         content_opf = "%s\n\n%s" % (gg.XML_DECLARATION,
@@ -847,7 +847,7 @@ class Writer(writers.HTMLishWriter):
 
     @staticmethod
     def fix_incompatible_css(sheet):
-        """ Strip CSS properties and values that are not EPUB compatible. 
+        """ Strip CSS properties and values that are not EPUB compatible.
             Unpack "media handheld" rules
         """
 
@@ -855,8 +855,8 @@ class Writer(writers.HTMLishWriter):
 
         for rule in sheet:
             if rule.type == rule.MEDIA_RULE:
-                if rule.media.mediaText.find ('handheld') > -1:
-                    debug ("Unpacking CSS @media handheld rule.")
+                if rule.media.mediaText.find('handheld') > -1:
+                    debug("Unpacking CSS @media handheld rule.")
                     rule.media.mediaText = 'all'
                     info("replacing  @media handheld rule with @media all")
 
@@ -932,7 +932,7 @@ class Writer(writers.HTMLishWriter):
         """ replace q elements with span surrounded by curly quotes. """
         def surround(elem, before, after):
             elem.text = before + elem.text if elem.text else before
-            if len(elem):
+            if len(elem) > 0:
                 elem[-1].tail = elem[-1].tail + after if elem[-1].tail else after
             else:
                 elem.text = elem.text +after
@@ -1322,12 +1322,12 @@ class Writer(writers.HTMLishWriter):
                         self.insert_root_div(xhtml)
                         self.fix_charset(xhtml)
                         self.fix_style_elements(xhtml)
-                        
+
                         if job.subtype in ('.images', '.noimages'):
                             # omit for future subtype '.v3'
                             self.reflow_pre(xhtml)
                             self.render_q(xhtml)
-                            
+
 
                         # strip all links to items not in manifest
                         p.strip_links(xhtml, job.spider.dict_urls_mediatypes())

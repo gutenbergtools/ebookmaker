@@ -32,7 +32,7 @@ class Writer(writers.HTMLishWriter):
     """ Class for writing HTML files. """
 
     def add_version(self, job, tree):
-        for root in gg.xpath(xhtml, '//xhtml:html'):
+        for root in gg.xpath(tree, '//xhtml:html'):
             root['version'] = "XHTML+RDFa 1.1"
 
     def add_dublincore(self, job, tree):
@@ -49,7 +49,7 @@ class Writer(writers.HTMLishWriter):
                 head.append(e)
 
     def add_moremeta(self, job, tree, url):
-        
+
         self.add_prop(tree, "og:title", job.dc.title)
 
         for dcmitype in job.dc.dcmitypes:
