@@ -83,7 +83,7 @@ class VariablesTransform (docutils.transforms.Transform):
 
         language = getmany ('DC.Language', ['en'])
         language = [DublinCore.language_map.get (
-            x, 'Unknown').title () for x in language]
+            x, default='Unknown').title () for x in language]
         language = DublinCore.strunk (language)
 
         copyrighted = getone ('PG.Rights', '').lower () == 'copyrighted'
