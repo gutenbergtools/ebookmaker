@@ -26,7 +26,7 @@ import sys
 from six.moves import cPickle
 
 from libgutenberg.GutenbergGlobals import SkipOutputFormat
-from libgutenberg import DublinCoreMapping
+from libgutenberg.DublinCore import PGDCObject
 import libgutenberg.GutenbergGlobals as gg
 from libgutenberg.Logger import debug, info, warning, error, exception
 from libgutenberg import Logger, DublinCore
@@ -172,7 +172,7 @@ def get_dc(job):
     parser = ParserFactory.ParserFactory.create(url)
     parser.parse()
     if options.is_job_queue:
-        dc = DublinCoreMapping.DublinCoreObject()
+        dc = PGDCObject()
         dc.load_from_database(job.ebook)
         dc.source = job.source
         dc.opf_identifier = job.opf_identifier
