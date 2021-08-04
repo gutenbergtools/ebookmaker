@@ -662,7 +662,7 @@ class ContentOPF(object):
             self.metadata.append(dcterms.date(
                 dc.created, {NS.opf.event: 'creation'}))
 
-        if dc.release_date:
+        if dc.release_date != datetime.date.min:
             self.metadata.append(dcterms.date(
                 dc.release_date.isoformat(),
                 {NS.opf.event: 'publication'}))
