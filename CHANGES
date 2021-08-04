@@ -1,3 +1,11 @@
+0.11.2 August 4. 2021
+Bugfixes for stand-alone use. We should not have released 0.11.1  on pypi.
+
+- Ebookmaker 0.11.1 did not work without psycopg2 and the PG database. Neither did libgutenberg 0.7.2. This version, with libgutenberg 0.8.1, works without the PG database or psycopg2.
+- uses libcountry for language name lists.
+- uses old dc object if database not present
+
+
 0.11.1 July 19. 2021
 Fixes for Ebookconverter compatibility. 0.11.0 was never deployed.
 
