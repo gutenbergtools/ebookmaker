@@ -398,7 +398,9 @@ def open_log(path):
     handler = logging.FileHandler(path, "a")
     handler.setFormatter(Logger.CustomFormatter(Logger.LOGFORMAT))
     handler.setLevel(logging.DEBUG)
+    handler.addFilter(Logger.q_message)
     logging.getLogger().addHandler(handler)
+    Logger.notifier = CommonCode.queue_notifications
     return handler
 
 

@@ -147,9 +147,9 @@ class ParserFactory(object):
             try:
                 return open(url, 'rb')
             except FileNotFoundError:
-                error('Missing file: %s' % url)
+                error('Notify: Missing file: %s' % url)
             except IsADirectoryError:
-                error('Missing file is a directory: %s' % url)
+                error('Notify: Missing file is a directory: %s' % url)
             return None
             
         if re.search(r'^([a-zA-z]:|/)', url):
