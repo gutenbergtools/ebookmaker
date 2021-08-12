@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-#  -*- mode: python; indent-tabs-mode: nil; -*- coding: iso-8859-1 -*-
+
 
 """
 CommonCode.py
@@ -68,17 +68,17 @@ def add_common_options(ap, user_config_file):
 
     ap.add_argument(
         "--verbose", "-v",
-        action   = "count",
-        default  = 0,
-        help     = "be verbose (-v -v be more verbose)")
+        action="count",
+        default=0,
+        help="be verbose (-v -v be more verbose)")
 
     ap.add_argument(
         "--config",
-        metavar  = "CONFIG_FILE",
-        dest     = "config_file",
-        action   = "append",
-        default  = user_config_file,
-        help     = "read config file (default: %(default)s)")
+        metavar="CONFIG_FILE",
+        dest="config_file",
+        action="append",
+        default=user_config_file,
+        help="read config file (default: %(default)s)")
 
 def set_arg_defaults(ap, config_file):
     # get default command-line args
@@ -87,7 +87,7 @@ def set_arg_defaults(ap, config_file):
     if cp.has_section('DEFAULT_ARGS'):
         ap.set_defaults(**dict(cp.items('DEFAULT_ARGS')))
 
-def parse_config_and_args(ap, sys_config, defaults = None):
+def parse_config_and_args(ap, sys_config, defaults=None):
 
     # put command-line args into options
     options.update(vars(ap.parse_args()))
@@ -115,4 +115,4 @@ def queue_notifications(ebook, message, subject='EbookMaker Notification'):
     with open(message_queue, 'a+') as messagefile:
         messagefile.write('Subject: %s\n' % subject)
         messagefile.write(message)
-    
+
