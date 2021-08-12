@@ -1,3 +1,9 @@
+0.11.3 August 12. 2021
+Adds notification support
+- Add queue_notifications method in CommonCode, usable by both EbookConverter and EbookMaker
+- configure notifications for missing file problems
+
+
 0.11.2 August 4. 2021
 Bugfixes for stand-alone use. We should not have released 0.11.1  on pypi.
 
