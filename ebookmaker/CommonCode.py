@@ -11,7 +11,7 @@ Distributable under the GNU General Public License Version 3 or newer.
 Common code for EbookMaker and EbookConverter.
 
 """
-
+import os
 import os.path
 
 from six.moves import configparser
@@ -105,3 +105,14 @@ def parse_config_and_args (ap, sys_config, defaults = None):
             setattr (options.config, name.upper (), value)
 
     return options
+
+
+PRIVATE = os.getenv('PRIVATE') or ''
+NOTIFICATION_DIR = os.path.join(PRIVATE, 'logs', 'notifications')
+
+def queue_notifications(ebook, message, subject='EbookMaker Notification'):
+    message_queue = os.path.join(NOTIFICATION_DIR, ebook + '.txt')
+    with open(message_queue, 'a+') as messagefile:
+        messagefile.write('Subject: %s\n' % subject)
+        messagefile.write(message)
+    
