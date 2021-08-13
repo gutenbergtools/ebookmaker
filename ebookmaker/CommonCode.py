@@ -52,7 +52,7 @@ class Job(object):
         return '\n'.join(l)
 
 
-def add_dependencies(targets, deps, order = None):
+def add_dependencies(targets, deps, order=None):
     """ Add dependent formats and optionally put into right build order. """
 
     for target, deps in deps.items():
@@ -111,8 +111,7 @@ PRIVATE = os.getenv('PRIVATE') or ''
 NOTIFICATION_DIR = os.path.join(PRIVATE, 'logs', 'notifications')
 
 def queue_notifications(ebook, message, subject='EbookMaker Notification'):
-    message_queue = os.path.join(NOTIFICATION_DIR, ebook + '.txt')
+    message_queue = os.path.join(NOTIFICATION_DIR, '%s.txt' % ebook)
     with open(message_queue, 'a+') as messagefile:
         messagefile.write('Subject: %s\n' % subject)
         messagefile.write(message)
-
