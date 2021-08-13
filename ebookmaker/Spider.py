@@ -154,6 +154,8 @@ class Spider(object):
         if self.redirection_map:
             for parser in self.parsers:
                 parser.remap_links(self.redirection_map)
+        # remove parsers with missing content
+        self.parsers = [parser for parser in self.parsers if parser.fp != None]
 
         self.topological_sort()
 
