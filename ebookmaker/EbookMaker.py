@@ -395,7 +395,10 @@ def add_local_options(ap):
 def open_log(path):
     """ Open a logfile in the output directory. """
 
-    handler = logging.FileHandler(path, "a")
+    if path:
+        handler = logging.FileHandler(path, "a")
+    else:
+        handler = logging.StreamHandler()
     handler.setFormatter(Logger.CustomFormatter(Logger.LOGFORMAT))
     handler.setLevel(logging.DEBUG)
     handler.addFilter(Logger.q_message)
@@ -418,7 +421,8 @@ def do_job(job):
     Logger.ebook = job.ebook
     if job.logfile:
         log_handler = open_log(os.path.join(os.path.abspath(job.outputdir), job.logfile))
-
+    else:
+        log_handler = open_log(None)
     debug('=== Building %s ===' % job.type)
     start_time = datetime.datetime.now()
     try:
