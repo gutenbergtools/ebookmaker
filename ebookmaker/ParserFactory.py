@@ -160,7 +160,7 @@ class ParserFactory(object):
                 fp = urllib.request.urlopen(url)
             except urllib.error.URLError as what:
                 fp = None
-                error('Missing file: %s' % what.reason)
+                error('Notify: Missing file: %s' % what.reason)
             except ValueError:  # just a relative path?
                 fp = open_file_from_path(url)
             
