@@ -394,17 +394,13 @@ def add_local_options(ap):
 
 def open_log(path):
     """ Open a logfile in the output directory. """
-
-    if path:
-        handler = logging.FileHandler(path, "a")
-    else:
-        handler = logging.StreamHandler()
-    handler.setFormatter(Logger.CustomFormatter(Logger.LOGFORMAT))
-    handler.setLevel(logging.DEBUG)
-    handler.addFilter(Logger.q_message)
-    logging.getLogger().addHandler(handler)
-    Logger.notifier = CommonCode.queue_notifications
-    return handler
+    file_handler = Logger.setup(
+        Logger.LOGFORMAT,
+        logfile=path,
+        loglevel=logging.INFO,
+        notifier=CommonCode.queue_notifications
+    )
+    return file_handler
 
 
 def close_log(handler):
