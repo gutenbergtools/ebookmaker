@@ -35,6 +35,7 @@ class Parser(HTMLParserBase):
             lxml.html.XHTMLParser(),
             base_url=self.attribs.url
         )
+        self.fp = True  # so writers won't skip it
 
         # mark the image for treatment as a linked image
         attribs.rel.add('linked_image')
