@@ -28,7 +28,29 @@ Fixes for Ebookconverter compatibility. 0.11.0 was never deployed.
 
 
 0.11.0 June 30. 2021
-This version of ebookmaker generates HTML for all types of input. Because the generated html is moved to a new directory, linked files also need to be moved. Because the generated file has a different name, back-links need to be changed
+Ebookmaker version 0.11 makes enhanced HTML files for all types of input, including HTML source files. Here are the improvements and other changes made to HTML source:
+
+- all HTML files are cleaned by HTML Tidy. Tidy does the following:
+    - converts all HTML to well-formed UTF8-encoded XHTML files. This will allow the PG server to add encoding to MIME headers, improving browser compatibility and accessibility.
+    - LF is used as the newline character for all files (unix standard)
+    - html entities such as "`&rsquo;`" `&Aacute;` etc. are converted to unicode characters
+    - correct badly formed HTML, improving browser compatibility and standards conformance.
+    - Because the files are now guaranteed to be well-formed, DOM manipulation can be done reliably by browser plugins, mobile apps, proxy servers, accessibility tools and PG's own file processors.
+    - inline style attributes are moved to a generated inline stylesheet for better rendering performance.
+    - a doctype declaration for XHTML+RDFa 1.1 is used for all files to allow validation with included RDFa metadata.
+    - tags are now uniformly lower case
+    - some legacy presentational tags (`<i>,` `<b>`, `<center>` when enclosed within appropriate inline tags, and <font>) are replaced with CSS <style> tags and structural markup as appropriate.
+    - empty paragraphs are discarded.
+    - any text in the body element is wrapped in a `<p>` element.
+- added RDFa data, Dublin Core, and schema.org metadata to head element of HTML for better SEO and facebook unfurls. Changes in the metadata are now reflected in the HTML presentation
+
+Some incidental changes were necessary to make this possible:
+- Because the generated html is moved to a new directory, linked files also needed to be moved.
+- Because the generated file has a different name, back-links needed to be changed
+
+It is possible that rendering of the HTML is changed by this additional processing; however, the changed rendering would be aligned aligned with what has long existed in PG EPUB files. 
+
+Note that the unprocessed source files will continue to be available without URL change on the PG web site.
 
 - Don't stop generating html with first html file.
 - Don't generate wrapper files when spidering to generate html
