@@ -1,11 +1,80 @@
-0.10.4 April 6, 2020
+0.11.3 August 18. 2021
+Adds notification support
+- Add queue_notifications method in CommonCode, usable by both EbookConverter and EbookMaker
+- configure notifications for missing file problems
+- remove parsers for missing files - bug exposed by html generation
+- fixed regression in WrapperParser
+- add coverage by test file 
+- enhanced log formatting
+- refactored log setup for use with 
+- started using CRITICAL logs to trigger notifications
+
+0.11.2 August 4. 2021
+Bugfixes for stand-alone use. We should not have released 0.11.1  on pypi.
+
+- Ebookmaker 0.11.1 did not work without psycopg2 and the PG database. Neither did libgutenberg 0.7.2. This version, with libgutenberg 0.8.1, works without the PG database or psycopg2.
+- uses libcountry for language name lists.
+- uses old dc object if database not present
+
+
+0.11.1 July 19. 2021
+Fixes for Ebookconverter compatibility. 0.11.0 was never deployed.
+
+- stop using old dc object, no use only ORM for db access
+- since the ORM dc object contains a session, it can't be pickled. But EbookConverter sends a pickled job queue to EbookConverter to process, presumably to enable processing on multiple servers. So job queues no longer can contain dc objects. EbookMaker now gets a new (ORM) dc object for every job. 
+- when making txt output, EBM was relying on not also generating html except for rst. so now we check directly for txt source when creating.
+- assorted delinting
+
+
+
+0.11.0 June 30. 2021
+Ebookmaker version 0.11 makes enhanced HTML files for all types of input, including HTML source files. Here are the improvements and other changes made to HTML source:
+
+- all HTML files are cleaned by HTML Tidy. Tidy does the following:
+    - converts all HTML to well-formed UTF8-encoded XHTML files. This will allow the PG server to add encoding to MIME headers, improving browser compatibility and accessibility.
+    - LF is used as the newline character for all files (unix standard)
+    - html entities such as "`&rsquo;`" `&Aacute;` etc. are converted to unicode characters
+    - correct badly formed HTML, improving browser compatibility and standards conformance.
+    - Because the files are now guaranteed to be well-formed, DOM manipulation can be done reliably by browser plugins, mobile apps, proxy servers, accessibility tools and PG's own file processors.
+    - inline style attributes are moved to a generated inline stylesheet for better rendering performance.
+    - a doctype declaration for XHTML+RDFa 1.1 is used for all files to allow validation with included RDFa metadata.
+    - tags are now uniformly lower case
+    - some legacy presentational tags (`<i>,` `<b>`, `<center>` when enclosed within appropriate inline tags, and <font>) are replaced with CSS <style> tags and structural markup as appropriate.
+    - empty paragraphs are discarded.
+    - any text in the body element is wrapped in a `<p>` element.
+- added RDFa data, Dublin Core, and schema.org metadata to head element of HTML for better SEO and facebook unfurls. Changes in the metadata are now reflected in the HTML presentation
+
+Some incidental changes were necessary to make this possible:
+- Because the generated html is moved to a new directory, linked files also needed to be moved.
+- Because the generated file has a different name, back-links needed to be changed
+
+It is possible that rendering of the HTML is changed by this additional processing; however, the changed rendering would be aligned aligned with what has long existed in PG EPUB files. 
+
+Note that the unprocessed source files will continue to be available without URL change on the PG web site.
+
+- Don't stop generating html with first html file.
+- Don't generate wrapper files when spidering to generate html
+- Move @media handling to EpubWriter, not in parser.
+- Also copy css and images to target directory
+- Don't rewrite urls on output; they're already relative
+- Let Spider follow "nofollow" links; instead have EpubWriter remove the nofollow links and corresponding files
+- added USAGE.md to provide better documentation for html authors preparing files for Ebookmaker
+- removed data-* attributes for epub because these attributes are not allowed in EPUB 2.0.1 and files were thus failing EpubCheck
+- add RDFa data and schema.org metadata to head element of generated HTML for better SEO and facebook unfurls
+- now using the doctype declaration for XHTML+RDFa 1.1 for generated HTML from libgutenberg >= 0.7.1
+- added a tidy config to eliminate dependence on system configured tidy and to turn off drop-empty-elements, an option not available at the command line. Dropping empty spans/divs was having unexpected effects on css rendering; easily worked around, but confusing for producers.
+
+Boilerplate generation will follow in v0.12
+
+
+0.10.4 April 6, 2021
 - add a minimal css stylesheet to the html generated for txt files
 - delint
 
-0.10.3 February 25, 2020
+0.10.3 February 25, 2021
 - added rendering for <q>: ebookmaker will now change all <q> tags to <span> for epub builds, keeping any attributes on the tags. curly quotes will be added inside the spans, double for top level q and single for all q nest in other qs.
 
-0.10.2 January 18, 2020
+0.10.2 January 18, 2021
 - corrected text in PG footer for RST - thanks Roger Frank. Note that boilerplate generation is being revised for v0.11
 - when reflowing pre, don't make it one long line. This was causing problems in the Kobo reader.
 - don't drop a heading that starts with "by " if class 'x-ebookmaker-important' is on it.

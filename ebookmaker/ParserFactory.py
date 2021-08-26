@@ -21,7 +21,7 @@ import six
 from pkg_resources import resource_listdir, resource_stream # pylint: disable=E0611
 import requests
 
-from libgutenberg.Logger import debug, error
+from libgutenberg.Logger import critical, debug, error
 from libgutenberg import MediaTypes
 from ebookmaker.CommonCode import Options
 from ebookmaker.Version import VERSION
@@ -147,9 +147,9 @@ class ParserFactory(object):
             try:
                 return open(url, 'rb')
             except FileNotFoundError:
-                error('Missing file: %s' % url)
+                critical('Missing file: %s' % url)
             except IsADirectoryError:
-                error('Missing file is a directory: %s' % url)
+                critical('Missing file is a directory: %s' % url)
             return None
             
         if re.search(r'^([a-zA-z]:|/)', url):
@@ -160,7 +160,7 @@ class ParserFactory(object):
                 fp = urllib.request.urlopen(url)
             except urllib.error.URLError as what:
                 fp = None
-                error('Missing file: %s' % what.reason)
+                error('Notify: Missing file: %s' % what.reason)
             except ValueError:  # just a relative path?
                 fp = open_file_from_path(url)
             

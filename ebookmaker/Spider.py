@@ -13,33 +13,48 @@ Rudimentary Web Spider
 
 """
 
-
+import os.path
 import fnmatch
 
 from six.moves import urllib
 
 import libgutenberg.GutenbergGlobals as gg
 from libgutenberg.GutenbergGlobals import NS
-from libgutenberg.Logger import debug, warning, error
+from libgutenberg.Logger import critical, debug, warning, error
 from libgutenberg import MediaTypes
 
 from ebookmaker import parsers
+from ebookmaker.CommonCode import Options
 from ebookmaker.ParserFactory import ParserFactory
 
+options = Options()
 
 class Spider(object):
     """ A very rudimentary web spider. """
 
-    def __init__(self):
+    def __init__(self, job):
         self.parsed_urls = set()
         self.parsers = []
         self.redirection_map = {}
 
+        dirpath = os.path.dirname(job.url)  # platform native path
+        # use for parser only
         self.include_urls = []
-        self.exclude_urls = []
+        self.include_urls += options.include_urls or [parsers.webify_url(dirpath) + '/*']
+
         self.include_mediatypes = []
+        self.include_mediatypes += options.include_mediatypes
+        if job.subtype == '.images' or job.type == 'rst.gen':
+            self.include_mediatypes.append('image/*')
+
+        self.exclude_urls = []
+        self.exclude_urls += options.exclude_urls
+
         self.exclude_mediatypes = []
-        self.max_depth = 1
+        self.exclude_mediatypes += options.exclude_mediatypes
+
+        self.max_depth = options.max_depth or six.MAXSIZE
+        self.jobtype = job.type
 
 
     def recursive_parse(self, root_attribs):
@@ -84,10 +99,10 @@ class Spider(object):
                 url = urllib.parse.urldefrag(url)[0]
                 if url == parser.attribs.url or url in self.parsed_urls:
                     continue
-                if elem.get('rel') == 'nofollow':
+                if elem.get('rel') == 'nofollow' and self.jobtype in ('epub.images',):
                     # remove link to content not followed
                     elem.tag = 'span'
-                    elem.set('data-nofolllow-href', elem.get('href'))
+                    elem.set('data-nofollow-href', elem.get('href'))
                     del elem.attrib['href']
                     del elem.attrib['rel']
                     warning('not followed: %s' % url)
@@ -108,7 +123,8 @@ class Spider(object):
                 tag = elem.tag
                 if tag == NS.xhtml.a:
                     if self.is_image(new_attribs) and self.is_included_url(new_attribs) and \
-                            self.is_included_mediatype(new_attribs):
+                            self.is_included_mediatype(new_attribs) and \
+                            self.jobtype in ('epub.images',):
                         # need to wrap an image
                         wrapper_parser = parsers.WrapperParser.Parser(new_attribs)
                         if wrapper_parser.attribs.url not in self.parsed_urls:
@@ -138,6 +154,8 @@ class Spider(object):
         if self.redirection_map:
             for parser in self.parsers:
                 parser.remap_links(self.redirection_map)
+        # remove parsers with missing content
+        self.parsers = [parser for parser in self.parsers if parser.fp != None]
 
         self.topological_sort()
 
@@ -154,7 +172,7 @@ class Spider(object):
         if not self.is_included_mediatype(attribs) and not self.is_included_relation(attribs):
             return
         elif not self.is_included_url(attribs) and not self.is_included_relation(attribs):
-            error('Failed for embedded media in %s from disallowed location: %s'
+            critical('Failed for embedded media in %s from disallowed location: %s'
                   % (attribs.referrer, attribs.url))
             return
 

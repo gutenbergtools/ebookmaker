@@ -9,3 +9,5 @@ pylint = "*"
 [packages]
 e1839a8 = {path = ".",editable = true}
 ebookmaker = {editable = true,path = "."}
+psycopg2 = "*"
+libgutenberg = "==0.8.2"

@@ -739,7 +739,7 @@ class Translator (writers.Translator):
             if c.startswith ('language-'):
                 language = c[9:]
                 language = DublinCore.DublinCore.language_map.get (
-                    language, 'english').lower ()
+                    language, default='en').lower ()
                 self.used_languages.add (language)
                 return language
         return None

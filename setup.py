@@ -4,7 +4,7 @@
 
 from setuptools import setup
 
-VERSION = '0.10.4'
+VERSION = '0.11.3'
 
 setup (
     name = 'ebookmaker',
@@ -43,11 +43,11 @@ setup (
         'roman',
         'requests',
         'six>=1.4.1',
-        'libgutenberg[covers]>=0.6.8',
+        'libgutenberg[covers]>=0.8.1',
     ],
     
     package_data = {
-        'ebookmaker.parsers': ['broken.png'],
+        'ebookmaker.parsers': ['broken.png', 'tidy.conf', 'txt2all.css'],
         'ebookmaker.writers': ['cover.jpg'],
         'ebookmaker.mydocutils.parsers': ['*.rst'],
         'ebookmaker.mydocutils.writers': ['*.css'],

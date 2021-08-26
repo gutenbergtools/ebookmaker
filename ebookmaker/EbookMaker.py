@@ -22,12 +22,11 @@ import logging
 import os.path
 import re
 import sys
-import datetime
 
-import six
 from six.moves import cPickle
 
 from libgutenberg.GutenbergGlobals import SkipOutputFormat
+from libgutenberg.DublinCore import PGDCObject
 import libgutenberg.GutenbergGlobals as gg
 from libgutenberg.Logger import debug, info, warning, error, exception
 from libgutenberg import Logger, DublinCore
@@ -115,7 +114,7 @@ def make_output_filename(type_, dc):
     return FILENAMES[type_].format(id=gg.string_to_filename(dc.title)[:65])
 
 
-def elect_coverpage(spider, url):
+def elect_coverpage(spider, url, dc):
     """ Find first coverpage candidate that is not too small. """
 
     coverpage_found = False
@@ -147,7 +146,7 @@ def elect_coverpage(spider, url):
         else:
             dir = os.path.dirname(os.path.abspath(url))
         debug('generating cover in %s' % dir)
-        cover_url = generate_cover(dir)
+        cover_url = generate_cover(dir, dc)
         if cover_url:
             cover_parser = ParserFactory.ParserFactory.create(cover_url)
             cover_parser.attribs.rel.add('coverpage')
@@ -156,10 +155,10 @@ def elect_coverpage(spider, url):
 
 
 
-def generate_cover(dir):
+def generate_cover(dir, dc):
     try:
-        cover_image = Cover.draw(options.dc, cover_width=1200, cover_height=1800)
-        cover_url = os.path.join(dir, make_output_filename('cover', options.dc))
+        cover_image = Cover.draw(dc, cover_width=1200, cover_height=1800)
+        cover_url = os.path.join(dir, make_output_filename('cover', dc))
         with open(cover_url, 'wb+') as cover:
             cover_image.save(cover)
         return cover_url
@@ -167,11 +166,17 @@ def generate_cover(dir):
         error("OSError, Cairo not installed or couldn't write file.")
         return None
 
-def get_dc(url):
+def get_dc(job):
     """ Get DC for book. """
-
+    url = job.url
     parser = ParserFactory.ParserFactory.create(url)
     parser.parse()
+    if options.is_job_queue:
+        dc = PGDCObject()
+        dc.load_from_database(job.ebook)
+        dc.source = job.source
+        dc.opf_identifier = job.opf_identifier
+        return dc
 
     # this is needed because the the document is not parsed again
     if options.coverpage_url:
@@ -389,12 +394,13 @@ def add_local_options(ap):
 
 def open_log(path):
     """ Open a logfile in the output directory. """
-
-    handler = logging.FileHandler(path, "a")
-    handler.setFormatter(Logger.CustomFormatter(Logger.LOGFORMAT))
-    handler.setLevel(logging.DEBUG)
-    logging.getLogger().addHandler(handler)
-    return handler
+    file_handler = Logger.setup(
+        Logger.LOGFORMAT,
+        logfile=path,
+        loglevel=logging.INFO,
+        notifier=CommonCode.queue_notifications
+    )
+    return file_handler
 
 
 def close_log(handler):
@@ -411,25 +417,13 @@ def do_job(job):
     Logger.ebook = job.ebook
     if job.logfile:
         log_handler = open_log(os.path.join(os.path.abspath(job.outputdir), job.logfile))
-
+    else:
+        log_handler = open_log(None)
     debug('=== Building %s ===' % job.type)
     start_time = datetime.datetime.now()
     try:
         if job.url:
-            spider = Spider.Spider()
-            dirpath = os.path.dirname(job.url)  # platform native path
-            spider.include_urls += (options.include_urls or
-                                    [parsers.webify_url(dirpath) + '/*']) # use for parser only
-
-            spider.include_mediatypes += options.include_mediatypes
-            if job.subtype == '.images' or job.type == 'rst.gen':
-                spider.include_mediatypes.append('image/*')
-
-            spider.exclude_urls += options.exclude_urls
-
-            spider.exclude_mediatypes += options.exclude_mediatypes
-
-            spider.max_depth = options.max_depth or six.MAXSIZE
+            spider = Spider.Spider(job)
 
             for rewrite in options.rewrite:
                 from_url, to_url = rewrite.split('>')
@@ -439,12 +433,13 @@ def do_job(job):
             attribs.url = parsers.webify_url(job.url)
             attribs.id = 'start'
 
+
             if options.input_mediatype:
                 attribs.orig_mediatype = attribs.HeaderElement.from_str(
                     options.input_mediatype)
 
             spider.recursive_parse(attribs)
-            elect_coverpage(spider, job.url)
+            elect_coverpage(spider, job.url, job.dc)
             job.url = spider.redirect(job.url)
             job.base_url = job.url
             job.spider = spider
@@ -503,7 +498,6 @@ def config():
     if not re.search(r'^(https?|file):', options.url):
         options.url = os.path.abspath(options.url)
 
-
 def main():
     """ Main program. """
 
@@ -527,16 +521,13 @@ def main():
     if options.is_job_queue:
         job_queue = cPickle.load(sys.stdin.buffer) # read bytes
     else:
-        options.dc = get_dc(options.url) # this is when doc at url gets parsed!
         job_queue = []
         output_files = dict()
         for type_ in options.types:
             job = CommonCode.Job(type_)
             job.url = options.url
             job.ebook = options.ebook
-            job.dc = options.dc
             job.outputdir = options.outputdir
-            job.outputfile = options.outputfile or make_output_filename(type_, options.dc)
             output_files[type_] = job.outputfile
             absoutputdir = os.path.abspath(job.outputdir)
             if job.type == 'kindle.images':
@@ -547,15 +538,17 @@ def main():
             job_queue.append(job)
 
     for j in job_queue:
-        options.dc = j.dc
+        dc = get_dc(j) # this is when doc at job.url gets parsed!
+        j.outputfile = j.outputfile or options.outputfile or make_output_filename(j.type, dc)
         options.outputdir = j.outputdir
+        j.dc = dc
         do_job(j)
 
     packager = PackagerFactory.create(options.packager, 'push')
     if packager:
         # HACK: the WWers ever only convert one ebook at a time
         job = job_queue[0]
-        job.outputfile = '%d-final.zip' % (options.dc.project_gutenberg_id)
+        job.outputfile = '%d-final.zip' % (dc.project_gutenberg_id)
         packager.package(job)
 
     end_time = datetime.datetime.now()
