@@ -1,3 +1,6 @@
+0.11.4 August 26, 2021
+- one more change. can't use xml write mode for html, because Chrome and Safari no longer support self-closing tags.
+
 0.11.3 August 18. 2021
 Adds notification support
 - Add queue_notifications method in CommonCode, usable by both EbookConverter and EbookMaker
