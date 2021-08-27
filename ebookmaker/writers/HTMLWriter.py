@@ -142,7 +142,7 @@ class Writer(writers.HTMLishWriter):
 
                     html = etree.tostring(xhtml,
                                           doctype=gg.XHTML_RDFa_DOCTYPE,
-                                          method='xml',
+                                          method='html',
                                           encoding='utf-8',
                                           pretty_print=True)
 
