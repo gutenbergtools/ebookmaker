@@ -1,3 +1,6 @@
+0.11.5 August 28, 2021
+- fix bug in stand-alone kindle generation
+
 0.11.4 August 26, 2021
 - one more change. can't use xml write mode for html, because Chrome and Safari no longer support self-closing tags.
 

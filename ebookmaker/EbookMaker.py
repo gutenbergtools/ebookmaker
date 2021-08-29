@@ -528,21 +528,21 @@ def main():
             job.url = options.url
             job.ebook = options.ebook
             job.outputdir = options.outputdir
-            output_files[type_] = job.outputfile
+            job_queue.append(job)
+
+    for job in job_queue:
+        dc = get_dc(job) # this is when doc at job.url gets parsed!
+        job.outputfile = job.outputfile or options.outputfile or make_output_filename(job.type, dc)
+        output_files[job.type] = job.outputfile
+        if job.type.startswith('kindle'):
             absoutputdir = os.path.abspath(job.outputdir)
             if job.type == 'kindle.images':
                 job.url = os.path.join(absoutputdir, output_files['epub.images'])
             elif job.type == 'kindle.noimages':
                 job.url = os.path.join(absoutputdir, output_files['epub.noimages'])
-
-            job_queue.append(job)
-
-    for j in job_queue:
-        dc = get_dc(j) # this is when doc at job.url gets parsed!
-        j.outputfile = j.outputfile or options.outputfile or make_output_filename(j.type, dc)
-        options.outputdir = j.outputdir
-        j.dc = dc
-        do_job(j)
+        options.outputdir = job.outputdir
+        job.dc = dc
+        do_job(job)
 
     packager = PackagerFactory.create(options.packager, 'push')
     if packager:
