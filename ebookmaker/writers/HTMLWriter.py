@@ -105,12 +105,8 @@ class Writer(writers.HTMLishWriter):
 
             outfile = self.outputfileurl(job, p.attribs.url)
 
-            if p.attribs.url.startswith(webify_url(job.outputdir)):
-                debug('%s is same as %s: already there'
-                      % (p.attribs.url, job.outputdir))
-                continue
             if gg.is_same_path(p.attribs.url, outfile):
-                debug('%s is same as %s: should not overwrite source'
+                warning('%s is same as %s: should not overwrite source'
                       % (p.attribs.url, outfile))
                 continue
 
