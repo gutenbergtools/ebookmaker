@@ -31,10 +31,6 @@ options = Options()
 class Writer(writers.HTMLishWriter):
     """ Class for writing HTML files. """
 
-    def add_version(self, job, tree):
-        for root in gg.xpath(tree, '//xhtml:html'):
-            root['version'] = "XHTML+RDFa 1.1"
-
     def add_dublincore(self, job, tree):
         """ Add dublin core metadata to <head>. """
         source = gg.archive2files(
@@ -135,10 +131,24 @@ class Writer(writers.HTMLishWriter):
                     self.add_meta(xhtml, 'viewport', 'width=device-width')
                     self.add_meta_generator(xhtml)
                     self.add_moremeta(job, xhtml, p.attribs.url)
+                    
+                    # strip xhtml namespace 
+                    # https://stackoverflow.com/questions/18159221/
+                    html = copy.deepcopy(xhtml)
+                    for elem in html.getiterator():
+                        elem.tag = etree.QName(elem).localname
+                    # Remove unused namespace declarations
+                    etree.cleanup_namespaces(html)
+                    
+                    xmllang = '{http://www.w3.org/XML/1998/namespace}lang'
+                    if xmllang in html.attrib:
+                        html.attrib['lang'] = html.attrib[xmllang]
+                        del(html.attrib[xmllang])
+                    html.head.insert(0, etree.Element('meta', charset="utf-8"))
 
-                    html = etree.tostring(xhtml,
-                                          doctype=gg.XHTML_RDFa_DOCTYPE,
+                    html = etree.tostring(html,
                                           method='html',
+                                          doctype='<!DOCTYPE html>',
                                           encoding='utf-8',
                                           pretty_print=True)
 
