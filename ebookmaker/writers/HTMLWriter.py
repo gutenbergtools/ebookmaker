@@ -108,12 +108,11 @@ class Writer(writers.HTMLishWriter):
         else:
             if url.startswith(webify_url(job.outputdir)):
                 relativeURL = gg.make_url_relative(webify_url(job.outputdir) + '/', url)
-                info ('output relativeURL for %s to %s : %s', webify_url(job.outputdir), url, relativeURL)
+                debug('output relativeURL for %s to %s : %s', webify_url(job.outputdir), url, relativeURL)
             else:
                 relativeURL = gg.make_url_relative(job.main, url)
-                info ('relativeURL for %s to %s : %s', job.main, url, relativeURL)
+                debug('relativeURL for %s to %s : %s', job.main, url, relativeURL)
 
-        info("source: %s relative: %s", url, relativeURL)
         return os.path.join(os.path.abspath(job.outputdir), relativeURL)
 
 
@@ -139,8 +138,7 @@ class Writer(writers.HTMLishWriter):
             outfile = gg.normalize_path(outfile)
 
             if gg.is_same_path(p.attribs.url, outfile):
-                #should never happen
-                error('%s is same as %s: should not overwrite source', p.attribs.url, outfile)
+                # debug('%s is same as %s: won't override source', p.attribs.url, outfile)
                 continue
 
             gg.mkdir_for_filename(outfile)
