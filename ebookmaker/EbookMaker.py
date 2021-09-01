@@ -518,11 +518,12 @@ def main():
     WriterFactory.load_writers()
     PackagerFactory.load_packagers()
 
+    output_files = dict()
     if options.is_job_queue:
         job_queue = cPickle.load(sys.stdin.buffer) # read bytes
+
     else:
-        job_queue = []
-        output_files = dict()
+        job_queue = []        
         for type_ in options.types:
             job = CommonCode.Job(type_)
             job.url = options.url
