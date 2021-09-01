@@ -530,6 +530,7 @@ def main():
             job.outputdir = options.outputdir
             job_queue.append(job)
 
+    dc = None
     for job in job_queue:
         dc = get_dc(job) # this is when doc at job.url gets parsed!
         job.outputfile = job.outputfile or options.outputfile or make_output_filename(job.type, dc)
@@ -543,6 +544,9 @@ def main():
         options.outputdir = job.outputdir
         job.dc = dc
         do_job(job)
+    else:
+        if dc and hasattr(dc, 'session') and dc.session:
+            dc.session.close()
 
     packager = PackagerFactory.create(options.packager, 'push')
     if packager:
