@@ -4,7 +4,9 @@ In addition to some small tweaks in its generated EPUBs, Ebookmaker version 0.11
 
 The source HTML files are not modified, and are available (at the URLs they've always been at) via the "More files..." link on the website. Errata should be addressed in the source files, not the derived files, as whitespace and link structure are changed by ebookmaker in ways that may preclude reprocessing. Files are re-derived for the entire catalog monthly.
 
-A major impetus for this change is to improve compatibility with browser plugins, mobile apps, proxy servers, accessibility tools and PG's own file processors. Much of our back file uses old versions of HTML that are poorly supported in modern browsers and other tools, and while there is ongoing work to update the back file, we are thousands of books away from being able to present uniformly coded HTML. This change is also a first step towards being able to use HTML5 for both source files and for presentation.
+A major impetus for this change is to improve compatibility with browser plugins, mobile apps, proxy servers, accessibility tools and PG's own file processors. Much of our back file uses old versions of HTML that are poorly supported in modern browsers and other tools, and while there is ongoing work to update the back file, we are thousands of books away from being able to present uniformly coded HTML. This change is also a first step towards being able to use HTML5 for both source files and for presentation; for many PG books, the derived files will validate as HTML5. 
+
+Submitters should be aware that our current process first converts submitted files to XHTML and HTML5ish files are derived from the XHTML; our process does not yet support features introduced in HTML5.
 
 Here are the differences between HTML source files and the HTML files derived from them:
 
@@ -13,15 +15,15 @@ Here are the differences between HTML source files and the HTML files derived fr
     ii. LF is used as the newline character for all files (unix standard)
     iii. HTML entities such as `&rsquo;` `&Aacute;` etc. are converted to unicode characters. Together with webserver configuration changes, this will improve web browser compatibility.
     iv. Tidy corrects badly formed HTML, improving browser compatibility and standards conformance.
-    v. A doctype declaration for XHTML+RDFa 1.1 is used for all files to allow better validation with included RDFa metadata.
+    v. An doctype declaration: `<!DOCTYPE html>` is used for all files This is compatible with the included metadata.
     vi. Tags are now uniformly lower case
     vii. Some legacy presentational tags (`<i>`, `<b>`, `<center>` when enclosed within appropriate inline tags, and ) are replaced with CSS `<style>` tags and structural markup as appropriate.
     viii. Empty paragraphs are discarded.
     ix. Any text directly in the `<body>` element is wrapped in a `<p>` element.
-    x. Self-closing tags are now closed with an end tag. So... `<a id="x" />` is changed to `<a id="x" ></a>`. This is needed because Chrome and Safari no longer support self-closing tags. The oddest looking change is `<br>` -> `<br></br>`. We need that because we're still using XHTML to support legacy content and EPUB2. We expect a lot of remediation work will be needed before we can switch to HTML5 and EPUB3.
+    x. Empty tags in HTML not closed with an end tag. So... `<a id="x" />` is changed to `<a id="x" ></a>`. This is needed because Chrome and Safari no longer support self-closing tags.
     xi. Inline style attributes are moved to a generated inline stylesheet for better rendering performance. The same mechanism is used to separate CSS from text in our EPUB files.
     
-2. Metadata is added to the `<head>` element. We include RDFa, Dublin Core, and schema.org metadata for better SEO and Facebook/Twitter unfurls. Changes in the metadata are now reflected in the HTML presentation.
+2. Metadata is added to the `<head>` element. We include Facebook OpenGraph, Dublin Core, and schema.org metadata for better SEO and Facebook/Twitter unfurls. Changes in the metadata entered by cataloguers are now reflected in the metadata of the HTML presentation.
 
 3. Because the derived HTML is moved to a new directory, linked files also needed to be moved. Because the derived file has a different name, back-links needed to be changed.
 
