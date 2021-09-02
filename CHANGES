@@ -1,3 +1,6 @@
+0.11.8 September 2, 2021
+- fix crash when source document contains html comments
+
 0.11.7 September 2, 2021
 - Using libgutenberg 0.8.7, which includes the type of meta tags used in HTML5.
 - Ebookmaker was not saving the derived HTML files if the main source file was in the output directory. This prevented online Ebookmaker to from displaying the files. Now, Ebookmaker will put derived files in an "out" directory. This turned out to require some code restructuring.
