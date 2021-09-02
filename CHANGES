@@ -1,10 +1,11 @@
 0.11.6 September 2, 2021
-- Using libgutenberg 0.8.7, which includes HTML5 style meta tags.
+- Using libgutenberg 0.8.7, which includes the type of meta tags used in HTML5.
 - Ebookmaker was not saving the derived HTML files if the main source file was in the output directory. This prevented online Ebookmaker to from displaying the files. Now, Ebookmaker will put derived files in an "out" directory. This turned out to require some code restructuring.
 - The pseudo-xhtml files produced by 0.11.5 were cause problems with browser compatibility, most noticeably by doubling break elements. It turns out that the quirky output from lxml was caused by xml namespacing of elements. when xml namespaces were removed, the html output method worked as desired, resulting in files that in many cases validated as html5. This solved a number of problems for us, and puts us in a position to start remediating problem files in the backfile in preparation for EPUB3.
 - The encoding for all python source files was changed to UTF8. A mis-encoded python file caused a problem with mdashes in titles.
 - Sessions are now closed after every set of jobs. Ebookconverter was running out of Databse connections.
 - Some superfluous logging was removed.
+- There is documentation for the changes introduced in version 0.11
 
 0.11.5 August 28, 2021
 - fix bug in stand-alone kindle generation
