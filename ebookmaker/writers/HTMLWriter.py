@@ -171,7 +171,8 @@ class Writer(writers.HTMLishWriter):
                     # https://stackoverflow.com/questions/18159221/
                     html = copy.deepcopy(xhtml)
                     for elem in html.getiterator():
-                        elem.tag = etree.QName(elem).localname
+                        if elem.tag is not etree.Comment:
+                            elem.tag = etree.QName(elem).localname
                     # Remove unused namespace declarations
                     etree.cleanup_namespaces(html)
                     
