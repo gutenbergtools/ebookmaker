@@ -545,9 +545,9 @@ def main():
         options.outputdir = job.outputdir
         job.dc = dc
         do_job(job)
-    else:
         if dc and hasattr(dc, 'session') and dc.session:
             dc.session.close()
+            dc.session = None # probably overkill
 
     packager = PackagerFactory.create(options.packager, 'push')
     if packager:
