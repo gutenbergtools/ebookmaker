@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-#  -*- mode: python; indent-tabs-mode: nil; -*- coding: iso-8859-1 -*-
+#  -*- mode: python; indent-tabs-mode: nil; -*- coding: UTF8 -*-
 
 """
 
@@ -518,11 +518,12 @@ def main():
     WriterFactory.load_writers()
     PackagerFactory.load_packagers()
 
+    output_files = dict()
     if options.is_job_queue:
         job_queue = cPickle.load(sys.stdin.buffer) # read bytes
+
     else:
-        job_queue = []
-        output_files = dict()
+        job_queue = []        
         for type_ in options.types:
             job = CommonCode.Job(type_)
             job.url = options.url
@@ -530,6 +531,7 @@ def main():
             job.outputdir = options.outputdir
             job_queue.append(job)
 
+    dc = None
     for job in job_queue:
         dc = get_dc(job) # this is when doc at job.url gets parsed!
         job.outputfile = job.outputfile or options.outputfile or make_output_filename(job.type, dc)
@@ -543,6 +545,9 @@ def main():
         options.outputdir = job.outputdir
         job.dc = dc
         do_job(job)
+    else:
+        if dc and hasattr(dc, 'session') and dc.session:
+            dc.session.close()
 
     packager = PackagerFactory.create(options.packager, 'push')
     if packager:

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-#  -*- mode: python; indent-tabs-mode: nil; -*- coding: iso-8859-1 -*-
+#  -*- mode: python; indent-tabs-mode: nil; -*- coding: UTF8 -*-
 
 """
 
@@ -14,7 +14,10 @@ Distributable under the GNU General Public License Version 3 or newer.
 
 import copy
 import os
+from pathlib import Path
 from urllib.parse import urlparse, urljoin
+import uuid
+
 from lxml import etree
 
 import libgutenberg.GutenbergGlobals as gg
@@ -30,10 +33,6 @@ options = Options()
 
 class Writer(writers.HTMLishWriter):
     """ Class for writing HTML files. """
-
-    def add_version(self, job, tree):
-        for root in gg.xpath(tree, '//xhtml:html'):
-            root['version'] = "XHTML+RDFa 1.1"
 
     def add_dublincore(self, job, tree):
         """ Add dublin core metadata to <head>. """
@@ -62,11 +61,39 @@ class Writer(writers.HTMLishWriter):
         self.add_prop(tree, "og:image", cover_url)
 
     def outputfileurl(self, job, url):
-        """ make the output path for the parser """
+        """ 
+        Make the output path for the parser.
+        Consider an image referenced in a source html file being moved to a destination directory.
+        The image must be moved to a Location that is the same, relative to the job's destination,
+        as it was in the source file.
+        The constraints are that 
+        1. we must not over-write the source files, and 
+        2. the destination directory may be the same as the source directory. 
+        In case (2), we'll create a new "out" directory to contain the written files; we'll also 
+        stop with an error if our source path is below an "out" directory.
+        
+        Complication: generated covers are already in the output directory.
+        
+        """
 
         if not job.main:
-            # this is the main file
+            # this is the main file. 
             job.main = url
+            
+            # check that the source file is not in the outputdir 
+            if gg.is_same_path(os.path.abspath(job.outputdir), os.path.dirname(url)):
+                # make sure that source is not in an 'out" directory
+                newdir = 'out'
+                for parent in Path(url).parents:
+                    if parent.name == newdir:
+                        # not allowed
+                        newdir = uuid.uuid4().hex
+                        warning("can't use an 'out' directory for both input and output; using %s",
+                                newdir)
+                        break
+                        
+                job.outputdir = os.path.join(job.outputdir, newdir)
+
             jobfilename = os.path.join(os.path.abspath(job.outputdir), job.outputfile)
 
             info("Creating HTML file: %s" % jobfilename)
@@ -79,9 +106,13 @@ class Writer(writers.HTMLishWriter):
                 relativeURL = job.outputfile
 
         else:
-            relativeURL = gg.make_url_relative(job.main, url)
+            if url.startswith(webify_url(job.outputdir)):
+                relativeURL = gg.make_url_relative(webify_url(job.outputdir) + '/', url)
+                debug('output relativeURL for %s to %s : %s', webify_url(job.outputdir), url, relativeURL)
+            else:
+                relativeURL = gg.make_url_relative(job.main, url)
+                debug('relativeURL for %s to %s : %s', job.main, url, relativeURL)
 
-        info("source: %s relative: %s", url, relativeURL)
         return os.path.join(os.path.abspath(job.outputdir), relativeURL)
 
 
@@ -104,14 +135,10 @@ class Writer(writers.HTMLishWriter):
             # Do html only. The images were copied earlier by PicsDirWriter.
 
             outfile = self.outputfileurl(job, p.attribs.url)
+            outfile = gg.normalize_path(outfile)
 
-            if p.attribs.url.startswith(webify_url(job.outputdir)):
-                debug('%s is same as %s: already there'
-                      % (p.attribs.url, job.outputdir))
-                continue
             if gg.is_same_path(p.attribs.url, outfile):
-                debug('%s is same as %s: should not overwrite source'
-                      % (p.attribs.url, outfile))
+                # debug('%s is same as %s: won't override source', p.attribs.url, outfile)
                 continue
 
             gg.mkdir_for_filename(outfile)
@@ -139,10 +166,25 @@ class Writer(writers.HTMLishWriter):
                     self.add_meta(xhtml, 'viewport', 'width=device-width')
                     self.add_meta_generator(xhtml)
                     self.add_moremeta(job, xhtml, p.attribs.url)
+                    
+                    # strip xhtml namespace 
+                    # https://stackoverflow.com/questions/18159221/
+                    html = copy.deepcopy(xhtml)
+                    for elem in html.getiterator():
+                        if elem.tag is not etree.Comment:
+                            elem.tag = etree.QName(elem).localname
+                    # Remove unused namespace declarations
+                    etree.cleanup_namespaces(html)
+                    
+                    xmllang = '{http://www.w3.org/XML/1998/namespace}lang'
+                    if xmllang in html.attrib:
+                        html.attrib['lang'] = html.attrib[xmllang]
+                        del(html.attrib[xmllang])
+                    html.head.insert(0, etree.Element('meta', charset="utf-8"))
 
-                    html = etree.tostring(xhtml,
-                                          doctype=gg.XHTML_RDFa_DOCTYPE,
+                    html = etree.tostring(html,
                                           method='html',
+                                          doctype='<!DOCTYPE html>',
                                           encoding='utf-8',
                                           pretty_print=True)
 
@@ -154,7 +196,7 @@ class Writer(writers.HTMLishWriter):
                         with open(outfile, 'wb') as fp_dest:
                             fp_dest.write(p.serialize())
                     except IOError as what:
-                        error('Cannot copy %s to %s: %s' % (job.attribs.url, outfile, what))
+                        error('Cannot copy %s to %s: %s', job.attribs.url, outfile, what)
 
             except Exception as what:
                 exception("Error building HTML %s: %s" % (outfile, what))
