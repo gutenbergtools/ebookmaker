@@ -81,6 +81,7 @@ class Writer(writers.HTMLishWriter):
             job.main = url
             
             # check that the source file is not in the outputdir 
+            info("are these the same path? %s, %s", os.path.abspath(job.outputdir), os.path.dirname(url))
             if gg.is_same_path(os.path.abspath(job.outputdir), os.path.dirname(url)):
                 # make sure that source is not in an 'out" directory
                 newdir = 'out'
@@ -169,17 +170,12 @@ class Writer(writers.HTMLishWriter):
                     
                     # strip xhtml namespace 
                     # https://stackoverflow.com/questions/18159221/
-                    html = copy.deepcopy(xhtml)
                     for elem in html.getiterator():
                         if elem.tag is not etree.Comment:
                             elem.tag = etree.QName(elem).localname
                     # Remove unused namespace declarations
                     etree.cleanup_namespaces(html)
                     
-                    xmllang = '{http://www.w3.org/XML/1998/namespace}lang'
-                    if xmllang in html.attrib:
-                        html.attrib['lang'] = html.attrib[xmllang]
-                        del(html.attrib[xmllang])
                     html.head.insert(0, etree.Element('meta', charset="utf-8"))
 
                     html = etree.tostring(html,
