@@ -39,8 +39,7 @@ class Parser(ParserBase):
         ParserBase.__init__(self, attribs)
         self.sheet = None
 
-
-    def parse(self):
+    def pre_parse(self):
         """ Parse the CSS file. """
 
         if self.sheet is not None:
@@ -97,23 +96,12 @@ class Parser(ParserBase):
         cssutils.replaceUrls(self.sheet, f)
 
 
-    def get_image_urls(self):
-        """ Return the urls of all images in document.
+    def iterlinks(self):
+        """ Return the urls of all images in document."""
+        
+        for url in cssutils.getUrls(self.sheet):
+            yield urllib.parse.urljoin(self.attribs.url, url), parsers.em.style()
 
-        Images are graphic files. The user may choose if he wants
-        images included or not.
-
-        """
-
-        images = []
-
-        for prop in self.iter_properties(self.sheet):
-            if (prop.value.cssValueType == prop.value.CSS_PRIMITIVE_VALUE and
-                    prop.value.primitiveType == prop.value.CSS_URI):
-                url = urllib.parse.urljoin(self.attribs.url, prop.value.cssText)
-                images.append(url)
-
-        return  images
 
 
     def get_aux_urls(self):
