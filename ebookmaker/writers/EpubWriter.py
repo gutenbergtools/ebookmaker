@@ -946,6 +946,16 @@ class Writer(writers.HTMLishWriter):
             q.tag = "span"
             surround(q, '“', '”')
 
+    @staticmethod
+    def fix_html5(xhtml):
+        """
+        Find html5 constructs and tries to fix them for xhtml
+        """
+        for meta in xpath(xhtml, '//xhtml:meta[@charset]'):
+            meta.getparent().remove(meta)
+
+        
+
 
     @staticmethod
     def strip_links(xhtml, manifest):
@@ -1307,6 +1317,8 @@ class Writer(writers.HTMLishWriter):
                         p.parse()
                         xhtml = copy.deepcopy(p.xhtml) if hasattr(p, 'xhtml') else None
                     if xhtml is not None:
+                        self.fix_html5(xhtml)
+                        
                         strip_classes = self.get_classes_that_float(xhtml)
                         strip_classes = strip_classes.intersection(STRIP_CLASSES)
                         if strip_classes:
