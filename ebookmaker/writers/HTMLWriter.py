@@ -22,7 +22,7 @@ from lxml import etree
 
 import libgutenberg.GutenbergGlobals as gg
 from libgutenberg.GutenbergGlobals import xpath
-from libgutenberg.Logger import debug, exception, info, error
+from libgutenberg.Logger import debug, exception, info, error, warning
 
 from ebookmaker import writers
 from ebookmaker.CommonCode import Options
@@ -30,6 +30,7 @@ from ebookmaker.writers import em
 from ebookmaker.parsers import webify_url
 
 options = Options()
+XMLLANG = '{http://www.w3.org/XML/1998/namespace}lang'
 
 class Writer(writers.HTMLishWriter):
     """ Class for writing HTML files. """
@@ -81,7 +82,6 @@ class Writer(writers.HTMLishWriter):
             job.main = url
             
             # check that the source file is not in the outputdir 
-            info("are these the same path? %s, %s", os.path.abspath(job.outputdir), os.path.dirname(url))
             if gg.is_same_path(os.path.abspath(job.outputdir), os.path.dirname(url)):
                 # make sure that source is not in an 'out" directory
                 newdir = 'out'
@@ -115,6 +115,26 @@ class Writer(writers.HTMLishWriter):
                 debug('relativeURL for %s to %s : %s', job.main, url, relativeURL)
 
         return os.path.join(os.path.abspath(job.outputdir), relativeURL)
+
+    def xhtml_to_html(self, html):
+        ''' 
+        try to convert the html4 DOM to an html5 DOM 
+        (assumes xhtml namespaces have been removed, except from attribute values)
+        '''
+        for meta in html.xpath("//meta[@http-equiv='Content-Type']"):
+            meta.getparent().remove(meta)
+        for meta in html.xpath("//meta[@http-equiv='Content-Style-Type']"):
+            meta.getparent().remove(meta)
+        for meta in html.xpath("//meta[@charset]"): # html5 doc, we'll replace it
+            meta.getparent().remove(meta)
+        for elem in html.xpath("//*[@xml:lang]"):
+            if XMLLANG in elem.attrib: # should always be true, but checking anyway
+                elem.attrib['lang'] = elem.attrib[XMLLANG]
+            else:
+                 warning('XMLLANG expected, not found: %s@%s', elem.tag, elem.attrib)
+        for style in html.xpath("//style[@type]"):
+            del style.attrib['type']
+        html.head.insert(0, etree.Element('meta', charset="utf-8"))
 
 
     def build(self, job):
@@ -160,7 +180,15 @@ class Writer(writers.HTMLishWriter):
                 p.parse()
 
             try:
+                xmllang = '{http://www.w3.org/XML/1998/namespace}lang'
                 if xhtml is not None:
+                    html = copy.deepcopy(xhtml)
+                    if xmllang in html.attrib:
+                        lang =  html.attrib[xmllang]
+                        if lang not in  job.dc.languages:
+                            job.dc.add_lang_id(lang)
+                        html.attrib['lang'] = lang
+                        del(html.attrib[xmllang])
                     self.add_dublincore(job, xhtml)
 
                     # makes iphones zoom in
@@ -175,8 +203,7 @@ class Writer(writers.HTMLishWriter):
                             elem.tag = etree.QName(elem).localname
                     # Remove unused namespace declarations
                     etree.cleanup_namespaces(html)
-                    
-                    html.head.insert(0, etree.Element('meta', charset="utf-8"))
+                    self.xhtml_to_html(html)
 
                     html = etree.tostring(html,
                                           method='html',
