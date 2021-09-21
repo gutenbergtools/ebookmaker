@@ -1,4 +1,15 @@
-0.11.8 September 3, 2021
+0.11.10 September 20, 2021
+- use tidy for _all_ html source files
+- addressed long-standing issue where images referenced in css were not included in epubs. This issue surfaced because the images were also missing from generated files.
+- addressed some simple issues preventing derived HTML5 files from validating. More complex issues involving incompatibilities between XHTML and HTML5 have been enumerated and will be addressed in subsequent updates.
+    - removed http-equiv meta elements for Content-Type and Content-Style-Type
+    - set lang attribute when xml:lang attribute is present
+    - removed duplicate encoding meta elements introduced by HTML5 source.
+    - removed type attribute from style elements
+- update requirements so that stand-alone installs will work better
+
+
+0.11.9 September 3, 2021
 - more aggressive session closing
 
 0.11.8 September 2, 2021
