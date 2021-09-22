@@ -185,8 +185,6 @@ class Writer(writers.HTMLishWriter):
                     html = copy.deepcopy(xhtml)
                     if xmllang in html.attrib:
                         lang =  html.attrib[xmllang]
-                        if lang not in  job.dc.languages:
-                            job.dc.add_lang_id(lang)
                         html.attrib['lang'] = lang
                         del(html.attrib[xmllang])
                     self.add_dublincore(job, xhtml)
