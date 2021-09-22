@@ -1,3 +1,8 @@
+0.11.11 September 22, 2021
+- remove encoding meta element originating in HTML5 source from EPUB2 files, as it was causing validation failures.
+- fix bug when an XHTML source file set an xml:lang attribute
+
+
 0.11.10 September 20, 2021
 - use tidy for _all_ html source files
 - addressed long-standing issue where images referenced in css were not included in epubs. This issue surfaced because the images were also missing from generated files.
