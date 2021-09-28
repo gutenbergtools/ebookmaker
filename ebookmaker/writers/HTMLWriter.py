@@ -187,12 +187,12 @@ class Writer(writers.HTMLishWriter):
                         lang =  html.attrib[xmllang]
                         html.attrib['lang'] = lang
                         del(html.attrib[xmllang])
-                    self.add_dublincore(job, xhtml)
+                    self.add_dublincore(job, html)
 
                     # makes iphones zoom in
-                    self.add_meta(xhtml, 'viewport', 'width=device-width')
-                    self.add_meta_generator(xhtml)
-                    self.add_moremeta(job, xhtml, p.attribs.url)
+                    self.add_meta(html, 'viewport', 'width=device-width')
+                    self.add_meta_generator(html)
+                    self.add_moremeta(job, html, p.attribs.url)
                     
                     # strip xhtml namespace 
                     # https://stackoverflow.com/questions/18159221/
