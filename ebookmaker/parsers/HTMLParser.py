@@ -410,6 +410,8 @@ class Parser(HTMLParserBase):
         debug("HTMLParser.pre_parse() ...")
 
         html = self.unicode_content()
+        html = html.replace('&#13;', '&#10;')
+        html = html.replace('&#xD;', '&#10;')
 
         if self.xhtml is None:
             # previous parse failed, try tidy
