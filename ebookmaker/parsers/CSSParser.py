@@ -113,7 +113,7 @@ class Parser(ParserBase):
         """ remove all rules with url() in them """
         to_delete = []
         for rule in self.sheet:
-            if rule.type == rule.STYLE_RULE and 'url(' in rule.cssText:
+            if rule.type == rule.STYLE_RULE and rule.cssText and 'url(' in rule.cssText:
                 to_delete.append(rule)
         for rule in to_delete:        
             self.sheet.deleteRule(rule)

@@ -1,3 +1,16 @@
+0.11.12 September 30, 2021
+- fix reversion in 0.11.10 leaving out added meta elements
+- remove encoding meta element originating in HTML5 source from EPUB2 files, as it was causing validation failures.
+- remove @media handheld rules for HTML
+- move content of table summary attribute to data-summary attribute
+- width attribute on table and col is converted to css in a style attribute
+- non-integer width or height on img is converted to css in a style attribute
+- fixed epub builds for books with images in external css sheets
+- the 'big' element is obsolete; changed to <span class="xhtml_big">. css is altered or added as appropriate
+- a number of table attributes are obsolete an changed to the corresponding css styles: table@width, col@width, table@cellpadding, table@cellspacing, table@border, td@align, th@align, td@valign, th@valign
+- html5 doesn't allow elision of dd in dl. Where they are missing, we add empty dd
+
+
 0.11.11 September 22, 2021
 - remove encoding meta element originating in HTML5 source from EPUB2 files, as it was causing validation failures.
 - fix bug when an XHTML source file set an xml:lang attribute
