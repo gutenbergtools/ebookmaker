@@ -57,6 +57,7 @@ class Parser(ParserBase):
 
         self.attribs.mediatype = parsers.ParserAttributes.HeaderElement('text/css')
         self.lowercase_selectors(self.sheet)
+        self.make_links_absolute()
 
 
     def parse_string(self, s):
@@ -90,6 +91,12 @@ class Parser(ParserBase):
                     sel.selectorText = RE_ELEMENT.sub(lambda m: m.group(1).lower(),
                                                       sel.selectorText)
 
+    def make_links_absolute(self):
+        """ make links absolute """
+        def abs_url(url):
+            return urllib.parse.urljoin(self.attribs.url, url)
+        cssutils.replaceUrls(self.sheet, abs_url)
+
 
     def rewrite_links(self, f):
         """ Rewrite all links using the function f. """
@@ -102,7 +109,15 @@ class Parser(ParserBase):
         for url in cssutils.getUrls(self.sheet):
             yield urllib.parse.urljoin(self.attribs.url, url), parsers.em.style()
 
-
+    def strip_images(self):
+        """ remove all rules with url() in them """
+        to_delete = []
+        for rule in self.sheet:
+            if rule.type == rule.STYLE_RULE and 'url(' in rule.cssText:
+                to_delete.append(rule)
+        for rule in to_delete:        
+            self.sheet.deleteRule(rule)
+            
 
     def get_aux_urls(self):
         """ Return the urls of all auxiliary files in document.

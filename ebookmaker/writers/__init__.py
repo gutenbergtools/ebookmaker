@@ -143,6 +143,7 @@ class HTMLishWriter(BaseWriter):
             attribs.url = attribs.orig_url = url
             p = ParserFactory.ParserFactory.get(attribs)
             p.parse_string(css_as_string)
+            p.make_links_absolute()
             spider.parsers.append(p)
 
         if xhtml is not None:

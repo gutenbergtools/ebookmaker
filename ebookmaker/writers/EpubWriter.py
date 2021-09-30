@@ -1376,6 +1376,8 @@ class Writer(writers.HTMLishWriter):
                     p.parse()
                 if hasattr(p, 'sheet') and p.sheet:
                     self.fix_incompatible_css(p.sheet)
+                    if job.subtype == '.noimages':
+                        p.strip_images()
                     p.rewrite_links(self.url2filename)
                     parserlist.append(p)
 
