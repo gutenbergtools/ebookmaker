@@ -258,7 +258,10 @@ class Writer(writers.HTMLishWriter):
             style.text = sheet.cssText
 
         css_for_deprecated = ' '.join([CSS_FOR_DEPRECATED.get(tag, '') for tag in deprecated_used])
-        html.head.insert(0, etree.Element('style', text=css_for_deprecated))
+        if css_for_deprecated:
+            elem = etree.Element('style')
+            elem.text = css_for_deprecated
+            html.head.insert(0, elem)
         
 
     def build(self, job):
