@@ -7,8 +7,14 @@
 - non-integer width or height on img is converted to css in a style attribute
 - fixed epub builds for books with images in external css sheets
 - the 'big' element is obsolete; changed to <span class="xhtml_big">. css is altered or added as appropriate
-- a number of table attributes are obsolete an changed to the corresponding css styles: table@width, col@width, table@cellpadding, table@cellspacing, table@border, td@align, th@align, td@valign, th@valign
+- a number of table attributes are obsolete in html5 and changed to the corresponding css styles: table@width, col@width, table@cellpadding, table@cellspacing, table@border, td@align, th@align, td@valign, th@valign
 - html5 doesn't allow elision of dd in dl. Where they are missing, we add empty dd
+- html5 doesn't permit carriage returns. these are replace by newlines when represented as numeric entities.
+- libgutenberg dependency updated to 0.8.11
+    - fix issue of polymorphism in dc.languages. Without a db, it's a list of structs; with a db, its a related collection.
+    - ebookmaker will no longer ignore xml:lang or DC meta attributes
+    - fix windows path comparison - ebookmaker will behave properly when input file is in outputdir
+
 
 
 0.11.11 September 22, 2021
