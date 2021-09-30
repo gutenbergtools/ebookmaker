@@ -1,4 +1,4 @@
-0.11.12 September 30, 2021
+0.11.13 September 30, 2021
 - fix reversion in 0.11.10 leaving out added meta elements
 - remove encoding meta element originating in HTML5 source from EPUB2 files, as it was causing validation failures.
 - remove @media handheld rules for HTML
@@ -14,8 +14,7 @@
     - fix issue of polymorphism in dc.languages. Without a db, it's a list of structs; with a db, its a related collection.
     - ebookmaker will no longer ignore xml:lang or DC meta attributes
     - fix windows path comparison - ebookmaker will behave properly when input file is in outputdir
-
-
+- fixed style element bug in unreleased 0.11.12
 
 0.11.11 September 22, 2021
 - remove encoding meta element originating in HTML5 source from EPUB2 files, as it was causing validation failures.
