@@ -138,7 +138,7 @@ class Spider(object):
                     else:
                         self.enqueue(queue, depth + 1, new_attribs, True)
                         
-                elif tag == NS.xhtml.img:
+                elif tag in (NS.xhtml.img, NS.xhtml.style):
                     self.enqueue(queue, depth, new_attribs, False)
                 elif tag == NS.xhtml.link:
                     if new_attribs.rel.intersection(('stylesheet', 'coverpage')):

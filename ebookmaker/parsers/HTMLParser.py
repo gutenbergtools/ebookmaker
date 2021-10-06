@@ -410,17 +410,8 @@ class Parser(HTMLParserBase):
         debug("HTMLParser.pre_parse() ...")
 
         html = self.unicode_content()
-
-        if html.startswith('<?xml'):
-            # Try a naive parse. This might fail because of errors in
-            # the html or because we have no dtd loaded.  We do not
-            # load dtds because that makes us dependent on network and
-            # the w3c site being up.  Having all users of ebookmaker
-            # install local dtds is unrealistic.
-            try:
-                self.xhtml = self.__parse(html)
-            except etree.ParseError:
-                pass
+        html = html.replace('&#13;', '&#10;')
+        html = html.replace('&#xD;', '&#10;')
 
         if self.xhtml is None:
             # previous parse failed, try tidy

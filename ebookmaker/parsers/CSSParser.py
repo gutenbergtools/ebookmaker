@@ -39,8 +39,7 @@ class Parser(ParserBase):
         ParserBase.__init__(self, attribs)
         self.sheet = None
 
-
-    def parse(self):
+    def pre_parse(self):
         """ Parse the CSS file. """
 
         if self.sheet is not None:
@@ -58,6 +57,7 @@ class Parser(ParserBase):
 
         self.attribs.mediatype = parsers.ParserAttributes.HeaderElement('text/css')
         self.lowercase_selectors(self.sheet)
+        self.make_links_absolute()
 
 
     def parse_string(self, s):
@@ -91,30 +91,33 @@ class Parser(ParserBase):
                     sel.selectorText = RE_ELEMENT.sub(lambda m: m.group(1).lower(),
                                                       sel.selectorText)
 
+    def make_links_absolute(self):
+        """ make links absolute """
+        def abs_url(url):
+            return urllib.parse.urljoin(self.attribs.url, url)
+        cssutils.replaceUrls(self.sheet, abs_url)
+
 
     def rewrite_links(self, f):
         """ Rewrite all links using the function f. """
         cssutils.replaceUrls(self.sheet, f)
 
 
-    def get_image_urls(self):
-        """ Return the urls of all images in document.
+    def iterlinks(self):
+        """ Return the urls of all images in document."""
+        
+        for url in cssutils.getUrls(self.sheet):
+            yield urllib.parse.urljoin(self.attribs.url, url), parsers.em.style()
 
-        Images are graphic files. The user may choose if he wants
-        images included or not.
-
-        """
-
-        images = []
-
-        for prop in self.iter_properties(self.sheet):
-            if (prop.value.cssValueType == prop.value.CSS_PRIMITIVE_VALUE and
-                    prop.value.primitiveType == prop.value.CSS_URI):
-                url = urllib.parse.urljoin(self.attribs.url, prop.value.cssText)
-                images.append(url)
-
-        return  images
-
+    def strip_images(self):
+        """ remove all rules with url() in them """
+        to_delete = []
+        for rule in self.sheet:
+            if rule.type == rule.STYLE_RULE and rule.cssText and 'url(' in rule.cssText:
+                to_delete.append(rule)
+        for rule in to_delete:        
+            self.sheet.deleteRule(rule)
+            
 
     def get_aux_urls(self):
         """ Return the urls of all auxiliary files in document.

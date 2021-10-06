@@ -1,4 +1,38 @@
-0.11.8 September 3, 2021
+0.11.13 September 30, 2021
+- fix reversion in 0.11.10 leaving out added meta elements
+- remove encoding meta element originating in HTML5 source from EPUB2 files, as it was causing validation failures.
+- remove @media handheld rules for HTML
+- move content of table summary attribute to data-summary attribute
+- width attribute on table and col is converted to css in a style attribute
+- non-integer width or height on img is converted to css in a style attribute
+- fixed epub builds for books with images in external css sheets
+- the 'big' element is obsolete; changed to <span class="xhtml_big">. css is altered or added as appropriate
+- a number of table attributes are obsolete in html5 and changed to the corresponding css styles: table@width, col@width, table@cellpadding, table@cellspacing, table@border, td@align, th@align, td@valign, th@valign
+- html5 doesn't allow elision of dd in dl. Where they are missing, we add empty dd
+- html5 doesn't permit carriage returns. these are replace by newlines when represented as numeric entities.
+- libgutenberg dependency updated to 0.8.11
+    - fix issue of polymorphism in dc.languages. Without a db, it's a list of structs; with a db, its a related collection.
+    - ebookmaker will no longer ignore xml:lang or DC meta attributes
+    - fix windows path comparison - ebookmaker will behave properly when input file is in outputdir
+- fixed style element bug in unreleased 0.11.12
+
+0.11.11 September 22, 2021
+- remove encoding meta element originating in HTML5 source from EPUB2 files, as it was causing validation failures.
+- fix bug when an XHTML source file set an xml:lang attribute
+
+
+0.11.10 September 20, 2021
+- use tidy for _all_ html source files
+- addressed long-standing issue where images referenced in css were not included in epubs. This issue surfaced because the images were also missing from generated files.
+- addressed some simple issues preventing derived HTML5 files from validating. More complex issues involving incompatibilities between XHTML and HTML5 have been enumerated and will be addressed in subsequent updates.
+    - removed http-equiv meta elements for Content-Type and Content-Style-Type
+    - set lang attribute when xml:lang attribute is present
+    - removed duplicate encoding meta elements introduced by HTML5 source.
+    - removed type attribute from style elements
+- update requirements so that stand-alone installs will work better
+
+
+0.11.9 September 3, 2021
 - more aggressive session closing
 
 0.11.8 September 2, 2021

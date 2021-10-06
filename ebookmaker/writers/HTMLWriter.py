@@ -15,14 +15,16 @@ Distributable under the GNU General Public License Version 3 or newer.
 import copy
 import os
 from pathlib import Path
+import re
 from urllib.parse import urlparse, urljoin
 import uuid
 
+import cssutils
 from lxml import etree
 
 import libgutenberg.GutenbergGlobals as gg
 from libgutenberg.GutenbergGlobals import xpath
-from libgutenberg.Logger import debug, exception, info, error
+from libgutenberg.Logger import debug, exception, info, error, warning
 
 from ebookmaker import writers
 from ebookmaker.CommonCode import Options
@@ -30,6 +32,18 @@ from ebookmaker.writers import em
 from ebookmaker.parsers import webify_url
 
 options = Options()
+XMLLANG = '{http://www.w3.org/XML/1998/namespace}lang'
+DEPRECATED = ['big']
+CSS_FOR_DEPRECATED = {
+    'big' : ".xhtml_big {font-size: larger;};"
+}
+
+def css_len(len_str):
+    """ if an int, make px """
+    try:
+        return str(int(len_str)) + 'px'
+    except ValueError:
+        return len_str
 
 class Writer(writers.HTMLishWriter):
     """ Class for writing HTML files. """
@@ -116,6 +130,140 @@ class Writer(writers.HTMLishWriter):
         return os.path.join(os.path.abspath(job.outputdir), relativeURL)
 
 
+    @staticmethod
+    def fix_incompatible_css(sheet):
+        """ Strip CSS properties and values that are not HTML5 compatible.
+            Unpack "media handheld" rules
+        """
+
+        cssclass = re.compile(r'\.(-?[_a-zA-Z]+[_a-zA-Z0-9-]*)')
+
+        for rule in sheet:
+            if rule.type == rule.MEDIA_RULE:
+                if rule.media.mediaText.find('handheld') > -1:
+                    rule.parentStyleSheet.deleteRule(rule)
+
+            if rule.type == rule.STYLE_RULE:
+                ruleclasses = list(cssclass.findall(rule.selectorList.selectorText))
+                for p in list(rule.style):
+                    pass
+
+    def fix_css_for_deprecated(self, sheet, tags=DEPRECATED, replacement='span'):
+        """ for deprecated properties, change selector to {replacement}.xhtl_{tag name};
+            if no existing selector, add the selector with a style
+        """
+        for tag in tags:
+            tagre = re.compile(f'(^| |\\+|,|>|~){tag}')
+            tagsub = f'\\1{replacement}.xhtml_{tag}'
+            for rule in sheet:
+                if rule.type == rule.STYLE_RULE:
+                    for selector in rule.selectorList:
+                        selector.selectorText = tagre.sub(tagsub, selector.selectorText)
+                            
+
+    def xhtml_to_html(self, html):
+        ''' 
+        try to convert the html4 DOM to an html5 DOM 
+        (assumes xhtml namespaces have been removed, except from attribute values)
+        '''
+
+        # fix metas 
+        for meta in html.xpath("//meta[@http-equiv='Content-Type']"):
+            meta.getparent().remove(meta)
+        for meta in html.xpath("//meta[@http-equiv='Content-Style-Type']"):
+            meta.getparent().remove(meta)
+        for meta in html.xpath("//meta[@charset]"): # html5 doc, we'll replace it
+            meta.getparent().remove(meta)
+        for elem in html.xpath("//*[@xml:lang]"):
+            if XMLLANG in elem.attrib: # should always be true, but checking anyway
+                elem.set('lang', elem.attrib[XMLLANG])
+            else:
+                warning('XMLLANG expected, not found: %s@%s', elem.tag, elem.attrib)
+
+        # remove type on style elements
+        for style in html.xpath("//style[@type]"):
+            del style.attrib['type']
+
+
+        # replacing attributes with css in a style attribute
+        # (tag, attr, cssprop, val2css)
+        replacements = [
+            ('col', 'width', 'width', css_len),
+            ('table', 'width', 'width', css_len),
+            ('td', 'align', 'text-align', lambda x : x),
+            ('td', 'valign', 'vertical-align', lambda x : x),
+            ('th', 'align', 'text-align', lambda x : x),
+            ('th', 'valign', 'vertical-align', lambda x : x),
+            ('table', 'cellpadding', 'padding', css_len),
+            ('table', 'cellspacing', 'border-spacing', css_len),
+            ('table', 'border', 'border-width', css_len),
+        ]
+        # width obsolete on table, col
+        for (tag, attr, cssattr, val2css) in replacements:
+            for elem in html.xpath(f"//{tag}[@{attr}]"):
+                if elem.attrib[attr]:
+                    val = elem.attrib[attr]
+                    del elem.attrib[attr]
+                    elem.set('style',
+                             '%s: %s; %s' % (cssattr, val2css(val), elem.attrib.get('style', ''))
+                            )
+        
+        # width and height attributes must be integer
+        for elem in html.xpath("//*[@width or @height]"):
+            rules = []
+            for key in ['width', 'height']:
+                if key in elem.attrib and elem.attrib[key]:
+                    val = elem.attrib[key]
+                    try: 
+                        val = int(val)
+                    except ValueError:
+                        del elem.attrib[key]
+                        rules.append('%s: %s' % (key, val))
+            if rules:
+                elem.attrib['style'] = '; '.join(rules) + '; ' + elem.attrib.get('style', '')
+
+        # fix missing <dd> elements
+        for dt in html.xpath("//dt"):
+            if dt.getnext() is None or dt.getnext().tag != 'dd':
+                dt.addnext(etree.Element('dd'))
+            
+        # deprecated elements -  replace with <span class="xhtml_{tag name}">
+        deprecated = ['big']
+        deprecated_used = set()
+        for tag in deprecated:
+            for elem in html.xpath("//" + tag):
+                if 'class' in elem.attrib and elem.attrib['class']:
+                    vals = elem.attrib['class'].split()
+                else:
+                    vals = []
+                vals.append('xhtml_' + tag)
+                elem.set('class', ' '.join(vals))
+                elem.tag = 'span'
+                deprecated_used.add(tag)
+        
+        html.head.insert(0, etree.Element('meta', charset="utf-8"))
+        for table in html.xpath("//table"):
+            if 'summary' in table.attrib:
+                summary = table.attrib['summary']
+                del table.attrib['summary']
+                if summary:
+                    table.attrib['data-summary'] = summary
+
+        # fix css in style elements
+        cssparser = cssutils.CSSParser()
+        for style in html.xpath("//style"):
+            sheet = cssparser.parseString(style.text)
+            self.fix_incompatible_css(sheet)
+            self.fix_css_for_deprecated(sheet, tags=deprecated_used)
+            style.text = sheet.cssText
+
+        css_for_deprecated = ' '.join([CSS_FOR_DEPRECATED.get(tag, '') for tag in deprecated_used])
+        if css_for_deprecated:
+            elem = etree.Element('style')
+            elem.text = css_for_deprecated
+            html.head.insert(0, elem)
+        
+
     def build(self, job):
         """ Build HTML file. """
 
@@ -159,28 +307,28 @@ class Writer(writers.HTMLishWriter):
                 p.parse()
 
             try:
+                xmllang = '{http://www.w3.org/XML/1998/namespace}lang'
                 if xhtml is not None:
-                    self.add_dublincore(job, xhtml)
+                    html = copy.deepcopy(xhtml)
+                    if xmllang in html.attrib:
+                        lang =  html.attrib[xmllang]
+                        html.attrib['lang'] = job.dc.languages[0].id or lang
+                        del(html.attrib[xmllang])
+                    self.add_dublincore(job, html)
 
                     # makes iphones zoom in
-                    self.add_meta(xhtml, 'viewport', 'width=device-width')
-                    self.add_meta_generator(xhtml)
-                    self.add_moremeta(job, xhtml, p.attribs.url)
+                    self.add_meta(html, 'viewport', 'width=device-width')
+                    self.add_meta_generator(html)
+                    self.add_moremeta(job, html, p.attribs.url)
                     
                     # strip xhtml namespace 
                     # https://stackoverflow.com/questions/18159221/
-                    html = copy.deepcopy(xhtml)
                     for elem in html.getiterator():
                         if elem.tag is not etree.Comment:
                             elem.tag = etree.QName(elem).localname
                     # Remove unused namespace declarations
                     etree.cleanup_namespaces(html)
-                    
-                    xmllang = '{http://www.w3.org/XML/1998/namespace}lang'
-                    if xmllang in html.attrib:
-                        html.attrib['lang'] = html.attrib[xmllang]
-                        del(html.attrib[xmllang])
-                    html.head.insert(0, etree.Element('meta', charset="utf-8"))
+                    self.xhtml_to_html(html)
 
                     html = etree.tostring(html,
                                           method='html',
@@ -192,6 +340,10 @@ class Writer(writers.HTMLishWriter):
                     info("Done generating HTML file: %s" % outfile)
                 else:
                     #images and css files
+
+                    if hasattr(p, 'sheet') and p.sheet:
+                        self.fix_incompatible_css(p.sheet)
+
                     try:
                         with open(outfile, 'wb') as fp_dest:
                             fp_dest.write(p.serialize())

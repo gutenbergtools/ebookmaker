@@ -214,8 +214,8 @@ def get_dc(job):
 
     # We need a language to build a valid epub, so just make one up.
     if not dc.languages:
+        info('no language found, using default')
         dc.add_lang_id('en')
-
     return dc
 
 
