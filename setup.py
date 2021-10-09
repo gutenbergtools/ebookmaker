@@ -34,7 +34,7 @@ setup (
     ],
 
     install_requires = [
-        'Pillow',
+        'pillow>=8.3.2',
         'chardet',
         'cherrypy',
         'cssutils',
