@@ -30,7 +30,7 @@ class Writer(writers.BaseWriter):
         """ Copy image files to dest_dir. Use image data cached in parsers. """
 
         for p in job.spider.parsers:
-            if hasattr(p, 'resize_image'):
+            if hasattr(p, 'resize_image') or hasattr(p, 'auxparser'):
                 src_uri = p.attribs.url
                 if src_uri.startswith(webify_url(dest_dir)):
                     debug('Not copying %s to %s: already there' % (src_uri, dest_dir))

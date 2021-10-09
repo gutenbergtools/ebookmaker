@@ -20,7 +20,7 @@ mediatypes = ('*/*', )
 
 class Parser (ParserBase):
     """ Parse an auxiliary file. """
-
+    auxparser = True
     def __init__ (self, attribs = None):
         ParserBase.__init__ (self, attribs)
         self.data = None
