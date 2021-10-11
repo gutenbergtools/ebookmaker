@@ -1,3 +1,10 @@
+0.11.14 October 11, 2021
+- fix error when a style element is empty
+- fix error when style contains non-ascii text
+- fix issue with aux files not being copied to html destination
+- use secure version of Pillow
+
+
 0.11.13 September 30, 2021
 - fix reversion in 0.11.10 leaving out added meta elements
 - remove encoding meta element originating in HTML5 source from EPUB2 files, as it was causing validation failures.
@@ -15,6 +22,7 @@
     - ebookmaker will no longer ignore xml:lang or DC meta attributes
     - fix windows path comparison - ebookmaker will behave properly when input file is in outputdir
 - fixed style element bug in unreleased 0.11.12
+
 
 0.11.11 September 22, 2021
 - remove encoding meta element originating in HTML5 source from EPUB2 files, as it was causing validation failures.
