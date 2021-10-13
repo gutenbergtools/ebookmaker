@@ -693,3 +693,9 @@ class Parser(HTMLParserBase):
                 head.append(parsers.em.link(rel='coverpage', href=coverpage_url))
                 debug("Inserted link to coverpage %s." % coverpage_url)
             return
+
+    def add_title(self, dc):
+        if dc.title:
+            for elem in xpath(self.xhtml, '//xhtml:title'):
+                elem.text = f'The Project Gutenberg eBook of {dc.title}, by {dc.authors_short()}'
+                break

@@ -56,6 +56,7 @@ class Spider(object):
 
         self.max_depth = options.max_depth or six.MAXSIZE
         self.jobtype = job.type
+        self.job_dc = job.dc
 
 
     def recursive_parse(self, root_attribs):
@@ -89,6 +90,8 @@ class Spider(object):
             if url in self.parsed_urls:
                 continue
             self.parsed_urls.add(url)
+            if hasattr(parser, 'add_title'):
+                parser.add_title(self.job_dc)
 
             self.add_redirection(parser.attribs.orig_url, url)
             parser.pre_parse()
