@@ -184,9 +184,11 @@ class Writer(writers.HTMLishWriter):
             if elem.tag in ('pre', 'style'):
                 del elem.attrib[XMLSPACE]
 
-        # remove type on style elements
-        for style in html.xpath("//style[@type]"):
-            del style.attrib['type']
+        # remove obsolete attributes
+        attrs_to_remove = [('style', 'type'), ('img', 'longdesc')]
+        for (tag, attr) in attrs_to_remove:
+            for elem in html.xpath(f"//{tag}[@{attr}]"):
+                del elem.attrib[attr]
 
 
         # replacing attributes with css in a style attribute
@@ -205,7 +207,6 @@ class Writer(writers.HTMLishWriter):
             ('table', 'cellpadding', 'padding', css_len),
             ('table', 'cellspacing', 'border-spacing', css_len),
             ('table', 'border', 'border-width', css_len),
-            ('img', 'longdesc', 'border-width', css_len),
         ]
         # width obsolete on table, col
         for (tag, attr, cssattr, val2css) in replacements:
