@@ -35,7 +35,7 @@ options = Options()
 XMLLANG = '{http://www.w3.org/XML/1998/namespace}lang'
 DEPRECATED = ['big']
 CSS_FOR_DEPRECATED = {
-    'big' : ".xhtml_big {font-size: larger;};"
+    'big' : ".xhtml_big {font-size: larger;}"
 }
 
 def css_len(len_str):
@@ -262,8 +262,8 @@ class Writer(writers.HTMLishWriter):
         if css_for_deprecated:
             elem = etree.Element('style')
             elem.text = css_for_deprecated
-            html.head.insert(0, elem)
-        
+            html.head.insert(1, elem) # right after charset declaration                
+
 
     def build(self, job):
         """ Build HTML file. """
