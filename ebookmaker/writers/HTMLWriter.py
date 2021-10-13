@@ -33,6 +33,7 @@ from ebookmaker.parsers import webify_url
 
 options = Options()
 XMLLANG = '{http://www.w3.org/XML/1998/namespace}lang'
+XMLSPACE = '{http://www.w3.org/XML/1998/namespace}space'
 DEPRECATED = ['big']
 CSS_FOR_DEPRECATED = {
     'big' : ".xhtml_big {font-size: larger;}"
@@ -179,6 +180,9 @@ class Writer(writers.HTMLishWriter):
                 elem.set('lang', elem.attrib[XMLLANG])
             else:
                 warning('XMLLANG expected, not found: %s@%s', elem.tag, elem.attrib)
+        for elem in html.xpath("//*[@xml:space]"):
+            if elem.tag in ('pre', 'style'):
+                del elem.attrib[XMLSPACE]
 
         # remove type on style elements
         for style in html.xpath("//style[@type]"):
