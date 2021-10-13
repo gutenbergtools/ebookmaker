@@ -169,9 +169,9 @@ class Writer(writers.HTMLishWriter):
         '''
 
         # fix metas 
-        for meta in html.xpath("//meta[@http-equiv='Content-Type']"):
+        for meta in html.xpath("//meta[translate(@http-equiv, 'CT', 'ct')='content-type']"):
             meta.getparent().remove(meta)
-        for meta in html.xpath("//meta[@http-equiv='Content-Style-Type']"):
+        for meta in html.xpath("//meta[translate(@http-equiv, 'CST', 'cst')='content-style-type']"):
             meta.getparent().remove(meta)
         for meta in html.xpath("//meta[@charset]"): # html5 doc, we'll replace it
             meta.getparent().remove(meta)
