@@ -200,9 +200,12 @@ class Writer(writers.HTMLishWriter):
             ('tr', 'valign', 'vertical-align', lambda x : x),
             ('th', 'align', 'text-align', lambda x : x),
             ('th', 'valign', 'vertical-align', lambda x : x),
+            ('tbody', 'align', 'text-align', lambda x : x),
+            ('tbody', 'valign', 'vertical-align', lambda x : x),
             ('table', 'cellpadding', 'padding', css_len),
             ('table', 'cellspacing', 'border-spacing', css_len),
             ('table', 'border', 'border-width', css_len),
+            ('img', 'longdesc', 'border-width', css_len),
         ]
         # width obsolete on table, col
         for (tag, attr, cssattr, val2css) in replacements:
