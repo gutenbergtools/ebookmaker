@@ -196,6 +196,8 @@ class Writer(writers.HTMLishWriter):
             ('table', 'width', 'width', css_len),
             ('td', 'align', 'text-align', lambda x : x),
             ('td', 'valign', 'vertical-align', lambda x : x),
+            ('tr', 'align', 'text-align', lambda x : x),
+            ('tr', 'valign', 'vertical-align', lambda x : x),
             ('th', 'align', 'text-align', lambda x : x),
             ('th', 'valign', 'vertical-align', lambda x : x),
             ('table', 'cellpadding', 'padding', css_len),
