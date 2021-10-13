@@ -4,7 +4,7 @@
 
 from setuptools import setup
 
-VERSION = '0.11.13'
+VERSION = '0.11.14'
 
 setup (
     name = 'ebookmaker',
@@ -34,7 +34,7 @@ setup (
     ],
 
     install_requires = [
-        'Pillow',
+        'pillow>=8.3.2',
         'chardet',
         'cherrypy',
         'cssutils',

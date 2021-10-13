@@ -252,10 +252,11 @@ class Writer(writers.HTMLishWriter):
         # fix css in style elements
         cssparser = cssutils.CSSParser()
         for style in html.xpath("//style"):
-            sheet = cssparser.parseString(style.text)
-            self.fix_incompatible_css(sheet)
-            self.fix_css_for_deprecated(sheet, tags=deprecated_used)
-            style.text = sheet.cssText
+            if style.text:
+                sheet = cssparser.parseString(style.text)
+                self.fix_incompatible_css(sheet)
+                self.fix_css_for_deprecated(sheet, tags=deprecated_used)
+                style.text = sheet.cssText.decode("utf-8")
 
         css_for_deprecated = ' '.join([CSS_FOR_DEPRECATED.get(tag, '') for tag in deprecated_used])
         if css_for_deprecated:

@@ -20,7 +20,7 @@ from six.moves import urllib
 
 import libgutenberg.GutenbergGlobals as gg
 from libgutenberg.GutenbergGlobals import NS
-from libgutenberg.Logger import critical, debug, warning, error
+from libgutenberg.Logger import critical, debug, error, info, warning
 from libgutenberg import MediaTypes
 
 from ebookmaker import parsers
@@ -46,7 +46,8 @@ class Spider(object):
         self.include_mediatypes += options.include_mediatypes
         if job.subtype == '.images' or job.type == 'rst.gen':
             self.include_mediatypes.append('image/*')
-
+        if job.type == 'html.images':
+            self.include_mediatypes.append('*/*')
         self.exclude_urls = []
         self.exclude_urls += options.exclude_urls
 
