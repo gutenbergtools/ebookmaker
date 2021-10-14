@@ -115,3 +115,25 @@ def queue_notifications(ebook, message, subject='EbookMaker Notification'):
     with open(message_queue, 'a+') as messagefile:
         messagefile.write('Subject: %s\n' % subject)
         messagefile.write(message)
+
+
+def dir_from_url(url):
+    if url.startswith('file://'):
+        dir = os.path.dirname(os.path.abspath(url[7:]))
+    elif url.startswith('file:'):
+        dir = os.path.dirname(os.path.abspath(url[5:]))
+    else:
+        dir = os.path.dirname(os.path.abspath(url))
+    return dir
+
+
+def find_candidates(path, file_filter=lambda x: True):
+    """ walk the directory containing path, return files satisfying file_filter 
+    """
+    for (root, dirs, files) in os.walk(path):
+        if '/.' in root or root.startswith('.'):
+            continue
+        for fname in files:
+            fpath = os.path.join(root, fname)
+            if file_filter(fpath):
+                yield fpath
