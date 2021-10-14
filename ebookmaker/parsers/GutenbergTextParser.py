@@ -690,7 +690,7 @@ class Parser(HTMLParserBase):
 
         if coverpage_url:
             for head in xpath(self.xhtml, "/xhtml:html/xhtml:head"):
-                head.append(parsers.em.link(rel='coverpage', href=coverpage_url))
+                head.append(parsers.em.link(rel='icon', href=coverpage_url, format='image/x-cover'))
                 debug("Inserted link to coverpage %s." % coverpage_url)
             return
 

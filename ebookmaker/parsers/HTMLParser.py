@@ -317,7 +317,6 @@ class Parser(HTMLParserBase):
             if elem.text and elem.text.startswith("E-text prepared by"):
                 elem.tag = NS.xhtml.p
 
-
     def _make_coverpage_link(self, coverpage_url=None):
         """ Insert a <link rel="coverpage"> in the html head.
 
@@ -325,7 +324,7 @@ class Parser(HTMLParserBase):
         coverpage by appling these rules:
 
           0. the image specified by the --cover command-line option
-          1. the image specified in <link rel='coverpage'>,
+          1. the image specified in <link rel='icon'> or <link rel='coverpage'>,
           2. the image with an id of 'coverpage' or
           3. the image with an url containing 'cover'
           4. the image with an url containing 'title'
@@ -334,21 +333,27 @@ class Parser(HTMLParserBase):
         order, else we proceed with the next rule.
         """
 
-        coverpages = xpath(self.xhtml, "//xhtml:link[@rel='coverpage']")
-
+        coverpages = xpath(self.xhtml, "//xhtml:link[@rel='icon' or @rel='coverpage']")
+        cover_attrs = {'rel': 'icon', 'type': 'image/x-cover'}
         if coverpage_url:
             for coverpage in coverpages:
                 coverpage.set('href', coverpage_url)
+                coverpage.attrib.update(cover_attrs)
                 debug("overrode link to coverpage with %s." % coverpage_url)
+                
             else:
                 for head in xpath(self.xhtml, "/xhtml:html/xhtml:head"):
-                    head.append(parsers.em.link(rel='coverpage', href=coverpage_url))
+                    head.append(parsers.em.link(rel='icon', href=coverpage_url, type='x-cover'))
                     debug("Inserted link to coverpage %s." % coverpage_url)
             return
 
         for coverpage in coverpages:
+            if 'type' in coverpage.attrib and coverpage.attrib['type'] != 'image/x-cover':
+                continue
             url = coverpage.get('href')
             debug("Found link to coverpage %s." % url)
+            if coverpage.attrib['rel'] == 'coverpage':
+                coverpage.attrib.update(cover_attrs)
             return   # already provided by user
 
         # look for a suitable candidate
@@ -361,7 +366,7 @@ class Parser(HTMLParserBase):
         for coverpage in coverpages:
             for head in xpath(self.xhtml, "/xhtml:html/xhtml:head"):
                 url = coverpage.get('src')
-                head.append(parsers.em.link(rel='coverpage', href=url))
+                head.append(parsers.em.link(rel='icon', href=url, type='x-cover'))
                 debug("Inserted link to coverpage %s." % url)
 
 

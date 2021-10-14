@@ -116,7 +116,7 @@ def make_output_filename(type_, dc):
 
 def cover_file_filter(fpath):
     dirpath, fname = os.path.split(fpath)
-    if 'cover' not in fname:
+    if 'cover' not in fname.lower():
         return False
     name, ext = os.path.splitext(fpath)
     if ext not in ['.jpg', '.jpeg', '.png', '.gif']:
