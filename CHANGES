@@ -1,3 +1,15 @@
+0.11.15 October 14, 2021
+- fix syntax and position of style element replacing HTML5 deprecated elements
+- remove xml:space from HTML5 pre and style elements
+- make removal of http-equiv meta elements case-insensitive
+- try to remove problematic carriage returns in meta tags
+- tr@align, tr@valign, tbody@align, tbody@valign changed to css equivalents
+- remove img@longdesc; it never did anything
+- add title to files produced from txt
+- to allow for better HTML5 validation the preferred mechanism for denoting a cover image has been changed from `<link rel="coverpage" type href="a_relative_url.jpg" />` to `<link rel="icon" href="a_relative_url.jpg" type="image/x-cover" />`. type is optional unless there is more than one link@rel=icon. The issue is that "coverpage" is not an HTML5-registered link relation. The registered "icon" relation is described as "Imports an icon to represent the document." The "coverpage" mechanism will continue to be supported and does not need to be changed, especially for XHMTL source files.
+- Ebookmaker now looks for unlinked cover files if there are none linked. Cover file names must contain the string "cover" and must an extension in '.jpg', '.jpeg', '.png', or '.gif'. Cover files must be in the same directory as the source html or one of its subdirectories. At some time in the past, cover files for display on the website were similarly identified by name. Some covers in the backfile were replaced by generated files when Ebookmaker added the capability of generating cover files. With Ebookmaker now identifying cover files, many of the unlinked covers should be restored. When a cover file is supplied, it is still a best practice to use a link element in the html file.
+
+
 0.11.14 October 11, 2021
 - fix error when a style element is empty
 - fix error when style contains non-ascii text
