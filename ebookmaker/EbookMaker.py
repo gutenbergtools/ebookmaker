@@ -125,7 +125,7 @@ def cover_file_filter(fpath):
 
 def add_cover(cover_url, spider):
     cover_parser = ParserFactory.ParserFactory.create(cover_url)
-    cover_parser.attribs.rel.add('coverpage')
+    cover_parser.attribs.rel.add('icon')
     cover_parser.pre_parse()
     spider.parsers.append(cover_parser)
     return True
@@ -136,15 +136,15 @@ def elect_coverpage(spider, url, dc):
 
     coverpage_found = False
     for p in spider.parsers:
-        if 'coverpage' in p.attribs.rel:
+        if 'icon' in p.attribs.rel:
             if coverpage_found:
                 # keep the first one found, reset all others
-                p.attribs.rel.remove('coverpage')
+                p.attribs.rel.remove('icon')
                 continue
             if hasattr(p, 'get_image_dimen'):
                 dimen = p.get_image_dimen()
                 if(dimen[0] * dimen[1]) < COVERPAGE_MIN_AREA:
-                    p.attribs.rel.remove('coverpage')
+                    p.attribs.rel.remove('icon')
                     p_url = p.url if hasattr(p, 'url') else ''
                     warning("removed coverpage candidate %s because too small (%d x %d)" %
                             (p_url, dimen[0], dimen[1]))

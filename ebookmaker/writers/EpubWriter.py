@@ -1278,7 +1278,7 @@ class Writer(writers.HTMLishWriter):
             # do images early as we need the new dimensions later
             for p in job.spider.parsers:
                 if hasattr(p, 'resize_image'):
-                    if 'coverpage' in p.attribs.rel:
+                    if 'icon' in p.attribs.rel:
                         if job.subtype == '.noimages':
                             np = p.resize_image(MAX_NOIMAGE_SIZE, MAX_COVER_DIMEN)
                         else:

@@ -318,7 +318,7 @@ class Parser(HTMLParserBase):
                 elem.tag = NS.xhtml.p
 
     def _make_coverpage_link(self, coverpage_url=None):
-        """ Insert a <link rel="coverpage"> in the html head.
+        """ Insert a <link rel="icon"> in the html head.
 
         First we determine the coverpage url.  In HTML we find the
         coverpage by appling these rules:
