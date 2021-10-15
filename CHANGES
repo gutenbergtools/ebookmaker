@@ -1,4 +1,11 @@
+0.11.16 October 15, 2021
+- fixed cover setting issues in 0.11.15
+- parser now converts unicode to Normal Form C. So "A"+"combining-`" -> "À"
+- CSS serializer now omits invalid CSS properties in the derived HTML5. CSS profile used in CSS2, and includes a small number of properties that are marked as errors by the HTML5 validator because it considers them deprecated by CSS3 (for example, the "speak" property, which is replaced by "speak-as") We'll need to move to CSS3 eventually, but for now we need to also target EPUB2 and ereaders that don't do CSS3 yet. The supported CSS Properties are defined by profiles in the cssutils module in python; CSS3 properties are somewhat modular, and there needs to be discussion around which properties we should be using in PG files.
+
+
 0.11.15 October 14, 2021
+Not deployed due to test failures
 - fix syntax and position of style element replacing HTML5 deprecated elements
 - remove xml:space from HTML5 pre and style elements
 - make removal of http-equiv meta elements case-insensitive
