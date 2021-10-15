@@ -14,6 +14,7 @@ import os
 import re
 import subprocess
 import sys
+import unicodedata
 
 from six.moves import urllib
 
@@ -422,6 +423,7 @@ class Parser(HTMLParserBase):
             # previous parse failed, try tidy
             info("Running html thru tidy.")
             html = self.tidy(html)
+            html = unicodedata.normalize('NFC', html)
             self.xhtml = self.__parse(html)     # let exception bubble up
 
         self._fix_anchors() # needs relative paths
