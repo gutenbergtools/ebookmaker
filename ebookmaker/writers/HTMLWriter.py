@@ -32,6 +32,7 @@ from ebookmaker.writers import em
 from ebookmaker.parsers import webify_url
 
 options = Options()
+cssutils.ser.prefs.validOnly = True
 XMLLANG = '{http://www.w3.org/XML/1998/namespace}lang'
 XMLSPACE = '{http://www.w3.org/XML/1998/namespace}space'
 DEPRECATED = ['big']
