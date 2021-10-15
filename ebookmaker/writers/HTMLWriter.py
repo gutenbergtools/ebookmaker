@@ -151,7 +151,7 @@ class Writer(writers.HTMLishWriter):
                     pass
 
     def fix_css_for_deprecated(self, sheet, tags=DEPRECATED, replacement='span'):
-        """ for deprecated properties, change selector to {replacement}.xhtl_{tag name};
+        """ for deprecated tags, change selector to {replacement}.xhtml_{tag name};
             if no existing selector, add the selector with a style
         """
         for tag in tags:
