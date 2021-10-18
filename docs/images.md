@@ -11,7 +11,7 @@ EbookMaker now considers three types of images it finds in html, and handles the
 3. cover images
    These can come in 4 flavors (in priority order):
     1. coverpage relation
-        `<link href="unicorn_image.jpg" rel="coverpage" />`  or `<link href="unicorn_image.jpg" rel="icon" type="x-cover" />` (preferred)
+        `<link href="unicorn_image.jpg" rel="coverpage" />`  or `<link href="unicorn_image.jpg" rel="icon" type="image/x-cover" />` (preferred)
     2. coverpage id
         `<img src="unicorn_image.jpg" id="coverpage" alt="front jacket" />`
     3. image with 'cover' in the url

@@ -344,7 +344,7 @@ class Parser(HTMLParserBase):
                 
             else:
                 for head in xpath(self.xhtml, "/xhtml:html/xhtml:head"):
-                    head.append(parsers.em.link(rel='icon', href=coverpage_url, type='x-cover'))
+                    head.append(parsers.em.link(rel='icon', href=coverpage_url, type='image/x-cover'))
                     debug("Inserted link to coverpage %s." % coverpage_url)
             return
 
@@ -367,7 +367,7 @@ class Parser(HTMLParserBase):
         for coverpage in coverpages:
             for head in xpath(self.xhtml, "/xhtml:html/xhtml:head"):
                 url = coverpage.get('src')
-                head.append(parsers.em.link(rel='icon', href=url, type='x-cover'))
+                head.append(parsers.em.link(rel='icon', href=url, type='image/x-cover'))
                 debug("Inserted link to coverpage %s." % url)
 
 
