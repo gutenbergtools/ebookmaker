@@ -1,3 +1,6 @@
+0.11.18 October 19, 2021
+- fixed reversion in TeX conversion
+
 0.11.17 October 18, 2021
 - fixed missing subtype in link rel setter
 
