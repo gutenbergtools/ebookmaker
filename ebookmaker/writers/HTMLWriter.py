@@ -37,7 +37,8 @@ XMLLANG = '{http://www.w3.org/XML/1998/namespace}lang'
 XMLSPACE = '{http://www.w3.org/XML/1998/namespace}space'
 DEPRECATED = ['big']
 CSS_FOR_DEPRECATED = {
-    'big' : ".xhtml_big {font-size: larger;}"
+    'big': ".xhtml_big {font-size: larger;}",
+    'tt': ".xhtml_tt {font-family: monospace;}",
 }
 
 def css_len(len_str):
@@ -239,7 +240,7 @@ class Writer(writers.HTMLishWriter):
                 dt.addnext(etree.Element('dd'))
             
         # deprecated elements -  replace with <span class="xhtml_{tag name}">
-        deprecated = ['big']
+        deprecated = ['big', 'tt']
         deprecated_used = set()
         for tag in deprecated:
             for elem in html.xpath("//" + tag):
