@@ -177,6 +177,8 @@ class Writer(writers.HTMLishWriter):
             meta.getparent().remove(meta)
         for meta in html.xpath("//meta[@charset]"): # html5 doc, we'll replace it
             meta.getparent().remove(meta)
+        for meta in html.xpath("//meta[@scheme]"): # remove obsolete formatted metas
+            meta.getparent().remove(meta)
         for elem in html.xpath("//*[@xml:lang]"):
             if XMLLANG in elem.attrib: # should always be true, but checking anyway
                 elem.set('lang', elem.attrib[XMLLANG])
