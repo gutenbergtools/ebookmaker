@@ -31,7 +31,7 @@ from ebookmaker.Version import VERSION, GENERATOR
 
 
 def remove_cr(content):
-    content = re.sub(r'\s*[\r\n]+\s*', '\n', content)
+    content = re.sub(r'\s*[\r\n]+\s*', '&#10;', content)
     return content
 
 class BaseWriter(object):
