@@ -1211,7 +1211,7 @@ class Writer(writers.HTMLishWriter):
             ocf.add_unicode('toc.ncx', six.text_type(ncx))
 
             for p in parserlist:
-                if 'coverpage' in p.attribs.rel:
+                if 'icon' in p.attribs.rel:
                     opf.add_coverpage(ocf, p.attribs.url)
                     break
 
