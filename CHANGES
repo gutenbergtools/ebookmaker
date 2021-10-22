@@ -1,3 +1,6 @@
+0.11.20 October 22, 2021
+- fixed file scanner used to find covers
+
 0.11.19 October 21, 2021
 - tt elements replaced by span with monospace font in HTML5
 - newlines properly escaped in meta attributes
