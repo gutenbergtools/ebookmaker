@@ -130,6 +130,7 @@ def dir_from_url(url):
 def find_candidates(path, file_filter=lambda x: True):
     """ walk the directory containing path, return files satisfying file_filter 
     """
+    path = dir_from_url(path)
     for (root, dirs, files) in os.walk(path):
         if '/.' in root or root.startswith('.'):
             continue
