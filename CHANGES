@@ -1,3 +1,6 @@
+0.11.21 October 23, 2021
+- fixed file scanner to not scan parent directory when asked to scan a directory
+
 0.11.20 October 22, 2021
 - fixed file scanner used to find covers
 
