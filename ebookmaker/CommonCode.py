@@ -118,6 +118,8 @@ def queue_notifications(ebook, message, subject='EbookMaker Notification'):
 
 
 def dir_from_url(url):
+    if os.path.isdir(url):
+        return url
     if url.startswith('file://'):
         dir = os.path.dirname(os.path.abspath(url[7:]))
     elif url.startswith('file:'):
