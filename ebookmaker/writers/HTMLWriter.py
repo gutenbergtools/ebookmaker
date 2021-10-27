@@ -226,6 +226,12 @@ class Writer(writers.HTMLishWriter):
         for colgroup in html.xpath("//colgroup[@span and col]"):
             del colgroup.attrib['span']
 
+        # move tfoot elements to end of table
+        for tfoot in html.xpath("//table/tfoot"):
+            table = tfoot.getparent()
+            table.append(tfoot)
+        
+        
         # width and height attributes must be integer
         for elem in html.xpath("//*[@width or @height]"):
             rules = []
