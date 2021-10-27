@@ -42,6 +42,8 @@ CSS_FOR_DEPRECATED = {
     'tt': ".xhtml_tt {font-family: monospace;}",
 }
 
+## from https://hg.mozilla.org/mozilla-central/file/3fd770ef6a65/layout/style/html.css#l310
+
 CSS_FOR_RULES = {
     'none': '''
 .rules-none > tr > td, .rules-none > * > tr > td, .rules-none > tr > th,
@@ -74,7 +76,6 @@ border-top-style: solid; border-bottom-style: solid;}
 border-left-width: thin; border-right-width: thin;
 border-left-style: solid; border-right-style: solid;}''',
 }
-
 
 CSS_FOR_FRAME = {
     'box': '.frame-box {border: thin outset;}',
@@ -135,26 +136,26 @@ class Writer(writers.HTMLishWriter):
         self.add_prop(tree, "og:image", cover_url)
 
     def outputfileurl(self, job, url):
-        """ 
+        """
         Make the output path for the parser.
         Consider an image referenced in a source html file being moved to a destination directory.
         The image must be moved to a Location that is the same, relative to the job's destination,
         as it was in the source file.
-        The constraints are that 
-        1. we must not over-write the source files, and 
-        2. the destination directory may be the same as the source directory. 
-        In case (2), we'll create a new "out" directory to contain the written files; we'll also 
+        The constraints are that
+        1. we must not over-write the source files, and
+        2. the destination directory may be the same as the source directory.
+        In case (2), we'll create a new "out" directory to contain the written files; we'll also
         stop with an error if our source path is below an "out" directory.
-        
+
         Complication: generated covers are already in the output directory.
-        
+
         """
 
         if not job.main:
-            # this is the main file. 
+            # this is the main file.
             job.main = url
-            
-            # check that the source file is not in the outputdir 
+
+            # check that the source file is not in the outputdir
             if gg.is_same_path(os.path.abspath(job.outputdir), os.path.dirname(url)):
                 # make sure that source is not in an 'out" directory
                 newdir = 'out'
@@ -165,7 +166,7 @@ class Writer(writers.HTMLishWriter):
                         warning("can't use an 'out' directory for both input and output; using %s",
                                 newdir)
                         break
-                        
+
                 job.outputdir = os.path.join(job.outputdir, newdir)
 
             jobfilename = os.path.join(os.path.abspath(job.outputdir), job.outputfile)
@@ -219,15 +220,15 @@ class Writer(writers.HTMLishWriter):
                 if rule.type == rule.STYLE_RULE:
                     for selector in rule.selectorList:
                         selector.selectorText = tagre.sub(tagsub, selector.selectorText)
-                            
+
 
     def xhtml_to_html(self, html):
-        ''' 
-        try to convert the html4 DOM to an html5 DOM 
+        '''
+        try to convert the html4 DOM to an html5 DOM
         (assumes xhtml namespaces have been removed, except from attribute values)
         '''
 
-        # fix metas 
+        # fix metas
         for meta in html.xpath("//meta[translate(@http-equiv, 'CT', 'ct')='content-type']"):
             meta.getparent().remove(meta)
         for meta in html.xpath("//meta[translate(@http-equiv, 'CST', 'cst')='content-style-type']"):
@@ -278,15 +279,15 @@ class Writer(writers.HTMLishWriter):
                     elem.set('style',
                              '%s: %s; %s' % (cssattr, val2css(val), elem.attrib.get('style', ''))
                             )
-        
-        
+
+
         # width and height attributes must be integer
         for elem in html.xpath("//*[@width or @height]"):
             rules = []
             for key in ['width', 'height']:
                 if key in elem.attrib and elem.attrib[key]:
                     val = elem.attrib[key]
-                    try: 
+                    try:
                         val = int(val)
                     except ValueError:
                         del elem.attrib[key]
@@ -298,7 +299,7 @@ class Writer(writers.HTMLishWriter):
         for dt in html.xpath("//dt"):
             if dt.getnext() is None or dt.getnext().tag != 'dd':
                 dt.addnext(etree.Element('dd'))
-            
+
         # deprecated elements -  replace with <span class="xhtml_{tag name}">
         deprecated = ['big', 'tt']
         deprecated_used = set()
@@ -307,11 +308,11 @@ class Writer(writers.HTMLishWriter):
                 add_class(elem, 'xhtml_' + tag)
                 elem.tag = 'span'
                 deprecated_used.add(tag)
-        
+
         html.head.insert(0, etree.Element('meta', charset="utf-8"))
 
-        ##### tables #######  
-      
+        ##### tables #######
+
         # remove summary attribute
         for table in html.xpath('//table[@summary]'):
             summary = table.attrib['summary']
@@ -328,7 +329,7 @@ class Writer(writers.HTMLishWriter):
                 if att_value in deprecated_atts[att]:
                     add_class(table, f'{att}-{att_value}')
                     del table.attrib[att]
-                    deprecated_used.add(att_value)                  
+                    deprecated_used.add(att_value)
 
         # remove span attribute from colgroups that have col children
         for colgroup in html.xpath("//colgroup[@span and col]"):
@@ -338,7 +339,7 @@ class Writer(writers.HTMLishWriter):
         for tfoot in html.xpath("//table/tfoot"):
             table = tfoot.getparent()
             table.append(tfoot)
-        
+
 
         ##### cleanup #######
 
@@ -355,7 +356,7 @@ class Writer(writers.HTMLishWriter):
         if css_for_deprecated:
             elem = etree.Element('style')
             elem.text = css_for_deprecated
-            html.head.insert(1, elem) # right after charset declaration                
+            html.head.insert(1, elem) # right after charset declaration
 
 
     def build(self, job):
@@ -414,8 +415,8 @@ class Writer(writers.HTMLishWriter):
                     self.add_meta(html, 'viewport', 'width=device-width')
                     self.add_meta_generator(html)
                     self.add_moremeta(job, html, p.attribs.url)
-                    
-                    # strip xhtml namespace 
+
+                    # strip xhtml namespace
                     # https://stackoverflow.com/questions/18159221/
                     for elem in html.getiterator():
                         if elem.tag is not etree.Comment:
