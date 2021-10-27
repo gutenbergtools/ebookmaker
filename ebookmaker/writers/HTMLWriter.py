@@ -48,6 +48,14 @@ def css_len(len_str):
     except ValueError:
         return len_str
 
+def add_class(elem, classname):
+    if 'class' in elem.attrib and elem.attrib['class']:
+        vals = elem.attrib['class'].split()
+    else:
+        vals = []
+    vals.append(classname)
+    elem.set('class', ' '.join(vals))
+
 class Writer(writers.HTMLishWriter):
     """ Class for writing HTML files. """
 
@@ -247,12 +255,7 @@ class Writer(writers.HTMLishWriter):
         deprecated_used = set()
         for tag in deprecated:
             for elem in html.xpath("//" + tag):
-                if 'class' in elem.attrib and elem.attrib['class']:
-                    vals = elem.attrib['class'].split()
-                else:
-                    vals = []
-                vals.append('xhtml_' + tag)
-                elem.set('class', ' '.join(vals))
+                add_class(elem, 'xhtml_' + tag)
                 elem.tag = 'span'
                 deprecated_used.add(tag)
         
