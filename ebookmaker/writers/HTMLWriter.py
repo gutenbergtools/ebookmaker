@@ -238,13 +238,23 @@ class Writer(writers.HTMLishWriter):
         for meta in html.xpath("//meta[@scheme]"): # remove obsolete formatted metas
             meta.getparent().remove(meta)
         for elem in html.xpath("//*[@xml:lang]"):
-            if XMLLANG in elem.attrib: # should always be true, but checking anyway
-                elem.set('lang', elem.attrib[XMLLANG])
-            else:
-                warning('XMLLANG expected, not found: %s@%s', elem.tag, elem.attrib)
+            elem.set('lang', elem.attrib[XMLLANG])
         for elem in html.xpath("//*[@xml:space]"):
             if elem.tag in ('pre', 'style'):
                 del elem.attrib[XMLSPACE]
+
+        #check values of lang
+        for elem in html.xpath("//*[@lang]"):
+            lang = elem.attrib['lang']
+            lang_name = gg.language_map.get(lang, default=None)
+            if lang_name:
+                continue
+            clean_lang = gg.language_map.inverse(lang, default=None)
+            if not clean_lang:
+                error("invalid lang attribute %s", lang)
+                del elem.attrib['lang']
+            elif lang != clean_lang:
+                elem.attrib['lang'] = clean_lang
 
         # remove obsolete attributes
         attrs_to_remove = [('style', 'type'), ('img', 'longdesc')]
