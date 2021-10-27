@@ -222,6 +222,10 @@ class Writer(writers.HTMLishWriter):
                              '%s: %s; %s' % (cssattr, val2css(val), elem.attrib.get('style', ''))
                             )
         
+        # remove span attribute from colgroups that have col children
+        for colgroup in html.xpath("//colgroup[@span and col]"):
+            del colgroup.attrib['span']
+
         # width and height attributes must be integer
         for elem in html.xpath("//*[@width or @height]"):
             rules = []
