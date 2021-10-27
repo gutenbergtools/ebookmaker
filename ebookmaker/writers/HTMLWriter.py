@@ -36,10 +36,59 @@ cssutils.ser.prefs.validOnly = True
 XMLLANG = '{http://www.w3.org/XML/1998/namespace}lang'
 XMLSPACE = '{http://www.w3.org/XML/1998/namespace}space'
 DEPRECATED = ['big']
+
 CSS_FOR_DEPRECATED = {
     'big': ".xhtml_big {font-size: larger;}",
     'tt': ".xhtml_tt {font-family: monospace;}",
 }
+
+CSS_FOR_RULES = {
+    'none': '''
+.rules-none > tr > td, .rules-none > * > tr > td, .rules-none > tr > th,
+.rules-none > * > tr > th, .rules-none > td, .rules-none > th {
+border-width: thin;
+border-style: none;}''',
+    'all': '''
+.rules-all > tr > td, .rules-all > * > tr > td, .rules-all > tr > th,
+.rules-all > * > tr > th, .rules-all > td, .rules-all > th {
+border-width: thin;
+border-style: solid;}''',
+    'cols': '''
+.rules-cols > tr > td, .rules-cols > * > tr > td,
+.rules-cols > tr > th, .rules-cols > * > tr > th' {
+border-left-width: thin;
+border-right-width: thin;
+border-left-style: solid;
+border-right-style: solid;}''',
+    'rows': '''
+.rules-rows > tr, .rules-rows > * > tr {
+border-top-width: thin;
+border-bottom-width: thin;
+border-top-style: solid;
+border-bottom-style: solid;}''',
+    'groups': '''
+.rules-groups > tfoot, .rules-groups > thead, .rules-groups > tbody {
+border-top-width: thin; border-bottom-width: thin;
+border-top-style: solid; border-bottom-style: solid;}
+.rules-groups > colgroup {
+border-left-width: thin; border-right-width: thin;
+border-left-style: solid; border-right-style: solid;}''',
+}
+
+
+CSS_FOR_FRAME = {
+    'box': '.frame-box {border: thin outset;}',
+    'void': '.frame-void {border-style: hidden;}',
+    'above': 'frame-above {border-style: outset hidden hidden hidden;}',
+    'below': 'frame-below {border-style: hidden hidden outset hidden;}',
+    'lhs': '.frame-lhs {border-style: hidden hidden hidden outset;}',
+    'rhs': '.frame-rhs {border-style: hidden outset hidden hidden;}',
+    'hsides': '.frame-hsides {border-style: outset hidden;}',
+    'vsides': '.frame-vsides {border-style: hidden outset;}',
+    'border': 'frame-border {border-style: outset;}',
+}
+CSS_FOR_DEPRECATED.update(CSS_FOR_RULES)
+CSS_FOR_DEPRECATED.update(CSS_FOR_FRAME)
 
 def css_len(len_str):
     """ if an int, make px """
@@ -269,6 +318,17 @@ class Writer(writers.HTMLishWriter):
             del table.attrib['summary']
             if summary:
                 table.attrib['data-summary'] = summary
+
+        # replace frame and rules attributes on tables
+        deprecated_atts = {'frame': CSS_FOR_FRAME, 'rules': CSS_FOR_RULES}
+        for att in deprecated_atts:
+            for table in html.xpath(f'//table[@{att}]'):
+                att_value = table.attrib[att]
+                info(att_value)
+                if att_value in deprecated_atts[att]:
+                    add_class(table, f'{att}-{att_value}')
+                    del table.attrib[att]
+                    deprecated_used.add(att_value)                  
 
         # remove span attribute from colgroups that have col children
         for colgroup in html.xpath("//colgroup[@span and col]"):
