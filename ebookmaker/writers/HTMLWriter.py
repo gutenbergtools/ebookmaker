@@ -222,15 +222,6 @@ class Writer(writers.HTMLishWriter):
                              '%s: %s; %s' % (cssattr, val2css(val), elem.attrib.get('style', ''))
                             )
         
-        # remove span attribute from colgroups that have col children
-        for colgroup in html.xpath("//colgroup[@span and col]"):
-            del colgroup.attrib['span']
-
-        # move tfoot elements to end of table
-        for tfoot in html.xpath("//table/tfoot"):
-            table = tfoot.getparent()
-            table.append(tfoot)
-        
         
         # width and height attributes must be integer
         for elem in html.xpath("//*[@width or @height]"):
@@ -276,6 +267,17 @@ class Writer(writers.HTMLishWriter):
             if summary:
                 table.attrib['data-summary'] = summary
 
+        # remove span attribute from colgroups that have col children
+        for colgroup in html.xpath("//colgroup[@span and col]"):
+            del colgroup.attrib['span']
+
+        # move tfoot elements to end of table
+        for tfoot in html.xpath("//table/tfoot"):
+            table = tfoot.getparent()
+            table.append(tfoot)
+        
+
+        ##### cleanup #######
 
         # fix css in style elements
         cssparser = cssutils.CSSParser()
