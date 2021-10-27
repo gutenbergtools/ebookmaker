@@ -266,12 +266,16 @@ class Writer(writers.HTMLishWriter):
                 deprecated_used.add(tag)
         
         html.head.insert(0, etree.Element('meta', charset="utf-8"))
-        for table in html.xpath("//table"):
-            if 'summary' in table.attrib:
-                summary = table.attrib['summary']
-                del table.attrib['summary']
-                if summary:
-                    table.attrib['data-summary'] = summary
+
+        ##### tables #######  
+      
+        # remove summary attribute
+        for table in html.xpath('//table[@summary]'):
+            summary = table.attrib['summary']
+            del table.attrib['summary']
+            if summary:
+                table.attrib['data-summary'] = summary
+
 
         # fix css in style elements
         cssparser = cssutils.CSSParser()
