@@ -255,6 +255,7 @@ class Writer(writers.HTMLishWriter):
                 del elem.attrib['lang']
             elif lang != clean_lang:
                 elem.attrib['lang'] = clean_lang
+                elem.attrib[XMLLANG] = clean_lang
 
         # remove obsolete attributes
         attrs_to_remove = [('style', 'type'), ('img', 'longdesc')]
