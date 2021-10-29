@@ -340,7 +340,6 @@ class Writer(writers.HTMLishWriter):
         for att in deprecated_atts:
             for table in html.xpath(f'//table[@{att}]'):
                 att_value = table.attrib[att]
-                info(att_value)
                 if att_value in deprecated_atts[att]:
                     add_class(table, f'{att}-{att_value}')
                     del table.attrib[att]
