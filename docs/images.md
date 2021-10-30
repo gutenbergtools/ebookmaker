@@ -11,7 +11,7 @@ EbookMaker now considers three types of images it finds in html, and handles the
 3. cover images
    These can come in 4 flavors (in priority order):
     1. coverpage relation
-        `<link href="unicorn_image.jpg" rel="coverpage" />`  or 
+        `<link href="unicorn_image.jpg" rel="coverpage" />`  or `<link href="unicorn_image.jpg" rel="icon" type="image/x-cover" />` (preferred)
     2. coverpage id
         `<img src="unicorn_image.jpg" id="coverpage" alt="front jacket" />`
     3. image with 'cover' in the url
@@ -34,7 +34,7 @@ Ebookmaker 0.9 has relaxed some limits on image sizes used inside EPUB and Kindl
 
 Industry specifications for book cover images have changed in the last few years. Amazon now requires that commercial ebook covers have _minimum_ dimensions of "at least 1200 pixels in width or 1800 pixels in height." They're more relaxed for self-published covers; KDP suggests minimum dimensions of 625 x 1000 px and ideal dimensions of 1600 x 2560. New Project Gutenberg books should have covers of quality commensurate with industry practice.
 
-Since cover images specified by the coverpage relation are not displayed in HTML, there is no need to limit their size (within reason!!!)
+Since cover images specified by the coverpage/icon relation are not displayed in HTML, there is no need to limit their size (within reason!!!)
 
 Suggested Guidelines for cover and image submissions to Project Gutenberg:
 

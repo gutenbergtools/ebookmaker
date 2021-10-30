@@ -183,13 +183,14 @@ class Translator (writers.Translator, html4css1.HTMLTranslator):
         self.set_class_on_child (node, 'first', 0)
         self.set_class_on_child (node, 'last', -1)
 
-
     def depart_document (self, node):
+        link_data = {'coverpage':('icon', 'image/x-cover'), 'page-images':('alt', 'text/*')}
         for key, values in node.meta_block.items ():
             for val in values:
                 val = self.attval (six.text_type (val))
-                if key in ('coverpage', 'page-images'):
-                    self.head.append ('<link rel="%s" href="%s" />\n' % (key, val))
+                if key in link_data:
+                    key, type_ = link_data[key]        
+                    self.head.append('<link rel="%s" href="%s" type= "%s" />\n' % (key, val, type_))
                 else:
                     self.head.append ('<meta name="%s" content="%s" />\n' % (key, val))
 

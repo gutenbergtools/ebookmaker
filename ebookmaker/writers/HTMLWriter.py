@@ -32,11 +32,64 @@ from ebookmaker.writers import em
 from ebookmaker.parsers import webify_url
 
 options = Options()
+cssutils.ser.prefs.validOnly = True
 XMLLANG = '{http://www.w3.org/XML/1998/namespace}lang'
+XMLSPACE = '{http://www.w3.org/XML/1998/namespace}space'
 DEPRECATED = ['big']
+
 CSS_FOR_DEPRECATED = {
-    'big' : ".xhtml_big {font-size: larger;};"
+    'big': ".xhtml_big {font-size: larger;}",
+    'tt': ".xhtml_tt {font-family: monospace;}",
 }
+
+## from https://hg.mozilla.org/mozilla-central/file/3fd770ef6a65/layout/style/html.css#l310
+
+CSS_FOR_RULES = {
+    'none': '''
+.rules-none > tr > td, .rules-none > * > tr > td, .rules-none > tr > th,
+.rules-none > * > tr > th, .rules-none > td, .rules-none > th {
+border-width: thin;
+border-style: none;}''',
+    'all': '''
+.rules-all > tr > td, .rules-all > * > tr > td, .rules-all > tr > th,
+.rules-all > * > tr > th, .rules-all > td, .rules-all > th {
+border-width: thin;
+border-style: solid;}''',
+    'cols': '''
+.rules-cols > tr > td, .rules-cols > * > tr > td,
+.rules-cols > tr > th, .rules-cols > * > tr > th' {
+border-left-width: thin;
+border-right-width: thin;
+border-left-style: solid;
+border-right-style: solid;}''',
+    'rows': '''
+.rules-rows > tr, .rules-rows > * > tr {
+border-top-width: thin;
+border-bottom-width: thin;
+border-top-style: solid;
+border-bottom-style: solid;}''',
+    'groups': '''
+.rules-groups > tfoot, .rules-groups > thead, .rules-groups > tbody {
+border-top-width: thin; border-bottom-width: thin;
+border-top-style: solid; border-bottom-style: solid;}
+.rules-groups > colgroup {
+border-left-width: thin; border-right-width: thin;
+border-left-style: solid; border-right-style: solid;}''',
+}
+
+CSS_FOR_FRAME = {
+    'box': '.frame-box {border: thin outset;}',
+    'void': '.frame-void {border-style: hidden;}',
+    'above': 'frame-above {border-style: outset hidden hidden hidden;}',
+    'below': 'frame-below {border-style: hidden hidden outset hidden;}',
+    'lhs': '.frame-lhs {border-style: hidden hidden hidden outset;}',
+    'rhs': '.frame-rhs {border-style: hidden outset hidden hidden;}',
+    'hsides': '.frame-hsides {border-style: outset hidden;}',
+    'vsides': '.frame-vsides {border-style: hidden outset;}',
+    'border': 'frame-border {border-style: outset;}',
+}
+CSS_FOR_DEPRECATED.update(CSS_FOR_RULES)
+CSS_FOR_DEPRECATED.update(CSS_FOR_FRAME)
 
 def css_len(len_str):
     """ if an int, make px """
@@ -44,6 +97,14 @@ def css_len(len_str):
         return str(int(len_str)) + 'px'
     except ValueError:
         return len_str
+
+def add_class(elem, classname):
+    if 'class' in elem.attrib and elem.attrib['class']:
+        vals = elem.attrib['class'].split()
+    else:
+        vals = []
+    vals.append(classname)
+    elem.set('class', ' '.join(vals))
 
 class Writer(writers.HTMLishWriter):
     """ Class for writing HTML files. """
@@ -75,26 +136,26 @@ class Writer(writers.HTMLishWriter):
         self.add_prop(tree, "og:image", cover_url)
 
     def outputfileurl(self, job, url):
-        """ 
+        """
         Make the output path for the parser.
         Consider an image referenced in a source html file being moved to a destination directory.
         The image must be moved to a Location that is the same, relative to the job's destination,
         as it was in the source file.
-        The constraints are that 
-        1. we must not over-write the source files, and 
-        2. the destination directory may be the same as the source directory. 
-        In case (2), we'll create a new "out" directory to contain the written files; we'll also 
+        The constraints are that
+        1. we must not over-write the source files, and
+        2. the destination directory may be the same as the source directory.
+        In case (2), we'll create a new "out" directory to contain the written files; we'll also
         stop with an error if our source path is below an "out" directory.
-        
+
         Complication: generated covers are already in the output directory.
-        
+
         """
 
         if not job.main:
-            # this is the main file. 
+            # this is the main file.
             job.main = url
-            
-            # check that the source file is not in the outputdir 
+
+            # check that the source file is not in the outputdir
             if gg.is_same_path(os.path.abspath(job.outputdir), os.path.dirname(url)):
                 # make sure that source is not in an 'out" directory
                 newdir = 'out'
@@ -105,7 +166,7 @@ class Writer(writers.HTMLishWriter):
                         warning("can't use an 'out' directory for both input and output; using %s",
                                 newdir)
                         break
-                        
+
                 job.outputdir = os.path.join(job.outputdir, newdir)
 
             jobfilename = os.path.join(os.path.abspath(job.outputdir), job.outputfile)
@@ -149,7 +210,7 @@ class Writer(writers.HTMLishWriter):
                     pass
 
     def fix_css_for_deprecated(self, sheet, tags=DEPRECATED, replacement='span'):
-        """ for deprecated properties, change selector to {replacement}.xhtl_{tag name};
+        """ for deprecated tags, change selector to {replacement}.xhtml_{tag name};
             if no existing selector, add the selector with a style
         """
         for tag in tags:
@@ -159,30 +220,48 @@ class Writer(writers.HTMLishWriter):
                 if rule.type == rule.STYLE_RULE:
                     for selector in rule.selectorList:
                         selector.selectorText = tagre.sub(tagsub, selector.selectorText)
-                            
+
 
     def xhtml_to_html(self, html):
-        ''' 
-        try to convert the html4 DOM to an html5 DOM 
+        '''
+        try to convert the html4 DOM to an html5 DOM
         (assumes xhtml namespaces have been removed, except from attribute values)
         '''
 
-        # fix metas 
-        for meta in html.xpath("//meta[@http-equiv='Content-Type']"):
+        # fix metas
+        for meta in html.xpath("//meta[translate(@http-equiv, 'CT', 'ct')='content-type']"):
             meta.getparent().remove(meta)
-        for meta in html.xpath("//meta[@http-equiv='Content-Style-Type']"):
+        for meta in html.xpath("//meta[translate(@http-equiv, 'CST', 'cst')='content-style-type']"):
             meta.getparent().remove(meta)
         for meta in html.xpath("//meta[@charset]"): # html5 doc, we'll replace it
             meta.getparent().remove(meta)
+        for meta in html.xpath("//meta[@scheme]"): # remove obsolete formatted metas
+            meta.getparent().remove(meta)
         for elem in html.xpath("//*[@xml:lang]"):
-            if XMLLANG in elem.attrib: # should always be true, but checking anyway
-                elem.set('lang', elem.attrib[XMLLANG])
-            else:
-                warning('XMLLANG expected, not found: %s@%s', elem.tag, elem.attrib)
+            elem.set('lang', elem.attrib[XMLLANG])
+        for elem in html.xpath("//*[@xml:space]"):
+            if elem.tag in ('pre', 'style'):
+                del elem.attrib[XMLSPACE]
 
-        # remove type on style elements
-        for style in html.xpath("//style[@type]"):
-            del style.attrib['type']
+        #check values of lang
+        for elem in html.xpath("//*[@lang]"):
+            lang = elem.attrib['lang']
+            lang_name = gg.language_map.get(lang, default=None)
+            if lang_name:
+                continue
+            clean_lang = gg.language_map.inverse(lang, default=None)
+            if not clean_lang:
+                error("invalid lang attribute %s", lang)
+                del elem.attrib['lang']
+            elif lang != clean_lang:
+                elem.attrib['lang'] = clean_lang
+                elem.attrib[XMLLANG] = clean_lang
+
+        # remove obsolete attributes
+        attrs_to_remove = [('style', 'type'), ('img', 'longdesc')]
+        for (tag, attr) in attrs_to_remove:
+            for elem in html.xpath(f"//{tag}[@{attr}]"):
+                del elem.attrib[attr]
 
 
         # replacing attributes with css in a style attribute
@@ -192,8 +271,16 @@ class Writer(writers.HTMLishWriter):
             ('table', 'width', 'width', css_len),
             ('td', 'align', 'text-align', lambda x : x),
             ('td', 'valign', 'vertical-align', lambda x : x),
+            ('tr', 'align', 'text-align', lambda x : x),
+            ('tr', 'valign', 'vertical-align', lambda x : x),
             ('th', 'align', 'text-align', lambda x : x),
             ('th', 'valign', 'vertical-align', lambda x : x),
+            ('thead', 'align', 'text-align', lambda x : x),
+            ('thead', 'valign', 'vertical-align', lambda x : x),
+            ('tfoot', 'align', 'text-align', lambda x : x),
+            ('tfoot', 'valign', 'vertical-align', lambda x : x),
+            ('tbody', 'align', 'text-align', lambda x : x),
+            ('tbody', 'valign', 'vertical-align', lambda x : x),
             ('table', 'cellpadding', 'padding', css_len),
             ('table', 'cellspacing', 'border-spacing', css_len),
             ('table', 'border', 'border-width', css_len),
@@ -207,14 +294,15 @@ class Writer(writers.HTMLishWriter):
                     elem.set('style',
                              '%s: %s; %s' % (cssattr, val2css(val), elem.attrib.get('style', ''))
                             )
-        
+
+
         # width and height attributes must be integer
         for elem in html.xpath("//*[@width or @height]"):
             rules = []
             for key in ['width', 'height']:
                 if key in elem.attrib and elem.attrib[key]:
                     val = elem.attrib[key]
-                    try: 
+                    try:
                         val = int(val)
                     except ValueError:
                         del elem.attrib[key]
@@ -226,28 +314,49 @@ class Writer(writers.HTMLishWriter):
         for dt in html.xpath("//dt"):
             if dt.getnext() is None or dt.getnext().tag != 'dd':
                 dt.addnext(etree.Element('dd'))
-            
+
         # deprecated elements -  replace with <span class="xhtml_{tag name}">
-        deprecated = ['big']
+        deprecated = ['big', 'tt']
         deprecated_used = set()
         for tag in deprecated:
             for elem in html.xpath("//" + tag):
-                if 'class' in elem.attrib and elem.attrib['class']:
-                    vals = elem.attrib['class'].split()
-                else:
-                    vals = []
-                vals.append('xhtml_' + tag)
-                elem.set('class', ' '.join(vals))
+                add_class(elem, 'xhtml_' + tag)
                 elem.tag = 'span'
                 deprecated_used.add(tag)
-        
+
         html.head.insert(0, etree.Element('meta', charset="utf-8"))
-        for table in html.xpath("//table"):
-            if 'summary' in table.attrib:
-                summary = table.attrib['summary']
-                del table.attrib['summary']
-                if summary:
-                    table.attrib['data-summary'] = summary
+
+        ##### tables #######
+
+        # remove summary attribute
+        for table in html.xpath('//table[@summary]'):
+            summary = table.attrib['summary']
+            del table.attrib['summary']
+            if summary:
+                table.attrib['data-summary'] = summary
+
+        # replace frame and rules attributes on tables
+        deprecated_atts = {'frame': CSS_FOR_FRAME, 'rules': CSS_FOR_RULES}
+        for att in deprecated_atts:
+            for table in html.xpath(f'//table[@{att}]'):
+                att_value = table.attrib[att]
+                info(att_value)
+                if att_value in deprecated_atts[att]:
+                    add_class(table, f'{att}-{att_value}')
+                    del table.attrib[att]
+                    deprecated_used.add(att_value)
+
+        # remove span attribute from colgroups that have col children
+        for colgroup in html.xpath("//colgroup[@span and col]"):
+            del colgroup.attrib['span']
+
+        # move tfoot elements to end of table
+        for tfoot in html.xpath("//table/tfoot"):
+            table = tfoot.getparent()
+            table.append(tfoot)
+
+
+        ##### cleanup #######
 
         # fix css in style elements
         cssparser = cssutils.CSSParser()
@@ -262,8 +371,8 @@ class Writer(writers.HTMLishWriter):
         if css_for_deprecated:
             elem = etree.Element('style')
             elem.text = css_for_deprecated
-            html.head.insert(0, elem)
-        
+            html.head.insert(1, elem) # right after charset declaration
+
 
     def build(self, job):
         """ Build HTML file. """
@@ -321,8 +430,8 @@ class Writer(writers.HTMLishWriter):
                     self.add_meta(html, 'viewport', 'width=device-width')
                     self.add_meta_generator(html)
                     self.add_moremeta(job, html, p.attribs.url)
-                    
-                    # strip xhtml namespace 
+
+                    # strip xhtml namespace
                     # https://stackoverflow.com/questions/18159221/
                     for elem in html.getiterator():
                         if elem.tag is not etree.Comment:

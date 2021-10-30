@@ -12,7 +12,7 @@ Distributable under the GNU General Public License Version 3 or newer.
 Base classes for *Writer modules. (EpubWriter, PluckerWriter, ...)
 
 """
-
+import re
 
 from functools import partial
 import os.path
@@ -20,7 +20,7 @@ import os.path
 from lxml import etree
 from lxml.builder import ElementMaker
 
-from libgutenberg.Logger import debug, error
+from libgutenberg.Logger import debug, info, error
 import libgutenberg.GutenbergGlobals as gg
 from libgutenberg import MediaTypes
 
@@ -28,6 +28,11 @@ from ebookmaker import parsers
 from ebookmaker import ParserFactory
 from ebookmaker.Version import VERSION, GENERATOR
 
+
+
+def remove_cr(content):
+    content = re.sub(r'\s*[\r\n]+\s*', '&#10;', content)
+    return content
 
 class BaseWriter(object):
     """
@@ -93,7 +98,7 @@ class HTMLishWriter(BaseWriter):
         """ Add a meta tag. """
 
         for head in gg.xpath(xhtml, '//xhtml:head'):
-            meta = em.meta(name=name, content=content)
+            meta = em.meta(name=name, content=remove_cr(content))
             meta.tail = '\n'
             head.append(meta)
 
@@ -102,7 +107,7 @@ class HTMLishWriter(BaseWriter):
         """ Add a property meta tag. """
 
         for head in gg.xpath(xhtml, '//xhtml:head'):
-            meta = em.meta(property=prop, content=content)
+            meta = em.meta(property=prop, content=remove_cr(content))
             meta.tail = '\n'
             head.append(meta)
 

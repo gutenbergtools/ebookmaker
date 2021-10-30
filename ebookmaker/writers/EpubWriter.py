@@ -1211,7 +1211,7 @@ class Writer(writers.HTMLishWriter):
             ocf.add_unicode('toc.ncx', six.text_type(ncx))
 
             for p in parserlist:
-                if 'coverpage' in p.attribs.rel:
+                if 'icon' in p.attribs.rel:
                     opf.add_coverpage(ocf, p.attribs.url)
                     break
 
@@ -1278,7 +1278,7 @@ class Writer(writers.HTMLishWriter):
             # do images early as we need the new dimensions later
             for p in job.spider.parsers:
                 if hasattr(p, 'resize_image'):
-                    if 'coverpage' in p.attribs.rel:
+                    if 'icon' in p.attribs.rel:
                         if job.subtype == '.noimages':
                             np = p.resize_image(MAX_NOIMAGE_SIZE, MAX_COVER_DIMEN)
                         else:

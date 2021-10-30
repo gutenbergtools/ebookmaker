@@ -122,12 +122,12 @@ class Parser (HTMLParser.Parser):
         # return coverpage even in no_images build
         if 'coverpage' in doc.meta_block:
             coverpage = doc.meta_block['coverpage']
-            yield coverpage[0], parsers.em.link (rel = 'coverpage')
+            yield coverpage[0], parsers.em.link (rel='icon')
         else:
             for field in doc.traverse (nodes.field):
                 field_name, field_body = field.children
                 if field_name.astext () == 'coverpage':
-                    yield field_body.astext (), parsers.em.link (rel = 'coverpage')
+                    yield field_body.astext(), parsers.em.link (rel='icon')
                     break
 
         # need broken.png for no_images build

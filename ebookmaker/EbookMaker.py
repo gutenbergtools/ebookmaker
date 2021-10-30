@@ -39,7 +39,7 @@ from ebookmaker import Spider
 from ebookmaker import WriterFactory
 from ebookmaker.packagers import PackagerFactory
 from ebookmaker import CommonCode
-from ebookmaker.CommonCode import Options
+from ebookmaker.CommonCode import Options, dir_from_url, find_candidates
 from ebookmaker.Version import VERSION
 
 options = Options()
@@ -114,44 +114,62 @@ def make_output_filename(type_, dc):
     return FILENAMES[type_].format(id=gg.string_to_filename(dc.title)[:65])
 
 
+def cover_file_filter(fpath):
+    dirpath, fname = os.path.split(fpath)
+    if 'cover' not in fname.lower():
+        return False
+    name, ext = os.path.splitext(fpath)
+    if ext not in ['.jpg', '.jpeg', '.png', '.gif']:
+        return False
+    return os.access(fpath, os.R_OK)
+
+def add_cover(cover_url, spider):
+    cover_parser = ParserFactory.ParserFactory.create(cover_url)
+    cover_parser.attribs.rel.add('icon')
+    cover_parser.pre_parse()
+    spider.parsers.append(cover_parser)
+    return True
+
+
 def elect_coverpage(spider, url, dc):
     """ Find first coverpage candidate that is not too small. """
 
     coverpage_found = False
     for p in spider.parsers:
-        if 'coverpage' in p.attribs.rel:
+        if 'icon' in p.attribs.rel:
             if coverpage_found:
                 # keep the first one found, reset all others
-                p.attribs.rel.remove('coverpage')
+                p.attribs.rel.remove('icon')
                 continue
             if hasattr(p, 'get_image_dimen'):
                 dimen = p.get_image_dimen()
                 if(dimen[0] * dimen[1]) < COVERPAGE_MIN_AREA:
-                    p.attribs.rel.remove('coverpage')
+                    p.attribs.rel.remove('icon')
                     p_url = p.url if hasattr(p, 'url') else ''
                     warning("removed coverpage candidate %s because too small (%d x %d)" %
                             (p_url, dimen[0], dimen[1]))
                     continue
             coverpage_found = True
+    
+    # check sourcedir for a cover by name
+    if not coverpage_found:
+        for cover_url in find_candidates(url, file_filter=cover_file_filter):
+            if add_cover(cover_url, spider):
+                break
+            
+    
     if spider.parsers and not coverpage_found and options.generate_cover:
         if not hasattr(Cover, 'cairo'):
             warning('Cairo not installed, cover generation disabled')
             return
         if options.outputdir:
             dir = options.outputdir
-        elif url.startswith('file://'):
-            dir = os.path.dirname(os.path.abspath(url[7:]))
-        elif url.startswith('file:'):
-            dir = os.path.dirname(os.path.abspath(url[5:]))
         else:
-            dir = os.path.dirname(os.path.abspath(url))
+            dir = dir_from_url(url)
         debug('generating cover in %s' % dir)
         cover_url = generate_cover(dir, dc)
         if cover_url:
-            cover_parser = ParserFactory.ParserFactory.create(cover_url)
-            cover_parser.attribs.rel.add('coverpage')
-            cover_parser.pre_parse()
-            spider.parsers.append(cover_parser)
+            add_cover(cover_url, spider)
 
 
 

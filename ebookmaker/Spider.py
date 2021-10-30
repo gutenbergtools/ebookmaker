@@ -56,6 +56,7 @@ class Spider(object):
 
         self.max_depth = options.max_depth or six.MAXSIZE
         self.jobtype = job.type
+        self.job_dc = job.dc
 
 
     def recursive_parse(self, root_attribs):
@@ -89,6 +90,8 @@ class Spider(object):
             if url in self.parsed_urls:
                 continue
             self.parsed_urls.add(url)
+            if hasattr(parser, 'add_title'):
+                parser.add_title(self.job_dc)
 
             self.add_redirection(parser.attribs.orig_url, url)
             parser.pre_parse()
@@ -142,7 +145,7 @@ class Spider(object):
                 elif tag in (NS.xhtml.img, NS.xhtml.style):
                     self.enqueue(queue, depth, new_attribs, False)
                 elif tag == NS.xhtml.link:
-                    if new_attribs.rel.intersection(('stylesheet', 'coverpage')):
+                    if new_attribs.rel.intersection(('stylesheet', 'icon')):
                         self.enqueue(queue, depth, new_attribs, False)
                     else:
                         self.enqueue(queue, depth + 1, new_attribs, True)
@@ -241,7 +244,7 @@ class Spider(object):
     def is_included_relation(self, attribs):
         """ Return True if this document is eligible. """
 
-        keep = attribs.rel.intersection(('coverpage', 'important', 'linked_image'))
+        keep = attribs.rel.intersection(('icon', 'important', 'linked_image'))
         if keep:
             debug("Not dropping after all because of rel.")
 
