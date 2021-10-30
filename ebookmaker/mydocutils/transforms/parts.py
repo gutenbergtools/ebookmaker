@@ -358,7 +358,7 @@ class ListOfAnythingTransform (docutils.transforms.Transform):
 
         for node in startnode.traverse (condition):
 
-            title = list (node.traverse (nodes.caption) + node.traverse (nodes.title))
+            title = list (node.traverse (nodes.caption)) + list (node.traverse (nodes.title))
             if len (title) != 1:
                 # cannot put anonymous X in list of X
                 continue

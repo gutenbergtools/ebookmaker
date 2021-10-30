@@ -155,7 +155,7 @@ class TablePass2 (nodes.SparseNodeVisitor):
         self.i = 0
 
         self.table_width = nroff_units (table.get ('width', '100%'), TABLE_WIDTH)
-        colspecs = table.traverse (nodes.colspec)
+        colspecs = list (table.traverse (nodes.colspec))
         self.table_width -= len (colspecs) * 2
 
     def visit_entry (self, node):
