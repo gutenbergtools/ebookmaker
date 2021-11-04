@@ -612,7 +612,7 @@ class Parser(HTMLParserBase):
     def css_content(self):
         default_css = resource_string(
             'ebookmaker.parsers', 'txt2all.css').decode('utf-8')
-        return default_css.translate(SPECIALS)
+        return default_css
 
 
     def parse(self):
