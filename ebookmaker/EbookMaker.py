@@ -155,6 +155,7 @@ def elect_coverpage(spider, url, dc):
     if not coverpage_found:
         for cover_url in find_candidates(url, file_filter=cover_file_filter):
             if add_cover(cover_url, spider):
+                coverpage_found = True
                 break
             
     
