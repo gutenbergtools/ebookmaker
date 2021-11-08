@@ -330,10 +330,13 @@ class Writer(writers.HTMLishWriter):
             if rules:
                 elem.attrib['style'] = '; '.join(rules) + '; ' + elem.attrib.get('style', '')
 
-        # fix missing <dd> elements
+        # fix missing <dd>,<dt> elements
         for dt in html.xpath("//dt"):
             if dt.getnext() is None or dt.getnext().tag != 'dd':
                 dt.addnext(etree.Element('dd'))
+        for dd in html.xpath("//dd"):
+            if dd.getprevious() is None:
+                dd.addprevious(etree.Element('dt'))
 
         # deprecated elements -  replace with <span class="xhtml_{tag name}">
         deprecated = ['big', 'tt', 'blink']
@@ -354,6 +357,7 @@ class Writer(writers.HTMLishWriter):
             del table.attrib['summary']
             if summary:
                 table.attrib['data-summary'] = summary
+
 
         # replace frame and rules attributes on tables
         deprecated_atts = {'frame': CSS_FOR_FRAME, 'rules': CSS_FOR_RULES, 'background': {}}
