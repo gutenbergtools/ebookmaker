@@ -246,8 +246,6 @@ class Writer(writers.HTMLishWriter):
             meta.getparent().remove(meta)
         for meta in html.xpath("//meta[@scheme]"): # remove obsolete formatted metas
             meta.getparent().remove(meta)
-        for elem in html.xpath("//*[@xml:lang]"):
-            elem.set('lang', elem.attrib[XMLLANG])
         for elem in html.xpath("//*[@xml:space]"):
             if elem.tag in ('pre', 'style'):
                 del elem.attrib[XMLSPACE]
@@ -265,6 +263,8 @@ class Writer(writers.HTMLishWriter):
             elif lang != clean_lang:
                 elem.attrib['lang'] = clean_lang
                 elem.attrib[XMLLANG] = clean_lang
+        for elem in html.xpath("//*[@xml:lang]"):
+            elem.set('lang', elem.attrib[XMLLANG])
 
         # remove obsolete attributes
         attrs_to_remove = [('style', 'type'), ('img', 'longdesc')]
