@@ -327,7 +327,7 @@ class Writer(writers.HTMLishWriter):
                 dt.addnext(etree.Element('dd'))
 
         # deprecated elements -  replace with <span class="xhtml_{tag name}">
-        deprecated = ['big', 'tt']
+        deprecated = ['big', 'tt', 'blink']
         deprecated_used = set()
         for tag in deprecated:
             for elem in html.xpath("//" + tag):
