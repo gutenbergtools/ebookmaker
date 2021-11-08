@@ -106,6 +106,14 @@ def add_class(elem, classname):
     vals.append(classname)
     elem.set('class', ' '.join(vals))
 
+def add_style(elem, style=''):
+    if style:
+        if 'style' in elem.attrib and elem.attrib['style']:
+            style = style.strip()
+            style = style if style.endswith(';') else style + '; '
+            style = style + elem.attrib['style']    
+        elem.set('style', style)
+
 class Writer(writers.HTMLishWriter):
     """ Class for writing HTML files. """
 
