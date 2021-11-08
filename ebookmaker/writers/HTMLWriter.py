@@ -263,6 +263,12 @@ class Writer(writers.HTMLishWriter):
             for elem in html.xpath(f"//{tag}[@{attr}]"):
                 del elem.attrib[attr]
 
+        # set required attributes
+        attrs_to_fill = [('img', 'alt', '')]
+        for (tag, attr, fill) in attrs_to_fill:
+            for elem in html.xpath(f"//{tag}[not(@{attr})]"):
+                elem.set(attr, fill)
+
 
         # replacing attributes with css in a style attribute
         # (tag, attr, cssprop, val2css)
