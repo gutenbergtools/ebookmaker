@@ -40,6 +40,7 @@ DEPRECATED = ['big']
 CSS_FOR_DEPRECATED = {
     'big': ".xhtml_big {font-size: larger;}",
     'tt': ".xhtml_tt {font-family: monospace;}",
+    'blink': "",
 }
 
 ## from https://hg.mozilla.org/mozilla-central/file/3fd770ef6a65/layout/style/html.css#l310
