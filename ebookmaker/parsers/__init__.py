@@ -332,6 +332,16 @@ class ParserBase(object):
         """ Rewrite all links using the dictionary url_map. """
         return
 
+class TxtParser(ParserBase):
+    """ Base class for text files we don't want to convert.
+    """
+
+    def __init__(self, attribs=None):
+        ParserBase.__init__(self, attribs)
+        self.attribs.mediatype = ParserAttributes.HeaderElement(mt.txt)
+
+    def serialize(self):
+        return bytes(self.unicode_content(), 'utf8')
 
 class HTMLParserBase(ParserBase):
     """ Base class for more HTMLish parsers.
