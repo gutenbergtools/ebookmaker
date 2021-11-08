@@ -277,8 +277,11 @@ class Writer(writers.HTMLishWriter):
             ('table', 'width', 'width', css_len),
             ('td', 'align', 'text-align', lambda x : x),
             ('td', 'valign', 'vertical-align', lambda x : x),
+            ('td', 'background', '', ''),
+            ('td', 'bordercolor', 'border-color',  lambda x : x),
             ('tr', 'align', 'text-align', lambda x : x),
             ('tr', 'valign', 'vertical-align', lambda x : x),
+            ('tr', 'bordercolor', 'border-color',  lambda x : x),
             ('th', 'align', 'text-align', lambda x : x),
             ('th', 'valign', 'vertical-align', lambda x : x),
             ('thead', 'align', 'text-align', lambda x : x),
@@ -290,6 +293,9 @@ class Writer(writers.HTMLishWriter):
             ('table', 'cellpadding', 'padding', css_len),
             ('table', 'cellspacing', 'border-spacing', css_len),
             ('table', 'border', 'border-width', css_len),
+            ('table', 'bordercolor', 'border-color',  lambda x : x),            
+            ('table', 'height', 'height', css_len),
+            ('table', 'background', '', ''),
         ]
         # width obsolete on table, col
         for (tag, attr, cssattr, val2css) in replacements:
@@ -297,9 +303,8 @@ class Writer(writers.HTMLishWriter):
                 if elem.attrib[attr]:
                     val = elem.attrib[attr]
                     del elem.attrib[attr]
-                    elem.set('style',
-                             '%s: %s; %s' % (cssattr, val2css(val), elem.attrib.get('style', ''))
-                            )
+                    if cssattr:
+                        add_style(elem, style=f'{cssattr}: {val2css(val)};')
 
 
         # width and height attributes must be integer
@@ -342,7 +347,7 @@ class Writer(writers.HTMLishWriter):
                 table.attrib['data-summary'] = summary
 
         # replace frame and rules attributes on tables
-        deprecated_atts = {'frame': CSS_FOR_FRAME, 'rules': CSS_FOR_RULES}
+        deprecated_atts = {'frame': CSS_FOR_FRAME, 'rules': CSS_FOR_RULES, 'background': {}}
         for att in deprecated_atts:
             for table in html.xpath(f'//table[@{att}]'):
                 att_value = table.attrib[att]
