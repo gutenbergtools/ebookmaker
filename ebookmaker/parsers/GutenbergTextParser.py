@@ -697,5 +697,6 @@ class Parser(HTMLParserBase):
     def add_title(self, dc):
         if dc.title:
             for elem in xpath(self.xhtml, '//xhtml:title'):
+                dc.title = re.sub(r'\s*[\r\n]+\s*', '\n', dc.title)
                 elem.text = f'The Project Gutenberg eBook of {dc.title}, by {dc.authors_short()}'
                 break
