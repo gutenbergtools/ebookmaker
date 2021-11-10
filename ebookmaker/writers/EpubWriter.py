@@ -1169,7 +1169,7 @@ class Writer(writers.HTMLishWriter):
         if we don't remove it from flow it will be displayed twice.
 
         """
-        for img in xpath(xhtml, '//xhtml:img[@src = $url]', url=url):
+        for img in xpath(xhtml, "//xhtml:img[@src = $url and not(contains(@class, 'x-ebookmaker-important'))]", url=url):
             debug("remove_coverpage: dropping <img> %s from flow" % url)
             img.drop_tree()
             return # only the first one though
@@ -1350,7 +1350,7 @@ class Writer(writers.HTMLishWriter):
                         # self.strip_rst_dropcaps(xhtml)
 
                         self.fix_html_image_dimensions(xhtml)
-                        if coverpage_url:
+                        if coverpage_url and not hasattr(p.attribs, 'nonlinear'):
                             self.remove_coverpage(xhtml, coverpage_url)
 
                         # externalize and fix CSS
