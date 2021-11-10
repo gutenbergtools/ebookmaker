@@ -30,7 +30,7 @@ from ebookmaker.parsers import HTMLParserBase
 from ebookmaker.CommonCode import Options
 
 options = Options()
-if options.configdir:
+if hasattr(options, 'configdir') and options.configdir:
     TIDYCONF = os.path.join(options.configdir, 'tidy.conf')
 else:
     TIDYCONF = os.path.join(os.path.dirname(__file__), 'tidy.conf')
