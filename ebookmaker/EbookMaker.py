@@ -361,6 +361,13 @@ def add_local_options(ap):
         help="output directory (default: ./)")
 
     ap.add_argument(
+        "--config-dir",
+        metavar="CONFIG_DIR",
+        dest="configdir",
+        default="",
+        help="config directory (default: ''")
+
+    ap.add_argument(
         "--output-file",
         metavar="OUTPUT_FILE",
         dest="outputfile",
