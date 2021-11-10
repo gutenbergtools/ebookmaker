@@ -28,7 +28,6 @@ from libgutenberg.Logger import debug, exception, info, error, warning
 
 from ebookmaker import writers
 from ebookmaker.CommonCode import Options
-from ebookmaker.writers import em
 from ebookmaker.parsers import webify_url
 
 options = Options()
@@ -112,7 +111,7 @@ def add_style(elem, style=''):
         if 'style' in elem.attrib and elem.attrib['style']:
             style = style.strip()
             style = style if style.endswith(';') else style + '; '
-            style = style + elem.attrib['style']    
+            style = style + elem.attrib['style']
         elem.set('style', style)
 
 class Writer(writers.HTMLishWriter):
@@ -284,25 +283,25 @@ class Writer(writers.HTMLishWriter):
         replacements = [
             ('col', 'width', 'width', css_len),
             ('table', 'width', 'width', css_len),
-            ('td', 'align', 'text-align', lambda x : x),
-            ('td', 'valign', 'vertical-align', lambda x : x),
+            ('td', 'align', 'text-align', lambda x: x),
+            ('td', 'valign', 'vertical-align', lambda x: x),
             ('td', 'background', '', ''),
-            ('td', 'bordercolor', 'border-color',  lambda x : x),
-            ('tr', 'align', 'text-align', lambda x : x),
-            ('tr', 'valign', 'vertical-align', lambda x : x),
-            ('tr', 'bordercolor', 'border-color',  lambda x : x),
-            ('th', 'align', 'text-align', lambda x : x),
-            ('th', 'valign', 'vertical-align', lambda x : x),
-            ('thead', 'align', 'text-align', lambda x : x),
-            ('thead', 'valign', 'vertical-align', lambda x : x),
-            ('tfoot', 'align', 'text-align', lambda x : x),
-            ('tfoot', 'valign', 'vertical-align', lambda x : x),
-            ('tbody', 'align', 'text-align', lambda x : x),
-            ('tbody', 'valign', 'vertical-align', lambda x : x),
+            ('td', 'bordercolor', 'border-color',  lambda x: x),
+            ('tr', 'align', 'text-align', lambda x: x),
+            ('tr', 'valign', 'vertical-align', lambda x: x),
+            ('tr', 'bordercolor', 'border-color',  lambda x: x),
+            ('th', 'align', 'text-align', lambda x: x),
+            ('th', 'valign', 'vertical-align', lambda x: x),
+            ('thead', 'align', 'text-align', lambda x: x),
+            ('thead', 'valign', 'vertical-align', lambda x: x),
+            ('tfoot', 'align', 'text-align', lambda x: x),
+            ('tfoot', 'valign', 'vertical-align', lambda x: x),
+            ('tbody', 'align', 'text-align', lambda x: x),
+            ('tbody', 'valign', 'vertical-align', lambda x: x),
             ('table', 'cellpadding', 'padding', css_len),
             ('table', 'cellspacing', 'border-spacing', css_len),
             ('table', 'border', 'border-width', css_len),
-            ('table', 'bordercolor', 'border-color',  lambda x : x),            
+            ('table', 'bordercolor', 'border-color',  lambda x: x),
             ('table', 'height', 'height', css_len),
             ('table', 'background', '', ''),
         ]

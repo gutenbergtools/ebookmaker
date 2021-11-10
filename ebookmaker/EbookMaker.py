@@ -141,7 +141,7 @@ def check_cover_size(p):
         else:
             p_url = p.url if hasattr(p, 'url') else ''
             warning("coverpage candidate %s is too small (%d x %d)" %
-                            (p_url, dimen[0], dimen[1]))
+                    (p_url, dimen[0], dimen[1]))
     return False
 
 
@@ -550,7 +550,7 @@ def main():
         job_queue = cPickle.load(sys.stdin.buffer) # read bytes
 
     else:
-        job_queue = []        
+        job_queue = []
         for type_ in options.types:
             job = CommonCode.Job(type_)
             job.url = options.url

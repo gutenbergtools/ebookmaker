@@ -307,14 +307,15 @@ class OutlineFixer(object):
             self.last = in_level
             self.stack.append((new_promotion, in_level))
             return in_level - new_promotion
-        elif in_level < from_level:
+
+        if in_level < from_level:
             # close out promotion
             self.last = from_level - promotion - 1
             self.stack.pop()
             return self.level(in_level)
-        else:
-            self.last = in_level
-            return in_level - promotion
+
+        self.last = in_level
+        return in_level - promotion
 
 
 class TocNCX(object):
@@ -954,8 +955,6 @@ class Writer(writers.HTMLishWriter):
         for meta in xpath(xhtml, '//xhtml:meta[@charset]'):
             meta.getparent().remove(meta)
 
-        
-
 
     @staticmethod
     def strip_links(xhtml, manifest):
@@ -1318,7 +1317,7 @@ class Writer(writers.HTMLishWriter):
                         xhtml = copy.deepcopy(p.xhtml) if hasattr(p, 'xhtml') else None
                     if xhtml is not None:
                         self.fix_html5(xhtml)
-                        
+
                         strip_classes = self.get_classes_that_float(xhtml)
                         strip_classes = strip_classes.intersection(STRIP_CLASSES)
                         if strip_classes:
