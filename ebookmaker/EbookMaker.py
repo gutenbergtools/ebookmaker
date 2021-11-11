@@ -71,10 +71,9 @@ picsdir.images picsdir.noimages
 rst.gen
 txt.utf-8 txt.iso-8859-1 txt.us-ascii
 html.images html.noimages
-epub.images epub.noimages
-kindle.images kindle.noimages
+epub.noimages kindle.noimages pdf.noimages
+epub.images kindle.images pdf.images
 cover.small cover.medium
-pdf.images pdf.noimages
 qrcode rdf facebook twitter null""".split()
 
 FILENAMES = {
