@@ -1,9 +1,13 @@
-0.11.25 November 10, 2021
+0.11.26 November 11, 2021
 - fixed a problem with covers selected from linked images based on the file name. (The image file would be added twice).
 - fixed a problem with linked images being omitted if they also were used as the cover image
 - cover images are stripped from the flow because they are re-added to the flow in the coverpages. This behavior can now be over-ridden with the x-ebookmaker-important class (as has been advertised).
 - added `--config-dir` command line argument to help guiguts integrate the included tidy config file.
-- update docutils
+- update docutils to 0.18+
+- fixed a problem with noimages files with caused by the parsing for .images jobs. Build order reversed!
+- fixed a problem with noimages files due to broken link removal
+- changed file naming methods so that Calibre file checking no longer complains.
+- 0.11.25 was not deployed due to test failures.
 
 
 0.11.24 November 8, 2021
