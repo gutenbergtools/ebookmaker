@@ -136,6 +136,7 @@ OPS_CONTENT_DOCUMENTS = set((
 
 
 match_link_url = re.compile(r'^https?://', re.I)
+match_non_link = re.compile(r'[a-zA-Z0-9_\-\.]*(#.*)?$')
 
 class OEBPSContainer(zipfile.ZipFile):
     """ Class representing an OEBPS Container. """
@@ -307,14 +308,15 @@ class OutlineFixer(object):
             self.last = in_level
             self.stack.append((new_promotion, in_level))
             return in_level - new_promotion
-        elif in_level < from_level:
+
+        if in_level < from_level:
             # close out promotion
             self.last = from_level - promotion - 1
             self.stack.pop()
             return self.level(in_level)
-        else:
-            self.last = in_level
-            return in_level - promotion
+
+        self.last = in_level
+        return in_level - promotion
 
 
 class TocNCX(object):
@@ -954,25 +956,25 @@ class Writer(writers.HTMLishWriter):
         for meta in xpath(xhtml, '//xhtml:meta[@charset]'):
             meta.getparent().remove(meta)
 
-        
-
 
     @staticmethod
     def strip_links(xhtml, manifest):
         """
-        Strip all links to images.
+        Strip all links to local resources that aren't in manifest or are images.
 
         This does not strip inline images, only standalone images that
         are targets of links. EPUB does not allow that.
 
         """
-        if options.strip_links:
-            for link in xpath(xhtml, '//xhtml:a[@href]'):
-                href = urllib.parse.urldefrag(link.get('href'))[0]
-                if not manifest[href] in OPS_CONTENT_DOCUMENTS:
-                    debug("strip_links: Deleting <a> to non-ops-document-type: %s" % href)
-                    del link.attrib['href']
-                    continue
+
+        for link in xpath(xhtml, '//xhtml:a[@href]'):
+            href = urllib.parse.urldefrag(link.get('href'))[0]
+            if href in manifest and not manifest[href].startswith('image'):
+                continue
+            if not href.startswith('file:'):
+                continue
+            debug("strip_links: Deleting <a> to file not in manifest: %s" % href)
+            del link.attrib['href']
 
 
     @staticmethod
@@ -1071,58 +1073,20 @@ class Writer(writers.HTMLishWriter):
     @staticmethod
     def url2filename(url):
         """ Generate a filename for this url.
-
-        From the wget docs:
-
-            When 'unix' is specified, Wget escapes the character '/'
-            and the control characters in the ranges 0-31 and 128-159.
-            This is the default on Unix-like operating systems.
-
-            When 'windows' is given, Wget escapes the characters '\',
-            '|', '/', ':', '?', '\"', '*', '<', '>', and the control
-            characters in the ranges 0-31 and 128-159.  In addition to
-            this, Wget in Windows mode uses '+' instead of ':' to
-            separate host and port in local file names, and uses '@'
-            instead of '?' to separate the query portion of the file
-            name from the rest.  Therefore, a URL that would be saved
-            as 'www.xemacs.org:4300/search.pl?input=blah' in Unix mode
-            would be saved as
-            'www.xemacs.org+4300/search.pl@input=blah' in Windows
-            mode.  This mode is the default on Windows.
-
-            If you specify `nocontrol', then the escaping of the
-            control characters is also switched off. This option may
-            make sense when you are downloading URLs whose names
-            contain UTF-8 characters, on a system which can save and
-            display filenames in UTF-8 (some possible byte values used
-            in UTF-8 byte sequences fall in the range of values
-            designated by Wget as 'controls').
-
-        For debugging we want to keep a filename resembling the url we
-        downloaded from instead of using a counter.
-
-        Also, we want the user to be able to unzip the epub. Thus we
-        must generate filenames that can be understood by the most
-        limited OS around (aka. Windows).
-
+            - preserve original filename and fragment
+            - map directory path to a cross platform filename string
 
         """
         if match_link_url.match(url):
             return url
         if url.startswith('file://'):
             url = url[7:]
-        def escape(matchobj):
-            """ Escape a char. """
-            return '@%x' % ord(matchobj.group(0))
 
-        url = urllib.parse.unquote(url)
-        url = re.sub('^.*?://', '', url)
-        url = os.path.normpath(url)
-        url = url.replace('/', '@')
-        url = re.sub('[\\|/:?"*<>\u0000-\u001F]', escape, url)
-        url = url.replace('\\', '@')
-        # url = url.translate(string.maketrans(':?', '+@')) # windows stupidity
-
+        url_match = match_non_link.search(url)
+        prefix = url[0:-len(url_match.group(0))]
+        if prefix:
+            prefix = abs(hash(prefix))
+            return f'{prefix}_{url_match.group(0)}'
         return url
 
 
@@ -1169,7 +1133,7 @@ class Writer(writers.HTMLishWriter):
         if we don't remove it from flow it will be displayed twice.
 
         """
-        for img in xpath(xhtml, '//xhtml:img[@src = $url]', url=url):
+        for img in xpath(xhtml, "//xhtml:img[@src = $url and not(contains(@class, 'x-ebookmaker-important'))]", url=url):
             debug("remove_coverpage: dropping <img> %s from flow" % url)
             img.drop_tree()
             return # only the first one though
@@ -1318,7 +1282,7 @@ class Writer(writers.HTMLishWriter):
                         xhtml = copy.deepcopy(p.xhtml) if hasattr(p, 'xhtml') else None
                     if xhtml is not None:
                         self.fix_html5(xhtml)
-                        
+
                         strip_classes = self.get_classes_that_float(xhtml)
                         strip_classes = strip_classes.intersection(STRIP_CLASSES)
                         if strip_classes:
@@ -1350,7 +1314,7 @@ class Writer(writers.HTMLishWriter):
                         # self.strip_rst_dropcaps(xhtml)
 
                         self.fix_html_image_dimensions(xhtml)
-                        if coverpage_url:
+                        if coverpage_url and not hasattr(p.attribs, 'nonlinear'):
                             self.remove_coverpage(xhtml, coverpage_url)
 
                         # externalize and fix CSS

@@ -54,7 +54,7 @@ class TablePass1 (nodes.SparseNodeVisitor):
         self.colspecs = None
 
     def visit_table (self, table):
-        self.colspecs = table.traverse (nodes.colspec)
+        self.colspecs = list (table.traverse (nodes.colspec))
         width = sum (map (operator.itemgetter ('colwidth'), self.colspecs))
         for colspec in self.colspecs:
             colspec['relative_width'] = float (colspec['colwidth']) / width

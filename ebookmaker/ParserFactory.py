@@ -21,7 +21,7 @@ import six
 from pkg_resources import resource_listdir, resource_stream # pylint: disable=E0611
 import requests
 
-from libgutenberg.Logger import critical, debug, error
+from libgutenberg.Logger import critical, debug, error, info
 from libgutenberg import MediaTypes
 from ebookmaker.CommonCode import Options
 from ebookmaker.Version import VERSION
@@ -67,6 +67,9 @@ class ParserFactory(object):
 
         try:
             mediatype = attribs.orig_mediatype.value
+            if mediatype == 'text/plain' and attribs.referrer:
+                # don't use GutenbergTextParser, it's a linked text file
+                return parsers.TxtParser(attribs)
             return parser_modules[mediatype].Parser(attribs)
         except (AttributeError, KeyError):
             return parser_modules['*/*'].Parser(attribs)

@@ -1437,7 +1437,7 @@ class Translator (writers.Translator):
         if 'colspec' in table:
             colspec = table['colspec']
         else:
-            colspecs = table.traverse (nodes.colspec)
+            colspecs = list (table.traverse (nodes.colspec))
             colspec = 'l' * len (colspecs)
             ## for c in colspecs:
             ##     colspec += { 'top'    : 'p' ,

@@ -27,8 +27,14 @@ from libgutenberg.MediaTypes import mediatypes as mt
 
 from ebookmaker import parsers
 from ebookmaker.parsers import HTMLParserBase
+from ebookmaker.CommonCode import Options
 
-TIDYCONF = os.path.join(os.path.dirname(__file__), 'tidy.conf')
+options = Options()
+if hasattr(options, 'configdir') and options.configdir:
+    TIDYCONF = os.path.join(options.configdir, 'tidy.conf')
+else:
+    TIDYCONF = os.path.join(os.path.dirname(__file__), 'tidy.conf')
+
 mediatypes = ('text/html', mt.xhtml)
 
 RE_XMLDECL = re.compile(r'<\?xml[^?]+\?>\s*')

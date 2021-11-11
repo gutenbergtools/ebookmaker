@@ -71,10 +71,9 @@ picsdir.images picsdir.noimages
 rst.gen
 txt.utf-8 txt.iso-8859-1 txt.us-ascii
 html.images html.noimages
-epub.images epub.noimages
-kindle.images kindle.noimages
+epub.noimages kindle.noimages pdf.noimages
+epub.images kindle.images pdf.images
 cover.small cover.medium
-pdf.images pdf.noimages
 qrcode rdf facebook twitter null""".split()
 
 FILENAMES = {
@@ -125,10 +124,24 @@ def cover_file_filter(fpath):
 
 def add_cover(cover_url, spider):
     cover_parser = ParserFactory.ParserFactory.create(cover_url)
-    cover_parser.attribs.rel.add('icon')
     cover_parser.pre_parse()
-    spider.parsers.append(cover_parser)
-    return True
+    if check_cover_size(cover_parser):
+        cover_parser.attribs.rel.add('icon')
+        if cover_parser.attribs.url not in spider.parsed_urls:
+            spider.parsers.append(cover_parser)
+        return True
+    return False
+
+def check_cover_size(p):
+    if hasattr(p, 'get_image_dimen'):
+        dimen = p.get_image_dimen()
+        if (dimen[0] * dimen[1]) > COVERPAGE_MIN_AREA:
+            return True
+        else:
+            p_url = p.url if hasattr(p, 'url') else ''
+            warning("coverpage candidate %s is too small (%d x %d)" %
+                    (p_url, dimen[0], dimen[1]))
+    return False
 
 
 def elect_coverpage(spider, url, dc):
@@ -137,27 +150,23 @@ def elect_coverpage(spider, url, dc):
     coverpage_found = False
     for p in spider.parsers:
         if 'icon' in p.attribs.rel:
+            if hasattr(p, 'get_image_dimen'):
+                if not check_cover_size(p):
+                    p.attribs.rel.remove('icon')
+                    continue
             if coverpage_found:
                 # keep the first one found, reset all others
                 p.attribs.rel.remove('icon')
                 continue
-            if hasattr(p, 'get_image_dimen'):
-                dimen = p.get_image_dimen()
-                if(dimen[0] * dimen[1]) < COVERPAGE_MIN_AREA:
-                    p.attribs.rel.remove('icon')
-                    p_url = p.url if hasattr(p, 'url') else ''
-                    warning("removed coverpage candidate %s because too small (%d x %d)" %
-                            (p_url, dimen[0], dimen[1]))
-                    continue
             coverpage_found = True
-    
+
     # check sourcedir for a cover by name
     if not coverpage_found:
         for cover_url in find_candidates(url, file_filter=cover_file_filter):
             if add_cover(cover_url, spider):
+                coverpage_found = True
                 break
-            
-    
+
     if spider.parsers and not coverpage_found and options.generate_cover:
         if not hasattr(Cover, 'cairo'):
             warning('Cairo not installed, cover generation disabled')
@@ -170,7 +179,6 @@ def elect_coverpage(spider, url, dc):
         cover_url = generate_cover(dir, dc)
         if cover_url:
             add_cover(cover_url, spider)
-
 
 
 def generate_cover(dir, dc):
@@ -350,6 +358,13 @@ def add_local_options(ap):
         dest="outputdir",
         default="./",
         help="output directory (default: ./)")
+
+    ap.add_argument(
+        "--config-dir",
+        metavar="CONFIG_DIR",
+        dest="configdir",
+        default="",
+        help="config directory (default: ''")
 
     ap.add_argument(
         "--output-file",
@@ -541,7 +556,7 @@ def main():
         job_queue = cPickle.load(sys.stdin.buffer) # read bytes
 
     else:
-        job_queue = []        
+        job_queue = []
         for type_ in options.types:
             job = CommonCode.Job(type_)
             job.url = options.url

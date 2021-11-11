@@ -15,6 +15,7 @@ from xml.sax.saxutils import escape, quoteattr
 import lxml
 
 from copy import copy
+from libgutenberg.Logger import info
 from ebookmaker.parsers import HTMLParserBase, IMAGE_WRAPPER
 
 mediatypes = ()
@@ -24,8 +25,8 @@ class Parser(HTMLParserBase):
     def __init__(self, attribs):
         HTMLParserBase.__init__(self, copy(attribs))
         self.attribs.orig_mediatype = self.attribs.mediatype
-        self.src = self.attribs.url
-        self.attribs.url = self.wrapper_url(self.attribs.url)
+        self.src = attribs.url
+        self.attribs.url = self.wrapper_url(attribs.url)
         self.attribs.orig_url = self.attribs.url
         self.attribs.nonlinear = True
         if not self.attribs.title:

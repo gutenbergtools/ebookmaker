@@ -4,7 +4,7 @@
 
 from setuptools import setup
 
-VERSION = '0.11.23'
+VERSION = '0.11.26'
 
 setup (
     name = 'ebookmaker',
@@ -38,12 +38,12 @@ setup (
         'chardet',
         'cherrypy',
         'cssutils',
-        'docutils>=0.14',
+        'docutils>=0.18',
         'lxml',
         'roman',
         'requests',
         'six>=1.4.1',
-        'libgutenberg[covers]>=0.8.11',
+        'libgutenberg[covers]>=0.8.12',
     ],
     
     package_data = {

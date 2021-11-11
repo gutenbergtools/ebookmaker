@@ -28,7 +28,6 @@ from libgutenberg.Logger import debug, exception, info, error, warning
 
 from ebookmaker import writers
 from ebookmaker.CommonCode import Options
-from ebookmaker.writers import em
 from ebookmaker.parsers import webify_url
 
 options = Options()
@@ -40,6 +39,7 @@ DEPRECATED = ['big']
 CSS_FOR_DEPRECATED = {
     'big': ".xhtml_big {font-size: larger;}",
     'tt': ".xhtml_tt {font-family: monospace;}",
+    'blink': "",
 }
 
 ## from https://hg.mozilla.org/mozilla-central/file/3fd770ef6a65/layout/style/html.css#l310
@@ -105,6 +105,14 @@ def add_class(elem, classname):
         vals = []
     vals.append(classname)
     elem.set('class', ' '.join(vals))
+
+def add_style(elem, style=''):
+    if style:
+        if 'style' in elem.attrib and elem.attrib['style']:
+            style = style.strip()
+            style = style if style.endswith(';') else style + '; '
+            style = style + elem.attrib['style']
+        elem.set('style', style)
 
 class Writer(writers.HTMLishWriter):
     """ Class for writing HTML files. """
@@ -237,8 +245,6 @@ class Writer(writers.HTMLishWriter):
             meta.getparent().remove(meta)
         for meta in html.xpath("//meta[@scheme]"): # remove obsolete formatted metas
             meta.getparent().remove(meta)
-        for elem in html.xpath("//*[@xml:lang]"):
-            elem.set('lang', elem.attrib[XMLLANG])
         for elem in html.xpath("//*[@xml:space]"):
             if elem.tag in ('pre', 'style'):
                 del elem.attrib[XMLSPACE]
@@ -256,6 +262,8 @@ class Writer(writers.HTMLishWriter):
             elif lang != clean_lang:
                 elem.attrib['lang'] = clean_lang
                 elem.attrib[XMLLANG] = clean_lang
+        for elem in html.xpath("//*[@xml:lang]"):
+            elem.set('lang', elem.attrib[XMLLANG])
 
         # remove obsolete attributes
         attrs_to_remove = [('style', 'type'), ('img', 'longdesc')]
@@ -263,27 +271,39 @@ class Writer(writers.HTMLishWriter):
             for elem in html.xpath(f"//{tag}[@{attr}]"):
                 del elem.attrib[attr]
 
+        # set required attributes
+        attrs_to_fill = [('img', 'alt', '')]
+        for (tag, attr, fill) in attrs_to_fill:
+            for elem in html.xpath(f"//{tag}[not(@{attr})]"):
+                elem.set(attr, fill)
+
 
         # replacing attributes with css in a style attribute
         # (tag, attr, cssprop, val2css)
         replacements = [
             ('col', 'width', 'width', css_len),
             ('table', 'width', 'width', css_len),
-            ('td', 'align', 'text-align', lambda x : x),
-            ('td', 'valign', 'vertical-align', lambda x : x),
-            ('tr', 'align', 'text-align', lambda x : x),
-            ('tr', 'valign', 'vertical-align', lambda x : x),
-            ('th', 'align', 'text-align', lambda x : x),
-            ('th', 'valign', 'vertical-align', lambda x : x),
-            ('thead', 'align', 'text-align', lambda x : x),
-            ('thead', 'valign', 'vertical-align', lambda x : x),
-            ('tfoot', 'align', 'text-align', lambda x : x),
-            ('tfoot', 'valign', 'vertical-align', lambda x : x),
-            ('tbody', 'align', 'text-align', lambda x : x),
-            ('tbody', 'valign', 'vertical-align', lambda x : x),
+            ('td', 'align', 'text-align', lambda x: x),
+            ('td', 'valign', 'vertical-align', lambda x: x),
+            ('td', 'background', '', ''),
+            ('td', 'bordercolor', 'border-color',  lambda x: x),
+            ('tr', 'align', 'text-align', lambda x: x),
+            ('tr', 'valign', 'vertical-align', lambda x: x),
+            ('tr', 'bordercolor', 'border-color',  lambda x: x),
+            ('th', 'align', 'text-align', lambda x: x),
+            ('th', 'valign', 'vertical-align', lambda x: x),
+            ('thead', 'align', 'text-align', lambda x: x),
+            ('thead', 'valign', 'vertical-align', lambda x: x),
+            ('tfoot', 'align', 'text-align', lambda x: x),
+            ('tfoot', 'valign', 'vertical-align', lambda x: x),
+            ('tbody', 'align', 'text-align', lambda x: x),
+            ('tbody', 'valign', 'vertical-align', lambda x: x),
             ('table', 'cellpadding', 'padding', css_len),
             ('table', 'cellspacing', 'border-spacing', css_len),
             ('table', 'border', 'border-width', css_len),
+            ('table', 'bordercolor', 'border-color',  lambda x: x),
+            ('table', 'height', 'height', css_len),
+            ('table', 'background', '', ''),
         ]
         # width obsolete on table, col
         for (tag, attr, cssattr, val2css) in replacements:
@@ -291,9 +311,8 @@ class Writer(writers.HTMLishWriter):
                 if elem.attrib[attr]:
                     val = elem.attrib[attr]
                     del elem.attrib[attr]
-                    elem.set('style',
-                             '%s: %s; %s' % (cssattr, val2css(val), elem.attrib.get('style', ''))
-                            )
+                    if cssattr:
+                        add_style(elem, style=f'{cssattr}: {val2css(val)};')
 
 
         # width and height attributes must be integer
@@ -310,13 +329,16 @@ class Writer(writers.HTMLishWriter):
             if rules:
                 elem.attrib['style'] = '; '.join(rules) + '; ' + elem.attrib.get('style', '')
 
-        # fix missing <dd> elements
+        # fix missing <dd>,<dt> elements
         for dt in html.xpath("//dt"):
             if dt.getnext() is None or dt.getnext().tag != 'dd':
                 dt.addnext(etree.Element('dd'))
+        for dd in html.xpath("//dd"):
+            if dd.getprevious() is None:
+                dd.addprevious(etree.Element('dt'))
 
         # deprecated elements -  replace with <span class="xhtml_{tag name}">
-        deprecated = ['big', 'tt']
+        deprecated = ['big', 'tt', 'blink']
         deprecated_used = set()
         for tag in deprecated:
             for elem in html.xpath("//" + tag):
@@ -335,12 +357,12 @@ class Writer(writers.HTMLishWriter):
             if summary:
                 table.attrib['data-summary'] = summary
 
+
         # replace frame and rules attributes on tables
-        deprecated_atts = {'frame': CSS_FOR_FRAME, 'rules': CSS_FOR_RULES}
+        deprecated_atts = {'frame': CSS_FOR_FRAME, 'rules': CSS_FOR_RULES, 'background': {}}
         for att in deprecated_atts:
             for table in html.xpath(f'//table[@{att}]'):
                 att_value = table.attrib[att]
-                info(att_value)
                 if att_value in deprecated_atts[att]:
                     add_class(table, f'{att}-{att_value}')
                     del table.attrib[att]
