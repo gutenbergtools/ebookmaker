@@ -960,19 +960,21 @@ class Writer(writers.HTMLishWriter):
     @staticmethod
     def strip_links(xhtml, manifest):
         """
-        Strip all links to images.
+        Strip all links to local resources that aren't in manifest or are images.
 
         This does not strip inline images, only standalone images that
         are targets of links. EPUB does not allow that.
 
         """
-        if options.strip_links:
-            for link in xpath(xhtml, '//xhtml:a[@href]'):
-                href = urllib.parse.urldefrag(link.get('href'))[0]
-                if not manifest[href] in OPS_CONTENT_DOCUMENTS:
-                    debug("strip_links: Deleting <a> to non-ops-document-type: %s" % href)
-                    del link.attrib['href']
-                    continue
+
+        for link in xpath(xhtml, '//xhtml:a[@href]'):
+            href = urllib.parse.urldefrag(link.get('href'))[0]
+            if href in manifest and not manifest[href].startswith('image'):
+                continue
+            if not href.startswith('file:'):
+                continue
+            debug("strip_links: Deleting <a> to file not in manifest: %s" % href)
+            del link.attrib['href']
 
 
     @staticmethod
