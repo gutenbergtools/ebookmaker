@@ -136,6 +136,7 @@ OPS_CONTENT_DOCUMENTS = set((
 
 
 match_link_url = re.compile(r'^https?://', re.I)
+match_non_link = re.compile(r'[a-zA-Z0-9_\-\.]*(#.*)?$')
 
 class OEBPSContainer(zipfile.ZipFile):
     """ Class representing an OEBPS Container. """
@@ -1070,58 +1071,20 @@ class Writer(writers.HTMLishWriter):
     @staticmethod
     def url2filename(url):
         """ Generate a filename for this url.
-
-        From the wget docs:
-
-            When 'unix' is specified, Wget escapes the character '/'
-            and the control characters in the ranges 0-31 and 128-159.
-            This is the default on Unix-like operating systems.
-
-            When 'windows' is given, Wget escapes the characters '\',
-            '|', '/', ':', '?', '\"', '*', '<', '>', and the control
-            characters in the ranges 0-31 and 128-159.  In addition to
-            this, Wget in Windows mode uses '+' instead of ':' to
-            separate host and port in local file names, and uses '@'
-            instead of '?' to separate the query portion of the file
-            name from the rest.  Therefore, a URL that would be saved
-            as 'www.xemacs.org:4300/search.pl?input=blah' in Unix mode
-            would be saved as
-            'www.xemacs.org+4300/search.pl@input=blah' in Windows
-            mode.  This mode is the default on Windows.
-
-            If you specify `nocontrol', then the escaping of the
-            control characters is also switched off. This option may
-            make sense when you are downloading URLs whose names
-            contain UTF-8 characters, on a system which can save and
-            display filenames in UTF-8 (some possible byte values used
-            in UTF-8 byte sequences fall in the range of values
-            designated by Wget as 'controls').
-
-        For debugging we want to keep a filename resembling the url we
-        downloaded from instead of using a counter.
-
-        Also, we want the user to be able to unzip the epub. Thus we
-        must generate filenames that can be understood by the most
-        limited OS around (aka. Windows).
-
+            - preserve original filename and fragment
+            - map directory path to a cross platform filename string
 
         """
         if match_link_url.match(url):
             return url
         if url.startswith('file://'):
             url = url[7:]
-        def escape(matchobj):
-            """ Escape a char. """
-            return '@%x' % ord(matchobj.group(0))
 
-        url = urllib.parse.unquote(url)
-        url = re.sub('^.*?://', '', url)
-        url = os.path.normpath(url)
-        url = url.replace('/', '@')
-        url = re.sub('[\\|/:?"*<>\u0000-\u001F]', escape, url)
-        url = url.replace('\\', '@')
-        # url = url.translate(string.maketrans(':?', '+@')) # windows stupidity
-
+        url_match = match_non_link.search(url)
+        prefix = url[0:-len(url_match.group(0))]
+        if prefix:
+            prefix = abs(hash(prefix))
+            return f'{prefix}_{url_match.group(0)}'
         return url
 
 
