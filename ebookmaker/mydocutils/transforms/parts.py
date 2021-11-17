@@ -504,7 +504,7 @@ class DropCapTransform (docutils.transforms.Transform):
 
         if len (iter_):
             para = iter_[0]
-            iter_ = para.traverse (nodes.Text)
+            iter_ = list (para.traverse (nodes.Text))
             details = self.startnode.details
 
             if len (iter_):
