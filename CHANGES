@@ -1,3 +1,6 @@
+0.11.27 November 18, 2021
+- one more fix for docutils 0.18+
+
 0.11.26 November 11, 2021
 - fixed a problem with covers selected from linked images based on the file name. (The image file would be added twice).
 - fixed a problem with linked images being omitted if they also were used as the cover image
