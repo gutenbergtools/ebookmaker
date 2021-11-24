@@ -105,10 +105,10 @@ COVERPAGE_MIN_AREA = 200 * 200
 
 def make_output_filename(type_, dc):
     """ Make a suitable filename for output type. """
-
-    if dc.project_gutenberg_id:
+    name_token = options.outputfile or dc.project_gutenberg_id
+    if name_token:
         # PG book: use PG naming convention
-        return FILENAMES[type_].format(id=dc.project_gutenberg_id)
+        return FILENAMES[type_].format(id=name_token)
     # not a PG ebook
     return FILENAMES[type_].format(id=gg.string_to_filename(dc.title)[:65])
 
@@ -371,7 +371,7 @@ def add_local_options(ap):
         metavar="OUTPUT_FILE",
         dest="outputfile",
         default=None,
-        help="output file (default: <title>.epub)")
+        help="token for use in filenames (default: <ebook number>)")
 
     ap.add_argument(
         "--validate",
@@ -568,7 +568,7 @@ def main():
     dc = None
     for job in job_queue:
         dc = get_dc(job) # this is when doc at job.url gets parsed!
-        job.outputfile = job.outputfile or options.outputfile or make_output_filename(job.type, dc)
+        job.outputfile = job.outputfile or make_output_filename(job.type, dc)
         output_files[job.type] = job.outputfile
         if job.type.startswith('kindle'):
             absoutputdir = os.path.abspath(job.outputdir)
