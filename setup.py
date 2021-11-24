@@ -38,7 +38,7 @@ setup (
         'chardet',
         'cherrypy',
         'cssutils',
-        'docutils>=0.18',
+        'docutils>=0.18.1',
         'lxml',
         'roman',
         'requests',
