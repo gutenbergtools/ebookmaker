@@ -281,6 +281,11 @@ class Writer(writers.HTMLishWriter):
             for elem in html.xpath(f"//{tag}[not(@{attr})]"):
                 elem.set(attr, fill)
 
+        # remove not_empty attributes
+        nullattrs_to_remove = ['height', 'width']
+        for attr in nullattrs_to_remove:
+            for elem in html.xpath(f"//*[@{attr}='' or @{attr}=0]"):
+                del elem.attrib[attr]
 
         # replacing attributes with css in a style attribute
         # (tag, attr, cssprop, val2css)
