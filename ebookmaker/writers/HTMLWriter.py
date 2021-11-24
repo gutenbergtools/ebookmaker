@@ -57,7 +57,7 @@ border-width: thin;
 border-style: solid;}''',
     'cols': '''
 .rules-cols > tr > td, .rules-cols > * > tr > td,
-.rules-cols > tr > th, .rules-cols > * > tr > th' {
+.rules-cols > tr > th, .rules-cols > * > tr > th {
 border-left-width: thin;
 border-right-width: thin;
 border-left-style: solid;
@@ -109,9 +109,8 @@ def add_class(elem, classname):
 def add_style(elem, style=''):
     if style:
         if 'style' in elem.attrib and elem.attrib['style']:
-            style = style.strip()
-            style = style if style.endswith(';') else style + '; '
-            style = style + elem.attrib['style']
+            prev_style = elem.attrib['style'].strip(' ;')
+            style = f'{prev_style};{style.strip(" ;")};'
         elem.set('style', style)
 
 class Writer(writers.HTMLishWriter):
