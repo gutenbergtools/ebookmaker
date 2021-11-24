@@ -234,6 +234,21 @@ class Writer(writers.HTMLishWriter):
         try to convert the html4 DOM to an html5 DOM
         (assumes xhtml namespaces have been removed, except from attribute values)
         '''
+        def check_lang(elem, lang_att):
+            lang = elem.attrib[lang_att]
+            lang_name = gg.language_map.get(lang, default=None)
+            if lang_name:
+                elem.attrib[XMLLANG] = lang
+                elem.attrib['lang'] = lang
+                return True
+            clean_lang = gg.language_map.inverse(lang, default=None)
+            if not clean_lang:
+                warning("invalid lang attribute %s", lang)
+                del elem.attrib[lang_att]
+                elem.attrib['data-invalid-lang'] = lang
+            elif lang != clean_lang:
+                elem.attrib['lang'] = clean_lang
+                elem.attrib[XMLLANG] = clean_lang
 
         # fix metas
         for meta in html.xpath("//meta[translate(@http-equiv, 'CT', 'ct')='content-type']"):
@@ -250,19 +265,9 @@ class Writer(writers.HTMLishWriter):
 
         #check values of lang
         for elem in html.xpath("//*[@lang]"):
-            lang = elem.attrib['lang']
-            lang_name = gg.language_map.get(lang, default=None)
-            if lang_name:
-                continue
-            clean_lang = gg.language_map.inverse(lang, default=None)
-            if not clean_lang:
-                error("invalid lang attribute %s", lang)
-                del elem.attrib['lang']
-            elif lang != clean_lang:
-                elem.attrib['lang'] = clean_lang
-                elem.attrib[XMLLANG] = clean_lang
-        for elem in html.xpath("//*[@xml:lang]"):
-            elem.set('lang', elem.attrib[XMLLANG])
+            check_lang(elem, 'lang')
+        for elem in html.xpath("//*[@xml:lang and not(@lang)]"):
+            check_lang(elem, XMLLANG)
 
         # remove obsolete attributes
         attrs_to_remove = [('style', 'type'), ('img', 'longdesc')]
