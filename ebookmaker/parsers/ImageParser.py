@@ -140,9 +140,10 @@ class Parser(ParserBase):
             if self.image_data:
                 try:
                     image = Image.open(six.BytesIO(self.image_data))
+                    self.dimen = image.size
                 except IOError as what:
                     error("Could not resize image (probably broken): %s", self.attribs.url)
-                self.dimen = (0, 0)  # broken image
+                    self.dimen = (0, 0)  # broken image
             else:
                 self.dimen = (0, 0)  # broken image
         return self.dimen
