@@ -4,7 +4,7 @@
 
 from setuptools import setup
 
-VERSION = '0.11.26'
+VERSION = '0.11.28'
 
 setup (
     name = 'ebookmaker',
@@ -38,7 +38,7 @@ setup (
         'chardet',
         'cherrypy',
         'cssutils',
-        'docutils>=0.18',
+        'docutils>=0.18.1',
         'lxml',
         'roman',
         'requests',

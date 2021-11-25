@@ -500,11 +500,11 @@ class DropCapTransform (docutils.transforms.Transform):
     default_priority = 719 # run before Contents Transform
 
     def apply (self, **kwargs):
-        iter_ = self.startnode.traverse (nodes.paragraph, siblings = 1)
+        iter_ = list (self.startnode.traverse (nodes.paragraph, siblings = 1))
 
         if len (iter_):
             para = iter_[0]
-            iter_ = para.traverse (nodes.Text)
+            iter_ = list (para.traverse (nodes.Text))
             details = self.startnode.details
 
             if len (iter_):
@@ -618,12 +618,12 @@ class StyleTransform (docutils.transforms.Transform):
                 # placed before the title node.
 
                 # traverse all children of parent
-                node_list = pending.parent.traverse (
-                    mynodes.node_selector (selector), include_self = 0)
+                node_list = list (pending.parent.traverse (
+                    mynodes.node_selector (selector), include_self = 0))
             else:
                 # traverse all following nodes and their children
-                node_list = pending.traverse (
-                    mynodes.node_selector (selector), siblings = 1, include_self = 0)
+                node_list = list (pending.traverse (
+                    mynodes.node_selector (selector), siblings = 1, include_self = 0))
 
         # classes    = frozenset ([c for c in details.get ('class', []) if not c.startswith ('-')])
         # rmclasses  = frozenset ([c[1:] for c in details.get ('class', []) if c.startswith ('-')])

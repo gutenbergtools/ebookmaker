@@ -126,7 +126,7 @@ class Parser(ParserBase):
             new_parser.fp = self.fp
 
         except IOError as what:
-            error("Could not resize image: %s" % what)
+            error("Could not resize image: %s", self.attribs.url)
             new_parser.attribs = copy.copy(self.attribs)
             fp = resource_stream('ebookmaker.parsers', 'broken.png')
             new_parser.image_data = fp.read()
@@ -138,8 +138,12 @@ class Parser(ParserBase):
     def get_image_dimen(self):
         if self.dimen is None:
             if self.image_data:
-                image = Image.open(six.BytesIO(self.image_data))
-                self.dimen = image.size
+                try:
+                    image = Image.open(six.BytesIO(self.image_data))
+                    self.dimen = image.size
+                except IOError as what:
+                    error("Could not resize image (probably broken): %s", self.attribs.url)
+                    self.dimen = (0, 0)  # broken image
             else:
                 self.dimen = (0, 0)  # broken image
         return self.dimen
