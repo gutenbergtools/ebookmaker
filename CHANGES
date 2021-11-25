@@ -1,3 +1,13 @@
+0.11.28 November 24, 2021
+- fix #100. the behavior of --output-file has changed. a string passed using this argument is used to name the file where the Gutenberg ID would be. Previously it would be just the name of the output file, no matter the file type, except for Kindle, PDF and TeX. File naming for kindle was broken completely. In the past (version <0.11) --title would override the parsed or looked-up title. Title would be used in the file name if there was no Gutenberg id, or --outputfile.  
+- docutils rst conversion introduced a typo in 0.18 resulting in some css problems
+- added exception handling in ImageParser for broken images
+- don't select cover until it's needed. Ebookmaker has been generating unneeded covers in the txt step because it hasn't parsed an html file.
+- for HTML5, fixed a css syntax error in the css added for the table@cols attribute
+- for HTML5, make sure lang and xml:lang attributes are in sync; put invalid langs in data-invalid-lang attribute.
+- for HTML5, remove height or width attributes that are 0 or empty
+
+
 0.11.27 November 18, 2021
 - one more fix for docutils 0.18+
 
