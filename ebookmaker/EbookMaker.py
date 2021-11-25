@@ -472,7 +472,7 @@ def do_job(job):
                     options.input_mediatype)
 
             spider.recursive_parse(attribs)
-            if job.type.split('.')[0] in ('epub', 'html', 'kindle', 'cover'):
+            if job.type.split('.')[0] in ('epub', 'html', 'kindle', 'cover', 'pdf'):
                 elect_coverpage(spider, job.url, job.dc)
             job.url = spider.redirect(job.url)
             job.base_url = job.url
