@@ -255,6 +255,8 @@ class Writer(writers.HTMLishWriter):
             meta.getparent().remove(meta)
         for meta in html.xpath("//meta[translate(@http-equiv, 'CST', 'cst')='content-style-type']"):
             meta.getparent().remove(meta)
+        for meta in html.xpath("//meta[translate(@http-equiv, 'CL', 'cl')='content-language']"):
+            meta.getparent().remove(meta)
         for meta in html.xpath("//meta[@charset]"): # html5 doc, we'll replace it
             meta.getparent().remove(meta)
         for meta in html.xpath("//meta[@scheme]"): # remove obsolete formatted metas
