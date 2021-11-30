@@ -459,8 +459,6 @@ class Writer(writers.HTMLishWriter):
                         del(html.attrib[xmllang])
                     self.add_dublincore(job, html)
 
-                    # makes iphones zoom in
-                    self.add_meta(html, 'viewport', 'width=device-width')
                     self.add_meta_generator(html)
                     self.add_moremeta(job, html, p.attribs.url)
 
