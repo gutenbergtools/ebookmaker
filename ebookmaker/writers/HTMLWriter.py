@@ -110,7 +110,7 @@ def add_style(elem, style=''):
     if style:
         if 'style' in elem.attrib and elem.attrib['style']:
             prev_style = elem.attrib['style'].strip(' ;')
-            style = f'{prev_style};{style.strip(" ;")};'
+            style = f'{style.strip(" ;")};{prev_style};'
         elem.set('style', style)
 
 class Writer(writers.HTMLishWriter):
