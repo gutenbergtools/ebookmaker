@@ -1,3 +1,9 @@
+0.11.29 November 30, 2021
+- for HTML5, remove Content-Language metas
+- when converting a presentational attribute to css in a style attribute, put the added css *before* existing content of the style, so as not to override it. this mimics browser behavior for cases when the two styles conflict. This won't do much good right away because tidy strips the styles into named classes.
+- stop adding a viewport meta tag. it turns out this interferes with good HTML5 designs for mobile.
+
+
 0.11.28 November 24, 2021
 - fix #100. the behavior of --output-file has changed. a string passed using this argument is used to name the file where the Gutenberg ID would be. Previously it would be just the name of the output file, no matter the file type, except for Kindle, PDF and TeX. File naming for kindle was broken completely. In the past (version <0.11) --title would override the parsed or looked-up title. Title would be used in the file name if there was no Gutenberg id, or --outputfile.  
 - docutils rst conversion introduced a typo in 0.18 resulting in some css problems
