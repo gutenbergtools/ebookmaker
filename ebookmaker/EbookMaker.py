@@ -492,6 +492,10 @@ def do_job(job):
             # FIXME: hack for push packager
             options.html_images_list = list(job.spider.aux_file_iter())
 
+        if job.type.split('.')[0] == 'txt':
+            # don't us GutenbergTextParser for subsequent builds
+            ParserFactory.ParserFactory.parsers = {}
+
     except SkipOutputFormat as what:
         warning("%s" % what)
 
