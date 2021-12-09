@@ -854,6 +854,7 @@ class Writer(writers.HTMLishWriter):
         """
 
         cssclass = re.compile(r'\.(-?[_a-zA-Z]+[_a-zA-Z0-9-]*)')
+        html5tag = re.compile(r'(^|[ ,~>+])(figure|figcaption|footer|header|section)')
 
         for rule in sheet:
             if rule.type == rule.MEDIA_RULE:
@@ -863,6 +864,10 @@ class Writer(writers.HTMLishWriter):
                     info("replacing  @media handheld rule with @media all")
 
             if rule.type == rule.STYLE_RULE:
+                #change html5 tags to classes with the same name
+                newrule = html5tag.sub(r'\1div.\2', rule.selectorList.selectorText)
+                rule.selectorList.selectorText = newrule
+
                 ruleclasses = list(cssclass.findall(rule.selectorList.selectorText))
                 for p in list(rule.style):
                     if p.name == 'float' and "x-ebookmaker" not in ruleclasses:
@@ -955,6 +960,16 @@ class Writer(writers.HTMLishWriter):
         """
         for meta in xpath(xhtml, '//xhtml:meta[@charset]'):
             meta.getparent().remove(meta)
+
+        usedtags = set()
+        for newtag in ['figcaption', 'figure', 'footer', 'header', 'section']:
+            for tag in xpath(xhtml, f'//xhtml:{newtag}'):
+                usedtags.add(newtag)
+                tag.tag = 'div'
+                writers.HTMLWriter.add_class(tag, newtag)
+
+        if 'figure' in usedtags:
+            Writer.add_internal_css(xhtml, 'div.figure {margin: 1em 40px;}')     
 
 
     @staticmethod
