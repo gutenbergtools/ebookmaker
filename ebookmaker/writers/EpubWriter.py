@@ -964,6 +964,12 @@ class Writer(writers.HTMLishWriter):
         for meta in xpath(xhtml, '//xhtml:meta[@property]'):
             meta.getparent().remove(meta)
 
+        # html5 moved tfoot to end of the table
+        for tfoot in xpath(xhtml, '//xhtml:*[last()][name()="tfoot"]'):
+            tbody = tfoot.getparent().find('{*}tbody')
+            if tbody is not None:
+                tbody.addprevious(tfoot)
+
         usedtags = set()
         for newtag in ['figcaption', 'figure', 'footer', 'header', 'section']:
             for tag in xpath(xhtml, f'//xhtml:{newtag}'):
