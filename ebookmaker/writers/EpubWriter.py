@@ -1221,22 +1221,21 @@ class Writer(writers.HTMLishWriter):
 
         filename = os.path.join(os.path.abspath(job.outputdir), job.outputfile)
 
-        for validator in (options.config.EPUB_VALIDATOR, options.config.EPUB_PREFLIGHT):
-            if validator is not None:
-                params = validator.split() + [filename]
-                checker = subprocess.Popen(params,
-                                           stdin=subprocess.PIPE,
-                                           stdout=subprocess.PIPE,
-                                           stderr=subprocess.PIPE)
+        if hasattr(options.config,'EPUB_VALIDATOR'):
+            validator = options.config.EPUB_VALIDATOR 
+            info('validating...')
+            params = validator.split() + [filename]
+            checker = subprocess.Popen(params,
+                                       stdin=subprocess.PIPE,
+                                       stdout=subprocess.PIPE,
+                                       stderr=subprocess.PIPE)
 
-                (dummy_stdout, stderr) = checker.communicate()
-                if stderr:
-                    error(stderr)
-                    return 1
-                    #raise Assertionerror(
-                    #    "%s does not validate." % job.outputfile)
+            (dummy_stdout, stderr) = checker.communicate()
+            if stderr:
+                error(stderr)
+                return 1
 
-        debug("%s validates ok." % job.outputfile)
+        info("%s validates ok." % job.outputfile)
         return 0
 
 
