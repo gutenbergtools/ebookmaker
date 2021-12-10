@@ -961,6 +961,9 @@ class Writer(writers.HTMLishWriter):
         for meta in xpath(xhtml, '//xhtml:meta[@charset]'):
             meta.getparent().remove(meta)
 
+        for meta in xpath(xhtml, '//xhtml:meta[@property]'):
+            meta.getparent().remove(meta)
+
         usedtags = set()
         for newtag in ['figcaption', 'figure', 'footer', 'header', 'section']:
             for tag in xpath(xhtml, f'//xhtml:{newtag}'):
