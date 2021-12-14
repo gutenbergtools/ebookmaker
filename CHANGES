@@ -1,15 +1,15 @@
 0.11.30 December 10, 2021
-- for EPUB, down-convert HTML5 tags to divs so the the files validate as EPUB2. The new div elements will add a class named the same as the html5 tag, so `<section>` becomes `<div class="section">`. Other attributes are preserved. In addition CSS selectors involving these elements will be transformed accordingly: for example `section` becomes `div.section`
-    - section
-    - figure  (initial style set to "margin: 1em 40px;",  copying from Firefox internal stylesheet.)
-    - figcaption
-    - header
-    - footer
-Users of these new tags need to check that their CSS does not conflict with the added classes or changed CSS. In almost all cases, avoiding HTML5 element names for CSS classes will prevent any conflict.
+- for EPUB, down-convert HTML5 tags to divs so the files validate as EPUB2. The new div elements will add a class named the same as the html5 tag, so `<section>` becomes `<div class="section">`. Other attributes are preserved. In addition CSS selectors involving these elements will be transformed accordingly: for example `section` becomes `div.section`
+    - `section`
+    - `figure`  (initial style set to "margin: 1em 40px;",  copying from Firefox internal stylesheet.)
+    - `figcaption`
+    - `header`
+    - `footer`
+Users of these HTML5-only tags need to check that their CSS does not conflict with the added classes or changed CSS. In almost all cases, avoiding HTML5 element names for CSS classes will prevent any conflict. Users of HTML5 input may still encounter unresolved issues with other parts of the DP/PG tool chain; please examine output files carefully for unexpected behavior.
 - for EPUB, move 'tfoot' elements to before 'tbody' (the order used in HTML4)
 - for EPUB, remove any 'meta' elements using the 'property' attribute.
 - add 'CRITICAL' notification for 'too-deep' errors
-- reset parsers after txt jobs. fixes a bug when the text source file is linked from the html.
+- reset parsers after txt jobs. fixes a bug when the plain text source file is linked from the html.
 - EPUBCheck validation was broken. To use EPUBCheck validation, first download and install EPUBCheck from https://www.w3.org/publishing/epubcheck/. If the command to invoke it is  `java -jar /Applications/epubcheck-4.2.6/epubcheck.jar`, then add this line to ~/.ebookmaker or /etc/ebookmaker.conf: `epub_validator: java -jar /Applications/epubcheck-4.2.6/epubcheck.jar` then turn on validation by adding `--validate` to Ebookmaker's command line invocation or by setting validate to true in ~/.ebookmaker
 
 
