@@ -854,6 +854,7 @@ class Writer(writers.HTMLishWriter):
         """
 
         cssclass = re.compile(r'\.(-?[_a-zA-Z]+[_a-zA-Z0-9-]*)')
+        html5tag = re.compile(r'(^|[ ,~>+])(figure|figcaption|footer|header|section)')
 
         for rule in sheet:
             if rule.type == rule.MEDIA_RULE:
@@ -863,6 +864,10 @@ class Writer(writers.HTMLishWriter):
                     info("replacing  @media handheld rule with @media all")
 
             if rule.type == rule.STYLE_RULE:
+                #change html5 tags to classes with the same name
+                newrule = html5tag.sub(r'\1div.\2', rule.selectorList.selectorText)
+                rule.selectorList.selectorText = newrule
+
                 ruleclasses = list(cssclass.findall(rule.selectorList.selectorText))
                 for p in list(rule.style):
                     if p.name == 'float' and "x-ebookmaker" not in ruleclasses:
@@ -955,6 +960,25 @@ class Writer(writers.HTMLishWriter):
         """
         for meta in xpath(xhtml, '//xhtml:meta[@charset]'):
             meta.getparent().remove(meta)
+
+        for meta in xpath(xhtml, '//xhtml:meta[@property]'):
+            meta.getparent().remove(meta)
+
+        # html5 moved tfoot to end of the table
+        for tfoot in xpath(xhtml, '//xhtml:*[last()][name()="tfoot"]'):
+            tbody = tfoot.getparent().find('{*}tbody')
+            if tbody is not None:
+                tbody.addprevious(tfoot)
+
+        usedtags = set()
+        for newtag in ['figcaption', 'figure', 'footer', 'header', 'section']:
+            for tag in xpath(xhtml, f'//xhtml:{newtag}'):
+                usedtags.add(newtag)
+                tag.tag = 'div'
+                writers.HTMLWriter.add_class(tag, newtag)
+
+        if 'figure' in usedtags:
+            Writer.add_internal_css(xhtml, 'div.figure {margin: 1em 40px;}')     
 
 
     @staticmethod
@@ -1206,22 +1230,21 @@ class Writer(writers.HTMLishWriter):
 
         filename = os.path.join(os.path.abspath(job.outputdir), job.outputfile)
 
-        for validator in (options.config.EPUB_VALIDATOR, options.config.EPUB_PREFLIGHT):
-            if validator is not None:
-                params = validator.split() + [filename]
-                checker = subprocess.Popen(params,
-                                           stdin=subprocess.PIPE,
-                                           stdout=subprocess.PIPE,
-                                           stderr=subprocess.PIPE)
+        if hasattr(options.config,'EPUB_VALIDATOR'):
+            validator = options.config.EPUB_VALIDATOR 
+            info('validating...')
+            params = validator.split() + [filename]
+            checker = subprocess.Popen(params,
+                                       stdin=subprocess.PIPE,
+                                       stdout=subprocess.PIPE,
+                                       stderr=subprocess.PIPE)
 
-                (dummy_stdout, stderr) = checker.communicate()
-                if stderr:
-                    error(stderr)
-                    return 1
-                    #raise Assertionerror(
-                    #    "%s does not validate." % job.outputfile)
+            (dummy_stdout, stderr) = checker.communicate()
+            if stderr:
+                error(stderr)
+                return 1
 
-        debug("%s validates ok." % job.outputfile)
+        info("%s validates ok." % job.outputfile)
         return 0
 
 

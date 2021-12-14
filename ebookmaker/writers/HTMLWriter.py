@@ -110,7 +110,7 @@ def add_style(elem, style=''):
     if style:
         if 'style' in elem.attrib and elem.attrib['style']:
             prev_style = elem.attrib['style'].strip(' ;')
-            style = f'{prev_style};{style.strip(" ;")};'
+            style = f'{style.strip(" ;")};{prev_style};'
         elem.set('style', style)
 
 class Writer(writers.HTMLishWriter):
@@ -254,6 +254,8 @@ class Writer(writers.HTMLishWriter):
         for meta in html.xpath("//meta[translate(@http-equiv, 'CT', 'ct')='content-type']"):
             meta.getparent().remove(meta)
         for meta in html.xpath("//meta[translate(@http-equiv, 'CST', 'cst')='content-style-type']"):
+            meta.getparent().remove(meta)
+        for meta in html.xpath("//meta[translate(@http-equiv, 'CL', 'cl')='content-language']"):
             meta.getparent().remove(meta)
         for meta in html.xpath("//meta[@charset]"): # html5 doc, we'll replace it
             meta.getparent().remove(meta)
@@ -457,8 +459,6 @@ class Writer(writers.HTMLishWriter):
                         del(html.attrib[xmllang])
                     self.add_dublincore(job, html)
 
-                    # makes iphones zoom in
-                    self.add_meta(html, 'viewport', 'width=device-width')
                     self.add_meta_generator(html)
                     self.add_moremeta(job, html, p.attribs.url)
 

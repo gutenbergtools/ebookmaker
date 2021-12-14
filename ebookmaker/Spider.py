@@ -174,7 +174,7 @@ class Spider(object):
                 warning('External link in %s: %s' % (attribs.referrer, attribs.url))
                 return
             if depth >= self.max_depth:
-                error('Omitted file %s due to depth > max_depth' % attribs.url)
+                critical('Omitted file %s due to depth > max_depth' % attribs.url)
                 return
         if not self.is_included_mediatype(attribs) and not self.is_included_relation(attribs):
             return

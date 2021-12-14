@@ -57,7 +57,7 @@ class BaseWriter(object):
             fp.write(bytes_)
 
 
-    def validate(self): # pylint: disable=R0201
+    def validate(self, job): # pylint: disable=R0201
         """ Validate the output with some (external) tool.
 
         Override this in a real writer.
