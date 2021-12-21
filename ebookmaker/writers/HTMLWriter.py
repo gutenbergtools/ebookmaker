@@ -142,6 +142,11 @@ class Writer(writers.HTMLishWriter):
         cover_url = urljoin(job.dc.canonical_url, canonical_cover_name)
         self.add_prop(tree, "og:image", cover_url)
 
+        # fix empty title elements
+        for title in xpath(tree, '//xhtml:title[not(text())]'):
+            title.text = job.dc.title
+
+
     def outputfileurl(self, job, url):
         """
         Make the output path for the parser.
