@@ -235,8 +235,8 @@ class Writer(writers.HTMLishWriter):
         (assumes xhtml namespaces have been removed, except from attribute values)
         '''
         def check_lang(elem, lang_att):
-            3to2 = {'ita': 'it', 'lat': 'la'}
-            lang_att = 3to2.get(lang_att, lang_att)
+            three2two = {'ita': 'it', 'lat': 'la'}
+            lang_att = three2two.get(lang_att, lang_att)
             lang = elem.attrib[lang_att]
             lang_name = gg.language_map.get(lang, default=None)
             if lang_name:
