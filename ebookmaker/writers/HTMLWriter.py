@@ -293,6 +293,7 @@ class Writer(writers.HTMLishWriter):
         # (tag, attr, cssprop, val2css)
         replacements = [
             ('col', 'width', 'width', css_len),
+            ('col', 'valign', 'vertical-align', lambda x: x),
             ('table', 'width', 'width', css_len),
             ('td', 'align', 'text-align', lambda x: x),
             ('td', 'valign', 'vertical-align', lambda x: x),
