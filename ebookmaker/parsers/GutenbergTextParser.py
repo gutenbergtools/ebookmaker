@@ -268,7 +268,7 @@ class Par(object):
             setattr(self.scores, subject, 1.0)
 
     def __len__(self):
-        return len(self.lines)
+        return min(len(self.lines), 50)
 
     def flush_left_lines(self):
         """ Return lines that are flush left.
@@ -384,7 +384,7 @@ class Par(object):
         # verse or quote ?
 
         c = count(self.metrics.titles)
-        self.scores.verse *= 1.2 ** (c - len(self) / 2.0)
+        self.scores.verse *= 1.2 ** (min(c - len(self.lines), 50) / 2.0)
         self.msg("%d titles in %d" % (c, len(self)))
 
         if self.metrics.rhymes:
