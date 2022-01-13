@@ -76,7 +76,7 @@ def add_common_options(ap, user_config_file):
         "--config",
         metavar="CONFIG_FILE",
         dest="config_file",
-        action="append",
+        action="store",
         default=user_config_file,
         help="read config file (default: %(default)s)")
 
