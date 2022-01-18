@@ -26,7 +26,7 @@ class Parser (ParserBase):
         self.data = None
 
 
-    def parse (self):
+    def pre_parse (self):
         """ Parse the file. """
         self.data = self.bytes_content ()
 

@@ -134,6 +134,7 @@ OPS_CONTENT_DOCUMENTS = set((
     'application/xml',
 ))
 
+OPS_FONT_TYPES = set(('application/font-woff', 'application/vnd.ms-opentype'))
 
 match_link_url = re.compile(r'^https?://', re.I)
 match_non_link = re.compile(r'[a-zA-Z0-9_\-\.]*(#.*)?$')
@@ -1366,6 +1367,8 @@ class Writer(writers.HTMLishWriter):
                     if job.subtype == '.noimages':
                         p.strip_images()
                     p.rewrite_links(self.url2filename)
+                    parserlist.append(p)
+                if str(p.attribs.mediatype) in OPS_FONT_TYPES:
                     parserlist.append(p)
 
             # after splitting html into chunks we have to rewrite all
