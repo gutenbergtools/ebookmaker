@@ -1369,6 +1369,7 @@ class Writer(writers.HTMLishWriter):
                     p.rewrite_links(self.url2filename)
                     parserlist.append(p)
                 if str(p.attribs.mediatype) in OPS_FONT_TYPES:
+                    warning('font file embedded: %s ;  check its license!', p.attribs.url)
                     parserlist.append(p)
 
             # after splitting html into chunks we have to rewrite all
