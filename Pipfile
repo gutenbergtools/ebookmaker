@@ -9,6 +9,6 @@ pylint = "*"
 [packages]
 e1839a8 = {path = ".",editable = true}
 ebookmaker = {editable = true,path = "."}
-libgutenberg = ">=0.8.12"
+libgutenberg = ">=0.8.14"
 psycopg2 = "*"
 docutils = ">=0.18.1"
