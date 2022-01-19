@@ -1,3 +1,12 @@
+0.12.x
+- for HTML5, move col@valign to css
+- for HTML5, change 3 letter language codes to 2 letter codes where available
+- for HTML5, fill empty title elements
+- fixed crash in text file analysis when number of lines in paragraph exceeds log(max float). 700-ish
+- include opentype fonts in EPUB file (.ttf. .otf, .woff), requires libgutenberg >= 0.8.14
+
+
+
 0.11.30 December 10, 2021
 - for EPUB, down-convert HTML5 tags to divs so the files validate as EPUB2. The new div elements will add a class named the same as the html5 tag, so `<section>` becomes `<div class="section">`. Other attributes are preserved. In addition CSS selectors involving these elements will be transformed accordingly: for example `section` becomes `div.section`
     - `section`
