@@ -21,8 +21,10 @@ from six.moves import urllib
 import lxml.html
 from lxml import etree
 
+from bs4 import BeautifulSoup
+
 from libgutenberg.GutenbergGlobals import NS, xpath
-from libgutenberg.Logger import info, debug, warning, error
+from libgutenberg.Logger import critical, info, debug, warning, error
 from libgutenberg.MediaTypes import mediatypes as mt
 
 from ebookmaker import parsers
@@ -30,10 +32,6 @@ from ebookmaker.parsers import HTMLParserBase
 from ebookmaker.CommonCode import Options
 
 options = Options()
-if hasattr(options, 'configdir') and options.configdir:
-    TIDYCONF = os.path.join(options.configdir, 'tidy.conf')
-else:
-    TIDYCONF = os.path.join(os.path.dirname(__file__), 'tidy.conf')
 
 mediatypes = ('text/html', mt.xhtml)
 
@@ -130,51 +128,6 @@ class Parser(HTMLParserBase):
 
         # debug("_fix_internal_frag: frag = %s" % id_)
         return id_
-
-
-    @staticmethod
-    def tidy(html):
-        """ Pipe html thru w3c tidy. """
-
-        html = parsers.RE_RESTRICTED.sub('', html)
-        html = RE_XMLDECL.sub('', html)
-        html = parsers.RE_HTML_CHARSET.sub('; charset=utf-8', html)
-
-        # convert to xhtml
-        try:
-            tidy = subprocess.Popen(
-                ["tidy", "-config", TIDYCONF, "-utf8"],
-                stdin=subprocess.PIPE,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE)
-        except FileNotFoundError:
-            error("Can't find Tidy; conversion likely to fail.")
-            return html
-
-        (html, stderr) = tidy.communicate(html.encode('utf-8'))
-
-        regex = re.compile(r'(Info:|Warning:|Error:)\s*', re.I)
-
-        # pylint: disable=E1103
-        msg = stderr.decode(sys.stderr.encoding).strip()
-        for line in msg.splitlines():
-            match = regex.search(line)
-            if match:
-                sline = regex.sub("", line)
-                g = match.group(1).lower()
-                if g == 'info:':
-                    info("tidy: %s" % sline)
-                elif g == 'warning:':
-                    warning("tidy: %s" % sline)
-                elif g == 'error:':
-                    error("tidy: %s" % sline)
-                else:
-                    error(line)
-
-        if tidy.returncode == 2:
-            raise ValueError("Tidy tried valiently, but the patient died.")
-
-        return html.decode('utf-8')
 
 
     def _fix_anchors(self):
@@ -421,15 +374,20 @@ class Parser(HTMLParserBase):
 
         debug("HTMLParser.pre_parse() ...")
 
-        html = self.unicode_content()
+        try:
+            soup = BeautifulSoup(self.bytes_content(), 'lxml')
+        except:
+            critical('failed to parse %s', self.attribs.url)
+            return
+        
+        html = str(soup)
         html = html.replace('&#13;', '&#10;')
         html = html.replace('&#xD;', '&#10;')
+        if '\r' in html or '\u2028' in html:
+            html = '\n'.join(html.splitlines())
+        self.unicode_buffer = html
 
         if self.xhtml is None:
-            # previous parse failed, try tidy
-            info("Running html thru tidy.")
-            html = self.tidy(html)
-            html = unicodedata.normalize('NFC', html)
             self.xhtml = self.__parse(html)     # let exception bubble up
 
         self._fix_anchors() # needs relative paths
@@ -440,7 +398,7 @@ class Parser(HTMLParserBase):
 
         self._make_coverpage_link()
 
-        debug("Done parsing %s" % self.attribs.url)
+        debug("Done parsing %s", self.attribs.url)
 
 
     def parse(self):

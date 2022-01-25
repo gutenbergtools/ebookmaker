@@ -222,9 +222,7 @@ class ParserBase(object):
     def guess_charset_from_body(self):
         """ Guess charset from text. """
 
-        # http://chardet-matthickford.readthedocs.org/en/latest/usage.html
-
-        result = chardet.detect(self.bytes_content())
+        result = cchardet.detect(self.bytes_content())
         charset = result.get('encoding')
         if charset:
             debug('Got charset %s from text sniffing' % charset)

@@ -35,7 +35,6 @@ setup (
 
     install_requires = [
         'pillow>=8.3.2',
-        'chardet',
         'cherrypy',
         'cssutils',
         'docutils>=0.18.1',
@@ -44,10 +43,12 @@ setup (
         'requests',
         'six>=1.4.1',
         'libgutenberg[covers]>=0.8.14',
+        'cchardet',
+        'beautifulsoup4',
     ],
     
     package_data = {
-        'ebookmaker.parsers': ['broken.png', 'tidy.conf', 'txt2all.css'],
+        'ebookmaker.parsers': ['broken.png', 'txt2all.css'],
         'ebookmaker.writers': ['cover.jpg'],
         'ebookmaker.mydocutils.parsers': ['*.rst'],
         'ebookmaker.mydocutils.writers': ['*.css'],

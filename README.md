@@ -11,7 +11,6 @@ If you are preparing HTML for use with Ebookmaker, the [Usage Notes](USAGE.md) m
 ## Prerequisites
 
 * Python3 >= 3.6
-* HTMLTidy (http://binaries.html-tidy.org/),
 * Kindlegen (https://www.amazon.com/gp/feature.html/?docId=1000765211) or Calibre (https://calibre-ebook.com/)
 * TexLive (to build from TeX and rst), and
 * groff (not sure when this is needed).
@@ -112,7 +111,7 @@ Travis-CI will run tests on branches committed in the gutenbergtools org
 
 ## Notes running Ebookmaker on Windows Machine (adapted from @windymilla)
 
-1. Install Python 3.6+ from python.org. Install HTML Tidy if you don't have it already. It doesn't come preinstalled on Windows, but if you have Guiguts installed, you should find it in a folder such as `C:\DP\guiguts-win\tools\tidy`. Add it to the path. Do the same for Kindlegen.
+1. Install Python 3.6+ from python.org. Install Kindlegen. Add it to the path. 
 2. Add system environment variable: Right-click "My Computer", then Properties, then Advanced, then Environment variables, then New. Call the variable PYTHON_HOME, and set it to the Python folder.
 3. Edit the Path variable and add to the end of it `;%PYTHON_HOME%\;%PYTHON_HOME%\Scripts\`
 4. Check by starting a new command window and typing `python`. It should run your version of Python. Quit python with `^Z` & Enter.
