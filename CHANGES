@@ -1,9 +1,17 @@
 0.12.x
+- replaces Tidy with Beautiful Soup. Ebookmaker has used HTML Tidy to make sure that source files produced over the course of ~ 25 years can be parsed into a reasonably modern HTML DOM. With the advent of HTML5, Tidy has begun to show its age, and maintenance of Tidy has not kept up with the times. Bugs in Tidy are not being fixed, and we find we can no longer rely on Tidy. To replace Tidy, we are using  Beautiful Soup, a very popular python package widely used for web scraping.
+
+Tidy did some other things that caused Ebookmaker's HTML5 output poorly suited for PG,
+    - it reorganized style attributes into css style elements. While this made the CSS easier to manage, it resulting in less readable source code.
+    - it normalized whitespace in block elements. In almost all cases, this had no effect of the HTML display, many PG contributors have used this whitespace to reproduce the printed pages in the source code, making it easy to maintain.
+
+Beautiful Soup, by contrast, only changes the source when absolutely needed to make parsable unicode  HTML. We expect the resulting HTML5 files will be more pleasing for PG contributors.
+
 - for HTML5, move col@valign to css
 - for HTML5, change 3 letter language codes to 2 letter codes where available
 - for HTML5, fill empty title elements
 - fixed crash in text file analysis when number of lines in paragraph exceeds log(max float). 700-ish
-- include opentype fonts in EPUB file (.ttf. .otf, .woff), requires libgutenberg >= 0.8.14
+- include opentype fonts in EPUB file (.ttf. .otf, .woff), requires libgutenberg >= 0.8.14. fixes #106
 
 
 
