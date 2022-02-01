@@ -32,8 +32,8 @@ from ebookmaker.parsers import webify_url
 
 options = Options()
 cssutils.ser.prefs.validOnly = True
-XMLLANG = '{http://www.w3.org/XML/1998/namespace}lang'
-XMLSPACE = '{http://www.w3.org/XML/1998/namespace}space'
+XMLLANG = '{%s}lang' % gg.NS.xml
+XMLSPACE = '{%s}space' % gg.NS.xml
 DEPRECATED = ['big']
 
 CSS_FOR_DEPRECATED = {
@@ -90,6 +90,9 @@ CSS_FOR_FRAME = {
 }
 CSS_FOR_DEPRECATED.update(CSS_FOR_RULES)
 CSS_FOR_DEPRECATED.update(CSS_FOR_FRAME)
+
+def xhtmltag(tag):
+    return '{%s}%s' % (gg.NS.xhtml, tag)
 
 def css_len(len_str):
     """ if an int, make px """
@@ -221,7 +224,8 @@ class Writer(writers.HTMLishWriter):
                 for p in list(rule.style):
                     pass
 
-    def fix_css_for_deprecated(self, sheet, tags=DEPRECATED, replacement='span'):
+    @staticmethod
+    def fix_css_for_deprecated(sheet, tags=DEPRECATED, replacement='span'):
         """ for deprecated tags, change selector to {replacement}.xhtml_{tag name};
             if no existing selector, add the selector with a style
         """
@@ -233,8 +237,8 @@ class Writer(writers.HTMLishWriter):
                     for selector in rule.selectorList:
                         selector.selectorText = tagre.sub(tagsub, selector.selectorText)
 
-
-    def xhtml_to_html(self, html):
+    @staticmethod
+    def xhtml_to_html(html):
         '''
         try to convert the html4 DOM to an html5 DOM
         (assumes xhtml namespaces have been removed, except from attribute values)
@@ -258,42 +262,42 @@ class Writer(writers.HTMLishWriter):
                 elem.attrib[XMLLANG] = clean_lang
 
         # fix metas
-        for meta in html.xpath("//meta[translate(@http-equiv, 'CT', 'ct')='content-type']"):
+        for meta in xpath(html, "//xhtml:meta[translate(@http-equiv, 'CT', 'ct')='content-type']"):
             meta.getparent().remove(meta)
-        for meta in html.xpath("//meta[translate(@http-equiv, 'CST', 'cst')='content-style-type']"):
+        for meta in xpath(html, "//xhtml:meta[translate(@http-equiv, 'CST', 'cst')='content-style-type']"):
             meta.getparent().remove(meta)
-        for meta in html.xpath("//meta[translate(@http-equiv, 'CL', 'cl')='content-language']"):
+        for meta in xpath(html, "//xhtml:meta[translate(@http-equiv, 'CL', 'cl')='content-language']"):
             meta.getparent().remove(meta)
-        for meta in html.xpath("//meta[@charset]"): # html5 doc, we'll replace it
+        for meta in xpath(html, "//xhtml:meta[@charset]"): # html5 doc, we'll replace it
             meta.getparent().remove(meta)
-        for meta in html.xpath("//meta[@scheme]"): # remove obsolete formatted metas
+        for meta in xpath(html, "//xhtml:meta[@scheme]"): # remove obsolete formatted metas
             meta.getparent().remove(meta)
-        for elem in html.xpath("//*[@xml:space]"):
+        for elem in xpath(html, "//xhtml:*[@xml:space]"):
             if elem.tag in ('pre', 'style'):
                 del elem.attrib[XMLSPACE]
 
         #check values of lang
-        for elem in html.xpath("//*[@lang]"):
+        for elem in xpath(html, "//xhtml:*[@lang]"):
             check_lang(elem, 'lang')
-        for elem in html.xpath("//*[@xml:lang and not(@lang)]"):
+        for elem in xpath(html, "//xhtml:*[@xml:lang and not(@lang)]"):
             check_lang(elem, XMLLANG)
 
         # remove obsolete attributes
         attrs_to_remove = [('style', 'type'), ('img', 'longdesc')]
         for (tag, attr) in attrs_to_remove:
-            for elem in html.xpath(f"//{tag}[@{attr}]"):
+            for elem in xpath(html, f"//xhtml:{tag}[@{attr}]"):
                 del elem.attrib[attr]
 
         # set required attributes
         attrs_to_fill = [('img', 'alt', '')]
         for (tag, attr, fill) in attrs_to_fill:
-            for elem in html.xpath(f"//{tag}[not(@{attr})]"):
+            for elem in xpath(html, f"//xhtml:{tag}[not(@{attr})]"):
                 elem.set(attr, fill)
 
         # remove not_empty attributes
         nullattrs_to_remove = ['height', 'width']
         for attr in nullattrs_to_remove:
-            for elem in html.xpath(f"//*[@{attr}='' or @{attr}=0]"):
+            for elem in xpath(html, f"//xhtml:*[@{attr}='' or @{attr}=0]"):
                 del elem.attrib[attr]
 
         # replacing attributes with css in a style attribute
@@ -326,7 +330,7 @@ class Writer(writers.HTMLishWriter):
         ]
         # width obsolete on table, col
         for (tag, attr, cssattr, val2css) in replacements:
-            for elem in html.xpath(f"//{tag}[@{attr}]"):
+            for elem in xpath(html, f"//xhtml:{tag}[@{attr}]"):
                 if elem.attrib[attr]:
                     val = elem.attrib[attr]
                     del elem.attrib[attr]
@@ -335,7 +339,7 @@ class Writer(writers.HTMLishWriter):
 
 
         # width and height attributes must be integer
-        for elem in html.xpath("//*[@width or @height]"):
+        for elem in xpath(html, "//xhtml:*[@width or @height]"):
             rules = []
             for key in ['width', 'height']:
                 if key in elem.attrib and elem.attrib[key]:
@@ -349,28 +353,28 @@ class Writer(writers.HTMLishWriter):
                 elem.attrib['style'] = '; '.join(rules) + '; ' + elem.attrib.get('style', '')
 
         # fix missing <dd>,<dt> elements
-        for dt in html.xpath("//dt"):
-            if dt.getnext() is None or dt.getnext().tag != 'dd':
-                dt.addnext(etree.Element('dd'))
-        for dd in html.xpath("//dd"):
+        for dt in xpath(html, "//xhtml:dt"):
+            if dt.getnext() is None or dt.getnext().tag != xhtmltag('dd'):
+                dt.addnext(etree.Element(xhtmltag('dd')))
+        for dd in xpath(html, "//xhtml:dd"):
             if dd.getprevious() is None:
-                dd.addprevious(etree.Element('dt'))
+                dd.addprevious(etree.Element(xhtmltag('dt')))
 
         # deprecated elements -  replace with <span class="xhtml_{tag name}">
         deprecated = ['big', 'tt', 'blink']
         deprecated_used = set()
         for tag in deprecated:
-            for elem in html.xpath("//" + tag):
+            for elem in xpath(html, "//xhtml:" + tag):
                 add_class(elem, 'xhtml_' + tag)
                 elem.tag = 'span'
                 deprecated_used.add(tag)
 
-        html.head.insert(0, etree.Element('meta', charset="utf-8"))
+        html.head.insert(0, etree.Element(xhtmltag('meta'), charset="utf-8"))
 
         ##### tables #######
 
         # remove summary attribute
-        for table in html.xpath('//table[@summary]'):
+        for table in xpath(html, '//xhtml:table[@summary]'):
             summary = table.attrib['summary']
             del table.attrib['summary']
             if summary:
@@ -380,7 +384,7 @@ class Writer(writers.HTMLishWriter):
         # replace frame and rules attributes on tables
         deprecated_atts = {'frame': CSS_FOR_FRAME, 'rules': CSS_FOR_RULES, 'background': {}}
         for att in deprecated_atts:
-            for table in html.xpath(f'//table[@{att}]'):
+            for table in xpath(html, f'//xhtml:table[@{att}]'):
                 att_value = table.attrib[att]
                 if att_value in deprecated_atts[att]:
                     add_class(table, f'{att}-{att_value}')
@@ -388,11 +392,11 @@ class Writer(writers.HTMLishWriter):
                     deprecated_used.add(att_value)
 
         # remove span attribute from colgroups that have col children
-        for colgroup in html.xpath("//colgroup[@span and col]"):
+        for colgroup in xpath(html, "//xhtml:colgroup[@span and xhtml:col]"):
             del colgroup.attrib['span']
 
         # move tfoot elements to end of table
-        for tfoot in html.xpath("//table/tfoot"):
+        for tfoot in xpath(html, "//xhtml:table/xhtml:tfoot"):
             table = tfoot.getparent()
             table.append(tfoot)
 
@@ -401,18 +405,18 @@ class Writer(writers.HTMLishWriter):
 
         # fix css in style elements
         cssparser = cssutils.CSSParser()
-        for style in html.xpath("//style"):
+        for style in xpath(html, "//xhtml:style"):
             if style.text:
                 sheet = cssparser.parseString(style.text)
-                self.fix_incompatible_css(sheet)
-                self.fix_css_for_deprecated(sheet, tags=deprecated_used)
+                Writer.fix_incompatible_css(sheet)
+                Writer.fix_css_for_deprecated(sheet, tags=deprecated_used)
                 style.text = sheet.cssText.decode("utf-8")
 
         css_for_deprecated = ' '.join([CSS_FOR_DEPRECATED.get(tag, '') for tag in deprecated_used])
         if css_for_deprecated:
-            elem = etree.Element('style')
+            elem = etree.Element(xhtmltag('style'))
             elem.text = css_for_deprecated
-            html.head.insert(1, elem) # right after charset declaration
+            html.find(xhtmltag('head')).insert(1, elem) # right after charset declaration
 
 
     def build(self, job):
@@ -421,7 +425,7 @@ class Writer(writers.HTMLishWriter):
         def rewrite_links(job, node):
             """ only needed if the mainsource filename has been changed """
             for renamed_path in job.link_map:
-                for link in node.xpath('//xhtml:*[@href]', namespaces=gg.NSMAP):
+                for link in xpath(node, '//xhtml:*[@href]'):
                     old_link = link.get('href')
                     parsed_url = urlparse(old_link)
                     if os.path.basename(parsed_url.path) == renamed_path:
@@ -458,18 +462,19 @@ class Writer(writers.HTMLishWriter):
                 p.parse()
 
             try:
-                xmllang = '{http://www.w3.org/XML/1998/namespace}lang'
+                
                 if xhtml is not None:
                     html = copy.deepcopy(xhtml)
-                    if xmllang in html.attrib:
-                        lang =  html.attrib[xmllang]
+                    if XMLLANG in html.attrib:
+                        lang =  html.attrib[XMLLANG]
                         html.attrib['lang'] = job.dc.languages[0].id or lang
-                        del(html.attrib[xmllang])
+                        del(html.attrib[XMLLANG])
                     self.add_dublincore(job, html)
 
                     self.add_meta_generator(html)
                     self.add_moremeta(job, html, p.attribs.url)
 
+                    self.xhtml_to_html(html)
                     # strip xhtml namespace
                     # https://stackoverflow.com/questions/18159221/
                     for elem in html.getiterator():
@@ -477,7 +482,6 @@ class Writer(writers.HTMLishWriter):
                             elem.tag = etree.QName(elem).localname
                     # Remove unused namespace declarations
                     etree.cleanup_namespaces(html)
-                    self.xhtml_to_html(html)
 
                     html = etree.tostring(html,
                                           method='html',
