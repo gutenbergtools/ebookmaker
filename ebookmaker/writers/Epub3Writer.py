@@ -29,7 +29,7 @@ from pkg_resources import resource_string # pylint: disable=E0611
 
 import libgutenberg.GutenbergGlobals as gg
 from libgutenberg.GutenbergGlobals import NS, xpath
-from libgutenberg.Logger import info, debug, warning, error, exception
+from libgutenberg.Logger import critical, debug, error, exception, info, warning
 from libgutenberg.MediaTypes import mediatypes as mt
 from ebookmaker import parsers
 from ebookmaker import ParserFactory
@@ -39,19 +39,13 @@ from ebookmaker import writers
 from ebookmaker.CommonCode import Options
 from ebookmaker.Version import VERSION, GENERATOR
 from .EpubWriter import (
-    MAX_CHUNK_SIZE,
     MAX_IMAGE_SIZE,
     MAX_COVER_DIMEN,
     MAX_IMAGE_DIMEN,
     LINKED_IMAGE_SIZE,
     LINKED_IMAGE_DIMEN,
-    TOC_HEADERS,
     DP_PAGENUMBER_CLASSES,
-    STRIP_CLASSES,
     PRIVATE_CSS,
-    OPS_TEXT_MEDIATYPES,
-    OPS_IMAGE_MEDIATYPES,
-    OPS_CORE_MEDIATYPES,
     OPS_CONTENT_DOCUMENTS,
     OPS_FONT_TYPES
 )
@@ -169,6 +163,7 @@ class OEBPSContainer(zipfile.ZipFile):
             version='1.0')
 
         i = self.zi()
+        i.filename = 'META-INF/container.xml'
         self.writestr(i, etree.tostring(
             container, encoding='utf-8', xml_declaration=True, pretty_print=True))
 
@@ -225,7 +220,7 @@ class Toc(object):
         self.dc = dc
         self.seen_urls = {}
         self.elementmaker = ElementMaker(namespace=str(NS.xhtml),
-                                nsmap={None: str(NS.xhtml)})
+                                         nsmap={None: str(NS.xhtml)})
 
 
     def __str__(self):
@@ -288,9 +283,10 @@ class Toc(object):
         # Ugly workaround for error: "Serialisation to unicode must not
         # request an XML declaration"
 
-        toc_ncx = "%s\n\n%s" % (gg.XML_DECLARATION,
-            etree.tostring(ncx, doctype=None, encoding=str, pretty_print=True)
-        )
+        toc_ncx = "%s\n\n%s" % (gg.XML_DECLARATION, etree.tostring(ncx,
+                                                                   doctype=None,
+                                                                   encoding=str,
+                                                                   pretty_print=True))
 
         if options.verbose >= 3:
             debug(toc_ncx)
@@ -337,7 +333,7 @@ class Toc(object):
                     prev_depth -= 1
             li = em.li(toc_item)
             current_ol.append(li)
-                               
+
         return root
 
 
@@ -351,9 +347,9 @@ class Toc(object):
         for url, pagename, depth in toc:
             if depth == -1:
                 toc_item = em.a(pagename, **{
-                    'href': url, 
+                    'href': url,
                     'id': "pt-%d" % len(pagelist_top),
-                    'value': str(len(pagelist_top)), 
+                    'value': str(len(pagelist_top)),
                     EPUB_TYPE: 'normal' if re.search('[0-9]', pagename) else 'frontmatter',
                 })
                 pagelist_top.append(em.li(toc_item))
@@ -430,13 +426,14 @@ class ContentOPF(object):
                 vals = []
             vals.append(newprop)
             prop = ' '.join(vals)
+            return prop
 
         if id_ is None or xpath(self.manifest, "//*[@id = '%s']" % id_):
             self.item_id += 1
             id_ = 'item%d' % self.item_id
-        
+
         if prop == 'cover':
-            self.add_coverpage(url, _id_)
+            self.add_coverpage(url, id_)
         manifest_atts = {'href': url, 'id': id_, 'media-type': mediatype}
         if mediatype == 'image/svg+xml':
             prop = add_prop(prop, 'svg')
@@ -455,7 +452,7 @@ class ContentOPF(object):
             # this is an auto-generated header id, not human-readable and probably duplicated
             # make a new one
             id_ = None
-        
+
         id_ = self.manifest_item(url, mediatype, id_)
 
         # HACK: ADE needs cover flow as first element
@@ -533,20 +530,21 @@ class ContentOPF(object):
         if dc.rights:
             self.metadata.append(dcterms.rights(dc.rights))
 
-        self.metadata.append(dcterms.identifier(dc.opf_identifier, {'id': 'id'})) 
+        self.metadata.append(dcterms.identifier(dc.opf_identifier, {'id': 'id'}))
 
         for count, author in enumerate(dc.authors):
             pretty_name = dc.make_pretty_name(author.name)
             if author.marcrel in {'aut', 'cre'}:
-                self.metadata.append(dcterms.creator(pretty_name, {'id': f'author_{count}' }))
+                self.metadata.append(dcterms.creator(pretty_name, {'id': f'author_{count}'}))
             else:
-                self.metadata.append(dcterms.contributor(pretty_name, {'id': f'author_{count}' }))
+                self.metadata.append(dcterms.contributor(pretty_name, {'id': f'author_{count}'}))
             self.metadata.append(self.opf.meta(author.name,
-                                 {'property':'file-as', 'refines': f'#author_{count}'}))
+                                               {'property':'file-as',
+                                                'refines': f'#author_{count}'}))
             self.metadata.append(self.opf.meta(author.marcrel,
-                                 {'property':'role',
-                                  'refines': f'#author_{count}',
-                                  'scheme': 'marc:relators'}))
+                                               {'property':'role',
+                                                'refines': f'#author_{count}',
+                                                'scheme': 'marc:relators'}))
 
 
         # replace newlines with /
@@ -876,7 +874,10 @@ class Writer(writers.HTMLishWriter):
         if we don't remove it from flow it will be displayed twice.
 
         """
-        for img in xpath(xhtml, "//xhtml:img[@src = $url and not(contains(@class, 'x-ebookmaker-important'))]", url=url):
+        for img in xpath(
+                xhtml,
+                "//xhtml:img[@src = $url and not(contains(@class, 'x-ebookmaker-important'))]",
+                url=url):
             debug("remove_coverpage: dropping <img> %s from flow" % url)
             img.drop_tree()
             return # only the first one though
@@ -918,9 +919,9 @@ class Writer(writers.HTMLishWriter):
                     cover_url = p.attribs.url
                     break
             else:
-                # no items cover items. should not happen
+                # no  cover items. should not happen
                 critical('no cover image available. turn on --generate_cover option')
-                cover_url
+                cover_url = ''
 
             #register an ADE cover
             href = ocf.add_image_wrapper(Writer.url2filename(cover_url), 'Cover')
@@ -944,8 +945,8 @@ class Writer(writers.HTMLishWriter):
 
         filename = os.path.join(os.path.abspath(job.outputdir), job.outputfile)
 
-        if hasattr(options.config,'EPUB_VALIDATOR'):
-            validator = options.config.EPUB_VALIDATOR 
+        if hasattr(options.config, 'EPUB_VALIDATOR'):
+            validator = options.config.EPUB_VALIDATOR
             info('validating...')
             params = validator.split() + [filename]
             checker = subprocess.Popen(params,
@@ -1011,7 +1012,7 @@ class Writer(writers.HTMLishWriter):
                         p.parse()
                         xhtml = copy.deepcopy(p.xhtml) if hasattr(p, 'xhtml') else None
                     if xhtml is not None:
-                        
+
                         HTMLWriter.Writer.xhtml_to_html(xhtml)
 
                         # build up TOC
