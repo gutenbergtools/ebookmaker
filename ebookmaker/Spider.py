@@ -103,7 +103,7 @@ class Spider(object):
                 url = urllib.parse.urldefrag(url)[0]
                 if url == parser.attribs.url or url in self.parsed_urls:
                     continue
-                if elem.get('rel') == 'nofollow' and self.jobtype in ('epub.images',):
+                if elem.get('rel') == 'nofollow' and self.jobtype in ('epub.images', 'epub3.images'):
                     # remove link to content not followed
                     elem.tag = 'span'
                     elem.set('data-nofollow-href', elem.get('href'))
@@ -128,7 +128,7 @@ class Spider(object):
                 if tag == NS.xhtml.a:
                     if self.is_image(new_attribs) and self.is_included_url(new_attribs) and \
                             self.is_included_mediatype(new_attribs) and \
-                            self.jobtype in ('epub.images',):
+                            self.jobtype in ('epub.images', 'epub3.images'):
                         # need to wrap an image
                         wrapper_parser = parsers.WrapperParser.Parser(new_attribs)
                         if wrapper_parser.attribs.url not in self.parsed_urls:

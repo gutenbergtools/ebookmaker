@@ -49,10 +49,11 @@ options = Options()
 CONFIG_FILES = ['/etc/ebookmaker.conf', os.path.expanduser('~/.ebookmaker')]
 
 DEPENDENCIES = collections.OrderedDict((
-    ('all', ('html', 'epub', 'kindle', 'pdf', 'txt', 'rst')),
-    ('test', ('html', 'epub')),
+    ('all', ('html', 'epub', 'epub3', 'kindle', 'pdf', 'txt', 'rst')),
+    ('test', ('html', 'epub', 'epub3')),
     ('html', ('html.images', 'html.noimages')),
     ('epub', ('epub.images', 'epub.noimages')),
+    ('epub3', ('epub3.images',)),
     ('kindle', ('kindle.images', 'kindle.noimages')),
     ('pdf', ('pdf.images', 'pdf.noimages')),
     ('txt', ('txt.utf-8', 'txt.iso-8859-1', 'txt.us-ascii')),
@@ -73,6 +74,7 @@ txt.utf-8 txt.iso-8859-1 txt.us-ascii
 html.images html.noimages
 epub.noimages kindle.noimages pdf.noimages
 epub.images kindle.images pdf.images
+epub3.images
 cover.small cover.medium
 qrcode rdf facebook twitter null""".split()
 
@@ -82,6 +84,7 @@ FILENAMES = {
 
     'epub.noimages': '{id}-epub.epub',
     'epub.images': '{id}-images-epub.epub',
+    'epub3.images': '{id}-images-epub3.epub',
 
     'kindle.noimages': '{id}-kindle.mobi',
     'kindle.images': '{id}-images-kindle.mobi',
@@ -472,7 +475,7 @@ def do_job(job):
                     options.input_mediatype)
 
             spider.recursive_parse(attribs)
-            if job.type.split('.')[0] in ('epub', 'html', 'kindle', 'cover', 'pdf'):
+            if job.type.split('.')[0] in ('epub', 'epub3', 'html', 'kindle', 'cover', 'pdf'):
                 elect_coverpage(spider, job.url, job.dc)
             job.url = spider.redirect(job.url)
             job.base_url = job.url
