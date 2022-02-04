@@ -62,13 +62,14 @@ class HTMLChunker (object):
 
     """
 
-    def __init__ (self):
+    def __init__ (self, version='epub2'):
         self.chunks = []
         self.idmap = {}
         self.chunk = None
         self.chunk_body = None
         self.chunk_size = 0
         self.next_id = 0
+        self.version = version
 
         self.tags = {}
         for tag, size in SECTIONS:
@@ -81,9 +82,9 @@ class HTMLChunker (object):
         """ Generate a name for the chunk. """
         u = list (urllib.parse.urlparse (url))
         root, ext = os.path.splitext (u[2])
-        # FIXME: brain-dead kindlegen only finds links in files with
-        # .html extension. so we just add .html to everything
-        u[2] = "%s-%d%s.html" % (root, self.next_id, ext)
+        
+        html_ext = 'html' if self.version == 'epub2' else 'xhtml'
+        u[2] = f'{root}-{self.next_id}{ext}.{html_ext}'
         self.next_id += 1
         return urllib.parse.urlunparse (u)
 
