@@ -143,7 +143,8 @@ class Parser(HTMLParserBase):
         # move anchor name to id
         # 'id' values are more strict than 'name' values
         # try to fix ill-formed ids
-
+        if self.xhtml is None:
+            return
         seen_ids = set()
 
         for anchor in ids_and_names(self.xhtml):
@@ -355,8 +356,11 @@ class Parser(HTMLParserBase):
             m = re.search(r'line\s(\d+),', str(what))
             if m:
                 lineno = int(m.group(1))
-                error("Line %d: %s" % (lineno, html.splitlines()[lineno - 1]))
-            raise
+                if html:
+                    error("Line %d: %s" % (lineno, html.splitlines()[lineno - 1]))
+                else:
+                    error("empty document")
+
 
 
     def pre_parse(self):
@@ -379,8 +383,12 @@ class Parser(HTMLParserBase):
         except:
             critical('failed to parse %s', self.attribs.url)
             return
-        
+            
         html = str(soup)
+        if not html:
+            critical('no content in %s', self.attribs.url)
+            return
+            
         html = html.replace('&#13;', '&#10;')
         html = html.replace('&#xD;', '&#10;')
         if '\r' in html or '\u2028' in html:

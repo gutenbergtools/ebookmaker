@@ -15,7 +15,7 @@ from __future__ import unicode_literals
 
 import re
 import os
-import chardet
+import cchardet
 from cherrypy.lib import httputil
 import six
 from six.moves import urllib

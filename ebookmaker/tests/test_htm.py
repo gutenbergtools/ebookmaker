@@ -26,6 +26,7 @@ class TestFromHtm(unittest.TestCase):
         self.assertFalse(output)
         outs = [
             "%s-epub.epub",
+            "%s-images-epub3.epub",
             "%s-images-epub.epub",
             "%s-noimages-h.html",
             "%s-h.html",
@@ -50,6 +51,7 @@ class TestFromHtm(unittest.TestCase):
         self.assertFalse(output)
         outs = [
             "%s-epub.epub",
+            "%s-images-epub3.epub",
             "%s-images-epub.epub",
             "%s-noimages-h.html",
             "%s-h.html",

@@ -99,7 +99,8 @@ class ParserFactory(object):
             fp = cls.open_url(url, attribs)
         else:
             fp = cls.open_file(url, attribs)
-
+        if fp is None:
+            return
         if attribs.url in cls.parsers:
             # reuse parser because parsing may be expensive, eg. reST docs
             # debug("... reusing parser for %s" % attribs.url)
@@ -163,7 +164,8 @@ class ParserFactory(object):
                 fp = urllib.request.urlopen(url)
             except urllib.error.URLError as what:
                 fp = None
-                error('Notify: Missing file: %s' % what.reason)
+                critical('Missing file: %s' % what.reason)
+                return None
             except ValueError:  # just a relative path?
                 fp = open_file_from_path(url)
             

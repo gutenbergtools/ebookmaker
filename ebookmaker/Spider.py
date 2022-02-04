@@ -84,10 +84,12 @@ class Spider(object):
                 continue
 
             parser = ParserFactory.create(url, attribs)
-
+            if parser is None:
+                continue
             # Maybe the url was redirected to something we already have?
             url = parser.attribs.url
             if url in self.parsed_urls:
+                critical('no content in %s', url)
                 continue
             self.parsed_urls.add(url)
             if hasattr(parser, 'add_title'):

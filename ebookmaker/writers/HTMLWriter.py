@@ -118,7 +118,7 @@ def add_style(elem, style=''):
 
 def serialize(xhtml):
     """ mode is html or xml """
-    return etree.tostring(html,
+    return etree.tostring(xhtml,
                           method='html',
                           doctype=gg.HTML5_DOCTYPE,
                           encoding='utf-8',
@@ -470,7 +470,7 @@ class Writer(writers.HTMLishWriter):
                 p.parse()
 
             try:
-                
+
                 if xhtml is not None:
                     html = copy.deepcopy(xhtml)
                     if XMLLANG in html.attrib:
