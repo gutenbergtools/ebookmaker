@@ -116,6 +116,14 @@ def add_style(elem, style=''):
             style = f'{style.strip(" ;")};{prev_style};'
         elem.set('style', style)
 
+def serialize(xhtml):
+    """ mode is html or xml """
+    return etree.tostring(html,
+                          method='html',
+                          doctype=gg.HTML5_DOCTYPE,
+                          encoding='utf-8',
+                          pretty_print=False)
+
 class Writer(writers.HTMLishWriter):
     """ Class for writing HTML files. """
 
@@ -483,13 +491,7 @@ class Writer(writers.HTMLishWriter):
                     # Remove unused namespace declarations
                     etree.cleanup_namespaces(html)
 
-                    html = etree.tostring(html,
-                                          method='html',
-                                          doctype='<!DOCTYPE html>',
-                                          encoding='utf-8',
-                                          pretty_print=True)
-
-                    self.write_with_crlf(outfile, html)
+                    self.write_with_crlf(outfile, serialize(html))
                     info("Done generating HTML file: %s" % outfile)
                 else:
                     #images and css files

@@ -75,8 +75,7 @@ BOGUS_CHARSET_NAMES = {'iso-latin-1': 'iso-8859-1',
                        'macintosh': 'mac_roman',
                        }
 
-IMAGE_WRAPPER = """<?xml version="1.0"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+IMAGE_WRAPPER = """<?xml version="1.0"?>{doctype}
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <title>{title}</title>
@@ -538,10 +537,12 @@ class HTMLParserBase(ParserBase):
 
     def serialize(self):
         """ Serialize to string. """
-
+        if self.attribs.url.endswith('.xhtml'):
+            doctype = gg.HTML5_DOCTYPE
+        else:
+            doctype=gg.XHTML_DOCTYPE
         return etree.tostring(self.xhtml,
-                              # FIXME: how can we trigger XHTML compatible serialization?
-                              doctype=gg.XHTML_DOCTYPE,
+                              doctype=doctype,
                               xml_declaration=True,
                               encoding='utf-8',
                               pretty_print=True)

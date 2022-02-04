@@ -16,6 +16,7 @@ import lxml
 
 from copy import copy
 from libgutenberg.Logger import info
+from libgutenberg import GutenbergGlobals as gg
 from ebookmaker.parsers import HTMLParserBase, IMAGE_WRAPPER
 
 mediatypes = ()
@@ -52,7 +53,8 @@ class Parser(HTMLParserBase):
         return IMAGE_WRAPPER.format(
             src=escape(self.src),
             title=quoteattr(self.attribs.title),
-            backlink=backlink)
+            backlink=backlink,
+            doctype=gg.XHTML_DOCTYPE)
 
 
     def wrapper_url(self, img_url):
