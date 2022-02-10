@@ -3,9 +3,9 @@
 
 """
 
-EpubWriter.py
+Epub3Writer.py
 
-Copyright 2009-2022 by Project Gutenberg
+Copyright 2022 by Project Gutenberg
 
 Distributable under the GNU General Public License Version 3 or newer.
 
@@ -15,8 +15,6 @@ Writes an EPUB3 file.
 
 import re
 import datetime
-import zipfile
-import time
 import os
 import copy
 import subprocess
@@ -25,31 +23,30 @@ from xml.sax.saxutils import quoteattr
 from six.moves import urllib
 from lxml import etree
 from lxml.builder import ElementMaker
-from pkg_resources import resource_string # pylint: disable=E0611
 
 import libgutenberg.GutenbergGlobals as gg
 from libgutenberg.GutenbergGlobals import NS, xpath
 from libgutenberg.Logger import critical, debug, error, exception, info, warning
 from libgutenberg.MediaTypes import mediatypes as mt
+
 from ebookmaker import parsers
 from ebookmaker import ParserFactory
 from ebookmaker import HTMLChunker
-# from ebookmaker import Spider
-from ebookmaker import writers
 from ebookmaker.CommonCode import Options
 from ebookmaker.Version import VERSION, GENERATOR
+
 from .EpubWriter import (
     MAX_IMAGE_SIZE,
     MAX_COVER_DIMEN,
     MAX_IMAGE_DIMEN,
     LINKED_IMAGE_SIZE,
     LINKED_IMAGE_DIMEN,
-    DP_PAGENUMBER_CLASSES,
     PRIVATE_CSS,
     OPS_CONTENT_DOCUMENTS,
-    OPS_FONT_TYPES
+    OPS_FONT_TYPES,
+    OutlineFixer
 )
-from . import HTMLWriter
+from . import EpubWriter, HTMLWriter
 
 EPUB_TYPE = '{%s}type' % NS.epub
 
@@ -59,113 +56,8 @@ options = Options()
 match_link_url = re.compile(r'^https?://', re.I)
 match_non_link = re.compile(r'[a-zA-Z0-9_\-\.]*(#.*)?$')
 
-class OEBPSContainer(zipfile.ZipFile):
+class OEBPSContainer(EpubWriter.OEBPSContainer):
     """ Class representing an OEBPS Container. """
-
-    def __init__(self, filename, oebps_path=None):
-        """ Create the zip file.
-
-        And populate it with mimetype and container.xml files.
-
-        """
-
-        self.zipfilename = filename
-        self.oebps_path = oebps_path if oebps_path else 'OEBPS/'
-        info('Creating Epub file: %s' % filename)
-
-        # open zipfile
-        zipfile.ZipFile.__init__(self, filename, 'w', zipfile.ZIP_DEFLATED)
-
-        # write mimetype
-        # the OCF spec says mimetype must be first and uncompressed
-        i = self.zi()
-        i.compress_type = zipfile.ZIP_STORED
-        i.filename = 'mimetype'
-        self.writestr(i, 'application/epub+zip')
-
-        self.add_container_xml('content.opf')
-
-        self.wrappers = 0 # to generate unique filenames for wrappers
-
-
-    def commit(self):
-        """ Close OCF Container. """
-        info("Done Epub file: %s" % self.zipfilename)
-        self.close()
-
-
-    def rollback(self):
-        """ Remove OCF Container. """
-        debug("Removing Epub file: %s" % self.zipfilename)
-        os.remove(self.zipfilename)
-
-
-    def add_unicode(self, name, u):
-        """ Add file to zip from unicode string. """
-        i = self.zi(name)
-        self.writestr(i, u.encode('utf-8'))
-
-
-    def add_bytes(self, name, bytes_, mediatype=None):
-        """ Add file to zip from bytes string. """
-
-        i = self.zi(name)
-        if mediatype and mediatype in parsers.ImageParser.mediatypes:
-            i.compress_type = zipfile.ZIP_STORED
-        self.writestr(i, bytes_)
-
-
-    def add_file(self, name, url, mediatype=None):
-        """ Add file to zip from bytes string. """
-
-        with open(url) as fp:
-            self.add_bytes(name, fp.read(), mediatype)
-
-
-    def zi(self, filename=None):
-        """ Make a ZipInfo. """
-        z = zipfile.ZipInfo()
-        z.date_time = time.gmtime()
-        z.compress_type = zipfile.ZIP_DEFLATED
-        z.external_attr = 0x81a40000
-        if filename:
-            z.filename = os.path.join(self.oebps_path, filename)
-        return z
-
-
-    def add_container_xml(self, rootfilename):
-        """ Write container.xml
-
-        <?xml version='1.0' encoding='UTF-8'?>
-
-        <container xmlns='urn:oasis:names:tc:opendocument:xmlns:container'
-                   version='1.0'>
-          <rootfiles>
-            <rootfile full-path='$path'
-                      media-type='application/oebps-package+xml' />
-          </rootfiles>
-        </container>
-
-        """
-
-        rootfilename = os.path.join(self.oebps_path, rootfilename)
-
-        ns_oasis = 'urn:oasis:names:tc:opendocument:xmlns:container'
-
-        ocf = ElementMaker(namespace=ns_oasis,
-                           nsmap={None: ns_oasis})
-
-        container = ocf.container(
-            ocf.rootfiles(
-                ocf.rootfile(**{
-                    'full-path': rootfilename,
-                    'media-type': 'application/oebps-package+xml'})),
-            version='1.0')
-
-        i = self.zi()
-        i.filename = 'META-INF/container.xml'
-        self.writestr(i, etree.tostring(
-            container, encoding='utf-8', xml_declaration=True, pretty_print=True))
 
 
     def add_image_wrapper(self, img_url, img_title):
@@ -180,36 +72,6 @@ class OEBPSContainer(zipfile.ZipFile):
                                                     doctype=gg.HTML5_DOCTYPE),
                        mt.xhtml)
         return filename
-
-
-
-class OutlineFixer(object):
-    """ Class that fixes outline levels. """
-
-    def __init__(self):
-        self.stack = [(0, 0),]
-        self.last = 0
-
-    def level(self, in_level):
-        if in_level < 1:
-            return in_level
-        (promotion, from_level) = self.stack[-1]
-        if in_level > self.last + 1:
-            # needs promotion
-            more_promotion = in_level - self.last - 1
-            new_promotion = promotion + more_promotion
-            self.last = in_level
-            self.stack.append((new_promotion, in_level))
-            return in_level - new_promotion
-
-        if in_level < from_level:
-            # close out promotion
-            self.last = from_level - promotion - 1
-            self.stack.pop()
-            return self.level(in_level)
-
-        self.last = in_level
-        return in_level - promotion
 
 
 class Toc(object):
@@ -584,287 +446,8 @@ class ContentOPF(object):
 
 
 
-class Writer(writers.HTMLishWriter):
+class Writer(EpubWriter.Writer):
     """ Class that writes epub files. """
-
-
-    @staticmethod
-    def strip_pagenumbers(xhtml, strip_classes):
-        """ Strip dp page numbers.
-
-        Rationale: DP implements page numbers either with float or
-        with absolute positioning. Float is not supported by Kindle.
-        Absolute positioning is not allowed in epub.
-
-        If we'd leave these in, they would show up as numbers in the
-        middle of the text.
-
-        To still keep links working, we replace all page number
-        contraptions we can find with empty <a>'s.
-
-        """
-
-        # look for elements with a class that is in strip_classes
-
-        for class_ in strip_classes:
-            xp = "//xhtml:*[@class and contains(concat(' ', normalize-space(@class), ' '), ' %s ')]" % class_
-
-            count = 0
-            for elem in xpath(xhtml, xp):
-
-                # save textual content
-                text = gg.normalize(etree.tostring(elem,
-                                                   method="text",
-                                                   encoding=str,
-                                                   with_tail=False))
-                if len(text) > 10:
-                    # safeguard against removing things that are not pagenumbers
-                    continue
-
-                if not text:
-                    text = elem.get('title')
-
-                # look for id anywhere inside element
-                id_ = elem.xpath(".//@id")
-
-                # transmogrify element into empty <a>
-                tail = elem.tail
-                elem.clear()
-                elem.tag = NS.xhtml.a
-                if id_:
-                    # some blockheaded PPers include more than
-                    # one page number in one span. take the last id
-                    # because the others represent empty pages.
-                    elem.set('id', id_[-1])
-
-                if class_ in DP_PAGENUMBER_CLASSES:
-                    # mark element as rewritten pagenumber. we
-                    # actually don't use this class for styling
-                    # because it is on an empty element
-                    elem.set('class', 'x-ebookmaker-pageno')
-
-                if text:
-                    elem.set('title', text)
-                elem.tail = tail
-                count += 1
-
-                # The OPS Spec 2.0 is very clear: "Reading Systems
-                # must be XML processors as defined in XML 1.1."
-                # Nevertheless many browser-plugin ebook readers use
-                # the HTML parsers of the browser.  But HTML parsers
-                # don't grok the minimized form of empty elements.
-                #
-                # This will force lxml to output the non-minimized form
-                # of the element.
-                elem.text = ''
-
-            if count:
-                warning("%d elements having class %s have been rewritten." %
-                        (count, class_))
-
-
-    @staticmethod
-    def insert_root_div(xhtml):
-        """ Insert a div immediately below body and move body contents
-        into it.
-
-        Rationale: We routinely turn page numbers into <a> elements.
-        <a> elements are illegal as children of body, but are legal as
-        children of <div>. See: `strip_page_numbers ()`
-
-        """
-        em = ElementMaker(namespace=str(NS.xhtml),
-                          nsmap={None: str(NS.xhtml)})
-
-        for body in xpath(xhtml, "/xhtml:body"):
-            div = em.div
-            div.set('id', 'pgepub-root-div')
-            for child in body:
-                div.append(child)
-            body.append(div)
-
-
-    # characters that are not widely supported
-    translate_map = {
-        0x2012: 0x2013,    # U+2012 FIGURE-DASH    -> U+2013 EN-DASH (ADE lacks this)
-        0x2015: 0x2014,    # U+2015 HORIZONTAL BAR -> U+2014 EM-DASH (ADE lacks this)
-    }
-
-
-    @staticmethod
-    def fix_incompatible_css(sheet):
-        """ Strip CSS properties and values that are not EPUB compatible.
-            Unpack "media handheld" rules
-        """
-
-        cssclass = re.compile(r'\.(-?[_a-zA-Z]+[_a-zA-Z0-9-]*)')
-        html5tag = re.compile(r'(^|[ ,~>+])(figure|figcaption|footer|header|section)')
-
-        for rule in sheet:
-            if rule.type == rule.MEDIA_RULE:
-                if rule.media.mediaText.find('handheld') > -1:
-                    debug("Unpacking CSS @media handheld rule.")
-                    rule.media.mediaText = 'all'
-                    info("replacing  @media handheld rule with @media all")
-
-            if rule.type == rule.STYLE_RULE:
-                #change html5 tags to classes with the same name
-                newrule = html5tag.sub(r'\1div.\2', rule.selectorList.selectorText)
-                rule.selectorList.selectorText = newrule
-
-                ruleclasses = list(cssclass.findall(rule.selectorList.selectorText))
-                for p in list(rule.style):
-                    if p.name == 'float' and "x-ebookmaker" not in ruleclasses:
-                        debug("Dropping property %s" % p.name)
-                        rule.style.removeProperty('float')
-                        rule.style.removeProperty('width')
-                        rule.style.removeProperty('height')
-                    elif p.name == 'position':
-                        debug("Dropping property %s" % p.name)
-                        rule.style.removeProperty('position')
-                        rule.style.removeProperty('left')
-                        rule.style.removeProperty('right')
-                        rule.style.removeProperty('top')
-                        rule.style.removeProperty('bottom')
-                    elif p.name in ('background-image', 'background-position',
-                                    'background-attachment', 'background-repeat'):
-                        debug("Dropping property %s" % p.name)
-                        rule.style.removeProperty(p.name)
-                    elif 'border' not in p.name and 'px' in p.value:
-                        debug("Dropping property with px value %s" % p.name)
-                        rule.style.removeProperty(p.name)
-
-        # debug("exit fix_incompatible_css")
-
-
-    @staticmethod
-    def get_classes_that_float(xhtml):
-        """ Get a list of all classes that use float or position. """
-
-        classes = set()
-        regex = re.compile(r"\.(\w+)", re.ASCII)
-
-        for style in xpath(xhtml, "//xhtml:style"):
-            p = parsers.CSSParser.Parser()
-            if style.text: # try to fix os-dependent empty style bug
-                p.parse_string(style.text)
-
-                for rule in p.sheet:
-                    if rule.type == rule.STYLE_RULE:
-                        for p in rule.style:
-                            if p.name in ('float', 'position'):
-                                classes.update(regex.findall(rule.selectorList.selectorText))
-                                break
-
-        return classes
-
-
-    @staticmethod
-    def strip_links(xhtml, manifest):
-        """
-        Strip all links to local resources that aren't in manifest or are images.
-
-        This does not strip inline images, only standalone images that
-        are targets of links. EPUB does not allow that.
-
-        """
-
-        for link in xpath(xhtml, '//xhtml:a[@href]'):
-            href = urllib.parse.urldefrag(link.get('href'))[0]
-            if href in manifest and not manifest[href].startswith('image'):
-                continue
-            if not href.startswith('file:'):
-                continue
-            debug("strip_links: Deleting <a> to file not in manifest: %s" % href)
-            del link.attrib['href']
-
-
-    @staticmethod
-    def strip_ins(xhtml):
-        """
-        Strip all <ins> tags.
-
-        There's a bug in the epub validator that trips on class and
-        title attributes in <ins> elements.
-
-        """
-        for ins in xpath(xhtml, '//xhtml:ins'):
-            ins.drop_tag()
-
-
-    @staticmethod
-    def strip_noepub(xhtml):
-        """ Strip all <* class='x-ebookmaker-drop'> tags.
-
-        As a way to tailor your html towards epub.
-
-        """
-
-        for e in xpath(xhtml, "//xhtml:*[contains (@class, 'x-ebookmaker-drop')]"):
-            e.drop_tree()
-
-
-    @staticmethod
-    def single_child(e):
-        """ Resturn true if node contains a single child element and nothing else. """
-        p = e.getparent()
-        return (len(p) == 1 and
-                (p.text is None or p.text.isspace()) and
-                (e.tail is None or e.tail.isspace()))
-
-
-    @staticmethod
-    def url2filename(url):
-        """ Generate a filename for this url.
-            - preserve original filename and fragment
-            - map directory path to a cross platform filename string
-
-        """
-        if match_link_url.match(url):
-            return url
-        if url.startswith('file://'):
-            url = url[7:]
-
-        url_match = match_non_link.search(url)
-        prefix = url[0:-len(url_match.group(0))]
-        if prefix:
-            prefix = abs(hash(prefix))
-            return f'{prefix}_{url_match.group(0)}'
-        return url
-
-
-    @staticmethod
-    def rescale_into(dimen, max_dimen):
-        """ Scale down dimen to fit into max_dimen. """
-        scale = 1.0
-        if dimen[0]:
-            scale = min(scale, max_dimen[0] / float(dimen[0]))
-        if dimen[1]:
-            scale = min(scale, max_dimen[1] / float(dimen[1]))
-
-        if scale < 1.0:
-            dimen = (int(dimen[0] * scale) if dimen[0] else None,
-                     int(dimen[1] * scale) if dimen[1] else None)
-
-        return dimen
-
-
-    @staticmethod
-    def fix_html_image_dimensions(xhtml):
-        """
-        Remove all width and height that is not specified in '%'.
-        """
-
-        for img in xpath(xhtml, '//xhtml:img'):
-            a = img.attrib
-
-            if '%' in a.get('width', '%') and '%' in a.get('height', '%'):
-                continue
-
-            if 'width' in a:
-                del a['width']
-            if 'height' in a:
-                del a['height']
 
 
     def remove_coverpage(self, xhtml, url):
