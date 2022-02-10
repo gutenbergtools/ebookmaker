@@ -13,8 +13,6 @@ Writes an EPUB file.
 
 """
 
-from __future__ import unicode_literals
-
 import re
 import datetime
 import zipfile
@@ -24,7 +22,6 @@ import copy
 import subprocess
 from xml.sax.saxutils import quoteattr
 
-import six
 from six.moves import urllib
 from lxml import etree
 from lxml.builder import ElementMaker
@@ -32,7 +29,7 @@ from pkg_resources import resource_string # pylint: disable=E0611
 
 import libgutenberg.GutenbergGlobals as gg
 from libgutenberg.GutenbergGlobals import NS, xpath
-from libgutenberg.Logger import info, debug, warning, error, exception
+from libgutenberg.Logger import critical, debug, error, exception, info, warning
 from libgutenberg.MediaTypes import mediatypes as mt
 from ebookmaker import parsers
 from ebookmaker import ParserFactory
@@ -287,7 +284,7 @@ class AdobePageMap(object):
 
         page_map = "%s\n\n%s" % (gg.XML_DECLARATION,
                                  etree.tostring(root,
-                                                encoding=six.text_type,
+                                                encoding=str,
                                                 pretty_print=True))
         if options.verbose >= 3:
             debug(page_map)
@@ -390,14 +387,13 @@ class TocNCX(object):
         if has_pages:
             ncx.append(self._make_pagelist(self.toc))
 
-
         # Ugly workaround for error: "Serialisation to unicode must not
         # request an XML declaration"
 
         toc_ncx = "%s\n\n%s" % (gg.XML_DECLARATION,
                                 etree.tostring(ncx,
                                                doctype=gg.NCX_DOCTYPE,
-                                               encoding=six.text_type,
+                                               encoding=str,
                                                pretty_print=True))
         if options.verbose >= 3:
             debug(toc_ncx)
@@ -503,7 +499,7 @@ class ContentOPF(object):
 
         content_opf = "%s\n\n%s" % (gg.XML_DECLARATION,
                                     etree.tostring(package,
-                                                   encoding=six.text_type,
+                                                   encoding=str,
                                                    pretty_print=True))
 
         # FIXME: remove this when lxml is fixed
@@ -765,7 +761,7 @@ class Writer(writers.HTMLishWriter):
                 # save textual content
                 text = gg.normalize(etree.tostring(elem,
                                                    method="text",
-                                                   encoding=six.text_type,
+                                                   encoding=str,
                                                    with_tail=False))
                 if len(text) > 10:
                     # safeguard against removing things that are not pagenumbers
@@ -846,9 +842,9 @@ class Writer(writers.HTMLishWriter):
 
         for node in xhtml.iter():
             if node.text:
-                node.text = six.text_type(node.text).translate(Writer.translate_map)
+                node.text = str(node.text).translate(Writer.translate_map)
             if node.tail:
-                node.tail = six.text_type(node.tail).translate(Writer.translate_map)
+                node.tail = str(node.tail).translate(Writer.translate_map)
 
 
     @staticmethod
@@ -1075,7 +1071,7 @@ class Writer(writers.HTMLishWriter):
                 except TypeError:
                     pass
                 tail = pre.tail
-                s = etree.tostring(pre, encoding=six.text_type, with_tail=False)
+                s = etree.tostring(pre, encoding=str, with_tail=False)
                 s = s.replace('>\n', '>')      # eliminate that empty first line
                 s = s.replace('\n', '\n<br/>')
                 s = re.sub('  +', nbsp, s)
@@ -1137,9 +1133,7 @@ class Writer(writers.HTMLishWriter):
     @staticmethod
     def fix_html_image_dimensions(xhtml):
         """
-
         Remove all width and height that is not specified in '%'.
-
         """
 
         for img in xpath(xhtml, '//xhtml:img'):
@@ -1200,24 +1194,15 @@ class Writer(writers.HTMLishWriter):
                     break
 
             opf.toc_item('toc.ncx')
-            ocf.add_unicode('toc.ncx', six.text_type(ncx))
+            ocf.add_unicode('toc.ncx', str(ncx))
 
             for p in parserlist:
                 if 'icon' in p.attribs.rel:
                     opf.add_coverpage(ocf, p.attribs.url)
                     break
 
-            # Adobe page-map
-
-            # opf.pagemap_item('page-map.xml')
-            # ocf.add_unicode('page-map.xml', six.text_type(AdobePageMap(ncx)))
-
-            # content.opf
-
-            # debug(etree.tostring(opf.manifest, encoding=siy.text_type, pretty_print=True))
-
             opf.rewrite_links(self.url2filename)
-            ocf.add_unicode('content.opf', six.text_type(opf))
+            ocf.add_unicode('content.opf', str(opf))
 
             ocf.commit()
 
@@ -1234,8 +1219,8 @@ class Writer(writers.HTMLishWriter):
 
         filename = os.path.join(os.path.abspath(job.outputdir), job.outputfile)
 
-        if hasattr(options.config,'EPUB_VALIDATOR'):
-            validator = options.config.EPUB_VALIDATOR 
+        if hasattr(options.config, 'EPUB_VALIDATOR'):
+            validator = options.config.EPUB_VALIDATOR
             info('validating...')
             params = validator.split() + [filename]
             checker = subprocess.Popen(params,
