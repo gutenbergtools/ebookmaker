@@ -974,7 +974,7 @@ class Writer(writers.HTMLishWriter):
         for newtag in ['figcaption', 'figure', 'footer', 'header', 'section']:
             for tag in xpath(xhtml, f'//xhtml:{newtag}'):
                 usedtags.add(newtag)
-                tag.tag = 'div'
+                tag.tag = NS.xhtml.div
                 writers.HTMLWriter.add_class(tag, newtag)
 
         if 'figure' in usedtags:
