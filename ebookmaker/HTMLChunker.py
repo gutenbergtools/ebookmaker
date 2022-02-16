@@ -30,17 +30,18 @@ from libgutenberg.Logger import debug, error
 from ebookmaker.CommonCode import Options
 options = Options()
 
-# MAX_CHUNK_SIZE  = 300 * 1024  # bytes
 MAX_CHUNK_SIZE  = 100 * 1024  # bytes
 
 SECTIONS = [
     ('div.section', 0.0),
     ('div.chapter', 0.0),
+    ('section', 0.0),
     ('h1',          0.5),
     ('div',         0.5),
     ('h2',          0.7),
     ('h3',          0.75),
-    ('p',           0.8)
+    ('p',           0.8),
+    ('figure',           0.8),
     ]
 
 def xpath (node, path):
@@ -70,10 +71,11 @@ class HTMLChunker (object):
         self.chunk_size = 0
         self.next_id = 0
         self.version = version
+        self.max_chunk_size = MAX_CHUNK_SIZE * (1 if version == 'epub2' else 3)
 
         self.tags = {}
         for tag, size in SECTIONS:
-            self.tags[NS.xhtml[tag]] = int (size * MAX_CHUNK_SIZE)
+            self.tags[NS.xhtml[tag]] = int (size * self.max_chunk_size)
         for tag in options.section_tags:
             self.tags[NS.xhtml[tag]] = 0
 
@@ -134,7 +136,7 @@ class HTMLChunker (object):
 
         attribs = copy.copy (attribs)
 
-        if self.chunk_size > MAX_CHUNK_SIZE:
+        if self.chunk_size > self.max_chunk_size:
             self.split (self.chunk, attribs)
             return
 
@@ -204,7 +206,7 @@ class HTMLChunker (object):
                     tags = [child.tag]
 
                 for tag in tags:
-                    if ((self.chunk_size + child_size > MAX_CHUNK_SIZE) or
+                    if ((self.chunk_size + child_size > self.max_chunk_size) or
                               (tag in self.tags and
                                self.chunk_size > self.tags[tag])):
 

@@ -25,6 +25,7 @@ Beautiful Soup, by contrast, only changes the source when absolutely needed to m
         - img class="dropcap" are not changed to spans
         - any of the above that prove to be needed can be added back as needed
         - all html4 -> html5 changes are made, no matter the source.
+- Ebookmaker breaks HTML source into chunks to improve performance on EPUB readers. For EPUB3 files, the chunker treats `section` elements the same way it treated `div.section` elements for EPUB2. Similarly section elements in HTML5 source are converted to div.section elements for EPUB2. In addition, the maximum chunk size for EPUB3 is 300KB compared to 100KB for EPUB2.
     
 
 
