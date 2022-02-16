@@ -393,11 +393,11 @@ class Writer(writers.HTMLishWriter):
         deprecated_atts = {'frame': CSS_FOR_FRAME, 'rules': CSS_FOR_RULES, 'background': {}}
         for att in deprecated_atts:
             for table in xpath(html, f'//xhtml:table[@{att}]'):
-                att_value = table.attrib[att]
+                att_value = table.attrib[att].lower()
                 if att_value in deprecated_atts[att]:
                     add_class(table, f'{att}-{att_value}')
-                    del table.attrib[att]
                     deprecated_used.add(att_value)
+                del table.attrib[att]
 
         # remove span attribute from colgroups that have col children
         for colgroup in xpath(html, "//xhtml:colgroup[@span and xhtml:col]"):
