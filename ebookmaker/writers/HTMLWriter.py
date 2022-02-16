@@ -34,12 +34,12 @@ options = Options()
 cssutils.ser.prefs.validOnly = True
 XMLLANG = '{%s}lang' % gg.NS.xml
 XMLSPACE = '{%s}space' % gg.NS.xml
-DEPRECATED = ['big']
 
 CSS_FOR_DEPRECATED = {
     'big': ".xhtml_big {font-size: larger;}",
     'tt': ".xhtml_tt {font-family: monospace;}",
     'blink': "",
+    'center': ".xhtml_center {justify-content: center; display: flex;}",
 }
 
 ## from https://hg.mozilla.org/mozilla-central/file/3fd770ef6a65/layout/style/html.css#l310
@@ -233,7 +233,7 @@ class Writer(writers.HTMLishWriter):
                     pass
 
     @staticmethod
-    def fix_css_for_deprecated(sheet, tags=DEPRECATED, replacement='span'):
+    def fix_css_for_deprecated(sheet, tags=[], replacement='span'):
         """ for deprecated tags, change selector to {replacement}.xhtml_{tag name};
             if no existing selector, add the selector with a style
         """
@@ -369,12 +369,12 @@ class Writer(writers.HTMLishWriter):
                 dd.addprevious(etree.Element(xhtmltag('dt')))
 
         # deprecated elements -  replace with <span class="xhtml_{tag name}">
-        deprecated = ['big', 'tt', 'blink']
+        deprecated = {'big': 'span', 'tt': 'span', 'blink': 'span', 'center': 'div'}
         deprecated_used = set()
         for tag in deprecated:
             for elem in xpath(html, "//xhtml:" + tag):
                 add_class(elem, 'xhtml_' + tag)
-                elem.tag = 'span'
+                elem.tag = deprecated[tag]
                 deprecated_used.add(tag)
 
         html.head.insert(0, etree.Element(xhtmltag('meta'), charset="utf-8"))
