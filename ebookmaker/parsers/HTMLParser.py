@@ -334,13 +334,12 @@ class Parser(HTMLParserBase):
     def __parse(self, html):
         # remove xml decl and doctype, we will add the correct one before serializing
         # html = re.compile('^.*<html ', re.I | re.S).sub('<html ', html)
-        # FIXME: do not remove doctype because we need it to load the dtd
 
-        # remove xml declaration because of parser error: "Unicode
-        # strings with encoding declaration are not supported. Please
-        # use bytes input or XML fragments without declaration."
-        re_xml_decl = re.compile(r'^.*?<\?xml.*?\?>', re.S | re.U)
+        re_xml_decl = re.compile(r'^.*?<\?xml.*?\?>', re.S)
+        re_doctype = re.compile(r'<!DOCTYPE[^>]*>\s*', re.I)
         html = re_xml_decl.sub('', html)
+        html = re_doctype.sub('<!DOCTYPE html >', html)
+
         try:
             return etree.fromstring(
                 html,
@@ -383,7 +382,7 @@ class Parser(HTMLParserBase):
         except:
             critical('failed to parse %s', self.attribs.url)
             return
-            
+        soup.html['xmlns'] = NS.xhtml
         html = str(soup)
         if not html:
             critical('no content in %s', self.attribs.url)
