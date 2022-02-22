@@ -71,6 +71,13 @@ DEPRECATED = {
     'width': 'hr td th applet pre',
 }
 
+ALLOWED_IN_BODY = {
+    NS.xhtml.address, NS.xhtml.blockquote, f'{NS.xhtml.de}l', NS.xhtml.div, NS.xhtml.dl,
+    NS.xhtml.h1, NS.xhtml.h2, NS.xhtml.h3, NS.xhtml.h4, NS.xhtml.h5, NS.xhtml.h6,
+    NS.xhtml.hr, NS.xhtml.ins, NS.xhtml.noscript, NS.xhtml.ol, NS.xhtml.p, NS.xhtml.pre,     
+    NS.xhtml.script, NS.xhtml.table, NS.xhtml.ul,
+    NS.svg.svg,
+}
 
 class Parser(HTMLParserBase):
     """ Parse a HTML Text
@@ -204,6 +211,17 @@ class Parser(HTMLParserBase):
                     error("Dropping frag to non-existing id in %s" % href)
 
 
+    def enclose_text(self):
+        """ same as setting enclose-text option on tidy; 
+        ' enclose any text it finds in the body element within a <P> element. 
+        This is useful when you want to take existing HTML and use it with a style sheet.'
+        """
+        for elem in self.xhtml.body:
+            if elem.tag not in ALLOWED_IN_BODY:
+                new_p = elem.makeelement(NS.xhtml.p)
+                elem.addprevious(new_p)
+                new_p.append(elem)
+                
     def _to_xhtml11(self):
         """ Make vanilla xhtml more conform to xhtml 1.1 """
 
@@ -211,6 +229,8 @@ class Parser(HTMLParserBase):
         for meta in xpath(self.xhtml, "/xhtml:html/xhtml:head/xhtml:meta[@http-equiv]"):
             if meta.get('http-equiv').lower() == 'content-type':
                 meta.set('content', mt.xhtml + '; charset=utf-8')
+
+        self.enclose_text()
 
         # drop javascript
 
