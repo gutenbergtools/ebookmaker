@@ -538,8 +538,10 @@ class HTMLParserBase(ParserBase):
     def serialize(self):
         """ Serialize to string. """
         if self.attribs.url.endswith('.xhtml'):
-            doctype = gg.HTML5_DOCTYPE
+            # epub3
+            doctype = ""
         else:
+            # epub2
             doctype=gg.XHTML_DOCTYPE
         return etree.tostring(self.xhtml,
                               doctype=doctype,
