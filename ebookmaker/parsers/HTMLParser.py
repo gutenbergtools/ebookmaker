@@ -23,13 +23,16 @@ from lxml import etree
 
 from bs4 import BeautifulSoup
 
-from libgutenberg.GutenbergGlobals import NS, xpath
+from libgutenberg.GutenbergGlobals import NS, HTML5_DOCTYPE
 from libgutenberg.Logger import critical, info, debug, warning, error
 from libgutenberg.MediaTypes import mediatypes as mt
 
 from ebookmaker import parsers
 from ebookmaker.parsers import HTMLParserBase
 from ebookmaker.CommonCode import Options
+from ebookmaker.utils import (
+    add_class, add_style, css_len, check_lang, gg, replace_elements,  xpath,
+)
 
 options = Options()
 
@@ -414,8 +417,7 @@ class Parser(HTMLParserBase):
             html = '\n'.join(html.splitlines())
         self.unicode_buffer = html
 
-        if self.xhtml is None:
-            self.xhtml = self.__parse(html)     # let exception bubble up
+        self.xhtml = self.__parse(html)     # let exception bubble up
 
         self._fix_anchors() # needs relative paths
 

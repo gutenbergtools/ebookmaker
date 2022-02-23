@@ -22,24 +22,22 @@ import uuid
 import cssutils
 from lxml import etree
 
-import libgutenberg.GutenbergGlobals as gg
-from libgutenberg.GutenbergGlobals import xpath
+
 from libgutenberg.Logger import debug, exception, info, error, warning
 
 from ebookmaker import writers
 from ebookmaker.CommonCode import Options
 from ebookmaker.parsers import webify_url
-
+from ebookmaker.utils import (
+    add_class, add_style, css_len, check_lang, replace_elements, gg, xpath,
+)
 options = Options()
 cssutils.ser.prefs.validOnly = True
-XMLLANG = '{%s}lang' % gg.NS.xml
-XMLSPACE = '{%s}space' % gg.NS.xml
 
-CSS_FOR_DEPRECATED = {
+
+CSS_FOR_REPLACED = {
     'big': ".xhtml_big {font-size: larger;}",
     'tt': ".xhtml_tt {font-family: monospace;}",
-    'blink': "",
-    'center': ".xhtml_center {justify-content: center; display: flex;}",
 }
 
 ## from https://hg.mozilla.org/mozilla-central/file/3fd770ef6a65/layout/style/html.css#l310
@@ -88,33 +86,28 @@ CSS_FOR_FRAME = {
     'vsides': '.frame-vsides {border-style: hidden outset;}',
     'border': 'frame-border {border-style: outset;}',
 }
-CSS_FOR_DEPRECATED.update(CSS_FOR_RULES)
-CSS_FOR_DEPRECATED.update(CSS_FOR_FRAME)
+CSS_FOR_REPLACED.update(CSS_FOR_RULES)
+CSS_FOR_REPLACED.update(CSS_FOR_FRAME)
 
-def xhtmltag(tag):
-    return '{%s}%s' % (gg.NS.xhtml, tag)
+REPLACE_ELEMENTS = {
+    'big': 'span',
+    'tt': 'span', 
+}
 
-def css_len(len_str):
-    """ if an int, make px """
-    try:
-        return str(int(len_str)) + 'px'
-    except ValueError:
-        return len_str
+# replacing attributes with css in a style attribute
+# (tag, attr, cssprop, val2css)
+REPLACEMENTS = [
+    ('tbody td tfoot th thead tr', 'align', 'text-align', lambda x: x),
+    ('table td', 'background', '', ''),
+    ('table', 'border', 'border-width', css_len),
+    ('table td tr', 'bordercolor', 'border-color',  lambda x: x),
+    ('table', 'cellpadding', 'padding', css_len),
+    ('table', 'cellspacing', 'border-spacing', css_len),
+    ('col td th tr', 'valign', 'vertical-align', lambda x: x),
+    ('tbody tfoot thead', 'valign', 'vertical-align', lambda x: x),
+    ('col', 'width', 'width', css_len),
+]
 
-def add_class(elem, classname):
-    if 'class' in elem.attrib and elem.attrib['class']:
-        vals = elem.attrib['class'].split()
-    else:
-        vals = []
-    vals.append(classname)
-    elem.set('class', ' '.join(vals))
-
-def add_style(elem, style=''):
-    if style:
-        if 'style' in elem.attrib and elem.attrib['style']:
-            prev_style = elem.attrib['style'].strip(' ;')
-            style = f'{style.strip(" ;")};{prev_style};'
-        elem.set('style', style)
 
 def serialize(xhtml):
     """ mode is html or xml """
@@ -251,23 +244,6 @@ class Writer(writers.HTMLishWriter):
         try to convert the html4 DOM to an html5 DOM
         (assumes xhtml namespaces have been removed, except from attribute values)
         '''
-        def check_lang(elem, lang_att):
-            three2two = {'ita': 'it', 'lat': 'la'}
-            lang_att = three2two.get(lang_att, lang_att)
-            lang = elem.attrib[lang_att]
-            lang_name = gg.language_map.get(lang, default=None)
-            if lang_name:
-                elem.attrib[XMLLANG] = lang
-                elem.attrib['lang'] = lang
-                return True
-            clean_lang = gg.language_map.inverse(lang, default=None)
-            if not clean_lang:
-                warning("invalid lang attribute %s", lang)
-                del elem.attrib[lang_att]
-                elem.attrib['data-invalid-lang'] = lang
-            elif lang != clean_lang:
-                elem.attrib['lang'] = clean_lang
-                elem.attrib[XMLLANG] = clean_lang
 
         # fix metas
         for meta in xpath(html, "//xhtml:meta[translate(@http-equiv, 'CT', 'ct')='content-type']"):
@@ -282,13 +258,13 @@ class Writer(writers.HTMLishWriter):
             meta.getparent().remove(meta)
         for elem in xpath(html, "//xhtml:*[@xml:space]"):
             if elem.tag in ('pre', 'style'):
-                del elem.attrib[XMLSPACE]
+                del elem.attrib[NS.xml.space]
 
-        #check values of lang
+        #check values of lang; lang attributes moved to xml:lang in pre_parse
         for elem in xpath(html, "//xhtml:*[@lang]"):
             check_lang(elem, 'lang')
         for elem in xpath(html, "//xhtml:*[@xml:lang and not(@lang)]"):
-            check_lang(elem, XMLLANG)
+            check_lang(elem, NS.xml.lang)
 
         # remove obsolete attributes
         attrs_to_remove = [('style', 'type'), ('img', 'longdesc')]
@@ -308,42 +284,14 @@ class Writer(writers.HTMLishWriter):
             for elem in xpath(html, f"//xhtml:*[@{attr}='' or @{attr}=0]"):
                 del elem.attrib[attr]
 
-        # replacing attributes with css in a style attribute
-        # (tag, attr, cssprop, val2css)
-        replacements = [
-            ('col', 'width', 'width', css_len),
-            ('col', 'valign', 'vertical-align', lambda x: x),
-            ('table', 'width', 'width', css_len),
-            ('td', 'align', 'text-align', lambda x: x),
-            ('td', 'valign', 'vertical-align', lambda x: x),
-            ('td', 'background', '', ''),
-            ('td', 'bordercolor', 'border-color',  lambda x: x),
-            ('tr', 'align', 'text-align', lambda x: x),
-            ('tr', 'valign', 'vertical-align', lambda x: x),
-            ('tr', 'bordercolor', 'border-color',  lambda x: x),
-            ('th', 'align', 'text-align', lambda x: x),
-            ('th', 'valign', 'vertical-align', lambda x: x),
-            ('thead', 'align', 'text-align', lambda x: x),
-            ('thead', 'valign', 'vertical-align', lambda x: x),
-            ('tfoot', 'align', 'text-align', lambda x: x),
-            ('tfoot', 'valign', 'vertical-align', lambda x: x),
-            ('tbody', 'align', 'text-align', lambda x: x),
-            ('tbody', 'valign', 'vertical-align', lambda x: x),
-            ('table', 'cellpadding', 'padding', css_len),
-            ('table', 'cellspacing', 'border-spacing', css_len),
-            ('table', 'border', 'border-width', css_len),
-            ('table', 'bordercolor', 'border-color',  lambda x: x),
-            ('table', 'height', 'height', css_len),
-            ('table', 'background', '', ''),
-        ]
-        # width obsolete on table, col
-        for (tag, attr, cssattr, val2css) in replacements:
-            for elem in xpath(html, f"//xhtml:{tag}[@{attr}]"):
-                if elem.attrib[attr]:
-                    val = elem.attrib[attr]
-                    del elem.attrib[attr]
-                    if cssattr:
-                        add_style(elem, style=f'{cssattr}: {val2css(val)};')
+        for (tags, attr, cssattr, val2css) in REPLACEMENTS:
+            for tag in tags.split():
+                for elem in xpath(html, f"//xhtml:{tag}[@{attr}]"):
+                    if elem.attrib[attr]:
+                        val = elem.attrib[attr]
+                        del elem.attrib[attr]
+                        if cssattr:
+                            add_style(elem, style=f'{cssattr}: {val2css(val)};')
 
 
         # width and height attributes must be integer
@@ -362,22 +310,17 @@ class Writer(writers.HTMLishWriter):
 
         # fix missing <dd>,<dt> elements
         for dt in xpath(html, "//xhtml:dt"):
-            if dt.getnext() is None or dt.getnext().tag != xhtmltag('dd'):
-                dt.addnext(etree.Element(xhtmltag('dd')))
+            if dt.getnext() is None or dt.getnext().tag != NS.xhtml.dd:
+                dt.addnext(etree.Element(NS.xhtml.dd))
         for dd in xpath(html, "//xhtml:dd"):
             if dd.getprevious() is None:
-                dd.addprevious(etree.Element(xhtmltag('dt')))
+                dd.addprevious(etree.Element(NS.xhtml.dt))
 
-        # deprecated elements -  replace with <span class="xhtml_{tag name}">
-        deprecated = {'big': 'span', 'tt': 'span', 'blink': 'span', 'center': 'div'}
-        deprecated_used = set()
-        for tag in deprecated:
-            for elem in xpath(html, "//xhtml:" + tag):
-                add_class(elem, 'xhtml_' + tag)
-                elem.tag = deprecated[tag]
-                deprecated_used.add(tag)
+        # deprecated elements -  replace with <span/div class="xhtml_{tag name}">
+        deprecated_used = replace_elements(html, REPLACE_ELEMENTS)
 
-        html.head.insert(0, etree.Element(xhtmltag('meta'), charset="utf-8"))
+
+        html.head.insert(0, etree.Element(NS.xhtml.meta, charset="utf-8"))
 
         ##### tables #######
 
@@ -390,6 +333,7 @@ class Writer(writers.HTMLishWriter):
 
 
         # replace frame and rules attributes on tables
+        
         deprecated_atts = {'frame': CSS_FOR_FRAME, 'rules': CSS_FOR_RULES, 'background': {}}
         for att in deprecated_atts:
             for table in xpath(html, f'//xhtml:table[@{att}]'):
@@ -420,11 +364,12 @@ class Writer(writers.HTMLishWriter):
                 Writer.fix_css_for_deprecated(sheet, tags=deprecated_used)
                 style.text = sheet.cssText.decode("utf-8")
 
-        css_for_deprecated = ' '.join([CSS_FOR_DEPRECATED.get(tag, '') for tag in deprecated_used])
+
+        css_for_deprecated = ' '.join([CSS_FOR_REPLACED.get(tag, '') for tag in deprecated_used])
         if css_for_deprecated:
-            elem = etree.Element(xhtmltag('style'))
+            elem = etree.Element(NS.xhtml.style)
             elem.text = css_for_deprecated
-            html.find(xhtmltag('head')).insert(1, elem) # right after charset declaration
+            html.find(NS.xhtml.head).insert(1, elem) # right after charset declaration
 
 
     def build(self, job):
@@ -473,10 +418,11 @@ class Writer(writers.HTMLishWriter):
 
                 if xhtml is not None:
                     html = copy.deepcopy(xhtml)
-                    if XMLLANG in html.attrib:
-                        lang =  html.attrib[XMLLANG]
+
+                    if NS.xml.lang in html.attrib:
+                        lang =  html.attrib[NS.xml.lang]
                         html.attrib['lang'] = job.dc.languages[0].id or lang
-                        del(html.attrib[XMLLANG])
+                        del(html.attrib[NS.xml.lang])
                     self.add_dublincore(job, html)
 
                     self.add_meta_generator(html)

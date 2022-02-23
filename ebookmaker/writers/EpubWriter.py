@@ -27,8 +27,7 @@ from lxml import etree
 from lxml.builder import ElementMaker
 from pkg_resources import resource_string # pylint: disable=E0611
 
-import libgutenberg.GutenbergGlobals as gg
-from libgutenberg.GutenbergGlobals import NS, xpath
+from libgutenberg.GutenbergGlobals import NS
 from libgutenberg.Logger import critical, debug, error, exception, info, warning
 from libgutenberg.MediaTypes import mediatypes as mt
 from ebookmaker import parsers
@@ -38,6 +37,9 @@ from ebookmaker import HTMLChunker
 from ebookmaker import writers
 from ebookmaker.CommonCode import Options
 from ebookmaker.Version import VERSION, GENERATOR
+from ebookmaker.utils import (
+    add_class, add_style, css_len, check_lang, gg, xhtmltag, xpath,
+)
 
 options = Options()
 
@@ -969,6 +971,12 @@ class Writer(writers.HTMLishWriter):
             tbody = tfoot.getparent().find('{*}tbody')
             if tbody is not None:
                 tbody.addprevious(tfoot)
+
+        # set required attributes removed in html5
+        attrs_to_fill = [('style', 'type', 'text/css')]
+        for (tag, attr, fill) in attrs_to_fill:
+            for elem in xpath(xhtml, f"//xhtml:{tag}[not(@{attr})]"):
+                elem.set(attr, fill)
 
         usedtags = set()
         for newtag in ['figcaption', 'figure', 'footer', 'header', 'section']:

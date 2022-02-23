@@ -7,10 +7,12 @@ Tidy did some other things that caused Ebookmaker's HTML5 output poorly suited f
 
 Beautiful Soup, by contrast, only changes the source when absolutely needed to make parsable unicode  HTML. We expect the resulting HTML5 files will be more pleasing for PG contributors.
     - Beautiful soup required some minor modification in error catching for missing files
+    - Incoming DOCTYPE is ignored
 
 - for HTML5, move col@valign to css
 - for HTML5, change 3 letter language codes to 2 letter codes where available
 - for HTML5, fill empty title elements
+- for HTML5, improve handling of HTML4 table@frame and table@rules
 - fixed crash in text file analysis when number of lines in paragraph exceeds log(max float). 700-ish
 - include opentype fonts in EPUB file (.ttf. .otf, .woff), requires libgutenberg >= 0.8.14. fixes #106
 - added an EPUB3 writer. In addition to producing valid EPUB3 files, some changes have been made to the produced EPUB.
