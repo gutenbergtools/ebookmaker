@@ -38,6 +38,8 @@ cssutils.ser.prefs.validOnly = True
 CSS_FOR_REPLACED = {
     'big': ".xhtml_big {font-size: larger;}",
     'tt': ".xhtml_tt {font-family: monospace;}",
+    # add some needed CSS3
+    '*': ".xhtml_center {justify-content: center; display: flex;}",
 }
 
 ## from https://hg.mozilla.org/mozilla-central/file/3fd770ef6a65/layout/style/html.css#l310
@@ -364,7 +366,7 @@ class Writer(writers.HTMLishWriter):
                 Writer.fix_css_for_deprecated(sheet, tags=deprecated_used)
                 style.text = sheet.cssText.decode("utf-8")
 
-
+        deprecated_used.add('*')  # '*' provides for css rules that are always added
         css_for_deprecated = ' '.join([CSS_FOR_REPLACED.get(tag, '') for tag in deprecated_used])
         if css_for_deprecated.strip():
             elem = etree.Element(NS.xhtml.style)
