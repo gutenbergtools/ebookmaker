@@ -19,7 +19,6 @@ import re
 from urllib.parse import urlparse, urljoin
 import uuid
 
-import cssutils
 from lxml import etree
 
 
@@ -28,6 +27,7 @@ from libgutenberg.Logger import debug, exception, info, error, warning
 from ebookmaker import writers
 from ebookmaker.CommonCode import Options
 from ebookmaker.parsers import webify_url
+from ebookmaker.parsers.CSSParser import cssutils
 from ebookmaker.utils import (
     add_class, add_style, css_len, check_lang, replace_elements, gg, xpath,
 )

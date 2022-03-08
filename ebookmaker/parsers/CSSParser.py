@@ -29,6 +29,16 @@ RE_ELEMENT = re.compile(r'((?:^|\s)[a-z0-9]+)', re.I)
 
 mediatypes = (mt.css, )
 
+PG_CSS_PROFILE = (
+    'Added Properties for Project Gutenberg',
+    {
+        'display': 'flex',
+        'justify-content': 'center',
+    },
+    None
+)
+cssutils.profile.addProfiles([PG_CSS_PROFILE])
+
 class Parser(ParserBase):
     """ Parse an external CSS file. """
 
