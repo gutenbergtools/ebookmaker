@@ -366,7 +366,7 @@ class Writer(writers.HTMLishWriter):
 
 
         css_for_deprecated = ' '.join([CSS_FOR_REPLACED.get(tag, '') for tag in deprecated_used])
-        if css_for_deprecated:
+        if css_for_deprecated.strip():
             elem = etree.Element(NS.xhtml.style)
             elem.text = css_for_deprecated
             html.find(NS.xhtml.head).insert(1, elem) # right after charset declaration
