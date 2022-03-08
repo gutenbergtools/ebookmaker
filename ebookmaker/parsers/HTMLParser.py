@@ -40,38 +40,60 @@ mediatypes = ('text/html', mt.xhtml)
 
 RE_XMLDECL = re.compile(r'<\?xml[^?]+\?>\s*')
 
+FONT_SIZES = {
+    '1': 'xx-small',
+    '2': 'x-small',
+    '3': 'small',
+    '4': 'medium',
+    '5': 'large',
+    '6': 'x-large',
+    '7': 'xx-large',
+    '+1': '110%',
+    '-1': '90%',
+    '+2': '125%',
+    '-2': '75%',
+}
+
+LIST_STYLES ={
+    '1': 'decimal',
+    'i': 'lower-roman',
+    'I': 'upper-roman',
+    'a': 'lower-alpha',
+    'A': 'upper-alpha',
+}
+
+REPLACE_ELEMENTS = {
+    'applet': None,
+    'script': None,
+    'basefont': None,
+    'object': 'div',
+    'iframe': None,
+    'isindex': None,
+    'input': 'div',
+    'legend': None,
+    'fieldset': None,
+    'font': 'span',
+    'center': 'div',
+    'blink': 'span'  
+}
+
 DEPRECATED = {
-    'align': 'caption applet iframe img input object legend table hr div h1 h2 h3 h4 h5 h6 p',
+    'align': 'hr', # should translate this to margin settings
     'alink': 'body',
-    'alt': 'applet',
-    'archive': 'applet',
     'background': 'body',
-    'bgcolor': '*',
-    'border': 'img object',
-    'clear': 'br',
-    'code': 'applet',
-    'codebase': 'applet',
-    'color': '*',
+    'bgcolor': 'body',
+    'border': 'img ',
     'compact': '*',
-    'face': '*',
-    'height': 'td th applet',
     'hspace': '*',
-    'language': 'script',
     'link': 'body',
-    'name': 'applet',
     'noshade': 'hr',
     'nowrap': '*',
-    'object': 'applet',
-    'prompt': 'isindex',
-    'size': 'hr font basefont',
     'start': 'ol',
     'text': 'body',
-    'type': 'li ol ul',
     'value': 'li',
     'version': 'html',
     'vlink': 'body',
     'vspace': '*',
-    'width': 'hr td th applet pre',
 }
 
 ALLOWED_IN_BODY = {
@@ -81,6 +103,28 @@ ALLOWED_IN_BODY = {
     NS.xhtml.script, NS.xhtml.table, NS.xhtml.ul,
     NS.svg.svg,
 }
+
+REPLACEMENTS = [
+    ('*', 'bgcolor', 'color', lambda x: x),
+    ('br', 'clear', 'clear', lambda x: x),
+    ('caption div h1 h2 h3 h4 h5 h5 p', 'align', 'text-align', lambda x: x),
+    ('hr', 'width', 'width', css_len),
+    ('hr', 'size', 'border', css_len),
+    ('img table', 'align', 'float', lambda x: x),
+    ('font', 'color', 'color', lambda x: x),
+    ('font', 'face', 'font-family', lambda x: x),
+    ('font', 'size', 'font-size', lambda x: FONT_SIZES.get(x.strip(), 'medium')),
+    ('table td th', 'height', 'height', css_len),
+    ('table td th pre', 'width', 'width', css_len),
+    ('li ol ul', 'type', 'list-style-type', lambda x: LIST_STYLES.get(x.strip(), '')),
+]
+
+CSS_FOR_REPLACED = {
+    'blink': "",
+    'center': "",
+    'font': "",
+}
+
 
 class Parser(HTMLParserBase):
     """ Parse a HTML Text
@@ -231,9 +275,7 @@ class Parser(HTMLParserBase):
         # Change content-type meta to application/xhtml+xml.
         for meta in xpath(self.xhtml, "/xhtml:html/xhtml:head/xhtml:meta[@http-equiv]"):
             if meta.get('http-equiv').lower() == 'content-type':
-                meta.set('content', mt.xhtml + '; charset=utf-8')
-
-        self.enclose_text()
+                meta.getparent().remove(meta)
 
         # drop javascript
 
@@ -281,6 +323,14 @@ class Parser(HTMLParserBase):
             elem.set(NS.xml.lang, lang)
 
         # strip deprecated attributes
+        for (tags, attr, cssattr, val2css) in REPLACEMENTS:
+            for tag in tags.split():
+                for elem in xpath(self.xhtml, f"//xhtml:{tag}[@{attr}]"):
+                    if elem.attrib[attr]:
+                        val = elem.attrib[attr]
+                    del elem.attrib[attr]
+                    if cssattr:
+                        add_style(elem, style=f'{cssattr}: {val2css(val)};')
 
         for a, t in DEPRECATED.items():
             for tag in t.split():
@@ -293,6 +343,13 @@ class Parser(HTMLParserBase):
                           "//xhtml:*[@class and normalize-space(@class) = '']"):
             del elem.attrib['class']
 
+        # fix attribute values
+        attrs_to_fix = [('align frame rules', lambda x: x.lower())]
+        for attrs, fix in attrs_to_fix:
+            for attr in attrs.split():
+                for elem in xpath(self.xhtml, f"//xhtml:*[@{attr}]"):
+                    elem.attrib[attr] = fix(elem.attrib[attr])
+
         # strip bogus header markup by Joe L.
         for elem in xpath(self.xhtml, "//xhtml:h1"):
             if elem.text and elem.text.startswith("The Project Gutenberg eBook"):
@@ -300,6 +357,22 @@ class Parser(HTMLParserBase):
         for elem in xpath(self.xhtml, "//xhtml:h3"):
             if elem.text and elem.text.startswith("E-text prepared by"):
                 elem.tag = NS.xhtml.p
+
+        # deprecated elements -  replace with <span/div class="xhtml_{tag name}">
+        deprecated_used = replace_elements(self.xhtml, REPLACE_ELEMENTS)
+
+        # enclose text the way tidy does
+        self.enclose_text()
+        
+        ##### cleanup #######
+
+        css_for_deprecated = ' '.join([CSS_FOR_REPLACED.get(tag, '') for tag in deprecated_used])
+        if css_for_deprecated.strip():
+            print(f'css_for_deprecated: {css_for_deprecated}')
+            elem = etree.Element(NS.xhtml.style)
+            elem.text = css_for_deprecated
+            self.xhtml.find(NS.xhtml.head).insert(1, elem) # right after charset declaration
+
 
     def _make_coverpage_link(self, coverpage_url=None):
         """ Insert a <link rel="icon"> in the html head.
