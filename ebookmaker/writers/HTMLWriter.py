@@ -29,7 +29,7 @@ from ebookmaker.CommonCode import Options
 from ebookmaker.parsers import webify_url
 from ebookmaker.parsers.CSSParser import cssutils
 from ebookmaker.utils import (
-    add_class, add_style, css_len, check_lang, replace_elements, gg, xpath,
+    add_class, add_style, css_len, check_lang, replace_elements, gg, xpath, NS
 )
 options = Options()
 cssutils.ser.prefs.validOnly = True

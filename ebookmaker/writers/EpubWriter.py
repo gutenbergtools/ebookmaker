@@ -38,7 +38,7 @@ from ebookmaker import writers
 from ebookmaker.CommonCode import Options
 from ebookmaker.Version import VERSION, GENERATOR
 from ebookmaker.utils import (
-    add_class, add_style, css_len, check_lang, gg, xhtmltag, xpath,
+    add_class, add_style, css_len, check_lang, gg, xpath,
 )
 
 options = Options()
