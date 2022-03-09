@@ -115,7 +115,7 @@ class Parser(ParserBase):
 
     def iterlinks(self):
         """ Return the urls of all images in document."""
-        
+
         for url in cssutils.getUrls(self.sheet):
             yield urllib.parse.urljoin(self.attribs.url, url), parsers.em.style()
 
@@ -125,9 +125,9 @@ class Parser(ParserBase):
         for rule in self.sheet:
             if rule.type == rule.STYLE_RULE and rule.cssText and 'url(' in rule.cssText:
                 to_delete.append(rule)
-        for rule in to_delete:        
+        for rule in to_delete:
             self.sheet.deleteRule(rule)
-            
+
 
     def get_aux_urls(self):
         """ Return the urls of all auxiliary files in document.

@@ -10,11 +10,7 @@ Copyright 2009 by Marcello Perathoner
 Distributable under the GNU General Public License Version 3 or newer.
 
 """
-import os
 import re
-import subprocess
-import sys
-import unicodedata
 
 from six.moves import urllib
 
@@ -23,16 +19,14 @@ from lxml import etree
 
 from bs4 import BeautifulSoup
 
-from libgutenberg.GutenbergGlobals import NS, HTML5_DOCTYPE
+from libgutenberg.GutenbergGlobals import NS
 from libgutenberg.Logger import critical, info, debug, warning, error
 from libgutenberg.MediaTypes import mediatypes as mt
 
 from ebookmaker import parsers
 from ebookmaker.parsers import HTMLParserBase
 from ebookmaker.CommonCode import Options
-from ebookmaker.utils import (
-    add_class, add_style, css_len, check_lang, gg, replace_elements,  xpath,
-)
+from ebookmaker.utils import add_style, css_len, replace_elements, xpath
 
 options = Options()
 
@@ -54,7 +48,7 @@ FONT_SIZES = {
     '-2': '75%',
 }
 
-LIST_STYLES ={
+LIST_STYLES = {
     '1': 'decimal',
     'i': 'lower-roman',
     'I': 'upper-roman',
@@ -74,7 +68,7 @@ REPLACE_ELEMENTS = {
     'fieldset': None,
     'font': 'span',
     'center': 'div',
-    'blink': 'span'  
+    'blink': 'span'
 }
 
 DEPRECATED = {
@@ -99,7 +93,7 @@ DEPRECATED = {
 ALLOWED_IN_BODY = {
     NS.xhtml.address, NS.xhtml.blockquote, f'{NS.xhtml.de}l', NS.xhtml.div, NS.xhtml.dl,
     NS.xhtml.h1, NS.xhtml.h2, NS.xhtml.h3, NS.xhtml.h4, NS.xhtml.h5, NS.xhtml.h6,
-    NS.xhtml.hr, NS.xhtml.ins, NS.xhtml.noscript, NS.xhtml.ol, NS.xhtml.p, NS.xhtml.pre,     
+    NS.xhtml.hr, NS.xhtml.ins, NS.xhtml.noscript, NS.xhtml.ol, NS.xhtml.p, NS.xhtml.pre,
     NS.xhtml.script, NS.xhtml.table, NS.xhtml.ul,
     NS.svg.svg,
 }
@@ -259,8 +253,8 @@ class Parser(HTMLParserBase):
 
 
     def enclose_text(self):
-        """ same as setting enclose-text option on tidy; 
-        ' enclose any text it finds in the body element within a <P> element. 
+        """ same as setting enclose-text option on tidy;
+        ' enclose any text it finds in the body element within a <P> element.
         This is useful when you want to take existing HTML and use it with a style sheet.'
         """
         for elem in self.xhtml.body:
@@ -268,7 +262,7 @@ class Parser(HTMLParserBase):
                 new_p = elem.makeelement(NS.xhtml.p)
                 elem.addprevious(new_p)
                 new_p.append(elem)
-                
+
     def _to_xhtml11(self):
         """ Make vanilla xhtml more conform to xhtml 1.1 """
 
@@ -363,7 +357,7 @@ class Parser(HTMLParserBase):
 
         # enclose text the way tidy does
         self.enclose_text()
-        
+
         ##### cleanup #######
 
         css_for_deprecated = ' '.join([CSS_FOR_REPLACED.get(tag, '') for tag in deprecated_used])
@@ -397,10 +391,11 @@ class Parser(HTMLParserBase):
                 coverpage.set('href', coverpage_url)
                 coverpage.attrib.update(cover_attrs)
                 debug("overrode link to coverpage with %s." % coverpage_url)
-                
+
             else:
                 for head in xpath(self.xhtml, "/xhtml:html/xhtml:head"):
-                    head.append(parsers.em.link(rel='icon', href=coverpage_url, type='image/x-cover'))
+                    head.append(parsers.em.link(rel='icon', href=coverpage_url,
+                                                type='image/x-cover'))
                     debug("Inserted link to coverpage %s." % coverpage_url)
             return
 
@@ -483,7 +478,7 @@ class Parser(HTMLParserBase):
         if not html:
             critical('no content in %s', self.attribs.url)
             return
-            
+
         html = html.replace('&#13;', '&#10;')
         html = html.replace('&#xD;', '&#10;')
         if '\r' in html or '\u2028' in html:

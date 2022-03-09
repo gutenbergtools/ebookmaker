@@ -93,7 +93,7 @@ CSS_FOR_REPLACED.update(CSS_FOR_FRAME)
 
 REPLACE_ELEMENTS = {
     'big': 'span',
-    'tt': 'span', 
+    'tt': 'span',
 }
 
 # replacing attributes with css in a style attribute
@@ -102,7 +102,7 @@ REPLACEMENTS = [
     ('tbody td tfoot th thead tr', 'align', 'text-align', lambda x: x),
     ('table td', 'background', '', ''),
     ('table', 'border', 'border-width', css_len),
-    ('table td tr', 'bordercolor', 'border-color',  lambda x: x),
+    ('table td tr', 'bordercolor', 'border-color', lambda x: x),
     ('table', 'cellpadding', 'padding', css_len),
     ('table', 'cellspacing', 'border-spacing', css_len),
     ('col td th tr', 'valign', 'vertical-align', lambda x: x),
@@ -228,7 +228,7 @@ class Writer(writers.HTMLishWriter):
                     pass
 
     @staticmethod
-    def fix_css_for_deprecated(sheet, tags=[], replacement='span'):
+    def fix_css_for_deprecated(sheet, tags='', replacement='span'):
         """ for deprecated tags, change selector to {replacement}.xhtml_{tag name};
             if no existing selector, add the selector with a style
         """
@@ -335,7 +335,7 @@ class Writer(writers.HTMLishWriter):
 
 
         # replace frame and rules attributes on tables
-        
+
         deprecated_atts = {'frame': CSS_FOR_FRAME, 'rules': CSS_FOR_RULES, 'background': {}}
         for att in deprecated_atts:
             for table in xpath(html, f'//xhtml:table[@{att}]'):
@@ -422,9 +422,9 @@ class Writer(writers.HTMLishWriter):
                     html = copy.deepcopy(xhtml)
 
                     if NS.xml.lang in html.attrib:
-                        lang =  html.attrib[NS.xml.lang]
+                        lang = html.attrib[NS.xml.lang]
                         html.attrib['lang'] = job.dc.languages[0].id or lang
-                        del(html.attrib[NS.xml.lang])
+                        del html.attrib[NS.xml.lang]
                     self.add_dublincore(job, html)
 
                     self.add_meta_generator(html)
