@@ -82,7 +82,7 @@ class Toc(object):
         self.dc = dc
         self.seen_urls = {}
         self.elementmaker = ElementMaker(namespace=str(NS.xhtml),
-                                         nsmap={None: str(NS.xhtml)})
+                                         nsmap={None: str(NS.xhtml), 'epub': str(NS.epub)})
 
 
     def __str__(self):
