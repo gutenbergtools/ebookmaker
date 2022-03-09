@@ -252,6 +252,18 @@ class Parser(HTMLParserBase):
                     error("Dropping frag to non-existing id in %s" % href)
 
 
+    def convert_epub_attribs(self):
+        """ Parser leaves some data elements for HTML. Epubcheck doesn't like these.
+        """
+        for elem in xpath(self.xhtml, '//@epub:*/..'):
+            for key in elem.attrib.keys():
+                if key.startswith('{%s}' % NS.epub):
+                    new_key = key.replace('{%s}' % NS.epub, 'data-epub-')
+                    val = elem.attrib[key]
+                    del elem.attrib[key]
+                    elem.attrib[new_key] = val
+
+
     def enclose_text(self):
         """ same as setting enclose-text option on tidy;
         ' enclose any text it finds in the body element within a <P> element.
@@ -325,6 +337,9 @@ class Parser(HTMLParserBase):
                     del elem.attrib[attr]
                     if cssattr:
                         add_style(elem, style=f'{cssattr}: {val2css(val)};')
+
+        # if source has epub attributes, change them to data attributes
+        self.convert_epub_attribs()
 
         for a, t in DEPRECATED.items():
             for tag in t.split():

@@ -52,11 +52,12 @@ MAX_IMAGE_DIMEN = (5000, 5000)  # in pixels
 LINKED_IMAGE_DIMEN = (5000, 5000)  # in pixels
 MAX_COVER_DIMEN = MAX_IMAGE_DIMEN
 
-
 # iPhone 3G:    320x480x?
 # Kindle 2:     600x800x16
 # Sony PRS-505: 584x754x8   (effective according to wikipedia)
 
+
+EPUB_TYPE = '{%s}type' % NS.epub
 
 TOC_HEADERS = ('contents', 'table of contents',
                'inhalt', 'inhaltsverzeichnis',
@@ -1046,7 +1047,7 @@ class Writer(writers.HTMLishWriter):
 
     @staticmethod
     def strip_data_attribs(xhtml):
-        """ Parser leaves some data elements for HTML. Epubcheck doesn't like these.
+        """ Epubcheck doesn't like data- attributes in EPUB2.
         """
         for e in xpath(xhtml, "//@*[starts-with(name(), 'data')]/.."):
             for key in e.attrib.keys():

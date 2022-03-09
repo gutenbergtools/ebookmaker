@@ -44,11 +44,10 @@ from .EpubWriter import (
     PRIVATE_CSS,
     OPS_CONTENT_DOCUMENTS,
     OPS_FONT_TYPES,
-    OutlineFixer
+    OutlineFixer,
+    EPUB_TYPE,
 )
 from . import EpubWriter, HTMLWriter
-
-EPUB_TYPE = '{%s}type' % NS.epub
 
 options = Options()
 
@@ -465,6 +464,18 @@ class Writer(EpubWriter.Writer):
             img.drop_tree()
             return # only the first one though
 
+    @staticmethod
+    def html_for_epub3(xhtml):
+        """ Convert data-epub attribute to ebub attributes
+        """
+        for e in xpath(xhtml, "//@*[starts-with(name(), 'data-epub')]/.."):
+            for key in e.attrib.keys():
+                if key.startswith('data-epub-'):
+                    val = e.attrib[key]
+                    del e.attrib[key]
+                    new_key = getattr(NS.epub, key[10:])
+                    e.attrib[new_key] = val
+
 
     def shipout(self, job, parserlist, ncx):
         """ Build the zip file. """
@@ -597,6 +608,7 @@ class Writer(EpubWriter.Writer):
                     if xhtml is not None:
 
                         HTMLWriter.Writer.xhtml_to_html(xhtml)
+                        self.html_for_epub3(xhtml)
 
                         # build up TOC
                         # has side effects on xhtml
