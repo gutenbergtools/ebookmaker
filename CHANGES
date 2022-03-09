@@ -5,9 +5,25 @@ Tidy did some other things that caused Ebookmaker's HTML5 output poorly suited f
     - it reorganized style attributes into css style elements. While this made the CSS easier to manage, it resulting in less readable source code.
     - it normalized whitespace in block elements. In almost all cases, this had no effect of the HTML display, many PG contributors have used this whitespace to reproduce the printed pages in the source code, making it easy to maintain.
 
-Beautiful Soup, by contrast, only changes the source when absolutely needed to make parsable unicode  HTML. We expect the resulting HTML5 files will be more pleasing for PG contributors.
+Beautiful Soup, by contrast, only changes the source when absolutely needed to make parsable unicode  HTML. We expect the resulting HTML5 files will be more pleasing for PG contributors. Some code was added to the Ebookmaker HTML parser to reproduce some of the functionality that Tidy provided.
     - Beautiful soup required some minor modification in error catching for missing files
     - Incoming DOCTYPE is ignored
+    - Tidy provided some conversion of obsolete elements/attributes into xhtml4 elements with added CSS Rules.
+        - `font` elements are replaced with `span`s.
+        - `center` elements are replace by `div`s. See note below about the CSS3 elements needed to reproduce the behavior of the `center` elements.
+        - when elements not permitted in as `body` content are present as a child of the `body element, they are wrapped in `div` elements
+
+- Ebookmaker has been somewhat heavy-handed when removing deprecated elements and attributes. With this version of Ebookmaker, we make more of an effort to preserve the formatting of the source document. This will impact EPUB2, EPUB3 and HTML5 produced files.
+    - size attributes in `font` tags are translated to css rather than ignored.
+    - list styles are translated to css rather than ignored.
+    - size and width attributes on `hr` are translated to css rather than ignored.
+    - width attributes on `hr` are translated to css rather than ignored.
+    - deprecated align attributes on most elements are translated to css rather than ignored.
+    - bgcolor attributes on elements other than body are translated to css rather than ignored.
+    - values for the attributes align, frame, and rules are changed to lower case
+
+- a customization has been added for the cssutils module to permit us to add selected CSS properties we want to use (the built-in tables are getting old.) We needed to do this because certain conversions for obsolete elements could not be duplicated without using newer CSS properties. In particular:
+    - to reproduce the legacy `center` element, we added `display: flex` and `justify-content: center`.   
 
 - for HTML5, move col@valign to css
 - for HTML5, change 3 letter language codes to 2 letter codes where available
