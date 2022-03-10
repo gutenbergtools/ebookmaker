@@ -979,6 +979,12 @@ class Writer(writers.HTMLishWriter):
             for elem in xpath(xhtml, f"//xhtml:{tag}[not(@{attr})]"):
                 elem.set(attr, fill)
 
+        # remove html5-only attribute
+        attrs_to_remove = [('*', 'role'),('*', 'aria-label'),('*', 'aria-labelledby'),]
+        for (tag, attr) in attrs_to_remove:
+            for elem in xpath(xhtml, f"//xhtml:{tag}[@{attr}]"):
+                del elem.attrib[attr]
+
         usedtags = set()
         for newtag in ['figcaption', 'figure', 'footer', 'header', 'section']:
             for tag in xpath(xhtml, f'//xhtml:{newtag}'):
