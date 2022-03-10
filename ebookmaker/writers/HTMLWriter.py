@@ -214,18 +214,18 @@ class Writer(writers.HTMLishWriter):
         """ Strip CSS properties and values that are not HTML5 compatible.
             Unpack "media handheld" rules
         """
-
-        cssclass = re.compile(r'\.(-?[_a-zA-Z]+[_a-zA-Z0-9-]*)')
-
         for rule in sheet:
-            if rule.type == rule.MEDIA_RULE:
-                if rule.media.mediaText.find('handheld') > -1:
-                    rule.parentStyleSheet.deleteRule(rule)
-
             if rule.type == rule.STYLE_RULE:
-                ruleclasses = list(cssclass.findall(rule.selectorList.selectorText))
                 for p in list(rule.style):
-                    pass
+                    if p.name == 'speak':
+                        val = rule.style.getPropertyValue('speak')
+                        if val == 'spell-out':
+                            rule.style.removeProperty('speak')
+                            rule.style.setProperty('speak-as', 'spell-out')
+                        elif val == 'none':
+                            rule.style.setProperty('speak', 'never')
+                        elif val == 'inherit':
+                            rule.style.setProperty('speak', 'auto')
 
     @staticmethod
     def fix_css_for_deprecated(sheet, tags='', replacement='span'):

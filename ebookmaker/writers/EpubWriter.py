@@ -892,6 +892,15 @@ class Writer(writers.HTMLishWriter):
                     elif 'border' not in p.name and 'px' in p.value:
                         debug("Dropping property with px value %s" % p.name)
                         rule.style.removeProperty(p.name)
+                    elif p.name == 'speak':
+                        val = rule.style.getPropertyValue('speak')
+                        if val == 'spell-out':
+                            rule.style.removeProperty('speak')
+                            rule.style.setProperty('speak-as', 'spell-out')
+                        elif val == 'none':
+                            rule.style.setProperty('speak', 'never')
+                        elif val == 'inherit':
+                            rule.style.setProperty('speak', 'auto')
 
         # debug("exit fix_incompatible_css")
 

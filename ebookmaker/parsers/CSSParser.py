@@ -34,9 +34,12 @@ PG_CSS_PROFILE = (
     {
         'display': 'flex',
         'justify-content': 'center',
+        'speak': r'auto|never|always',
+        'speak-as': 'normal|spell-out|digits|literal-punctuation|no-punctuation',
     },
     None
 )
+
 cssutils.profile.addProfiles([PG_CSS_PROFILE])
 
 class Parser(ParserBase):

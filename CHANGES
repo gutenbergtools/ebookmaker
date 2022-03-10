@@ -44,7 +44,14 @@ Beautiful Soup, by contrast, only changes the source when absolutely needed to m
         - any of the above that prove to be needed can be added back as needed
         - all html4 -> html5 changes are made, no matter the source.
 - Ebookmaker breaks HTML source into chunks to improve performance on EPUB readers. For EPUB3 files, the chunker treats `section` elements the same way it treated `div.section` elements for EPUB2. Similarly section elements in HTML5 source are converted to div.section elements for EPUB2. In addition, the maximum chunk size for EPUB3 is 300KB compared to 100KB for EPUB2.
-    
+- Ebookmaker now supports attribute in the epub namespace {http://www.idpf.org/2007/ops} These can be entered in source file in two ways:
+    - any `data-epub-*` attribute in an html or xhtml source file is moved to the epub namespace for EPUB2, stripped for EPUB2, and preserved as-is for HTML5. This option will allow permit validation with the W3C 'nu' validator.
+    - any 'epub:*' attribute in a properly namespaced XHTML file will be preserved for EPUB3, stripped for EPUB2, and converted to a `data-epub-*` attribute in HTML5.
+- This version expands support for accessibility attributes.
+    - the epub:role attribute (see above for using the epub namespace)
+    - HTML5 attributes `role`, `aria-label` and `aria-labelledby` help screen readers interpret HTML. see https://idpf.github.io/epub-guides/epub-aria-authoring/ for guidance about how to use these. Ebookmaker will strip these attributes for EPUB2 files.
+    - obsolete values of the `speak` CSS property are now updated to current CSS2/3 equivalents.
+    - as discussed above, `speak` and `speak-as` css properties are now included in EPUB, EPUB3 and HTML5 files.
 
 
 0.11.30 December 10, 2021
