@@ -74,6 +74,7 @@ class Spider(object):
 
         # enqueue root url
 
+        counter = 0
         self.enqueue(queue, 0, root_attribs, True)
 
         while queue:
@@ -102,6 +103,7 @@ class Spider(object):
             # look for more documents to add to the queue
             debug("Requesting iterlinks for: %s ..." % url)
             for url, elem in parser.iterlinks():
+                counter += 1
                 url = urllib.parse.urldefrag(url)[0]
                 if url == parser.attribs.url or url in self.parsed_urls:
                     continue
@@ -128,7 +130,8 @@ class Spider(object):
 
                 if not new_attribs.id:
                     # synthesize and set an id for backlink
-                    new_attribs.id = f'id-{abs(hash(elem))}'
+                    seed = url + ' ' + str(counter)
+                    new_attribs.id = f'id-{abs(hash(seed))}'
                     elem.attrib['id'] = new_attribs.id
    
                 tag = elem.tag
