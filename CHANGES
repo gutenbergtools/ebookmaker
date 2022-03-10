@@ -53,6 +53,7 @@ Beautiful Soup, by contrast, only changes the source when absolutely needed to m
     - HTML5 attributes `role`, `aria-label` and `aria-labelledby` help screen readers interpret HTML. see https://idpf.github.io/epub-guides/epub-aria-authoring/ for guidance about how to use these. Ebookmaker will strip these attributes for EPUB2 files.
     - obsolete values of the `speak` CSS property are now updated to current CSS2/3 equivalents.
     - as discussed above, `speak` and `speak-as` css properties are now included in EPUB, EPUB3 and HTML5 files.
+- tibetan (bo) added to list of languages for mobi conversion by calibre
 
 
 0.11.30 December 10, 2021
