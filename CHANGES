@@ -23,7 +23,8 @@ Beautiful Soup, by contrast, only changes the source when absolutely needed to m
     - values for the attributes align, frame, and rules are changed to lower case
 
 - a customization has been added for the cssutils module to permit us to add selected CSS properties we want to use (the built-in tables are getting old.) We needed to do this because certain conversions for obsolete elements could not be duplicated without using newer CSS properties. In particular:
-    - to reproduce the legacy `center` element, we added `display: flex` and `justify-content: center`.   
+    - to reproduce the legacy `center` element, we added `display: flex` and `justify-content: center`.
+    - `speak` and `speak-as` css properties have been updated.
 
 - for HTML5, move col@valign to css
 - for HTML5, change 3 letter language codes to 2 letter codes where available
@@ -33,7 +34,7 @@ Beautiful Soup, by contrast, only changes the source when absolutely needed to m
 - include opentype fonts in EPUB file (.ttf. .otf, .woff), requires libgutenberg >= 0.8.14. fixes #106
 - added an EPUB3 writer. In addition to producing valid EPUB3 files, some changes have been made to the produced EPUB.
     - There in only an "-images" flavor. We continue to produce EPUB2 in images and no-images flavors
-    - Many changes in the HTML and CSS that were done for compatibility with e-readers are no longer done. For example: 
+    - Many changes in the HTML and CSS that were done for compatibility with e-readers are no longer done. They remain in place for EPUB2. For example: 
         - Floats are not removed.
         - CSS absolute units are not changed.
         - Uncommon characters and ligatures are not simplified.
