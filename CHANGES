@@ -54,7 +54,7 @@ Beautiful Soup, by contrast, only changes the source when absolutely needed to m
     - obsolete values of the `speak` CSS property are now updated to current CSS2/3 equivalents.
     - as discussed above, `speak` and `speak-as` css properties are now included in EPUB, EPUB3 and HTML5 files.
 - tibetan (bo) added to list of languages for mobi conversion by calibre
-
+- fixed issue where backlinks required an id set on the original element
 
 0.11.30 December 10, 2021
 - for EPUB, down-convert HTML5 tags to divs so the files validate as EPUB2. The new div elements will add a class named the same as the html5 tag, so `<section>` becomes `<div class="section">`. Other attributes are preserved. In addition CSS selectors involving these elements will be transformed accordingly: for example `section` becomes `div.section`

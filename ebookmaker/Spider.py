@@ -126,6 +126,11 @@ class Spider(object):
                     elif k == 'rel':
                         new_attribs.rel.update(v.lower().split())
 
+                if not new_attribs.id:
+                    # synthesize and set an id for backlink
+                    new_attribs.id = f'id-{abs(hash(elem))}'
+                    elem.attrib['id'] = new_attribs.id
+   
                 tag = elem.tag
                 if tag == NS.xhtml.a:
                     if self.is_image(new_attribs) and self.is_included_url(new_attribs) and \
