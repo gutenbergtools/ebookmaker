@@ -12,7 +12,7 @@ Distributable under the GNU General Public License Version 3 or newer.
 
 import libgutenberg.GutenbergGlobals as gg
 from libgutenberg.GutenbergGlobals import xpath, NS
-
+from libgutenberg.Logger import critical, debug, error, info, warning
 
 def css_len(len_str):
     """ if an int, make px """
@@ -37,7 +37,7 @@ def add_style(elem, style=''):
         elem.set('style', style)
 
 def check_lang(elem, lang_att):
-    three2two = {'ita': 'it', 'lat': 'la'}
+    three2two = {'ita': 'it', 'lat': 'la', 'heb': 'he', 'fra': 'fr', 'spa': 'es', 'deu': 'de'}
     lang_att = three2two.get(lang_att, lang_att)
     lang = elem.attrib[lang_att]
     lang_name = gg.language_map.get(lang, default=None)
