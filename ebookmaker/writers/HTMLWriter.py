@@ -286,6 +286,11 @@ class Writer(writers.HTMLishWriter):
             for elem in xpath(html, f"//xhtml:*[@{attr}='' or @{attr}=0]"):
                 del elem.attrib[attr]
 
+        # put a space in empty headings
+        for heading in [f'h{n}' for n in range(1,6)]:
+            for elem in xpath(html, f"//xhtml:{heading}[not(text())]"):
+                elem.text = ' '
+
         for (tags, attr, cssattr, val2css) in REPLACEMENTS:
             for tag in tags.split():
                 for elem in xpath(html, f"//xhtml:{tag}[@{attr}]"):
