@@ -484,7 +484,7 @@ class Parser(HTMLParserBase):
         debug("HTMLParser.pre_parse() ...")
 
         try:
-            soup = BeautifulSoup(self.bytes_content(), 'lxml')
+            soup = BeautifulSoup(self.bytes_content(), 'lxml', exclude_encodings=["us-ascii"])
         except:
             critical('failed to parse %s', self.attribs.url)
             return
