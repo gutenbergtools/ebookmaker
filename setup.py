@@ -42,7 +42,7 @@ setup (
         'roman',
         'requests',
         'six>=1.4.1',
-        'libgutenberg[covers]>=0.8.14',
+        'libgutenberg[covers]>=0.8.16',
         'cchardet',
         'beautifulsoup4',
     ],
