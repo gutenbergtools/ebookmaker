@@ -121,6 +121,7 @@ def serialize(xhtml):
 
 class Writer(writers.HTMLishWriter):
     """ Class for writing HTML files. """
+    VALIDATOR = 'HTML_VALIDATOR'
 
     def add_dublincore(self, job, tree):
         """ Add dublin core metadata to <head>. """

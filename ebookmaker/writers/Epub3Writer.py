@@ -17,7 +17,6 @@ import re
 import datetime
 import os
 import copy
-import subprocess
 from xml.sax.saxutils import quoteattr
 
 from six.moves import urllib
@@ -448,6 +447,7 @@ class ContentOPF(object):
 class Writer(EpubWriter.Writer):
     """ Class that writes epub files. """
 
+    VALIDATOR = 'EPUB_VALIDATOR'
 
     def remove_coverpage(self, xhtml, url):
         """ Remove coverpage from flow.
@@ -531,30 +531,6 @@ class Writer(EpubWriter.Writer):
             ocf.rollback()
             raise
 
-
-    def validate(self, job):
-        """ Validate generated epub using external tools. """
-
-        debug("Validating %s ..." % job.outputfile)
-
-        filename = os.path.join(os.path.abspath(job.outputdir), job.outputfile)
-
-        if hasattr(options.config, 'EPUB_VALIDATOR'):
-            validator = options.config.EPUB_VALIDATOR
-            info('validating...')
-            params = validator.split() + [filename]
-            checker = subprocess.Popen(params,
-                                       stdin=subprocess.PIPE,
-                                       stdout=subprocess.PIPE,
-                                       stderr=subprocess.PIPE)
-
-            (dummy_stdout, stderr) = checker.communicate()
-            if stderr:
-                error(stderr)
-                return 1
-
-        info("%s validates ok." % job.outputfile)
-        return 0
 
     def build(self, job):
         """ Build epub """

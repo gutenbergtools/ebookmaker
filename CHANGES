@@ -26,6 +26,7 @@ Beautiful Soup, by contrast, only changes the source when absolutely needed to m
     - to reproduce the legacy `center` element, we added `display: flex` and `justify-content: center`.
     - `speak` and `speak-as` css properties have been updated.
 
+- for HTML5, a validation hook has been added. As with EPUB validation, add the path of your command-line HTML5 validator to the .ebookmaker config file and set the --validate flag. Tested with the W3C "Nu" validator - https://validator.github.io/validator/
 - for HTML5, move col@valign to css
 - for HTML5, change 3 letter language codes to 2 letter codes where available
 - for HTML5, fill empty title elements

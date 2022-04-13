@@ -13,6 +13,7 @@ Base classes for *Writer modules. (EpubWriter, PluckerWriter, ...)
 
 """
 import re
+import subprocess
 
 from functools import partial
 import os.path
@@ -26,9 +27,11 @@ from libgutenberg import MediaTypes
 
 from ebookmaker import parsers
 from ebookmaker import ParserFactory
+from ebookmaker.CommonCode import Options
 from ebookmaker.Version import VERSION, GENERATOR
 
 
+options = Options()
 
 def remove_cr(content):
     content = re.sub(r'\s*[\r\n]+\s*', '&#10;', content)
@@ -42,6 +45,8 @@ class BaseWriter(object):
 
     """
 
+    VALIDATOR = None
+    
     def build(self, job):
         """ override this in a real writer """
         pass
@@ -57,12 +62,31 @@ class BaseWriter(object):
             fp.write(bytes_)
 
 
-    def validate(self, job): # pylint: disable=R0201
-        """ Validate the output with some (external) tool.
+    def validate(self, job):
+        """ Validate generated file using external tools. """
 
-        Override this in a real writer.
+        if not self.VALIDATOR:
+            return 0
 
-        """
+        debug("Validating %s ..." % job.outputfile)
+
+        filename = os.path.join(os.path.abspath(job.outputdir), job.outputfile)
+
+        if hasattr(options.config, self.VALIDATOR):
+            validator = getattr(options.config, self.VALIDATOR)
+            info('validating...')
+            params = validator.split() + [filename]
+            checker = subprocess.Popen(params,
+                                       stdin=subprocess.PIPE,
+                                       stdout=subprocess.PIPE,
+                                       stderr=subprocess.PIPE)
+
+            (dummy_stdout, stderr) = checker.communicate()
+            if stderr:
+                error(stderr)
+                return 1
+
+        info("%s validates ok." % job.outputfile)
         return 0
 
 
