@@ -2,7 +2,7 @@
 - replaces Tidy with Beautiful Soup. Ebookmaker has used HTML Tidy to make sure that source files produced over the course of ~ 25 years can be parsed into a reasonably modern HTML DOM. With the advent of HTML5, Tidy has begun to show its age, and maintenance of Tidy has not kept up with the times. Bugs in Tidy are not being fixed, and we find we can no longer rely on Tidy. To replace Tidy, we are using  Beautiful Soup, a very popular python package widely used for web scraping.
 
 Tidy did some other things that caused Ebookmaker's HTML5 output poorly suited for PG,
-    - it reorganized style attributes into css style elements. While this made the CSS easier to manage, it resulting in less readable source code.
+    - it reorganized style attributes into css style elements. While this made the CSS easier to manage, it resulted in less readable source code.
     - it normalized whitespace in block elements. In almost all cases, this had no effect of the HTML display, many PG contributors have used this whitespace to reproduce the printed pages in the source code, making it easy to maintain.
 
 Beautiful Soup, by contrast, only changes the source when absolutely needed to make parsable unicode  HTML. We expect the resulting HTML5 files will be more pleasing for PG contributors. Some code was added to the Ebookmaker HTML parser to reproduce some of the functionality that Tidy provided.
