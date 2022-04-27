@@ -11,6 +11,7 @@ Distributable under the GNU General Public License Version 3 or newer.
 
 """
 import re
+import unicodedata
 
 from six.moves import urllib
 
@@ -18,6 +19,8 @@ import lxml.html
 from lxml import etree
 
 from bs4 import BeautifulSoup
+from bs4.formatter import EntitySubstitution, HTMLFormatter
+
 
 from libgutenberg.GutenbergGlobals import NS
 from libgutenberg.Logger import critical, info, debug, warning, error
@@ -119,6 +122,11 @@ CSS_FOR_REPLACED = {
     'font': "",
 }
 
+
+def nfc(_str):
+    return unicodedata.normalize('NFC', EntitySubstitution.substitute_xml(_str))
+
+nfc_formatter = HTMLFormatter(entity_substitution=nfc)
 
 class Parser(HTMLParserBase):
     """ Parse a HTML Text
@@ -489,13 +497,12 @@ class Parser(HTMLParserBase):
             critical('failed to parse %s', self.attribs.url)
             return
         soup.html['xmlns'] = NS.xhtml
-        html = str(soup)
+        #html = str(soup)
+        html = soup.decode(formatter=nfc_formatter)
         if not html:
             critical('no content in %s', self.attribs.url)
             return
 
-        html = html.replace('&#13;', '&#10;')
-        html = html.replace('&#xD;', '&#10;')
         if '\r' in html or '\u2028' in html:
             html = '\n'.join(html.splitlines())
         self.unicode_buffer = html

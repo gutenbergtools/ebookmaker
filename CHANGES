@@ -12,6 +12,7 @@ Beautiful Soup, by contrast, only changes the source when absolutely needed to m
         - `font` elements are replaced with `span`s.
         - `center` elements are replace by `div`s. See note below about the CSS3 elements needed to reproduce the behavior of the `center` elements.
         - when elements not permitted in as `body` content are present as a child of the `body element, they are wrapped in `div` elements
+    - A special formatter for Beautiful soup enforces Unicode Normal Form Composed.
 
 - Ebookmaker has been somewhat heavy-handed when removing deprecated elements and attributes. With this version of Ebookmaker, we make more of an effort to preserve the formatting of the source document. This will impact EPUB2, EPUB3 and HTML5 produced files.
     - size attributes in `font` tags are translated to css rather than ignored.
