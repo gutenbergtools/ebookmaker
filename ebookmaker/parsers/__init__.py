@@ -79,10 +79,11 @@ IMAGE_WRAPPER = """<?xml version="1.0"?>{doctype}
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <title>{title}</title>
+    <link href="pgepub.css" rel="stylesheet"/>
   </head>
   <body>
     <div style="text-align: center">
-      <img src="{src}" alt={title} style="max-width: 100%; " />
+      <img src="{src}" alt={title} class="{wrapper_class}" />
       {backlink}
     </div>
   </body>

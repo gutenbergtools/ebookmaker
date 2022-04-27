@@ -54,6 +54,15 @@ options = Options()
 match_link_url = re.compile(r'^https?://', re.I)
 match_non_link = re.compile(r'[a-zA-Z0-9_\-\.]*(#.*)?$')
 
+PRIVATE_CSS_3 = """
+@media (orientation: landscape) {
+    img.x-ebookmaker-cover {height: 100%;}
+    }
+@media (orientation: portrait) {
+    img.x-ebookmaker-cover {width: 100%;}
+    }
+"""
+
 class OEBPSContainer(EpubWriter.OEBPSContainer):
     """ Class representing an OEBPS Container. """
 
@@ -67,6 +76,7 @@ class OEBPSContainer(EpubWriter.OEBPSContainer):
                        parsers.IMAGE_WRAPPER.format(src=img_url,
                                                     title=img_title,
                                                     backlink="",
+                                                    wrapper_class='x-ebookmaker-cover',
                                                     doctype=gg.HTML5_DOCTYPE),
                        mt.xhtml)
         return filename
@@ -477,6 +487,18 @@ class Writer(EpubWriter.Writer):
                     e.attrib[new_key] = val
 
 
+    @staticmethod
+    def fix_incompatible_css(sheet):
+        """ Strip CSS properties and values that are not EPUB3 compatible (if we find any).
+            Remove "media handheld" rules
+        """
+        for rule in sheet:
+            if rule.type == rule.MEDIA_RULE:
+                if rule.media.mediaText.find('handheld') > -1:
+                    sheet.deleteRule(rule)
+                    info("deleting  @media handheld rule")
+
+
     def shipout(self, job, parserlist, ncx):
         """ Build the zip file. """
 
@@ -539,8 +561,8 @@ class Writer(EpubWriter.Writer):
         parserlist = []
         css_count = 0
 
-        # add CSS parser
-        self.add_external_css(job.spider, None, PRIVATE_CSS, 'pgepub.css')
+        # add CSS parsers
+        self.add_external_css(job.spider, None, PRIVATE_CSS + PRIVATE_CSS_3, 'pgepub.css')
 
         try:
             chunker = HTMLChunker.HTMLChunker(version='epub3')
@@ -591,7 +613,7 @@ class Writer(EpubWriter.Writer):
                         ncx.toc += p.make_toc(xhtml)
 
                         # allows authors to customize css for epub
-                        self.add_body_class(xhtml, 'x-ebookmaker')
+                        self.add_body_class(xhtml, 'x-ebookmaker-3')
 
                         self.insert_root_div(xhtml)
 
