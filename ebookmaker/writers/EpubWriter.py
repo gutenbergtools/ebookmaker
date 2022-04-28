@@ -909,7 +909,7 @@ class Writer(writers.HTMLishWriter):
 
 
     @staticmethod
-    def get_classes_that_float(xhtml):
+    def get_classes_with_prop(xhtml, props=('float', 'position')):
         """ Get a list of all classes that use float or position. """
 
         classes = set()
@@ -923,7 +923,7 @@ class Writer(writers.HTMLishWriter):
                 for rule in p.sheet:
                     if rule.type == rule.STYLE_RULE:
                         for p in rule.style:
-                            if p.name in ('float', 'position'):
+                            if p.name in props:
                                 classes.update(regex.findall(rule.selectorList.selectorText))
                                 break
 
@@ -1297,7 +1297,7 @@ class Writer(writers.HTMLishWriter):
                     if xhtml is not None:
                         self.fix_html5(xhtml)
 
-                        strip_classes = self.get_classes_that_float(xhtml)
+                        strip_classes = self.get_classes_with_prop(xhtml)
                         strip_classes = strip_classes.intersection(STRIP_CLASSES)
                         if strip_classes:
                             self.strip_pagenumbers(xhtml, strip_classes)

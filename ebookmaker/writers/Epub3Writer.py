@@ -45,6 +45,7 @@ from .EpubWriter import (
     OPS_FONT_TYPES,
     OutlineFixer,
     EPUB_TYPE,
+    STRIP_CLASSES,
 )
 from . import EpubWriter, HTMLWriter
 
@@ -497,6 +498,17 @@ class Writer(EpubWriter.Writer):
                     sheet.deleteRule(rule)
                     info("deleting  @media handheld rule")
 
+            if rule.type == rule.STYLE_RULE:
+                ruleclasses = list(cssclass.findall(rule.selectorList.selectorText))
+                for p in list(rule.style):
+                    # Apple books only allows position property in fixed-layout books
+                    if p.name == 'position':
+                        debug("Dropping property %s" % p.name)
+                        rule.style.removeProperty('position')
+                        rule.style.removeProperty('left')
+                        rule.style.removeProperty('right')
+                        rule.style.removeProperty('top')
+                        rule.style.removeProperty('bottom')
 
     def shipout(self, job, parserlist, ncx):
         """ Build the zip file. """
@@ -603,6 +615,12 @@ class Writer(EpubWriter.Writer):
                         p.parse()
                         xhtml = copy.deepcopy(p.xhtml) if hasattr(p, 'xhtml') else None
                     if xhtml is not None:
+                    
+                        # can't have absolute positions in reflowable EPUB3
+                        strip_classes = self.get_classes_with_prop(xhtml, props=('position'))                        
+                        strip_classes = strip_classes.intersection(STRIP_CLASSES)
+                        if strip_classes:
+                            self.strip_pagenumbers(xhtml, strip_classes)
 
                         HTMLWriter.Writer.xhtml_to_html(xhtml)
                         self.html_for_epub3(xhtml)
