@@ -148,7 +148,7 @@ class Toc(object):
         )
 
         if has_pages:
-            ncx.append(self._make_pagelist(self.toc))
+            body.append(self._make_pagelist(self.toc))
 
         # Ugly workaround for error: "Serialisation to unicode must not
         # request an XML declaration"
@@ -219,7 +219,6 @@ class Toc(object):
                 toc_item = em.a(pagename, **{
                     'href': url,
                     'id': "pt-%d" % len(pagelist_top),
-                    'value': str(len(pagelist_top)),
                     EPUB_TYPE: 'normal' if re.search('[0-9]', pagename) else 'frontmatter',
                 })
                 pagelist_top.append(em.li(toc_item))
