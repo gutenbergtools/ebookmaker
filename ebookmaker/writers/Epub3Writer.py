@@ -40,7 +40,6 @@ from .EpubWriter import (
     MAX_IMAGE_DIMEN,
     LINKED_IMAGE_SIZE,
     LINKED_IMAGE_DIMEN,
-    PRIVATE_CSS,
     OPS_CONTENT_DOCUMENTS,
     OPS_FONT_TYPES,
     OutlineFixer,
@@ -55,7 +54,41 @@ options = Options()
 match_link_url = re.compile(r'^https?://', re.I)
 match_non_link = re.compile(r'[a-zA-Z0-9_\-\.]*(#.*)?$')
 
-PRIVATE_CSS_3 = """
+
+PRIVATE_CSS = """\
+@charset "utf-8";
+
+body, body.tei.tei-text {
+   color: black;
+   background-color: white;
+   width: auto;
+   border: 0;
+   padding: 0;
+   }
+div, p, pre, h1, h2, h3, h4, h5, h6 {
+   margin-left: 0;
+   margin-right: 0;
+   display: block
+   }
+div.pgebub-root-div {
+   margin: 0
+   }
+h2 {
+   page-break-before: always;
+   padding-top: 1em
+   }
+div.figcenter span.caption {
+   display: block;
+   }
+.pgmonospaced {
+   font-family: monospace;
+   font-size: 0.9em
+   }
+a.pgkilled {
+   text-decoration: none;
+   }
+img.ebookmaker-cover {max-width: 100%;}
+
 @media (orientation: landscape) {
     img.x-ebookmaker-cover {height: 100%;}
     }
@@ -486,12 +519,12 @@ class Writer(EpubWriter.Writer):
                     new_key = getattr(NS.epub, key[10:])
                     e.attrib[new_key] = val
 
-
     @staticmethod
     def fix_incompatible_css(sheet):
-        """ Strip CSS properties and values that are not EPUB3 compatible (if we find any).
+        """ Strip CSS properties and values that are not EPUB3 compatible.
             Remove "media handheld" rules
         """
+        cssclass = re.compile(r'\.(-?[_a-zA-Z]+[_a-zA-Z0-9-]*)')
         for rule in sheet:
             if rule.type == rule.MEDIA_RULE:
                 if rule.media.mediaText.find('handheld') > -1:
@@ -573,7 +606,7 @@ class Writer(EpubWriter.Writer):
         css_count = 0
 
         # add CSS parsers
-        self.add_external_css(job.spider, None, PRIVATE_CSS + PRIVATE_CSS_3, 'pgepub.css')
+        self.add_external_css(job.spider, None, PRIVATE_CSS, 'pgepub.css')
 
         try:
             chunker = HTMLChunker.HTMLChunker(version='epub3')
