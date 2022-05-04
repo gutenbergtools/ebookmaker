@@ -49,17 +49,19 @@ options = Options()
 CONFIG_FILES = ['/etc/ebookmaker.conf', os.path.expanduser('~/.ebookmaker')]
 
 DEPENDENCIES = collections.OrderedDict((
-    ('all', ('html', 'epub', 'epub3', 'kindle', 'pdf', 'txt', 'rst')),
+    ('all', ('html', 'epub', 'epub3', 'kindle', 'kf8', 'pdf', 'txt', 'rst')),
     ('test', ('html', 'epub', 'epub3')),
     ('html', ('html.images', 'html.noimages')),
     ('epub', ('epub.images', 'epub.noimages')),
     ('epub3', ('epub3.images',)),
     ('kindle', ('kindle.images', 'kindle.noimages')),
+    ('kf8', ('kf8.images',)),
     ('pdf', ('pdf.images', 'pdf.noimages')),
     ('txt', ('txt.utf-8', 'txt.iso-8859-1', 'txt.us-ascii')),
     ('rst', ('rst.gen', )),
     ('kindle.noimages', ('epub.noimages', )),
     ('kindle.images', ('epub.images', )),
+    ('kf8.images', ('epub3.images', )),
     ('html.noimages', ('picsdir.noimages', )),
     ('html.images', ('picsdir.images', )),
     ('pdf.noimages', ('picsdir.noimages', )),
@@ -74,7 +76,7 @@ txt.utf-8 txt.iso-8859-1 txt.us-ascii
 html.images html.noimages
 epub.noimages kindle.noimages pdf.noimages
 epub.images kindle.images pdf.images
-epub3.images
+epub3.images kf8.images
 cover.small cover.medium
 qrcode rdf facebook twitter null""".split()
 
@@ -88,6 +90,7 @@ FILENAMES = {
 
     'kindle.noimages': '{id}-kindle.mobi',
     'kindle.images': '{id}-images-kindle.mobi',
+    'kf8.images': '{id}-kf8-kindle.mobi',
 
     'pdf.noimages': '{id}-pdf.pdf',
     'pdf.images': '{id}-images-pdf.pdf',
@@ -528,8 +531,9 @@ def config():
         {
             'proxies' : None,
             'xelatex' : 'xelatex',
-            'mobigen' : 'kindlegen',
-            'mobilang': '',
+            'mobigen' : 'ebook-convert',
+            'mobilang': 'ebook-convert',
+            'mobikf8': 'ebook-convert',
             'groff'   : 'groff',
             'rhyming_dict': None,
             'timestamp': datetime.datetime.today().isoformat()[:19],
@@ -583,6 +587,10 @@ def main():
                 job.url = os.path.join(absoutputdir, output_files['epub.images'])
             elif job.type == 'kindle.noimages':
                 job.url = os.path.join(absoutputdir, output_files['epub.noimages'])
+        if job.type.startswith('kf8'):
+            absoutputdir = os.path.abspath(job.outputdir)
+            job.url = os.path.join(absoutputdir, output_files['epub3.images'])
+            
         options.outputdir = job.outputdir
         job.dc = dc
         do_job(job)

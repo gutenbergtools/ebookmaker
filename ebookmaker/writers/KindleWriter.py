@@ -32,11 +32,14 @@ class Writer(BaseWriter):
     def build(self, job):
         """ Build kindle file from epub using amazon kindlegen or calibre. """
 
-        if job.dc.languages:
-            if job.dc.languages[0].id in no_kindlegen_langs:
-                mobimaker = options.config.MOBILANG
-            else:
-                mobimaker = options.config.MOBIGEN
+        if job.maintype == 'kindle':
+            if job.dc.languages:
+                if job.dc.languages[0].id in no_kindlegen_langs:
+                    mobimaker = options.config.MOBILANG
+                else:
+                    mobimaker = options.config.MOBIGEN
+        else:
+            mobimaker = options.config.MOBIKF8
         if not mobimaker:
             info('no mobimaker available')
             return
@@ -57,6 +60,7 @@ class Writer(BaseWriter):
                         job.url,
                         os.path.basename(job.outputfile),
                         '--personal-doc="[EBOK]"',
+                        '--mobi-file-type=' + ('new' if job.maintype == 'kf8' else 'old')
                     ],
                     stdin=subprocess.PIPE,
                     stdout=subprocess.PIPE,

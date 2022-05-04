@@ -62,8 +62,9 @@ def unload_writers ():
 
 def create (type_):
     """ Load writer module for type. """
-
     try:
+        if type_ == 'kf8':
+            type_ = 'kindle'
         return writers[type_].Writer ()
     except KeyError:
         raise KeyError ('No writer for type %s' % type_)

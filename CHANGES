@@ -1,5 +1,8 @@
 0.12.x
-- This version is being tested and deployed on Python 3.8. We will continue to address any issues with  Python 3.7. We no longer support Python 3.5. We have not yet test on Python 3.9 but we expect it works without change.
+
+With 0.12, Ebookmaker adds EPUB3 and MOBI(KF8) as output formats.
+
+- This version is being tested and deployed on Python 3.8. We will continue to address any issues with  Python 3.7. We no longer support Python 3.5. We have not yet tested on Python 3.9 but we expect it works without change.
 - replaces Tidy with Beautiful Soup. Ebookmaker has used HTML Tidy to make sure that source files produced over the course of ~ 25 years can be parsed into a reasonably modern HTML DOM. With the advent of HTML5, Tidy has begun to show its age, and maintenance of Tidy has not kept up with the times. Bugs in Tidy are not being fixed, and we find we can no longer rely on Tidy. To replace Tidy, we are using  Beautiful Soup, a very popular python package widely used for web scraping.
 
 Tidy did some other things that caused Ebookmaker's HTML5 output poorly suited for PG,
@@ -63,6 +66,7 @@ Beautiful Soup, by contrast, only changes the source when absolutely needed to m
 - tibetan (bo) added to list of languages for mobi conversion by calibre
 - fixed issue where backlinks required an id set on the original element
 - HTML5 `wbr` tags (line break opportunity) are removed for EPUB2
+- Ebookmaker is phasing out the use of Kindlegen, which has been unsupported for a while by Amazon. While kindlegen can still be specified as the converter app in the config file, Calibre is now the default conversion app. the generated EPUB2 file is used as the source for MOBI (version 6) files, while EPUB3 files are used as the source for MOBI (KF8 format) files.
 
 0.11.30 December 10, 2021
 - for EPUB, down-convert HTML5 tags to divs so the files validate as EPUB2. The new div elements will add a class named the same as the html5 tag, so `<section>` becomes `<div class="section">`. Other attributes are preserved. In addition CSS selectors involving these elements will be transformed accordingly: for example `section` becomes `div.section`
