@@ -46,6 +46,7 @@ from .EpubWriter import (
     EPUB_TYPE,
     STRIP_CLASSES,
 )
+HANDHELD_QUERY = 'max-width: 480px'
 from . import EpubWriter, HTMLWriter
 
 options = Options()
@@ -527,9 +528,11 @@ class Writer(EpubWriter.Writer):
         cssclass = re.compile(r'\.(-?[_a-zA-Z]+[_a-zA-Z0-9-]*)')
         for rule in sheet:
             if rule.type == rule.MEDIA_RULE:
-                if rule.media.mediaText.find('handheld') > -1:
-                    sheet.deleteRule(rule)
-                    info("deleting  @media handheld rule")
+                for medium in rule.media:
+                    info(f'{medium}')
+                    if medium == 'handheld':
+                        rule.media.deleteMedium(medium)
+                        rule.media.appendMedium(HANDHELD_QUERY)
 
             if rule.type == rule.STYLE_RULE:
                 ruleclasses = list(cssclass.findall(rule.selectorList.selectorText))
@@ -663,6 +666,7 @@ class Writer(EpubWriter.Writer):
                         ncx.toc += p.make_toc(xhtml)
 
                         # allows authors to customize css for epub
+                        self.add_body_class(xhtml, 'x-ebookmaker')
                         self.add_body_class(xhtml, 'x-ebookmaker-3')
 
                         self.insert_root_div(xhtml)

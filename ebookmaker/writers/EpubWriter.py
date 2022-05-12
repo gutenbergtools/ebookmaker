@@ -1321,6 +1321,7 @@ class Writer(writers.HTMLishWriter):
 
                         # allows authors to customize css for epub
                         self.add_body_class(xhtml, 'x-ebookmaker')
+                        self.add_body_class(xhtml, 'x-ebookmaker-2')
 
                         self.insert_root_div(xhtml)
                         self.fix_charset(xhtml)
