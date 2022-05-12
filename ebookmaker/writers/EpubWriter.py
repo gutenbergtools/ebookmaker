@@ -1055,6 +1055,14 @@ class Writer(writers.HTMLishWriter):
         """
 
         for e in xpath(xhtml, "//xhtml:*[contains (@class, 'x-ebookmaker-drop')]"):
+            # preserve any ids ing the tree we're dropping
+            dropped_ids = []
+            if 'id' in e.attrib:
+                dropped_ids.append(e.attrib['id'])
+            for id_el in xpath(e, './/xhtml:*[@id]'):
+                dropped_ids.append(id_el.attrib['id'])
+            for dropped_id in dropped_ids:
+                e.addprevious(xhtml.makeelement(NS.xhtml.span, attrib={'id': dropped_id}))
             e.drop_tree()
 
 
