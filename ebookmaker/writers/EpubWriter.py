@@ -991,7 +991,7 @@ class Writer(writers.HTMLishWriter):
                 tbody.addprevious(tfoot)
 
         # set required attributes removed in html5
-        attrs_to_fill = [('style', 'type', 'text/css')]
+        attrs_to_fill = [('style', 'type', 'text/css'), ('table', 'summary', '')]
         for (tag, attr, fill) in attrs_to_fill:
             for elem in xpath(xhtml, f"//xhtml:{tag}[not(@{attr})]"):
                 elem.set(attr, fill)
