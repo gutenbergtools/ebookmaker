@@ -45,6 +45,7 @@ from .EpubWriter import (
     OutlineFixer,
     EPUB_TYPE,
     STRIP_CLASSES,
+    TocNCX
 )
 HANDHELD_QUERY = 'max-width: 480px'
 from . import EpubWriter, HTMLWriter
@@ -117,7 +118,7 @@ class OEBPSContainer(EpubWriter.OEBPSContainer):
         return filename
 
 
-class Toc(object):
+class Toc(TocNCX):
     """ Class that builds toc.xhtml. derived from EpubWriter.TocNCX"""
 
     def __init__(self, dc):
@@ -128,27 +129,13 @@ class Toc(object):
                                          nsmap={None: str(NS.xhtml), 'epub': str(NS.epub)})
 
 
-    def __str__(self):
-        return self.__unicode__()
-
     def __unicode__(self):
         """ Serialize toc.em as unicode string. """
         em = self.elementmaker
         tocdepth = 1
 
         if self.toc:
-            # normalize toc so that it starts with an h1 and doesn't jump down more than one
-            # level at a time
-            fixer = OutlineFixer()
-            for t in self.toc:
-                t[2] = fixer.level(t[2])
-
-            # flatten toc if it contains only one top-level entry
-            top_level_entries = sum(t[2] == 1 for t in self.toc)
-            if top_level_entries < 2:
-                for t in self.toc:
-                    if t[2] != -1:
-                        t[2] = max(1, t[2] - 1)
+            self.normalize_toc()
 
             tocdepth = max(t[2] for t in self.toc)
 
@@ -196,12 +183,6 @@ class Toc(object):
         if options.verbose >= 3:
             debug(toc_ncx)
         return toc_ncx
-
-
-    def rewrite_links(self, f):
-        """ Rewrite all links f(). """
-        for entry in self.toc:
-            entry[0] = f(entry[0])
 
 
     def _make_navmap(self, toc):

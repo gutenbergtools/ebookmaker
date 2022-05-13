@@ -300,8 +300,8 @@ class OutlineFixer(object):
     """ Class that fixes outline levels. """
 
     def __init__(self):
-        self.stack = [(0, 0),]
-        self.last = 0
+        self.stack = [(0, 1),]
+        self.last = 1
 
     def level(self, in_level):
         if in_level < 1:
@@ -339,24 +339,38 @@ class TocNCX(object):
     def __str__(self):
         return self.__unicode__()
 
+
+    def normalize_toc(self):
+        """ normalize toc so that it starts with an h1 and doesn't jump down more than one """
+        # level at a time
+        fixer = OutlineFixer()
+        top_level = 10
+        for t in self.toc:
+            t[2] = fixer.level(t[2])
+            if t[2] > 0:
+                top_level = min(t[2], top_level)
+        if top_level != 1:
+            for t in self.toc:
+                t[2] = t[2] - top_level + 1
+
+        # flatten toc if it contains only one top-level entry
+        top_level_entries = list(filter(lambda x: x[2] == 1, self.toc))
+        if len(top_level_entries) < 2:
+            for t in self.toc:
+                if t[2] != -1:
+                    t[2] = max(1, t[2] - 1)
+
+        # remove entries before the first level 1 entry
+        if self.toc[0][2] != 1:
+            self.toc = self.toc[self.toc.index(top_level_entries[0]):]
+
     def __unicode__(self):
         """ Serialize toc.ncx as unicode string. """
         ncx = self.ncx
         tocdepth = 1
 
         if self.toc:
-            # normalize toc so that it starts with an h1 and doesn't jump down more than one
-            # level at a time
-            fixer = OutlineFixer()
-            for t in self.toc:
-                t[2] = fixer.level(t[2])
-
-            # flatten toc if it contains only one top-level entry
-            top_level_entries = sum(t[2] == 1 for t in self.toc)
-            if top_level_entries < 2:
-                for t in self.toc:
-                    if t[2] != -1:
-                        t[2] = max(1, t[2] - 1)
+            self.normalize_toc()
 
             tocdepth = max(t[2] for t in self.toc)
 
