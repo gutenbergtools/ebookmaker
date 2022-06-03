@@ -1307,6 +1307,7 @@ class Writer(writers.HTMLishWriter):
 
                     if hasattr(p, 'rst2epub2'):
                         xhtml = p.rst2epub2(job)
+                        xhtml = copy.deepcopy(xhtml)
 
                         if options.verbose >= 2:
                             # write html to disk for debugging
