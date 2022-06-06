@@ -983,19 +983,6 @@ class Writer(writers.HTMLishWriter):
             surround(q, '“', '”')
 
     @staticmethod
-    def fix_rsthtml(xhtml):
-        """
-        fix weird stuff in xhtml from docutils??
-        """
-        
-        # remove bad attribute
-        attrs_to_remove = [('*', 'classes'),]
-        for (tag, attr) in attrs_to_remove:
-            for elem in xpath(xhtml, f"//xhtml:{tag}[@{attr}]"):
-                del elem.attrib[attr]
-
-
-    @staticmethod
     def fix_html5(xhtml):
         """
         Find html5 constructs and tries to fix them for xhtml
@@ -1321,7 +1308,6 @@ class Writer(writers.HTMLishWriter):
                     if hasattr(p, 'rst2epub2'):
                         xhtml = p.rst2epub2(job)
                         xhtml = copy.deepcopy(xhtml)
-                        self.fix_rsthtml(xhtml)
 
                         if options.verbose >= 2:
                             # write html to disk for debugging

@@ -23,6 +23,7 @@ from docutils import nodes
 from docutils.writers import html4css1
 
 from libgutenberg.Logger import info, debug, warning, error
+from libgutenberg.GutenbergGlobals import xpath
 
 from ebookmaker.mydocutils.transforms import parts
 from ebookmaker.mydocutils import writers
@@ -39,6 +40,12 @@ class Writer (html4css1.Writer):
         self.translator_class = Translator
 
     def fixup_xhtml (self, xhtml):
+        # remove bad attribute
+        attrs_to_remove = [('*', 'classes'),]
+        for (tag, attr) in attrs_to_remove:
+            for elem in xpath(xhtml, f"//xhtml:{tag}[@{attr}]"):
+                del elem.attrib[attr]
+        
         return xhtml
 
 

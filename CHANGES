@@ -71,7 +71,9 @@ Beautiful Soup, by contrast, only changes the source when absolutely needed to m
 - for EPUB2, added the required summary attribute on table elements.
 - for EPUB, fixed bug for irregular heading hierarchies
 - work around bug in lxml >= 4.7 causing parse failures for rst conversions
-- restored newlines in validation logging to make vaidation issues readabl
+- restored newlines in validation logging to make vaidation issues readable
+- for conversions from RST: removed invalid 'classes' attribute
+- for EPUB and EPUB3: Ebookmaker no longer makes an invalid reference when 'mailto:' links are present
 
 0.11.30 December 10, 2021
 - for EPUB, down-convert HTML5 tags to divs so the files validate as EPUB2. The new div elements will add a class named the same as the html5 tag, so `<section>` becomes `<div class="section">`. Other attributes are preserved. In addition CSS selectors involving these elements will be transformed accordingly: for example `section` becomes `div.section`
