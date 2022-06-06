@@ -71,7 +71,8 @@ REPLACE_ELEMENTS = {
     'fieldset': None,
     'font': 'span',
     'center': 'div',
-    'blink': 'span'
+    'blink': 'span',
+    'embed': None,
 }
 
 DEPRECATED = {
