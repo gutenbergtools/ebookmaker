@@ -137,7 +137,7 @@ OPS_CONTENT_DOCUMENTS = set((
 
 OPS_FONT_TYPES = set(('application/font-woff', 'application/vnd.ms-opentype'))
 
-match_link_url = re.compile(r'^https?://', re.I)
+match_link_url = re.compile(r'^(https?://|mailto:)', re.I)
 match_non_link = re.compile(r'[a-zA-Z0-9_\-\.]*(#.*)?$')
 
 class OEBPSContainer(zipfile.ZipFile):
