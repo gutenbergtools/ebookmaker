@@ -83,7 +83,7 @@ class BaseWriter(object):
 
             (dummy_stdout, stderr) = checker.communicate()
             if stderr:
-                error(stderr)
+                error(str(stderr).replace('\\n', '\n'))
                 return 1
 
         info("%s validates ok." % job.outputfile)
