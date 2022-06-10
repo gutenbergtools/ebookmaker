@@ -31,6 +31,7 @@ from ebookmaker.parsers.CSSParser import cssutils
 from ebookmaker.utils import (
     add_class, add_style, css_len, check_lang, replace_elements, gg, xpath, NS
 )
+from ebookmaker.writers import HtmlTemplates
 options = Options()
 cssutils.ser.prefs.validOnly = True
 
@@ -110,6 +111,7 @@ REPLACEMENTS = [
     ('col', 'width', 'width', css_len),
 ]
 
+DIVIDER = re.compile(r'\*\*+.*\*\*+')
 
 def serialize(xhtml):
     """ mode is html or xml """
@@ -152,6 +154,43 @@ class Writer(writers.HTMLishWriter):
         # fix empty title elements
         for title in xpath(tree, '//xhtml:title[not(text())]'):
             title.text = job.dc.title
+
+    @staticmethod
+    def replace_boilerplate(job, tree):
+        # get text after the divider, put in dc.credit if not already there
+        if not job.dc.credit:
+            for pre in xpath(tree, '//*[@id="pg-header"]//xhtml:pre'):
+                divided = DIVIDER.split(' '.join(pre.itertext()))
+                if len(divided) > 1:
+                    job.dc.credit = divided[1]
+
+        body = None
+        for body in xpath(tree, '//xhtml:body'):
+            break
+        else:
+            error('No Body!!!')
+            return
+        
+        new_bp = HtmlTemplates.pgheader(job.dc)
+
+        for pg_header in xpath(tree, '//*[@id="pg-header"]'):
+            pg_header.getparent().replace(pg_header, new_bp)
+            break
+        else:
+            body.insert(new_bp, 0)
+            warning('No pg-header found, inserted a generated one')
+            
+        new_bp = HtmlTemplates.pgfooter(job.dc)
+
+        for pg_footer in xpath(tree, '//*[@id="pg-footer"]'):
+            pg_footer.getparent().replace(pg_footer, new_bp)
+            break
+        else:
+            body.append(new_bp)
+            warning('No pg-footer found, inserted a generated one')
+
+        for pg_smallprint in xpath(tree, '//*[@id="pg-smallprint"]'):
+            pg_smallprint.getparent().remove(pg_smallprint)
 
 
     def outputfileurl(self, job, url):
@@ -431,12 +470,14 @@ class Writer(writers.HTMLishWriter):
                         lang = html.attrib[NS.xml.lang]
                         html.attrib['lang'] = job.dc.languages[0].id or lang
                         del html.attrib[NS.xml.lang]
-                    self.add_dublincore(job, html)
 
+                    self.add_dublincore(job, html)
                     self.add_meta_generator(html)
                     self.add_moremeta(job, html, p.attribs.url)
 
+                    self.replace_boilerplate(job, html)
                     self.xhtml_to_html(html)
+
                     # strip xhtml namespace
                     # https://stackoverflow.com/questions/18159221/
                     for elem in html.getiterator():
@@ -445,8 +486,9 @@ class Writer(writers.HTMLishWriter):
                     # Remove unused namespace declarations
                     etree.cleanup_namespaces(html)
 
-                    self.write_with_crlf(outfile, serialize(html))
+                    self.write_with_crlf(outfile, serialize(html))                   
                     info("Done generating HTML file: %s" % outfile)
+
                 else:
                     #images and css files
 

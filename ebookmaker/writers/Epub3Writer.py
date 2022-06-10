@@ -631,6 +631,7 @@ class Writer(EpubWriter.Writer):
                         # make a copy so we can mess around
                         p.parse()
                         xhtml = copy.deepcopy(p.xhtml) if hasattr(p, 'xhtml') else None
+
                     if xhtml is not None:
                     
                         # can't have absolute positions in reflowable EPUB3
@@ -639,8 +640,11 @@ class Writer(EpubWriter.Writer):
                         if strip_classes:
                             self.strip_pagenumbers(xhtml, strip_classes)
 
+                        HTMLWriter.Writer.replace_boilerplate(job, xhtml)
                         HTMLWriter.Writer.xhtml_to_html(xhtml)
+
                         self.html_for_epub3(xhtml)
+                        xhtml.make_links_absolute(base_url=p.attribs.url)
 
                         # build up TOC
                         # has side effects on xhtml
