@@ -7,7 +7,7 @@
 
 .. _pg-header:
 
-.. container:: noindent pgheader language-en
+.. container:: noindent pgheader language-en pg_boilerplate
 
    This ebook is for the use of anyone anywhere in the United States
    and most other parts of the world at no cost and with almost no

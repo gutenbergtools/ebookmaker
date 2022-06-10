@@ -73,6 +73,7 @@ Beautiful Soup, by contrast, only changes the source when absolutely needed to m
 - work around bug in lxml >= 4.7 causing parse failures for rst conversions
 - restored newlines in validation logging to make vaidation issues readable
 - for conversions from RST: removed invalid 'classes' attribute
+- for conversions from RST: added pg_boilerplate to generated headers
 - for EPUB and EPUB3: Ebookmaker no longer makes an invalid reference when 'mailto:' links are present
 - for EPUB and EPUB3: Adds a MIN_CHUNK_SIZE to avoid empty chunks when `body` begins with a section.
 

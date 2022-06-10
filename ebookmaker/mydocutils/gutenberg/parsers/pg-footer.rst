@@ -23,7 +23,7 @@
 
 .. _pg-footer:
 
-.. class:: pgfooter language-en
+.. class:: pgfooter language-en pg_boilerplate
 
 A Word from Project Gutenberg
 =============================
