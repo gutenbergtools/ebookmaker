@@ -83,7 +83,7 @@ class BaseWriter(object):
 
             (dummy_stdout, stderr) = checker.communicate()
             if stderr:
-                error(str(stderr).replace('\\n', '\n'))
+                error(stderr.decode("utf-8"))
                 return 1
 
         info("%s validates ok." % job.outputfile)
