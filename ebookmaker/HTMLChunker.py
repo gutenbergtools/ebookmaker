@@ -25,12 +25,13 @@ from six.moves import urllib
 
 import libgutenberg.GutenbergGlobals as gg
 from libgutenberg.GutenbergGlobals import NS
-from libgutenberg.Logger import debug, error
+from libgutenberg.Logger import debug, error, info
 
 from ebookmaker.CommonCode import Options
 options = Options()
 
 MAX_CHUNK_SIZE = 100 * 1024  # bytes
+MIN_CHUNK_SIZE = 1024  # bytes
 
 SECTIONS = [
     ('div.section', 0.0),
@@ -75,9 +76,9 @@ class HTMLChunker(object):
 
         self.tags = {}
         for tag, size in SECTIONS:
-            self.tags[NS.xhtml[tag]] = int(size * self.max_chunk_size)
+            self.tags[NS.xhtml[tag]] = max(MIN_CHUNK_SIZE, int(size * self.max_chunk_size))
         for tag in options.section_tags:
-            self.tags[NS.xhtml[tag]] = 0
+            self.tags[NS.xhtml[tag]] = MIN_CHUNK_SIZE
 
 
     def _make_name(self, url):
