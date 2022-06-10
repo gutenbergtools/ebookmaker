@@ -96,10 +96,11 @@ DEPRECATED = {
 }
 
 ALLOWED_IN_BODY = {
-    NS.xhtml.address, NS.xhtml.blockquote, f'{NS.xhtml.de}l', NS.xhtml.div, NS.xhtml.dl,
+    NS.xhtml.address, NS.xhtml.article, NS.xhtml.blockquote, NS.xhtml.del, NS.xhtml.div,
+    NS.xhtml.dl, NS.xhtml.footer, 
     NS.xhtml.h1, NS.xhtml.h2, NS.xhtml.h3, NS.xhtml.h4, NS.xhtml.h5, NS.xhtml.h6,
-    NS.xhtml.hr, NS.xhtml.ins, NS.xhtml.noscript, NS.xhtml.ol, NS.xhtml.p, NS.xhtml.pre,
-    NS.xhtml.script, NS.xhtml.table, NS.xhtml.ul,
+    NS.xhtml.header, NS.xhtml.hr, NS.xhtml.ins, NS.xhtml.noscript, NS.xhtml.ol, NS.xhtml.p,
+    NS.xhtml.pre, NS.xhtml.section, NS.xhtml.script, NS.xhtml.table, NS.xhtml.ul,
     NS.svg.svg,
 }
 

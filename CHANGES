@@ -36,6 +36,7 @@ Beautiful Soup, by contrast, only changes the source when absolutely needed to m
 - for HTML5, change 3 letter language codes to 2 letter codes where available
 - for HTML5, fill empty title elements
 - for HTML5, improve handling of HTML4 table@frame and table@rules
+- for HTML5, `article`, `section`, `header`, and `footer` are now allowed as top-level elements in `body`
 - fixed crash in text file analysis when number of lines in paragraph exceeds log(max float). 700-ish
 - include opentype fonts in EPUB file (.ttf. .otf, .woff), requires libgutenberg >= 0.8.14. fixes #106
 - added an EPUB3 writer. In addition to producing valid EPUB3 files, some changes have been made to the produced EPUB.
@@ -86,7 +87,8 @@ Beautiful Soup, by contrast, only changes the source when absolutely needed to m
         usually the trademark license
     pg_smallprint
         on older books, this will contain license-ish language and other material. it's usually 
-        found at the top of the text, and is often comically dated. 
+        found at the top of the text, and is often comically dated.
+
 
 
 0.11.30 December 10, 2021
