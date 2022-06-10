@@ -27,9 +27,10 @@ from libgutenberg.Logger import critical, info, debug, warning, error
 from libgutenberg.MediaTypes import mediatypes as mt
 
 from ebookmaker import parsers
-from ebookmaker.parsers import HTMLParserBase
 from ebookmaker.CommonCode import Options
 from ebookmaker.utils import add_style, css_len, replace_elements, xpath
+from . import HTMLParserBase
+from .boilerplate import mark_soup
 
 options = Options()
 
@@ -498,7 +499,11 @@ class Parser(HTMLParserBase):
             critical('failed to parse %s', self.attribs.url)
             return
         soup.html['xmlns'] = NS.xhtml
-        #html = str(soup)
+        
+        marked = mark_soup(soup)
+        if not marked:
+            warning('no boilerplate found in %s', self.attribs.url)
+
         html = soup.decode(formatter=nfc_formatter)
         if not html:
             critical('no content in %s', self.attribs.url)
@@ -515,7 +520,6 @@ class Parser(HTMLParserBase):
         self.xhtml.make_links_absolute(base_url=self.attribs.url)
 
         self._to_xhtml11()
-
         self._make_coverpage_link()
 
         debug("Done parsing %s", self.attribs.url)
