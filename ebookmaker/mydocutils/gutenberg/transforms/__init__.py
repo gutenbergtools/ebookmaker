@@ -163,6 +163,5 @@ class VariablesTransform (docutils.transforms.Transform):
                     s += '\n'
 
                 s += '\nLanguage: %s\n\n' % language
-                s += 'Character set encoding: %s' % doc.settings.encoding.upper ()
 
                 sub (variable, [ nodes.inline ('', nodes.Text (s)) ])

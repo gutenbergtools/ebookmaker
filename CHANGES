@@ -74,6 +74,7 @@ Beautiful Soup, by contrast, only changes the source when absolutely needed to m
 - restored newlines in validation logging to make vaidation issues readable
 - for conversions from RST: removed invalid 'classes' attribute
 - for conversions from RST: added pg_boilerplate to generated headers
+- for conversions from RST: stop printing the encoding as metadata
 - for EPUB and EPUB3: Ebookmaker no longer makes an invalid reference when 'mailto:' links are present
 - for EPUB and EPUB3: Adds a MIN_CHUNK_SIZE to avoid empty chunks when `body` begins with a section.
 
