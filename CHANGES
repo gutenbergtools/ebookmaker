@@ -88,7 +88,7 @@ Beautiful Soup, by contrast, only changes the source when absolutely needed to m
     pg_smallprint
         on older books, this will contain license-ish language and other material. it's usually 
         found at the top of the text, and is often comically dated.
-
+- for HTML5 and EPUB3. replace old boilerplate with up-to-date, generated Boilerplate!!!
 
 
 0.11.30 December 10, 2021
