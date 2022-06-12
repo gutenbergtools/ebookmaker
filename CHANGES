@@ -70,6 +70,7 @@ Beautiful Soup, by contrast, only changes the source when absolutely needed to m
 - Ebookmaker is phasing out the use of Kindlegen, which has been unsupported for a while by Amazon. While kindlegen can still be specified as the converter app in the config file, Calibre is now the default conversion app. the generated EPUB2 file is used as the source for MOBI (version 6) files, while EPUB3 files are used as the source for MOBI (KF8 format) files.
 - fixed bug where dangling references were created by `x-ebookmaker-drop`
 - for EPUB2, added the required summary attribute on table elements.
+- for EPUB2, when an x-ebookmaker-page element is added, a `div` is made instead of an `a` when the element is a dirct child of `body`
 - for EPUB, fixed bug for irregular heading hierarchies
 - work around bug in lxml >= 4.7 causing parse failures for rst conversions
 - restored newlines in validation logging to make vaidation issues readable

@@ -793,10 +793,13 @@ class Writer(writers.HTMLishWriter):
                 # look for id anywhere inside element
                 id_ = elem.xpath(".//@id")
 
-                # transmogrify element into empty <a>
+                # transmogrify element into empty <a> or <div>
                 tail = elem.tail
                 elem.clear()
-                elem.tag = NS.xhtml.a
+                if elem.getparent().tag == NS.xhtml.body:
+                    elem.tag = NS.xhtml.div
+                else:
+                    elem.tag = NS.xhtml.a
                 if id_:
                     # some blockheaded PPers include more than
                     # one page number in one span. take the last id
