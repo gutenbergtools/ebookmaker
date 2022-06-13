@@ -1079,7 +1079,8 @@ class Writer(writers.HTMLishWriter):
             for id_el in xpath(e, './/xhtml:*[@id]'):
                 dropped_ids.append(id_el.attrib['id'])
             for dropped_id in dropped_ids:
-                e.addprevious(xhtml.makeelement(NS.xhtml.span, attrib={'id': dropped_id}))
+                newtag = NS.xhtml.div if e.getparent().tag == NS.xhtml.body else NS.xhtml.span
+                e.addprevious(xhtml.makeelement(newtag, attrib={'id': dropped_id}))
             e.drop_tree()
 
 

@@ -72,14 +72,15 @@ Beautiful Soup, by contrast, only changes the source when absolutely needed to m
 - fixed bug where dangling references were created by `x-ebookmaker-drop`
 - for EPUB2, added the required summary attribute on table elements.
 - for EPUB2, when an x-ebookmaker-page element is added, a `div` is made instead of an `a` when the element is a dirct child of `body`
+- for EPUB2 and EPUB3, when an x-ebookmaker-drop element containing an `id` is removed, a `div` is added instead of an `span` when the element was a direct child of `body`.
 - for EPUB, fixed bug for irregular heading hierarchies
 - work around bug in lxml >= 4.7 causing parse failures for rst conversions
 - restored newlines in validation logging to make vaidation issues readable
 - for conversions from RST: removed invalid 'classes' attribute
 - for conversions from RST: added pg_boilerplate to generated headers
 - for conversions from RST: stop printing the encoding as metadata
-- for EPUB and EPUB3: Ebookmaker no longer makes an invalid reference when 'mailto:' links are present
-- for EPUB and EPUB3: Adds a MIN_CHUNK_SIZE to avoid empty chunks when `body` begins with a section.
+- for EPUB2 and EPUB3: Ebookmaker no longer makes an invalid reference when 'mailto:' links are present
+- for EPUB2 and EPUB3: Adds a MIN_CHUNK_SIZE to avoid empty chunks when `body` begins with a section.
 - when HTML source files are parsed, we attempt to identify Project Gutenberg "Boilerplate". When detected, these sections are wrapped in `section` tags with appropriate ids. three types of boilerplate identified are:
     pg_header
         usually a title and license declaration
