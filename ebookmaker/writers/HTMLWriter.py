@@ -174,7 +174,12 @@ class Writer(writers.HTMLishWriter):
         new_bp = HtmlTemplates.pgheader(job.dc)
 
         for pg_header in xpath(tree, '//*[@id="pg-header"]'):
-            pg_header.getparent().replace(pg_header, new_bp)
+            prev = pg_header.getprevious()
+            parent = pg_header.getparent()
+            while prev is not None:
+                parent.remove(prev)
+                prev = pg_header.getprevious()
+            parent.replace(pg_header, new_bp)
             break
         else:
             body.insert(new_bp, 0)
@@ -183,7 +188,12 @@ class Writer(writers.HTMLishWriter):
         new_bp = HtmlTemplates.pgfooter(job.dc)
 
         for pg_footer in xpath(tree, '//*[@id="pg-footer"]'):
-            pg_footer.getparent().replace(pg_footer, new_bp)
+            next = pg_footer.getnext()
+            parent = pg_footer.getparent()
+            while next is not None:
+                parent.remove(next)
+                next = pg_footer.getnext()
+            parent.replace(pg_footer, new_bp)
             break
         else:
             body.append(new_bp)
