@@ -42,7 +42,8 @@ def check_lang(elem, lang_att):
     lang = elem.attrib[lang_att]
     lang_name = gg.language_map.get(lang, default=None)
     if lang_name:
-        elem.attrib[NS.xml.lang] = lang
+        if NS.xml.lang in elem.attrib:
+             del elem.attrib[NS.xml.lang]
         elem.attrib['lang'] = lang
         return True
     clean_lang = gg.language_map.inverse(lang, default=None)
@@ -52,7 +53,8 @@ def check_lang(elem, lang_att):
         elem.attrib['data-invalid-lang'] = lang
     elif lang != clean_lang:
         elem.attrib['lang'] = clean_lang
-        elem.attrib[NS.xml.lang] = clean_lang
+        if NS.xml.lang in elem.attrib:
+             del elem.attrib[NS.xml.lang]
 
 def replace_elements(xhtml, deprecated):
     ''' replace a dictionary of deprecated elements with a new element or just delete it.
