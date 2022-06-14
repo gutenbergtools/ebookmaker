@@ -1,4 +1,4 @@
-0.12.x
+0.12.0a June 14, 2022. alpha, not for production.
 
 With 0.12, Ebookmaker adds EPUB3 and MOBI(KF8) as output formats.
 
@@ -40,8 +40,8 @@ Beautiful Soup, by contrast, only changes the source when absolutely needed to m
 - fixed crash in text file analysis when number of lines in paragraph exceeds log(max float). 700-ish
 - include opentype fonts in EPUB file (.ttf. .otf, .woff), requires libgutenberg >= 0.8.14. fixes #106
 - added an EPUB3 writer. In addition to producing valid EPUB3 files, some changes have been made to the produced EPUB.
-    - There in only an "-images" flavor. We continue to produce EPUB2 in images and no-images flavors
-    - Many changes in the HTML and CSS that were done for compatibility with e-readers are no longer done. They remain in place for EPUB2. For example: 
+    - There is only an "-images" flavor. We continue to produce EPUB2 in images and no-images flavors
+    - Many changes in the HTML and CSS that were done for compatibility with e-readers are not done for EPUB3. The changes remain in place for EPUB2. For example: 
         - Floats are not removed.
         - CSS absolute units are not changed.
         - Uncommon characters and ligatures are not simplified.
@@ -51,12 +51,12 @@ Beautiful Soup, by contrast, only changes the source when absolutely needed to m
         - img class="dropcap" are not changed to spans
         - any of the above that prove to be needed can be added back as needed
         - all html4 -> html5 changes are made, no matter the source.
-    - it turns out that producers have long used workarounds to adjust for all the changes in support of limited-capability ereaders. For example, drop-caps in the HTML versions used @media(handheld) and `x-ebookmaker` css rules to remove drop-caps that didn't work in EPUB. Now that we are no longer removing floats and the like, we had hoped to undo most of these accommodations for EPUB3. This proved to be too complex. `@media(handheld)` rules are now replaced by `@media (max-width: 480px)` for EPUB3, and `x-ebookmaker is supplemented by `x-ebookmaker-2` for EPUB2 files and `x-ebookmaker-3` for EPUB3 files. Going forward, producers should try to avoid, as much as possible, using the `x-ebookmaker-3` class and use media queries instead so that changes customizations will benefit small-screen users to the html files.
+    - it turns out that producers have long used workarounds to adjust for all the changes in support of limited-capability ereaders. For example, drop-caps in the HTML versions used @media(handheld) and `x-ebookmaker` css rules to remove drop-caps that didn't work in EPUB. Now that we are no longer removing floats and the like, we had hoped to undo most of these accommodations for EPUB3. This proved to be too complex. `@media(handheld)` rules are now replaced by `@media (max-width: 480px)` for EPUB3, and `x-ebookmaker is supplemented by `x-ebookmaker-2` for EPUB2 files and `x-ebookmaker-3` for EPUB3 files. Going forward, producers should try to avoid, as much as possible, using the `x-ebookmaker-3` class and instead use media queries so that customizations will also benefit small-screen users of the html files.
     - For EPUB3, we still need to remove CSS rules that use the position property. Apple iBooks only allows the position property for fixed-layout EPUBs; for reflowable EPUBS, it appears to remove any elements that use `position: absolute`. It looks like absolute positioning is used mostly for page number anchors in the PG corpus, so we are retaining the behavior of hiding page number anchors when they use absolute positioning. Producers who want visible page number anchors should use floating elements.
     - For EPUB3, in our initial testing, we found that setting a default body margin hurt more books than it helped, and we are now using different default CSS sheets for EPUB3 and EPUB2.
     - CSS for the EPUB cover is has been updated to better handle small or oddly sized cover images.
 - Ebookmaker breaks HTML source into chunks to improve performance on EPUB readers. For EPUB3 files, the chunker treats `section` elements the same way it treated `div.section` elements for EPUB2. Similarly section elements in HTML5 source are converted to div.section elements for EPUB2. In addition, the maximum chunk size for EPUB3 is 300KB compared to 100KB for EPUB2.
-- Ebookmaker now supports attribute in the epub namespace {http://www.idpf.org/2007/ops} These can be entered in source file in two ways:
+- Ebookmaker now supports attributes in the epub namespace {http://www.idpf.org/2007/ops} These can be entered in source file in two ways:
     - any `data-epub-*` attribute in an html or xhtml source file is moved to the epub namespace for EPUB2, stripped for EPUB2, and preserved as-is for HTML5. This option will allow permit validation with the W3C 'nu' validator.
     - any 'epub:*' attribute in a properly namespaced XHTML file will be preserved for EPUB3, stripped for EPUB2, and converted to a `data-epub-*` attribute in HTML5.
 - This version expands support for accessibility attributes.
@@ -71,7 +71,7 @@ Beautiful Soup, by contrast, only changes the source when absolutely needed to m
 - Ebookmaker is phasing out the use of Kindlegen, which has been unsupported for a while by Amazon. While kindlegen can still be specified as the converter app in the config file, Calibre is now the default conversion app. the generated EPUB2 file is used as the source for MOBI (version 6) files, while EPUB3 files are used as the source for MOBI (KF8 format) files.
 - fixed bug where dangling references were created by `x-ebookmaker-drop`
 - for EPUB2, added the required summary attribute on table elements.
-- for EPUB2, when an x-ebookmaker-page element is added, a `div` is made instead of an `a` when the element is a dirct child of `body`
+- for EPUB2, when an x-ebookmaker-page element is added, a `div` is made instead of an `a` when the element is a direct child of `body`
 - for EPUB2 and EPUB3, when an x-ebookmaker-drop element containing an `id` is removed, a `div` is added instead of an `span` when the element was a direct child of `body`.
 - for EPUB, fixed bug for irregular heading hierarchies
 - work around bug in lxml >= 4.7 causing parse failures for rst conversions
@@ -81,7 +81,7 @@ Beautiful Soup, by contrast, only changes the source when absolutely needed to m
 - for conversions from RST: stop printing the encoding as metadata
 - for EPUB2 and EPUB3: Ebookmaker no longer makes an invalid reference when 'mailto:' links are present
 - for EPUB2 and EPUB3: Adds a MIN_CHUNK_SIZE to avoid empty chunks when `body` begins with a section.
-- when HTML or TXT source files are parsed, we attempt to identify Project Gutenberg "Boilerplate". When detected, these sections are wrapped in `section` tags with appropriate ids. three types of boilerplate identified are:
+- when HTML or TXT source files are parsed, we attempt to identify Project Gutenberg "Boilerplate". When detected, these sections are wrapped in `section` tags for HTML and `pre` for TXT, with appropriate ids. three types of boilerplate identified are:
     pg_header
         usually a title and license declaration
         sometimes, title, book number, release date, authors, language, encoding, credits
