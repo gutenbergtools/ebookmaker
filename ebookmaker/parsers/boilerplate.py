@@ -42,9 +42,9 @@ TOP_MARKERS = [
 ]
 BOTTOM_MARKERS = [
     re.compile(r"\** ?END OF TH(E|IS) PROJECT GUTENBERG", re.I),
-    re.compile(r"Ende dieses Projekt Gutenberg", re.I),
-    re.compile(r"END OF PROJECT GUTENBERG", re.I),
-    re.compile(r"End of the Project Gutenberg", re.I),
+    re.compile(r"\** ?Ende dieses Projekt Gutenberg", re.I),
+    re.compile(r"\** ?END OF PROJECT GUTENBERG", re.I),
+    re.compile(r"\** ?End of the Project Gutenberg", re.I),
 ]
 SMALLPRINT_MARKERS = [
     re.compile(r"\** ?END\*? ?THE SMALL PRINT", re.I),
@@ -118,3 +118,25 @@ def mark_soup(soup):
     found_bottom = mark_bp(body, 'pg-footer', BOTTOM_MARKERS, top=False) 
     found_smallprint = mark_bp(body, 'pg-smallprint', SMALLPRINT_MARKERS, top=True)
     return found_top or found_bottom or found_smallprint
+
+
+def strip_headers_from_txt(text):
+    ''' 
+    when input is plain text, strip the heaters and return (stripped_text, pg_header, pg_footer)
+    '''
+    def markers_split(text, markers):
+        for marker in markers:
+            divider = marker.search(text)
+            if divider:
+                (before, after) = text.split(divider.group(0))
+                return before, divider.group(0), after
+        return  None, text, None
+    header_text, divider, text = markers_split(text, TOP_MARKERS)
+    divider_tail = ''
+    if '\n' in text:
+        divider_tail, text = text.split('\n', maxsplit=1)
+    pg_header = '\n'.join(['<pre id="pg-header">', header_text, divider, divider_tail, '</pre>'])
+
+    text, divider, footer_text = markers_split(text, BOTTOM_MARKERS)
+    pg_footer = '\n'.join(['<pre id="pg-footer">', divider, footer_text, '</pre>'])
+    return text, pg_header, pg_footer

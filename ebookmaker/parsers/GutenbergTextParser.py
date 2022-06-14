@@ -29,6 +29,7 @@ from libgutenberg.MediaTypes import mediatypes as mt
 from ebookmaker import parsers
 from ebookmaker.CommonCode import Options
 from ebookmaker.parsers import HTMLParserBase
+from ebookmaker.parsers.boilerplate import strip_headers_from_txt
 
 options = Options()
 mediatypes = (mt.txt, )
@@ -626,6 +627,7 @@ class Parser(HTMLParserBase):
             return
 
         text = self.unicode_content()
+        text, pg_header, pg_footer = strip_headers_from_txt(text)
         text = parsers.RE_RESTRICTED.sub('', text)
         text = gg.xmlspecialchars(text)
 
@@ -676,10 +678,14 @@ class Parser(HTMLParserBase):
 
         for body in xpath(self.xhtml, '//xhtml:body'):
             xhtmlparser = lxml.html.XHTMLParser()
+            if pg_header:
+                body.append(etree.fromstring(pg_header, xhtmlparser))
             for par in self.pars:
                 p = etree.fromstring(self.ship_out(par), xhtmlparser)
                 p.tail = '\n\n'
                 body.append(p)
+            if pg_footer:
+                body.append(etree.fromstring(pg_footer, xhtmlparser))
 
         self.pars = []
 

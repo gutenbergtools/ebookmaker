@@ -81,7 +81,7 @@ Beautiful Soup, by contrast, only changes the source when absolutely needed to m
 - for conversions from RST: stop printing the encoding as metadata
 - for EPUB2 and EPUB3: Ebookmaker no longer makes an invalid reference when 'mailto:' links are present
 - for EPUB2 and EPUB3: Adds a MIN_CHUNK_SIZE to avoid empty chunks when `body` begins with a section.
-- when HTML source files are parsed, we attempt to identify Project Gutenberg "Boilerplate". When detected, these sections are wrapped in `section` tags with appropriate ids. three types of boilerplate identified are:
+- when HTML or TXT source files are parsed, we attempt to identify Project Gutenberg "Boilerplate". When detected, these sections are wrapped in `section` tags with appropriate ids. three types of boilerplate identified are:
     pg_header
         usually a title and license declaration
         sometimes, title, book number, release date, authors, language, encoding, credits
