@@ -11,20 +11,25 @@ If you are preparing HTML for use with Ebookmaker, the [Usage Notes](USAGE.md) m
 ## Prerequisites
 
 * Python3 >= 3.7
-* Calibre (https://calibre-ebook.com/) (for Kindle files)
+
+### Needed only for Kindle generation
+
+* Calibre (https://calibre-ebook.com/) (needed to make  Kindle files)
     * may need to install Calibre's ebook-convert command line tool https://manual.calibre-ebook.com/generated/en/cli-index.html
-* TexLive (to build from TeX and rst)
+
+### Needed only for validation
+
 * EpubCheck (for EPUB vaidalition) To use EPUBCheck validation, first download and install EPUBCheck from https://www.w3.org/publishing/epubcheck/. If the command to invoke it is  `java -jar /Applications/epubcheck-4.2.6/epubcheck.jar`, then add this line to ~/.ebookmaker or /etc/ebookmaker.conf: `epub_validator: java -jar /Applications/epubcheck-4.2.6/epubcheck.jar` then turn on validation by adding `--validate` to Ebookmaker's command line invocation or by setting validate to true in ~/.ebookmaker
 * the W3C "Nu" validator (for HTML5 validation) https://validator.github.io/validator/ add this line to ~/.ebookmaker or /etc/ebookmaker.conf: `html_validator: [something for your install]/vnu-runtime-image/bin/vnu` then turn on validation by adding `--validate` to Ebookmaker's command line invocation or by setting validate to true in ~/.ebookmaker
 
-For cover generation
+### Needed only for cover generation
 
 * Cairo https://www.cairographics.org/download/
 * Noto Sans and Noto Sans CJK:
     * CentOS or RedHat: `yum install google-noto-sans-cjk-fonts; yum install google-noto-sans-fonts`
     * Ubuntu: `apt-get install fonts-noto-cjk fonts-noto`
 
-For RST conversion
+### Needed only for conversion from RST
 
 * Libertinus Serif and Libertinus Sans https://github.com/alerque/libertinus
     * For Linux, 
@@ -32,6 +37,7 @@ For RST conversion
         * unzip, put .otf files into ~/.fonts 
         * update font catalog `fc-cache -f -v`
 * DejaVu Sans Mono https://dejavu-fonts.github.io/
+* TexLive (to build PDF from TeX and rst)
 
 Tested with Python 3.8
 
