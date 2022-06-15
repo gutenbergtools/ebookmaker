@@ -2,18 +2,20 @@
 
 
 Ebookmaker is the tool used for format conversion at Project Gutenberg.
-It builds EPUB2 and Kindle files from HTML.
-Also it builds HTML4, EPUB2, Kindle, and PDF files from reST sources.
+It builds HTML5, EPUB2, EPUB3 and Kindle files (including KF8) from HTML.
+It builds builds thes formats and PDF files from reST sources.
 
 If you are preparing HTML for use with Ebookmaker, the [Usage Notes](USAGE.md) may be of interest.
 
 
 ## Prerequisites
 
-* Python3 >= 3.6
-* Kindlegen (https://www.amazon.com/gp/feature.html/?docId=1000765211) or Calibre (https://calibre-ebook.com/)
-* TexLive (to build from TeX and rst), and
-* groff (not sure when this is needed).
+* Python3 >= 3.7
+* Calibre (https://calibre-ebook.com/) (for Kindle files)
+    * must install Calibre's ebook-convert command line tool
+* TexLive (to build from TeX and rst)
+* EpubCheck (for EPUB vaidalition) To use EPUBCheck validation, first download and install EPUBCheck from https://www.w3.org/publishing/epubcheck/. If the command to invoke it is  `java -jar /Applications/epubcheck-4.2.6/epubcheck.jar`, then add this line to ~/.ebookmaker or /etc/ebookmaker.conf: `epub_validator: java -jar /Applications/epubcheck-4.2.6/epubcheck.jar` then turn on validation by adding `--validate` to Ebookmaker's command line invocation or by setting validate to true in ~/.ebookmaker
+* the W3C "Nu" validator (for HTML5 validation) https://validator.github.io/validator/ add this line to ~/.ebookmaker or /etc/ebookmaker.conf: `html_validator: [something for your install]/vnu-runtime-image/bin/vnu` then turn on validation by adding `--validate` to Ebookmaker's command line invocation or by setting validate to true in ~/.ebookmaker
 
 For cover generation
 
@@ -31,7 +33,7 @@ For RST conversion
         * update font catalog `fc-cache -f -v`
 * DejaVu Sans Mono https://dejavu-fonts.github.io/
 
-Tested with Python 3.6
+Tested with Python 3.8
 
 ## Install
 
@@ -79,7 +81,7 @@ Install the gutenberg modules:
 Check your install:
 
 `$ ebookmaker --version`
-`EbookMaker 0.9.0`
+`EbookMaker 0.12.0`
 
 Since you're in the shell, you can navigate to a book's directory and convert it:
 
@@ -111,7 +113,7 @@ Travis-CI will run tests on branches committed in the gutenbergtools org
 
 ## Notes running Ebookmaker on Windows Machine (adapted from @windymilla)
 
-1. Install Python 3.6+ from python.org. Install Kindlegen. Add it to the path. 
+1. Install Python 3.7+ from python.org. Install Kindlegen. Add it to the path. 
 2. Add system environment variable: Right-click "My Computer", then Properties, then Advanced, then Environment variables, then New. Call the variable PYTHON_HOME, and set it to the Python folder.
 3. Edit the Path variable and add to the end of it `;%PYTHON_HOME%\;%PYTHON_HOME%\Scripts\`
 4. Check by starting a new command window and typing `python`. It should run your version of Python. Quit python with `^Z` & Enter.
