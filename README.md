@@ -12,7 +12,7 @@ If you are preparing HTML for use with Ebookmaker, the [Usage Notes](USAGE.md) m
 
 * Python3 >= 3.7
 * Calibre (https://calibre-ebook.com/) (for Kindle files)
-    * must install Calibre's ebook-convert command line tool
+    * may need to install Calibre's ebook-convert command line tool https://manual.calibre-ebook.com/generated/en/cli-index.html
 * TexLive (to build from TeX and rst)
 * EpubCheck (for EPUB vaidalition) To use EPUBCheck validation, first download and install EPUBCheck from https://www.w3.org/publishing/epubcheck/. If the command to invoke it is  `java -jar /Applications/epubcheck-4.2.6/epubcheck.jar`, then add this line to ~/.ebookmaker or /etc/ebookmaker.conf: `epub_validator: java -jar /Applications/epubcheck-4.2.6/epubcheck.jar` then turn on validation by adding `--validate` to Ebookmaker's command line invocation or by setting validate to true in ~/.ebookmaker
 * the W3C "Nu" validator (for HTML5 validation) https://validator.github.io/validator/ add this line to ~/.ebookmaker or /etc/ebookmaker.conf: `html_validator: [something for your install]/vnu-runtime-image/bin/vnu` then turn on validation by adding `--validate` to Ebookmaker's command line invocation or by setting validate to true in ~/.ebookmaker
