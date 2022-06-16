@@ -1,4 +1,9 @@
-0.12.0a June 14, 2022. alpha, not for production.
+0.12.0a1 June 16, 2022. alpha, not for production.
+
+- fix boilerplate insertion
+
+
+0.12.0a0 June 14, 2022. alpha, not for production.
 
 With 0.12, Ebookmaker adds EPUB3 and MOBI(KF8) as output formats.
 

@@ -182,7 +182,7 @@ class Writer(writers.HTMLishWriter):
             parent.replace(pg_header, new_bp)
             break
         else:
-            body.insert(new_bp, 0)
+            body.insert(0, new_bp)
             warning('No pg-header found, inserted a generated one')
             
         new_bp = HtmlTemplates.pgfooter(job.dc)
