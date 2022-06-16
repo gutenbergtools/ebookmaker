@@ -28,7 +28,7 @@ from six.moves import cPickle
 from libgutenberg.GutenbergGlobals import SkipOutputFormat
 from libgutenberg.DublinCore import PGDCObject
 import libgutenberg.GutenbergGlobals as gg
-from libgutenberg.Logger import debug, info, warning, error, exception
+from libgutenberg.Logger import critical, debug, info, warning, error, exception
 from libgutenberg import Logger, DublinCore
 from libgutenberg import MediaTypes as mt
 from libgutenberg import Cover
@@ -578,25 +578,30 @@ def main():
 
     dc = None
     for job in job_queue:
-        dc = get_dc(job) # this is when doc at job.url gets parsed!
-        job.outputfile = job.outputfile or make_output_filename(job.type, dc)
-        output_files[job.type] = job.outputfile
-        if job.type.startswith('kindle'):
-            absoutputdir = os.path.abspath(job.outputdir)
-            if job.type == 'kindle.images':
-                job.url = os.path.join(absoutputdir, output_files['epub.images'])
-            elif job.type == 'kindle.noimages':
-                job.url = os.path.join(absoutputdir, output_files['epub.noimages'])
-        if job.type.startswith('kf8'):
-            absoutputdir = os.path.abspath(job.outputdir)
-            job.url = os.path.join(absoutputdir, output_files['epub3.images'])
-            
-        options.outputdir = job.outputdir
-        job.dc = dc
-        do_job(job)
-        if dc and hasattr(dc, 'session') and dc.session:
-            dc.session.close()
-            dc.session = None # probably overkill
+        try:
+            info('Job starting for type %s from %s', job.type, job.url)
+            dc = get_dc(job) # this is when doc at job.url gets parsed!
+            job.outputfile = job.outputfile or make_output_filename(job.type, dc)
+            output_files[job.type] = job.outputfile
+            if job.type.startswith('kindle'):
+                absoutputdir = os.path.abspath(job.outputdir)
+                if job.type == 'kindle.images':
+                    job.url = os.path.join(absoutputdir, output_files['epub.images'])
+                elif job.type == 'kindle.noimages':
+                    job.url = os.path.join(absoutputdir, output_files['epub.noimages'])
+            if job.type.startswith('kf8'):
+                absoutputdir = os.path.abspath(job.outputdir)
+                job.url = os.path.join(absoutputdir, output_files['epub3.images'])
+
+            options.outputdir = job.outputdir
+            job.dc = dc
+            do_job(job)
+            if dc and hasattr(dc, 'session') and dc.session:
+                dc.session.close()
+                dc.session = None # probably overkill
+        except Exception as e:
+            error('Job failed for type %s from %s', job.type, job.url)
+            error(e)
 
     packager = PackagerFactory.create(options.packager, 'push')
     if packager:

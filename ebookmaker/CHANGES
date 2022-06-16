@@ -2,6 +2,7 @@
 
 - update to libgutenberg 0.9.0
 - fix boilerplate insertion
+- catch errors for each job in a job queue so that the rest of the queue can execute
 
 
 0.12.0a0 June 14, 2022. alpha, not for production.
