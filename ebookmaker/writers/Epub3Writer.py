@@ -588,6 +588,7 @@ class Writer(EpubWriter.Writer):
         ncx = Toc(job.dc)
         parserlist = []
         css_count = 0
+        boilerplate_done = False
 
         # add CSS parsers
         self.add_external_css(job.spider, None, PRIVATE_CSS, 'pgepub.css')
@@ -640,7 +641,9 @@ class Writer(EpubWriter.Writer):
                         if strip_classes:
                             self.strip_pagenumbers(xhtml, strip_classes)
 
-                        HTMLWriter.Writer.replace_boilerplate(job, xhtml)
+                        if not boilerplate_done:
+                            HTMLWriter.Writer.replace_boilerplate(job, xhtml)
+                            boilerplate_done = True
                         HTMLWriter.Writer.xhtml_to_html(xhtml)
 
                         self.html_for_epub3(xhtml)
