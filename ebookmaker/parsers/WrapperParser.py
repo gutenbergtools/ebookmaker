@@ -72,5 +72,5 @@ class Parser(HTMLParserBase):
     def iterlinks(self):
         """ only return the image """
         for iterlink in super(Parser, self).iterlinks():
-            if iterlink[1].tag == 'img':
+            if iterlink[1].tag == gg.NS.xhtml.img:
                 yield iterlink
