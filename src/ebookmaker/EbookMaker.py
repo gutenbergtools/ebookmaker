@@ -380,12 +380,6 @@ def add_local_options(ap):
         help="token for use in filenames (default: <ebook number>)")
 
     ap.add_argument(
-        "--validate",
-        dest="validate",
-        action="count",
-        help="validate epub through epubcheck")
-
-    ap.add_argument(
         "--section",
         metavar="TAG.CLASS",
         dest="section_tags",

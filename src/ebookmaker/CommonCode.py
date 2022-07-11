@@ -80,6 +80,23 @@ def add_common_options(ap, user_config_file):
         default=user_config_file,
         help="read config file (default: %(default)s)")
 
+    ap.add_argument(
+        "--validate",
+        dest="validate",
+        action="store",
+        type=bool,
+        default=False,
+        help="validate epub and html through epubcheck/nu")
+
+    ap.add_argument(
+        "--notify",
+        dest="notify",
+        action="store",
+        type=bool,
+        default=False,
+        help="write CRITICAL messages to notifier logs")
+
+
 def set_arg_defaults(ap, config_file):
     # get default command-line args
     cp = configparser.ConfigParser()
