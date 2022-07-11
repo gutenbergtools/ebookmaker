@@ -21,7 +21,7 @@ import os.path
 from lxml import etree
 from lxml.builder import ElementMaker
 
-from libgutenberg.Logger import debug, info, error
+from libgutenberg.Logger import critical, debug, info, error
 import libgutenberg.GutenbergGlobals as gg
 from libgutenberg import MediaTypes
 
@@ -83,7 +83,8 @@ class BaseWriter(object):
 
             (dummy_stdout, stderr) = checker.communicate()
             if stderr:
-                error(stderr.decode("utf-8"))
+                critical('validation error reported by %s:\r', self.VALIDATOR)
+                critical(stderr.decode("utf-8"))
                 return 1
 
         info("%s validates ok." % job.outputfile)
