@@ -21,6 +21,7 @@ If you are preparing HTML for use with Ebookmaker, the [Usage Notes](USAGE.md) m
 
 * EpubCheck (for EPUB vaidalition) To use EPUBCheck validation, first download and install EPUBCheck from https://www.w3.org/publishing/epubcheck/. If the command to invoke it is  `java -jar /Applications/epubcheck-4.2.6/epubcheck.jar`, then add this line to ~/.ebookmaker or /etc/ebookmaker.conf: `epub_validator: java -jar /Applications/epubcheck-4.2.6/epubcheck.jar` then turn on validation by adding `--validate` to Ebookmaker's command line invocation or by setting validate to true in ~/.ebookmaker
 * the W3C "Nu" validator (for HTML5 validation) https://validator.github.io/validator/ add this line to ~/.ebookmaker or /etc/ebookmaker.conf: `html_validator: [something for your install]/vnu-runtime-image/bin/vnu` then turn on validation by adding `--validate` to Ebookmaker's command line invocation or by setting validate to true in ~/.ebookmaker
+* on MacOS, you may need to create security exceptions. On my system, I had to do `sudo xattr -r -d com.apple.quarantine /Users/eric/vnu-runtime-image/lib`
 
 ### Needed only for cover generation
 
