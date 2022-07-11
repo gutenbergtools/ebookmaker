@@ -427,20 +427,21 @@ def add_local_options(ap):
 
 def open_log(path):
     """ Open a logfile in the output directory. """
+    if options.notify:
+        Logger.notifier = CommonCode.queue_notifications
     file_handler = Logger.setup(
         Logger.LOGFORMAT,
         logfile=path,
         loglevel=logging.INFO,
-        notifier=CommonCode.queue_notifications
     )
     return file_handler
 
 
 def close_log(handler):
     """ Close logfile handler. """
-
-    logging.getLogger().removeHandler(handler)
-    handler.close()
+    if handler:
+        logging.getLogger().removeHandler(handler)
+        handler.close()
 
 
 def do_job(job):
@@ -450,8 +451,7 @@ def do_job(job):
     Logger.ebook = job.ebook
     if job.logfile:
         log_handler = open_log(os.path.join(os.path.abspath(job.outputdir), job.logfile))
-    else:
-        log_handler = open_log(None)
+
     debug('=== Building %s ===' % job.type)
     start_time = datetime.datetime.now()
     try:
@@ -507,7 +507,6 @@ def do_job(job):
 
     if log_handler:
         close_log(log_handler)
-        log_handler = None
 
 
 def config():
