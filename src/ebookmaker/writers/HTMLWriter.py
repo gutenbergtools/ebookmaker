@@ -480,6 +480,8 @@ class Writer(writers.HTMLishWriter):
                         lang = html.attrib[NS.xml.lang]
                         html.attrib['lang'] = job.dc.languages[0].id or lang
                         del html.attrib[NS.xml.lang]
+                    else:
+                        html.attrib['lang'] = job.dc.languages[0].id 
 
                     self.add_dublincore(job, html)
                     self.add_meta_generator(html)
