@@ -8,7 +8,7 @@ pylint = "*"
 
 [packages]
 e1839a8 = {path = ".",editable = true}
-ebookmaker = {editable = true, extras = ["covers", "postgres"], path = "."}
-libgutenberg = ">=0.9.3"
+ebookmaker = {editable = true, path = "."}
+libgutenberg = ">=0.10.0"
 psycopg2 = "*"
 docutils = ">=0.18.1"
