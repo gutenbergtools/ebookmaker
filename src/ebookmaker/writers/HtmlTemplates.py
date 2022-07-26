@@ -8,9 +8,19 @@ Copyright 2022 by Project Gutenberg
 
 Use f-strings to render boilerplate trees
 """
+import datetime
 import html
 import lxml
 from lxml import etree
+
+pg_date = datetime.date(1971, 12, 1)
+try:
+    hr_format = "%B %-d, %Y"
+    f'{pg_date.strftime(hr_format)}'
+except ValueError:
+    # https://strftime.org/
+    hr_format = "%B %#d, %Y"
+
 
 def pgheader(dc):
     def pstyle(key, val):
@@ -40,7 +50,7 @@ This ebook is for the use of anyone anywhere in the United States and most other
         {pstyle('Subtitle', dc.subtitle)}
         {pstyle('Author', dc.authors_short())}
         {pstyle('Release Date', 
-            f'{dc.release_date.strftime("%B %-d, %Y")} [EBook #{dc.project_gutenberg_id}]')}
+            f'{dc.release_date.strftime(hr_format)} [EBook #{dc.project_gutenberg_id}]')}
         {pstyle('Language', ', '.join(language_list))}
         {pstyle('Original Publication', dc.pubinfo)}
         {pstyle('Credits', dc.credit)}
