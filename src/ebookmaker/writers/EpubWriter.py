@@ -27,7 +27,7 @@ from lxml import etree
 from lxml.builder import ElementMaker
 from pkg_resources import resource_string # pylint: disable=E0611
 
-from libgutenberg.GutenbergGlobals import NS
+from libgutenberg.GutenbergGlobals import NS, mkdir_for_filename
 from libgutenberg.Logger import critical, debug, error, exception, info, warning
 from libgutenberg.MediaTypes import mediatypes as mt
 from ebookmaker import parsers
@@ -153,6 +153,7 @@ class OEBPSContainer(zipfile.ZipFile):
         self.zipfilename = filename
         self.oebps_path = oebps_path if oebps_path else 'OEBPS/'
         info('Creating Epub file: %s' % filename)
+        mkdir_for_filename(filename)
 
         # open zipfile
         zipfile.ZipFile.__init__(self, filename, 'w', zipfile.ZIP_DEFLATED)

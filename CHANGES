@@ -1,3 +1,8 @@
+0.12.0b1
+- fix windows exception for unpadded date format
+- add directory creation to epubwriters
+
+
 0.12.0b0 July 12, 2022. beta, almost for production.
 
 - update to libgutenberg 0.10.0 - much improved logging when run from ebookconverter
