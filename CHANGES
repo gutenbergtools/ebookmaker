@@ -3,6 +3,7 @@
 - add target directory creation to epubwriter
 - remove gaps in playOrder for EPUB2
 - don't count the size of the chunk template for chunking
+- remove xml:space attributes - not allowed in EPUB or HTML5
 
 0.12.0b0 July 12, 2022. beta, almost for production.
 

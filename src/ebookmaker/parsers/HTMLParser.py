@@ -304,6 +304,11 @@ class Parser(HTMLParserBase):
         for form in xpath(self.xhtml, "//xhtml:form"):
             form.drop_tree()
 
+        # remove xml:space
+
+        for elem in xpath(self.xhtml, "//xhtml:*[@xml:space]"):
+            del elem.attrib[NS.xml.space]
+
         # blockquotes
 
         for bq in xpath(self.xhtml, "//xhtml:blockquote"):
