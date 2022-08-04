@@ -441,7 +441,7 @@ class TocNCX(object):
                     ncx.navLabel(ncx.text(title)),
                     ncx.content(src=url),
                     **{'id': "np-%d" % count,
-                       'playOrder': self.seen_urls[url]})
+                       'playOrder': str(count)})
 
                 try:
                     parent = last_np_with_depth[depth - 1]
