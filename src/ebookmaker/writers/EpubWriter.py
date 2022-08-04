@@ -333,6 +333,7 @@ class TocNCX(object):
         self.toc = []
         self.dc = dc
         self.seen_urls = {}
+        self.play_orders = set()
         self.ncx = ElementMaker(namespace=str(NS.ncx),
                                 nsmap={None: str(NS.ncx)})
 
@@ -407,6 +408,13 @@ class TocNCX(object):
         if has_pages:
             ncx.append(self._make_pagelist(self.toc))
 
+        # remove gaps in playOrder
+        play_orders = list(self.play_orders)
+        play_orders.sort()
+        for np in xpath(ncx, '//ncx:*[@playOrder]'):
+            po = np.attrib['playOrder']
+            np.attrib['playOrder'] = str(play_orders.index(po))
+
         # Ugly workaround for error: "Serialisation to unicode must not
         # request an XML declaration"
 
@@ -437,11 +445,13 @@ class TocNCX(object):
         for url, title, depth in toc:
             if depth > -1:
                 count += 1
+                po = self.seen_urls[url]
+                self.play_orders.add(po)
                 np = ncx.navPoint(
                     ncx.navLabel(ncx.text(title)),
                     ncx.content(src=url),
                     **{'id': "np-%d" % count,
-                       'playOrder': str(count)})
+                       'playOrder': po})
 
                 try:
                     parent = last_np_with_depth[depth - 1]
@@ -466,13 +476,15 @@ class TocNCX(object):
 
         for url, pagename, depth in toc:
             if depth == -1:
+                po = self.seen_urls[url]
+                self.play_orders.add(po)
                 pt = ncx.pageTarget(
                     ncx.navLabel(ncx.text(pagename)),
                     ncx.content(src=url),
                     **{'id': "pt-%d" % len(root),
                        'value': str(len(root)), # fixme: extract value
                        'type': 'normal' if re.search('[0-9]', pagename) else 'front',
-                       'playOrder': self.seen_urls[url]})
+                       'playOrder': po})
 
                 root.append(pt)
 
