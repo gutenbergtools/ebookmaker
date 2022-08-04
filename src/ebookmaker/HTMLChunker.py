@@ -125,7 +125,7 @@ class HTMLChunker(object):
         """ start a new chunk """
 
         self.chunk = copy.deepcopy(template)
-        self.chunk_size = len(etree.tostring(self.chunk))
+        self.chunk_size = 0
         self.chunk_body = xpath(self.chunk, "//xhtml:body")[0]
         while len(self.chunk_body) == 1:
             self.chunk_body = self.chunk_body[0]

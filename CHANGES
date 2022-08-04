@@ -2,8 +2,7 @@
 - fix windows exception for unpadded date format
 - add target directory creation to epubwriter
 - remove gaps in playOrder for EPUB2
-
-
+- don't count the size of the chunk template for chunking
 
 0.12.0b0 July 12, 2022. beta, almost for production.
 
