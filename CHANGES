@@ -1,4 +1,4 @@
-0.12.0b1
+0.12.0b1 August 4, 2022. possibly final candidate
 - fix windows exception for unpadded date format
 - add target directory creation to epubwriter
 - remove gaps in playOrder for EPUB2
