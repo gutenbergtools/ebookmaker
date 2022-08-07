@@ -76,15 +76,13 @@ class BaseWriter(object):
             validator = getattr(options.config, self.VALIDATOR)
             info('validating...')
             params = validator.split() + [filename]
-            checker = subprocess.Popen(params,
-                                       stdin=subprocess.PIPE,
+            checker = subprocess.run(params,
                                        stdout=subprocess.PIPE,
                                        stderr=subprocess.PIPE)
 
-            (dummy_stdout, stderr) = checker.communicate()
-            if stderr:
+            if checker.stderr:
                 critical('validation error reported by %s:\r', self.VALIDATOR)
-                critical(stderr.decode("utf-8"))
+                critical(checker.stderr.decode("utf-8"))
                 return 1
 
         info("%s validates ok." % job.outputfile)

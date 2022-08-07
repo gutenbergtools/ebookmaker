@@ -54,7 +54,7 @@ class Writer(BaseWriter):
             cwd = os.getcwd()
             os.chdir(outputdir)
             if 'ebook-convert' in mobimaker:
-                kindlegen = subprocess.Popen(
+                kindlegen = subprocess.run(
                     [
                         mobimaker,
                         job.url,
@@ -62,18 +62,16 @@ class Writer(BaseWriter):
                         '--personal-doc="[EBOK]"',
                         '--mobi-file-type=' + ('new' if job.maintype == 'kf8' else 'old')
                     ],
-                    stdin=subprocess.PIPE,
                     stdout=subprocess.PIPE,
                     stderr=subprocess.PIPE
                 )
             else:
-                kindlegen = subprocess.Popen(
+                kindlegen = subprocess.run(
                     [
                         mobimaker,
                         '-o', os.path.basename(job.outputfile),
                         job.url
                     ],
-                    stdin=subprocess.PIPE,
                     stdout=subprocess.PIPE,
                     stderr=subprocess.PIPE
                 )
@@ -83,19 +81,17 @@ class Writer(BaseWriter):
             error("KindleWriter: %s %s" % (mobimaker, what))
             raise SkipOutputFormat
 
-        (stdout, stderr) = kindlegen.communicate()
-
         os.chdir(cwd)
 
         if kindlegen.returncode > 0:
             regex = re.compile(r'^(\w+)\(prcgen\):')
 
             # pylint: disable=E1103
-            msg = stderr.rstrip()
+            msg = kindlegen.stderr.rstrip()
             if msg:
                 msg = msg.decode(sys.stderr.encoding)
                 error(msg)
-            msg = stdout.rstrip()
+            msg = kindlegen.stdout.rstrip()
             msg = msg.decode(sys.stdout.encoding)
             for line in msg.splitlines():
                 match = regex.match(line)
