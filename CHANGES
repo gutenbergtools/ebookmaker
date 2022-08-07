@@ -1,3 +1,6 @@
+0.12.0b2
+- EpubWriter and TxtWriter now create a target directory if it doesn't exist, as HTMLWriter does
+
 0.12.0b1 August 4, 2022. possibly final candidate
 - fix windows exception for unpadded date format
 - add target directory creation to epubwriter

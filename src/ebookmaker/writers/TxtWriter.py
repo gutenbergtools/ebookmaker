@@ -20,7 +20,7 @@ import subprocess
 import sys
 
 from libgutenberg.Logger import debug, info, warning, error
-from libgutenberg.GutenbergGlobals import SkipOutputFormat
+from libgutenberg.GutenbergGlobals import SkipOutputFormat, mkdir_for_filename
 
 from ebookmaker import ParserFactory
 from ebookmaker import writers
@@ -98,6 +98,8 @@ class Writer(writers.BaseWriter):
         filename = os.path.join(job.outputdir, job.outputfile)
 
         encoding = job.subtype.strip('.')
+
+        mkdir_for_filename(filename)
 
         info("Creating plain text file: %s from %s", filename, job.url)
 
