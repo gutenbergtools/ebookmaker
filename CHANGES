@@ -1,4 +1,7 @@
 0.12.0b2
+- Changes to the cli were needed for ebookconverter integration
+    - `--notify` and `--validate` are now flags that turn on validation and notification
+    - to prevent any issues with picked jobs being sent via stdin to subprocesses, the newer subprocess api is now used to run validators and mobi generators.
 - EpubWriter and TxtWriter now create a target directory if it doesn't exist, as HTMLWriter does
 
 0.12.0b1 August 4, 2022. possibly final candidate

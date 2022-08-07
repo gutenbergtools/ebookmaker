@@ -83,17 +83,13 @@ def add_common_options(ap, user_config_file):
     ap.add_argument(
         "--validate",
         dest="validate",
-        action="store",
-        type=bool,
-        default=False,
+        action="store_true",
         help="validate epub and html through epubcheck/nu")
 
     ap.add_argument(
         "--notify",
         dest="notify",
-        action="store",
-        type=bool,
-        default=False,
+        action="store_true",
         help="write CRITICAL messages to notifier logs")
 
 
