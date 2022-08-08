@@ -413,7 +413,7 @@ class TocNCX(object):
         play_orders.sort()
         for np in xpath(ncx, '//ncx:*[@playOrder]'):
             po = np.attrib['playOrder']
-            np.attrib['playOrder'] = str(play_orders.index(po))
+            np.attrib['playOrder'] = str(play_orders.index(po) + 1)
 
         # Ugly workaround for error: "Serialisation to unicode must not
         # request an XML declaration"
