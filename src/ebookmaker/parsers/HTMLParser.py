@@ -331,6 +331,16 @@ class Parser(HTMLParserBase):
                     tbody.append(tr)
             table.append(tbody)
 
+        # wrap bare col elements
+
+        for table in xpath(self.xhtml, "//xhtml:table[xhtml:col]"):
+            # epub3 only allows col elements inside colgroup elements
+            colgroup = etree.Element(NS.xhtml.colgroup)
+            for col in table:
+                if col.tag == NS.xhtml.col:
+                    colgroup.append(col)
+            table[0] = colgroup
+
         # move lang to xml:lang
 
         for elem in xpath(self.xhtml, "//xhtml:*[@lang]"):
