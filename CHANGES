@@ -1,5 +1,6 @@
 0.12.0
 - start EPUB2 playorders at 1 not 0
+- instaed of dropping img elements in noimages epubs, replace them with span tags to preserve link targets.
 
 0.12.0b2 August 7, 2022, very possibly final candidate
 - Changes to the cli were needed for ebookconverter integration

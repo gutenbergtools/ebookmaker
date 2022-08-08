@@ -440,9 +440,10 @@ class HTMLParserBase(ParserBase):
         for image in xpath(xhtml, '//xhtml:img[@src]'):
             src = image.get('src')
             if src not in manifest:
-                debug("strip_links: Deleting <img> with src %s not in manifest." % src)
-                image.tail = image.get('alt', '') + (image.tail or '')
-                image.drop_tree()
+                debug("strip_links: Replacing <img> with src %s not in manifest." % src)
+                image.tag = NS.xhtml.span
+                image.content = image.get('alt', '') 
+                del image.attrib['src']
 
 
     def make_toc(self, xhtml):
