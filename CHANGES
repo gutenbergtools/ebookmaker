@@ -1,3 +1,6 @@
+0.11.31 August 9, 2022
+This version changes requirements so that a working v0.11 still installs despite breaking changes in libgutenberg. Tested in Python 3.8. Use `pipenv install --ignore-pipfile` to get an environment that is known to work
+
 0.11.30 December 10, 2021
 - for EPUB, down-convert HTML5 tags to divs so the files validate as EPUB2. The new div elements will add a class named the same as the html5 tag, so `<section>` becomes `<div class="section">`. Other attributes are preserved. In addition CSS selectors involving these elements will be transformed accordingly: for example `section` becomes `div.section`
     - `section`
