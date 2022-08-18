@@ -1,4 +1,4 @@
-0.12.0
+0.12.0 August 18, 2022
 - start EPUB2 playorders at 1 not 0
 - wrap bare col elements in colgroup
 - instaed of dropping img elements in noimages epubs, replace them with span tags to preserve link targets.
