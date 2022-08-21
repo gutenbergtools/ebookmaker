@@ -444,6 +444,7 @@ class HTMLParserBase(ParserBase):
                 image.tag = NS.xhtml.span
                 image.content = image.get('alt', '') 
                 del image.attrib['src']
+                del image.attrib['alt']
 
 
     def make_toc(self, xhtml):
