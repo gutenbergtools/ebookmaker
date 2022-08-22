@@ -34,6 +34,7 @@ import re
 from bs4 import BeautifulSoup
 import soupsieve as sv
 
+from libgutenberg.GutenbergGlobals import xmlspecialchars
 from libgutenberg.Logger import critical, info, debug, warning, error
 
 
@@ -135,8 +136,8 @@ def strip_headers_from_txt(text):
     divider_tail = ''
     if '\n' in text:
         divider_tail, text = text.split('\n', maxsplit=1)
-    pg_header = '\n'.join(['<pre id="pg-header">', header_text, divider, divider_tail, '</pre>'])
+    pg_header = '\n'.join(['<pre id="pg-header">', xmlspecialchars(header_text), divider, divider_tail, '</pre>'])
 
     text, divider, footer_text = markers_split(text, BOTTOM_MARKERS)
-    pg_footer = '\n'.join(['<pre id="pg-footer">', divider, footer_text, '</pre>'])
+    pg_footer = '\n'.join(['<pre id="pg-footer">', divider, xmlspecialchars(footer_text), '</pre>'])
     return text, pg_header, pg_footer
