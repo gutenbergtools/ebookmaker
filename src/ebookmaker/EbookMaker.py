@@ -594,7 +594,7 @@ def main():
                 dc.session = None # probably overkill
         except Exception as e:
             error('Job failed for type %s from %s', job.type, job.url)
-            error(e)
+            exception(e)
 
     packager = PackagerFactory.create(options.packager, 'push')
     if packager:
