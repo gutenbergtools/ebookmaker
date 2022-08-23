@@ -72,6 +72,12 @@ div, p, pre, h1, h2, h3, h4, h5, h6 {
    margin-right: 0;
    display: block
    }
+section.pgheader{
+    page-break-after: always;
+    }
+section.pgfooter{
+    page-break-before: always;
+    }
 div.pgebub-root-div {
    margin: 0
    }
