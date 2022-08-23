@@ -89,7 +89,7 @@ div.figcenter span.caption {
 a.pgkilled {
    text-decoration: none;
    }
-img.ebookmaker-cover {max-width: 100%;}
+img.x-ebookmaker-cover {max-width: 100%;}
 
 @media (orientation: landscape) {
     img.x-ebookmaker-cover {height: 100%;}
