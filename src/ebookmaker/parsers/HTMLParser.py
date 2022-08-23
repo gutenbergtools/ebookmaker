@@ -464,6 +464,13 @@ class Parser(HTMLParserBase):
 
 
     def __parse(self, html):
+        def fix_bad_entity(entity, html):
+            warning("Fixing problem entity: '%s'" % entity)
+            soup = BeautifulSoup(f'&{entity};', 'html.parser')
+            if soup:
+                should_be = str(soup)
+                return html.replace(f'&{entity};', should_be)
+            return html.replace(f'&{entity};', entity)
         # remove xml decl and doctype, we will add the correct one before serializing
         # html = re.compile('^.*<html ', re.I | re.S).sub('<html ', html)
 
@@ -480,18 +487,18 @@ class Parser(HTMLParserBase):
         except etree.ParseError as what:
             # cannot try HTML parser because we depend on correct xhtml namespace
             m = re.search(r"Entity '([^']+)'", str(what))
-            if m:
-                warning("Missing entity: '%s'" % m.group(1))
+            if m and m.group(1):
+                html = fix_bad_entity(m.group(1), html)
+                return self.__parse(html)
             else:
                 error("Failed to parse file because: %s" % what)
-            m = re.search(r'line\s(\d+),', str(what))
-            if m:
-                lineno = int(m.group(1))
-                if html:
-                    error("Line %d: %s" % (lineno, html.splitlines()[lineno - 1]))
-                else:
-                    error("empty document")
-
+                mline = re.search(r'line\s(\d+),', str(what))
+                if mline:
+                    lineno = int(mline.group(1))
+                    if html:
+                        error("Line %d: %s" % (lineno, html.splitlines()[lineno - 1]))
+                    else:
+                        error("empty document")
 
 
     def pre_parse(self):
