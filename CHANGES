@@ -2,6 +2,7 @@
 - fixed a mismatch between the classname given to the cover and the corresponding css
 - added CSS page breaks before footer and after header
 - BeautifulSoup doesn't convert entities in script or style elements because HTML5 specifies these as CDATA. So our code has to handle cases where there are unexpected entities there.
+- remove ALL non-default attributes in replaced img, not just alt
 
 0.12.2 August 23,2022
 - xml escape headers extracted from text files
