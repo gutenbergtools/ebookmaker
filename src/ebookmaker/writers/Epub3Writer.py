@@ -72,6 +72,12 @@ div, p, pre, h1, h2, h3, h4, h5, h6 {
    margin-right: 0;
    display: block
    }
+section.pgheader{
+    page-break-after: always;
+    }
+section.pgfooter{
+    page-break-before: always;
+    }
 div.pgebub-root-div {
    margin: 0
    }
@@ -89,7 +95,7 @@ div.figcenter span.caption {
 a.pgkilled {
    text-decoration: none;
    }
-img.ebookmaker-cover {max-width: 100%;}
+img.x-ebookmaker-cover {max-width: 100%;}
 
 @media (orientation: landscape) {
     img.x-ebookmaker-cover {height: 100%;}

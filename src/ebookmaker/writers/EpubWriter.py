@@ -106,7 +106,7 @@ div.figcenter span.caption {
 a.pgkilled {
    text-decoration: none;
    }
-img.ebookmaker-cover {max-width: 100%;}
+img.x-ebookmaker-cover {max-width: 100%;}
 """
 
 OPS_TEXT_MEDIATYPES = set((
@@ -259,7 +259,7 @@ class OEBPSContainer(zipfile.ZipFile):
                        parsers.IMAGE_WRAPPER.format(src=img_url,
                                                     title=img_title,
                                                     backlink="",
-                                                    wrapper_class='x-ebookmaker-wrapper',
+                                                    wrapper_class='x-ebookmaker-cover',
                                                     doctype=gg.XHTML_DOCTYPE),
                        mt.xhtml)
         return filename

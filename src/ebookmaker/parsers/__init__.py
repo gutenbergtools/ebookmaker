@@ -442,9 +442,10 @@ class HTMLParserBase(ParserBase):
             if src not in manifest:
                 debug("strip_links: Replacing <img> with src %s not in manifest." % src)
                 image.tag = NS.xhtml.span
-                image.content = image.get('alt', '') 
-                del image.attrib['src']
-                del image.attrib['alt']
+                image.content = image.get('alt', '')
+                for attr  in image.attrib:
+                    if attr not in ["class", "dir", "id", "lang", "style", "title"]:
+                        del image.attrib[attr]
 
 
     def make_toc(self, xhtml):
