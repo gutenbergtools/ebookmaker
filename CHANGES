@@ -1,5 +1,6 @@
 0.12.4
 - fixed bug in colgroup wrapping
+- Ebookmaker will now NEVER break a page in the middle of a table, a list, or a figure.
 
 0.12.3 August 24,2022
 - fixed a mismatch between the classname given to the cover and the corresponding css
