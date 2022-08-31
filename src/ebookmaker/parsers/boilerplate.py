@@ -81,6 +81,10 @@ def check_patterns(node, patterns):
 
 def mark_soup(soup):
     def mark_bp(node, mark, markers, top=True):
+        marked = node.find(id=mark)
+        if marked:
+            marked.name = 'section'
+            return True
         divider = check_patterns(node, markers)
         if divider:
             # first, copy the element that contains the top (bottom) boilerplate divider 

@@ -3,6 +3,7 @@
 - Ebookmaker will now NEVER break a page in the middle of a table, a list, or a figure.
 - PG boilerplate is inserted in EPUB2 files as well
 - Fixed issue with special characters in the boilerplate dividers causing txt builds to fail
+- recognize previously marked pg-header, etc., such as from rst
 
 0.12.3 August 24,2022
 - fixed a mismatch between the classname given to the cover and the corresponding css
