@@ -40,6 +40,7 @@ from ebookmaker.Version import VERSION, GENERATOR
 from ebookmaker.utils import (
     add_class, add_style, css_len, gg, xpath,
 )
+from . import HTMLWriter
 
 options = Options()
 
@@ -1289,6 +1290,7 @@ class Writer(writers.HTMLishWriter):
         ncx = TocNCX(job.dc)
         parserlist = []
         css_count = 0
+        boilerplate_done = False
 
         # add CSS parser
         self.add_external_css(job.spider, None, PRIVATE_CSS, 'pgepub.css')
@@ -1340,6 +1342,11 @@ class Writer(writers.HTMLishWriter):
                         p.parse()
                         xhtml = copy.deepcopy(p.xhtml) if hasattr(p, 'xhtml') else None
                     if xhtml is not None:
+                        if not boilerplate_done:
+                            HTMLWriter.Writer.replace_boilerplate(job, xhtml)
+                            boilerplate_done = True
+
+                        xhtml.make_links_absolute(base_url=p.attribs.url)
                         self.fix_html5(xhtml)
 
                         strip_classes = self.get_classes_with_prop(xhtml)
