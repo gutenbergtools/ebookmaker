@@ -339,7 +339,7 @@ class Parser(HTMLParserBase):
             for col in table:
                 if col.tag == NS.xhtml.col:
                     colgroup.append(col)
-            table[0] = colgroup
+            table.insert(0, colgroup)
 
         # move lang to xml:lang
 

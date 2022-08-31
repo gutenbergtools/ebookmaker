@@ -45,6 +45,8 @@ SECTIONS = [
     ('figure', 0.8),
 ]
 
+NEVER_SPLIT = [NS.xhtml[tag] for tag in ['table', 'figure', 'dl', 'ol', 'ul']]
+
 def xpath(node, path):
     """ xpath helper """
     return node.xpath(path, namespaces = gg.NSMAP)
@@ -73,6 +75,7 @@ class HTMLChunker(object):
         self.next_id = 0
         self.version = version
         self.max_chunk_size = MAX_CHUNK_SIZE * (1 if version == 'epub2' else 3)
+        self.nosplit = False
 
         self.tags = {}
         for tag, size in SECTIONS:
@@ -129,6 +132,7 @@ class HTMLChunker(object):
         self.chunk_body = xpath(self.chunk, "//xhtml:body")[0]
         while len(self.chunk_body) == 1:
             self.chunk_body = self.chunk_body[0]
+        self.nosplit = False
 
 
     def shipout_chunk(self, attribs, chunk_id = None, comment = None):
@@ -136,7 +140,7 @@ class HTMLChunker(object):
 
         attribs = copy.copy(attribs)
 
-        if self.chunk_size > self.max_chunk_size:
+        if self.chunk_size > self.max_chunk_size and not self.nosplit:
             self.split(self.chunk, attribs)
             return
 
@@ -206,9 +210,11 @@ class HTMLChunker(object):
                     tags = [child.tag]
 
                 for tag in tags:
+                    if child.tag in NEVER_SPLIT:
+                        self.nosplit = True
+                        break
                     if ((self.chunk_size + child_size > self.max_chunk_size) or
-                              (tag in self.tags and
-                               self.chunk_size > self.tags[tag])):
+                              (tag in self.tags and self.chunk_size > self.tags[tag])):
 
                         comment = ("Chunk: size=%d Split on %s"
                                    % (self.chunk_size, re.sub('^{.*}', '', tag)))
