@@ -1,3 +1,6 @@
+0.12.5
+- fix failed txt build when boilerplate is not found
+
 0.12.4 August 31, 2022
 - fixed bug in colgroup wrapping
 - Ebookmaker will now NEVER break a page in the middle of a table, a list, or a figure.

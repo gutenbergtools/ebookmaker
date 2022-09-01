@@ -135,18 +135,24 @@ def strip_headers_from_txt(text):
             if divider:
                 (before, after) = text.split(divider.group(0))
                 return before, divider.group(0), after
-        return  None, text, None
+        return  text, None, text
     header_text, divider, text = markers_split(text, TOP_MARKERS)
-    divider_tail = ''
-    if '\n' in text:
-        divider_tail, text = text.split('\n', maxsplit=1)
-    pg_header = '\n'.join([
-        '<pre id="pg-header">',
-        xmlspecialchars(header_text),
-        xmlspecialchars(divider),
-        xmlspecialchars(divider_tail),
-        '</pre>'])
+    if divider is None:
+        pg_header = ''
+    else:
+        divider_tail = ''
+        if '\n' in text:
+            divider_tail, text = text.split('\n', maxsplit=1)
+        pg_header = '\n'.join([
+            '<pre id="pg-header">',
+            xmlspecialchars(header_text),
+            xmlspecialchars(divider),
+            xmlspecialchars(divider_tail),
+            '</pre>'])
 
     text, divider, footer_text = markers_split(text, BOTTOM_MARKERS)
-    pg_footer = '\n'.join(['<pre id="pg-footer">', divider, xmlspecialchars(footer_text), '</pre>'])
+    if divider is None:
+        pg_header = ''
+    else:
+        pg_footer = '\n'.join(['<pre id="pg-footer">', divider, xmlspecialchars(footer_text), '</pre>'])
     return text, pg_header, pg_footer
