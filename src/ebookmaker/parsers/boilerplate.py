@@ -133,7 +133,12 @@ def strip_headers_from_txt(text):
         for marker in markers:
             divider = marker.search(text)
             if divider:
-                (before, after) = text.split(divider.group(0))
+                sections = text.split(divider.group(0))
+                if len(sections) == 2:
+                    (before, after) = sections
+                else:
+                    before = ' '.join(sections[0:-1])
+                    after = sections[-1]
                 return before, divider.group(0), after
         return  text, None, text
     header_text, divider, text = markers_split(text, TOP_MARKERS)

@@ -1,5 +1,6 @@
 0.12.5
 - fix failed txt build when boilerplate is not found
+- fix failed txt build when boilerplate marker appears twice
 
 0.12.4 August 31, 2022
 - fixed bug in colgroup wrapping
