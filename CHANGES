@@ -1,4 +1,5 @@
-0.12.5
+0.12.5 September 1, 2022
+There remain problems converting HTML 4.0 files.
 - fix failed txt build when boilerplate is not found
 - fix failed txt build when boilerplate marker appears twice
 
