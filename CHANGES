@@ -1,3 +1,8 @@
+0.12.5 September 1, 2022
+There remain problems converting HTML 4.0 files.
+- fix failed txt build when boilerplate is not found
+- fix failed txt build when boilerplate marker appears twice
+
 0.12.4 August 31, 2022
 - fixed bug in colgroup wrapping
 - Ebookmaker will now NEVER break a page in the middle of a table, a list, or a figure.
