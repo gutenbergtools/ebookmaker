@@ -18,7 +18,7 @@ from six.moves import urllib
 import lxml.html
 from lxml import etree
 
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, NavigableString
 from bs4.formatter import EntitySubstitution, HTMLFormatter
 
 
@@ -523,6 +523,13 @@ class Parser(HTMLParserBase):
             return
         soup.html['xmlns'] = NS.xhtml
         
+        # rap bare strings at body top level
+        for elem in soup.html.body.contents:
+            if isinstance(elem, NavigableString) and str(elem).strip(' \n\r\t'):
+                p = soup.new_tag('p')
+                p.string = str(elem)
+                elem.replace_with(p)
+
         marked = mark_soup(soup)
         if not marked:
             warning('no boilerplate found in %s', self.attribs.url)
