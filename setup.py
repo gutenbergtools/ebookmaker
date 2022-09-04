@@ -5,7 +5,7 @@
 
 from setuptools import setup
 
-VERSION = '0.12.5'
+VERSION = '0.12.6'
 
 if __name__ == "__main__":
  
@@ -83,6 +83,7 @@ if __name__ == "__main__":
             "Programming Language :: Python",
             "Programming Language :: Python :: 3.7",
             "Programming Language :: Python :: 3.8",
+            "Programming Language :: Python :: 3.9",
         ],
 
         platforms = 'OS-independent'

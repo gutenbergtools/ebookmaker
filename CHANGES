@@ -1,4 +1,4 @@
-0.12.6
+0.12.6 September 3, 2022
 - bad things happen if there's text at the top level. often this is a result of bad html. pre_parse now takes care of this
 
 0.12.5 September 1, 2022
