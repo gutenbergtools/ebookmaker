@@ -74,6 +74,7 @@ BOGUS_CHARSET_NAMES = {'iso-latin-1': 'iso-8859-1',
                        # python has bogus codec name
                        'macintosh': 'mac_roman',
                        }
+COREATTRS = ["class", "dir", "id", "lang", "style", "title"]
 
 IMAGE_WRAPPER = """<?xml version="1.0"?>{doctype}
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -444,7 +445,7 @@ class HTMLParserBase(ParserBase):
                 image.tag = NS.xhtml.span
                 image.content = image.get('alt', '')
                 for attr  in image.attrib:
-                    if attr not in ["class", "dir", "id", "lang", "style", "title"]:
+                    if attr not in COREATTRS:
                         del image.attrib[attr]
 
 
