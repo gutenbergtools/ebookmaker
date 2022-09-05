@@ -780,7 +780,7 @@ class Writer(writers.HTMLishWriter):
         middle of the text.
 
         To still keep links working, we replace all page number
-        contraptions we can find with empty <a>'s.
+        contraptions we can find with empty flow elements while keeping all the link anchors
 
         """
 
@@ -804,21 +804,27 @@ class Writer(writers.HTMLishWriter):
                 if not text:
                     text = elem.get('title')
 
-                # look for id anywhere inside element
-                id_ = elem.xpath(".//@id")
+                # use span as a generic flow element with empty string content
+                # use title attribute to contain any text that was removed
 
-                # transmogrify element into empty <a> or <div>
-                tail = elem.tail
-                elem.clear()
-                if elem.getparent().tag == NS.xhtml.body:
-                    elem.tag = NS.xhtml.div
-                else:
-                    elem.tag = NS.xhtml.a
-                if id_:
-                    # some blockheaded PPers include more than
-                    # one page number in one span. take the last id
-                    # because the others represent empty pages.
-                    elem.set('id', id_[-1])
+                if elem.getparent().tag != NS.xhtml.body:
+                    if not elem.tag == NS.xhtml.a:
+                        elem.tag = NS.xhtml.span
+                        for attr in elem.attrib:
+                            if attr not in parsers.COREATTRS:
+                                del elem.attrib[attr]                      
+
+                for sub_elem in elem.xpath(".//*"):
+                    # the element contains elements with ids. make sure they're flow
+                    if not sub_elem.tag == NS.xhtml.a:
+                        sub_elem.tag = NS.xhtml.span
+                        for attr in sub_elem.attrib:
+                            if attr not in parsers.COREATTRS:
+                                del sub_elem.attrib[attr]
+                    if sub_elem.text:
+                        sub_elem.set('title', sub_elem.text)
+                    sub_elem.text = ''
+                    sub_elem.tail = ''
 
                 if class_ in DP_PAGENUMBER_CLASSES:
                     # mark element as rewritten pagenumber. we
@@ -828,7 +834,6 @@ class Writer(writers.HTMLishWriter):
 
                 if text:
                     elem.set('title', text)
-                elem.tail = tail
                 count += 1
 
                 # The OPS Spec 2.0 is very clear: "Reading Systems
