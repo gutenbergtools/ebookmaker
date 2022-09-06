@@ -1,8 +1,9 @@
 0.12.8 September 6, 2022
 - fixed parsing no-footer text files (stupid mistake!)
 - fixed an issue where css files disappear because they are empty but there are still links to them
-- added some file checks and a custom exception so that it's clearer what has happened if you give ebookmaker a bad file
-- removed a css link in wrapper that was was getting stripped, then re-inserted later. 
+- added some file checks and a custom exception so that it's clearer what has happened if you give ebookmaker a bad file.
+- removed a css link in wrapper that was was getting stripped, then re-inserted later.
+- ancient browsers didn't understand stylesheets, so xml comments were used to hide the style text. Our CSS parser is too modern to remember this, it seems. So we needed to un-comment style text. Probably was another thing that tidy was doing without telling us.
 
 0.12.7 September 5, 2022
 - fixed an ancient bug in EPUB2 pageno handling. Having two children ids in a pageno-class element no longer generates validation errors for EPUB2 files. Yes, it seems odd that a book would have two page anchors in one page number floating element, but it makes sense if you look at the rendered HTML (#501), and it's no reason to mock people.
