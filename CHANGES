@@ -1,3 +1,6 @@
+0.12.8 September 6, 2022
+- fixed parsing no-footer text files (stupid mistake!)
+
 0.12.7 September 5, 2022
 - fixed an ancient bug in EPUB2 pageno handling. Having two children ids in a pageno-class element no longer generates validation errors for EPUB2 files. Yes, it seems odd that a book would have two page anchors in one page number floating element, but it makes sense if you look at the rendered HTML (#501), and it's no reason to mock people.
 
