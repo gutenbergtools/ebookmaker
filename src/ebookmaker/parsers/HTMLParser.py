@@ -27,7 +27,7 @@ from libgutenberg.Logger import critical, info, debug, warning, error
 from libgutenberg.MediaTypes import mediatypes as mt
 
 from ebookmaker import parsers
-from ebookmaker.CommonCode import Options
+from ebookmaker.CommonCode import Options, EbookmakerBadFileException
 from ebookmaker.utils import add_style, css_len, replace_elements, xpath
 from . import HTMLParserBase
 from .boilerplate import mark_soup
@@ -520,10 +520,25 @@ class Parser(HTMLParserBase):
             soup = BeautifulSoup(self.bytes_content(), 'lxml', exclude_encodings=["us-ascii"])
         except:
             critical('failed to parse %s', self.attribs.url)
-            return
+            raise EbookmakerBadFileException('failed parsing')
+        try:
+            if not soup.html.body.contents:
+                critical('body has no contents in ', self.attribs.url)
+                raise EbookmakerBadFileException('body has no contents')
+        except:
+            critical('%s is not a usable html file', self.attribs.url)
+            raise EbookmakerBadFileException('unusable file')
+
         soup.html['xmlns'] = NS.xhtml
-        
-        # rap bare strings at body top level
+
+        # ancient browsers didn't understand stylesheets, so xml comments were used to hide the
+        # style text. Our CSS parser is too modern to remember this, it seems. 
+        # So we need to un-comment the sttyle text
+        xmlcomment = re.compile(r'<!--(.*?)-->', re.S)
+        for commented_style in soup.find_all('style', string=xmlcomment):
+            commented_style.string = xmlcomment.sub(r'\1', str(commented_style.string))
+
+        # wrap bare strings at body top level
         for elem in soup.html.body.contents:
             if isinstance(elem, NavigableString) and str(elem).strip(' \n\r\t'):
                 p = soup.new_tag('p')

@@ -978,7 +978,7 @@ class Writer(writers.HTMLishWriter):
                 p.parse_string(style.text)
                 try:
                     # pylint: disable=E1103
-                    style.text = p.sheet.cssText.decode('utf-8')
+                    style.text = p.sheet.cssText.decode('utf-8') or '/* empty style */'
                 except (ValueError, UnicodeError):
                     debug("CSS:\n%s" % p.sheet.cssText)
                     raise

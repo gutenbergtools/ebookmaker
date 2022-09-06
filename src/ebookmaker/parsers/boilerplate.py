@@ -157,7 +157,7 @@ def strip_headers_from_txt(text):
 
     text, divider, footer_text = markers_split(text, BOTTOM_MARKERS)
     if divider is None:
-        pg_header = ''
+        pg_footer = ''
     else:
         pg_footer = '\n'.join(['<pre id="pg-footer">', divider, xmlspecialchars(footer_text), '</pre>'])
     return text, pg_header, pg_footer
