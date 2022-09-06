@@ -27,7 +27,7 @@ from libgutenberg.Logger import critical, info, debug, warning, error
 from libgutenberg.MediaTypes import mediatypes as mt
 
 from ebookmaker import parsers
-from ebookmaker.CommonCode import Options
+from ebookmaker.CommonCode import Options, EbookmakerBadFileException
 from ebookmaker.utils import add_style, css_len, replace_elements, xpath
 from . import HTMLParserBase
 from .boilerplate import mark_soup
@@ -520,7 +520,15 @@ class Parser(HTMLParserBase):
             soup = BeautifulSoup(self.bytes_content(), 'lxml', exclude_encodings=["us-ascii"])
         except:
             critical('failed to parse %s', self.attribs.url)
-            return
+            raise EbookmakerBadFileException('failed parsing')
+        try:
+            if not soup.html.body.contents:
+                critical('body has no contents in ', self.attribs.url)
+                raise EbookmakerBadFileException('body has no contents')
+        except:
+            critical('%s is not a usable html file', self.attribs.url)
+            raise EbookmakerBadFileException('unusable file')
+
         soup.html['xmlns'] = NS.xhtml
         
         # rap bare strings at body top level

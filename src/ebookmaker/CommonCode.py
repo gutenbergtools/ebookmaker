@@ -23,6 +23,9 @@ class Struct(object):
 
 options = Options()
 
+class EbookmakerBadFileException(Exception):
+    pass
+
 class Job(object):
     """Hold 'globals' for a job.
 
