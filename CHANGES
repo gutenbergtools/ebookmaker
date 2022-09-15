@@ -1,3 +1,8 @@
+0.12.9 September 15, 2022
+- restore stylesheet in cover wrapper
+- PG producers used to do all sorts of crazy things in css comments, such as nesting CDATA sections: `/*<![CDATA[ */`. tidy used to clean this up for us. Now we're removing css comments entirely.
+- what's more, the css sometimes contained malformed xml comments
+
 0.12.8 September 6, 2022
 - fixed parsing no-footer text files (stupid mistake!)
 - fixed an issue where css files disappear because they are empty but there are still links to them

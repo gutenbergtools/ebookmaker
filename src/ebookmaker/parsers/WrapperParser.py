@@ -55,7 +55,8 @@ class Parser(HTMLParserBase):
             title=quoteattr(self.attribs.title),
             backlink=backlink,
             wrapper_class='x-ebookmaker-wrapper',
-            doctype=gg.XHTML_DOCTYPE)
+            doctype=gg.XHTML_DOCTYPE,
+            style='')
 
 
     def wrapper_url(self, img_url):
