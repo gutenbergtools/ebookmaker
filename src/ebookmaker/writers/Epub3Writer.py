@@ -119,7 +119,8 @@ class OEBPSContainer(EpubWriter.OEBPSContainer):
                                                     title=img_title,
                                                     backlink="",
                                                     wrapper_class='x-ebookmaker-cover',
-                                                    doctype=gg.HTML5_DOCTYPE),
+                                                    doctype=gg.HTML5_DOCTYPE,
+                                                    style=parsers.STYLE_LINK),
                        mt.xhtml)
         return filename
 

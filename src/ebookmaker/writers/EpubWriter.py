@@ -261,7 +261,8 @@ class OEBPSContainer(zipfile.ZipFile):
                                                     title=img_title,
                                                     backlink="",
                                                     wrapper_class='x-ebookmaker-cover',
-                                                    doctype=gg.XHTML_DOCTYPE),
+                                                    doctype=gg.XHTML_DOCTYPE,
+                                                    style=parsers.STYLE_LINK),
                        mt.xhtml)
         return filename
 

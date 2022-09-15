@@ -1,3 +1,6 @@
+0.12.9 September 15, 2022
+- restore stylesheet in cover wrapper
+
 0.12.8 September 6, 2022
 - fixed parsing no-footer text files (stupid mistake!)
 - fixed an issue where css files disappear because they are empty but there are still links to them
