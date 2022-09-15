@@ -538,6 +538,10 @@ class Parser(HTMLParserBase):
         for commented_style in soup.find_all('style', string=xmlcomment):
             commented_style.string = xmlcomment.sub(r'\1', str(commented_style.string))
 
+        xmlopencomment = re.compile(r'<!--(.*?)')
+        for commented_style in soup.find_all('style', string=xmlopencomment):
+            commented_style.string = xmlopencomment.sub(r'', str(commented_style.string))
+
         # pg producers did crazy things in css comments, such as inserting CDATA sections
         csscomment = re.compile(r'/\*(.*?)\*/', re.S)
         for commented_style in soup.find_all('style', string=csscomment):
