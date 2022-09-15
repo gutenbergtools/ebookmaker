@@ -533,7 +533,7 @@ class Parser(HTMLParserBase):
 
         # ancient browsers didn't understand stylesheets, so xml comments were used to hide the
         # style text. Our CSS parser is too modern to remember this, it seems. 
-        # So we need to un-comment the sttyle text
+        # So we needed to un-comment the style text
         xmlcomment = re.compile(r'<!--(.*?)-->', re.S)
         for commented_style in soup.find_all('style', string=xmlcomment):
             commented_style.string = xmlcomment.sub(r'\1', str(commented_style.string))
