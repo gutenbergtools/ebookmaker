@@ -89,16 +89,23 @@ def mark_soup(soup):
         if divider:
             # first, copy the element that contains the top (bottom) boilerplate divider 
             # and content that precedes (follows) it
-            top_el = node
-            if len(node.contents) == 1:
+            top_el = copy.copy(node)
+            if len(node.find_all(True, recursive=False)) == 1:
                 # pathological
-                top_el = node.contents[0]
+                top_el = node.find(True, recursive=False)
             bp_section = soup.new_tag('section', id=mark)
 
+            in_bottom = False
             for elem in top_el.contents:
-                bp_section.append(copy.copy(elem))
+                if top or in_bottom:
+                    bp_section.append(copy.copy(elem))
+                #print(elem.name)
                 if elem in divider.parents:
-                    break
+                    if top:
+                        break
+                    else:
+                        bp_section.append(copy.copy(elem))
+                        in_bottom = True
 
             # next remove the divider and anything before (after) the divider from the soup
             prune(node, divider, after=not top)
@@ -109,7 +116,10 @@ def mark_soup(soup):
             # divider is a string
             prune(bp_section, divider, after=top)
             bp_section['class'] = 'pg_boilerplate'
-            node.insert(0 if top else -1, bp_section)
+            if top:
+                node.insert(0, bp_section)
+            else:
+                node.append(bp_section)
             return True
         return False
 
@@ -119,9 +129,12 @@ def mark_soup(soup):
         print('no body')
         return
 
-    found_top = mark_bp(body, 'pg-header', TOP_MARKERS, top=True) 
-    found_bottom = mark_bp(body, 'pg-footer', BOTTOM_MARKERS, top=False) 
-    found_smallprint = mark_bp(body, 'pg-smallprint', SMALLPRINT_MARKERS, top=True)
+    found_top = mark_bp(body, 'pg-header', TOP_MARKERS, top=True)
+    found_bottom = mark_bp(body, 'pg-footer', BOTTOM_MARKERS, top=False)
+    if not found_bottom:
+        found_smallprint = mark_bp(body, 'pg-smallprint', SMALLPRINT_MARKERS, top=True)
+    else:
+        found_smallprint = False
     return found_top or found_bottom or found_smallprint
 
 
