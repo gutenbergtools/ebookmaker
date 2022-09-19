@@ -17,7 +17,7 @@ import os
 import subprocess
 
 from libgutenberg.Logger import debug, info, warning, error
-from libgutenberg.GutenbergGlobals import SkipOutputFormat
+from libgutenberg.GutenbergGlobals import SkipOutputFormat, mkdir_for_filename
 
 from ebookmaker import ParserFactory
 from ebookmaker import writers
@@ -37,6 +37,7 @@ class Writer (writers.BaseWriter):
         debug ("Inputfile: %s" % inputfilename)
         info ("Creating PDF file: %s" % outputfilename)
 
+        mkdir_for_filename(outputfilename)
         parser = ParserFactory.ParserFactory.create (inputfilename)
 
         if not hasattr (parser, 'rst2xetex'):

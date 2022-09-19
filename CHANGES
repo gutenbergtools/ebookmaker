@@ -1,5 +1,6 @@
 0.12.11 September 19, 2022
 - allow figure in body
+- let PDFWriter create a directory
 
 0.12.10 September 18, 2022
 - fixed bad bug finding footer in texts generated from TEI
