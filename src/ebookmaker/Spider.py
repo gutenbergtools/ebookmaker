@@ -146,8 +146,6 @@ class Spider(object):
                             self.parsers.append(wrapper_parser)
                             self.parsed_urls.add(wrapper_parser.attribs.url)
                         
-                        # careful! we're changing the xml here, and the parser gets cached,
-                        # so make sure 'epub.images' is the last job done.
                         elem.set('href', wrapper_parser.attribs.url)
                         new_attribs.referrer = wrapper_parser.attribs.url
                         elem.set('title', wrapper_parser.attribs.title)
