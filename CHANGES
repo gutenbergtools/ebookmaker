@@ -1,3 +1,6 @@
+0.12.13 September 23, 2022
+- fix reversion in txt production because GutenbergTextParser needs caching
+
 0.12.12 September 22, 2022
 - caching the html tree in the parserwas causing the epub build to interfere with the epub3 build, so a reset method has been added for parsers to make themselves safe for reuse. Raw bytes are still cached, since most of the benefit of caching is reading from disk.
 
