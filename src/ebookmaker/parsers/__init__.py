@@ -172,6 +172,16 @@ class ParserBase(object):
         self.unicode_buffer = None
 
 
+    def reset(self):
+        """ Make the parser safe for re-use.
+
+        This method is called before parser is reused and should be implemented if
+        data from a previous use needs cleaning up. 
+
+        """
+        pass
+
+
     def pre_parse(self):
         """ Do a lightweight parse, that allows iterlinks () to succeed.
 
@@ -353,6 +363,10 @@ class HTMLParserBase(ParserBase):
     def __init__(self, attribs=None):
         ParserBase.__init__(self, attribs)
         self.attribs.mediatype = ParserAttributes.HeaderElement(mt.xhtml)
+        self.xhtml = None
+
+
+    def reset(self):
         self.xhtml = None
 
 

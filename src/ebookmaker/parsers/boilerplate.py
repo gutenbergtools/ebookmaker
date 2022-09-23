@@ -18,10 +18,10 @@ pg_header
 
 pg_footer
     usually the license
-    
+
 pg_smallprint
-    on older books, this will contain license-ish language and other material. it's usually found 
-    at the top of the text, and is often comically dated. 
+    on older books, this will contain license-ish language and other material. it's usually found
+    at the top of the text, and is often comically dated.
 
 
 BeautifulSoup is used for its superior "scraping" tools.
@@ -31,7 +31,6 @@ BeautifulSoup is used for its superior "scraping" tools.
 import copy
 import re
 
-from bs4 import BeautifulSoup
 import soupsieve as sv
 
 from libgutenberg.GutenbergGlobals import xmlspecialchars
@@ -56,10 +55,10 @@ SMALLPRINT_MARKERS = [
 def prune(root, divider, after=True):
     ''' prune parts of the root element before or after a divider element '''
     def next_or_prev(el, after=True):
-         return el.next_sibling if after else el.previous_sibling
+        return el.next_sibling if after else el.previous_sibling
 
     def after_or_before(el, after=True):
-         return list(el.next_siblings) if after else list(el.previous_siblings)
+        return list(el.next_siblings) if after else list(el.previous_siblings)
 
     dividers = [divider] + list(divider.parents)
     keep = False
@@ -87,18 +86,24 @@ def mark_soup(soup):
             return True
         divider = check_patterns(node, markers)
         if divider:
-            # first, copy the element that contains the top (bottom) boilerplate divider 
+            # first, copy the element that contains the top (bottom) boilerplate divider
             # and content that precedes (follows) it
-            top_el = node
-            if len(node.contents) == 1:
+            top_el = copy.copy(node)
+            if len(node.find_all(True, recursive=False)) == 1:
                 # pathological
-                top_el = node.contents[0]
+                top_el = node.find(True, recursive=False)
             bp_section = soup.new_tag('section', id=mark)
 
+            in_bottom = False
             for elem in top_el.contents:
-                bp_section.append(copy.copy(elem))
+                if top or in_bottom:
+                    bp_section.append(copy.copy(elem))
+                #print(elem.name)
                 if elem in divider.parents:
-                    break
+                    if top:
+                        break
+                    bp_section.append(copy.copy(elem))
+                    in_bottom = True
 
             # next remove the divider and anything before (after) the divider from the soup
             prune(node, divider, after=not top)
@@ -109,7 +114,10 @@ def mark_soup(soup):
             # divider is a string
             prune(bp_section, divider, after=top)
             bp_section['class'] = 'pg_boilerplate'
-            node.insert(0 if top else -1, bp_section)
+            if top:
+                node.insert(0, bp_section)
+            else:
+                node.append(bp_section)
             return True
         return False
 
@@ -119,14 +127,17 @@ def mark_soup(soup):
         print('no body')
         return
 
-    found_top = mark_bp(body, 'pg-header', TOP_MARKERS, top=True) 
-    found_bottom = mark_bp(body, 'pg-footer', BOTTOM_MARKERS, top=False) 
-    found_smallprint = mark_bp(body, 'pg-smallprint', SMALLPRINT_MARKERS, top=True)
+    found_top = mark_bp(body, 'pg-header', TOP_MARKERS, top=True)
+    found_bottom = mark_bp(body, 'pg-footer', BOTTOM_MARKERS, top=False)
+    if not found_bottom:
+        found_smallprint = mark_bp(body, 'pg-smallprint', SMALLPRINT_MARKERS, top=True)
+    else:
+        found_smallprint = False
     return found_top or found_bottom or found_smallprint
 
 
 def strip_headers_from_txt(text):
-    ''' 
+    '''
     when input is plain text, strip the heaters and return (stripped_text, pg_header, pg_footer)
     '''
     def markers_split(text, markers):
@@ -159,5 +170,8 @@ def strip_headers_from_txt(text):
     if divider is None:
         pg_footer = ''
     else:
-        pg_footer = '\n'.join(['<pre id="pg-footer">', divider, xmlspecialchars(footer_text), '</pre>'])
+        pg_footer = '\n'.join(['<pre id="pg-footer">',
+                               divider,
+                               xmlspecialchars(footer_text),
+                               '</pre>'])
     return text, pg_header, pg_footer

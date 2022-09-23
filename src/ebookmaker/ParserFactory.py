@@ -88,6 +88,7 @@ class ParserFactory(object):
             # debug("... reusing parser for %s" % url)
             # reuse same parser, maybe already filled with data
             parser = cls.parsers[url]
+            parser.reset()
             parser.attribs.update(attribs)
             # debug(str(parser.attribs))
             return parser
