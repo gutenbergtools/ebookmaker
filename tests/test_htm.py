@@ -16,10 +16,8 @@ class TestFromHtm(unittest.TestCase):
         book_id = '43172'
         dir = os.path.join(self.sample_dir, book_id)
         htmfile = os.path.join(dir, '%s-h' % book_id, '%s-h.htm' % book_id)
-        cmd = 'ebookmaker --ebook=43172 --make=test --output-dir={dir} {htmfile}'.format(
-            dir=self.out_dir,
-            htmfile=htmfile,
-        )
+        cmd = f'ebookmaker --ebook=43172 --make=test --output-dir={self.out_dir} '
+        cmd += f'--validate {htmfile}'
 
         output = subprocess.check_output(cmd, shell=True)
 
