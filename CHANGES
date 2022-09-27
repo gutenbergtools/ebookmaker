@@ -1,5 +1,6 @@
 0.12.14
 - add tests for conversion from txt source
+- boilerplate marking was duplicating an id. The code was incoherent. Cleaned this up.
 
 0.12.13 September 23, 2022
 - fix reversion in txt production because GutenbergTextParser needs caching

@@ -71,6 +71,7 @@ def prune(root, divider, after=True):
         keep = has_sibling or keep
 
 def check_patterns(node, patterns):
+    ''' finds the element containing the marker pattern '''
     for pattern in patterns:
         found = node.find(string=pattern)
         if found:
@@ -86,33 +87,23 @@ def mark_soup(soup):
             return True
         divider = check_patterns(node, markers)
         if divider:
-            # first, copy the element that contains the top (bottom) boilerplate divider
-            # and content that precedes (follows) it
-            top_el = copy.copy(node)
-            if len(node.find_all(True, recursive=False)) == 1:
-                # pathological
-                top_el = node.find(True, recursive=False)
-            bp_section = soup.new_tag('section', id=mark)
+            # first, copy the Node - it contains the divider
+            node_for_divider = copy.copy(node)
+            divider_copy = check_patterns(node_for_divider, markers)
 
-            in_bottom = False
-            for elem in top_el.contents:
-                if top or in_bottom:
-                    bp_section.append(copy.copy(elem))
-                #print(elem.name)
-                if elem in divider.parents:
-                    if top:
-                        break
-                    bp_section.append(copy.copy(elem))
-                    in_bottom = True
-
-            # next remove the divider and anything before (after) the divider from the soup
+            # prune all content after (before) the divider
+            prune(node_for_divider, divider_copy, after=top)
+            
+            # now prune all content before (after) the divider 
+            # this should be mostly the divider and old boilerplate
             prune(node, divider, after=not top)
-            divider.parent.extract()
 
-            # remove anything after the divider from bp_header
-            divider = check_patterns(bp_section, markers)
-            # divider is a string
-            prune(bp_section, divider, after=top)
+            # remove the divider
+            divider.extract()
+
+            # re-insert the boilerplate
+            bp_section = soup.new_tag('section', id=mark)
+            bp_section.append(divider_copy)
             bp_section['class'] = 'pg_boilerplate'
             if top:
                 node.insert(0, bp_section)
@@ -129,11 +120,11 @@ def mark_soup(soup):
 
     found_top = mark_bp(body, 'pg-header', TOP_MARKERS, top=True)
     found_bottom = mark_bp(body, 'pg-footer', BOTTOM_MARKERS, top=False)
-    if not found_bottom:
+    '''if not found_bottom:
         found_smallprint = mark_bp(body, 'pg-smallprint', SMALLPRINT_MARKERS, top=True)
     else:
-        found_smallprint = False
-    return found_top or found_bottom or found_smallprint
+        found_smallprint = False'''
+    return found_top or found_bottom #or found_smallprint
 
 
 def strip_headers_from_txt(text):
