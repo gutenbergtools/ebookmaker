@@ -53,7 +53,7 @@ SMALLPRINT_MARKERS = [
 ]
 
 def prune(root, divider, after=True):
-    ''' prune parts of the root element before or after a divider element '''
+    ''' prune parts of the root element before or after a divider  '''
     def next_or_prev(el, after=True):
         return el.next_sibling if after else el.previous_sibling
 
@@ -93,6 +93,12 @@ def mark_soup(soup):
 
             # prune all content after (before) the divider
             prune(node_for_divider, divider_copy, after=top)
+
+            #put that into a new section tag
+            bp_section = soup.new_tag('section', id=mark)
+            bp_section['class'] = 'pg_boilerplate'
+            for child in node_for_divider.contents:
+                bp_section.append(copy.copy(child))
             
             # now prune all content before (after) the divider 
             # this should be mostly the divider and old boilerplate
@@ -102,9 +108,6 @@ def mark_soup(soup):
             divider.extract()
 
             # re-insert the boilerplate
-            bp_section = soup.new_tag('section', id=mark)
-            bp_section.append(divider_copy)
-            bp_section['class'] = 'pg_boilerplate'
             if top:
                 node.insert(0, bp_section)
             else:
