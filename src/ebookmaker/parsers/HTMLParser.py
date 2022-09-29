@@ -548,11 +548,13 @@ class Parser(HTMLParserBase):
             commented_style.string = csscomment.sub('', str(commented_style.string))
 
         # wrap bare strings at body top level
+        # same as setting enclose-text option on tidy;
         for elem in soup.html.body.contents:
             if isinstance(elem, NavigableString) and str(elem).strip(' \n\r\t'):
-                p = soup.new_tag('p')
-                p.string = str(elem)
-                elem.replace_with(p)
+                if not isinstance(elem, Comment):
+                    p = soup.new_tag('p')
+                    p.string = str(elem)
+                    elem.replace_with(p)
 
         marked = mark_soup(soup)
         if not marked:
