@@ -18,7 +18,7 @@ from six.moves import urllib
 import lxml.html
 from lxml import etree
 
-from bs4 import BeautifulSoup, NavigableString
+from bs4 import BeautifulSoup, NavigableString, Comment
 from bs4.formatter import EntitySubstitution, HTMLFormatter
 
 
@@ -275,17 +275,6 @@ class Parser(HTMLParserBase):
                     elem.attrib[new_key] = val
 
 
-    def enclose_text(self):
-        """ same as setting enclose-text option on tidy;
-        ' enclose any text it finds in the body element within a <P> element.
-        This is useful when you want to take existing HTML and use it with a style sheet.'
-        """
-        for elem in self.xhtml.body:
-            if elem.tag not in ALLOWED_IN_BODY:
-                new_p = elem.makeelement(NS.xhtml.p)
-                elem.addprevious(new_p)
-                new_p.append(elem)
-
     def _to_xhtml11(self):
         """ Make vanilla xhtml more conform to xhtml 1.1 """
 
@@ -395,9 +384,6 @@ class Parser(HTMLParserBase):
 
         # deprecated elements -  replace with <span/div class="xhtml_{tag name}">
         deprecated_used = replace_elements(self.xhtml, REPLACE_ELEMENTS)
-
-        # enclose text the way tidy does
-        self.enclose_text()
 
         ##### cleanup #######
 
