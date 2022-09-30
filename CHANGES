@@ -5,6 +5,7 @@
 - removed redundant enclose_text()
 - `--make=kindle` and `--make=all` no longer make `kindle.noimages`
 - stop warning about external links that start with 'https://www.gutenberg.org/'
+- More helpful message when file not found
 
 0.12.13 September 23, 2022
 - fix reversion in txt production because GutenbergTextParser needs caching
