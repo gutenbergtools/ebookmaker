@@ -1,5 +1,5 @@
 0.12.15 (October 1, 2022
-- fixed bug exposed by implementaion of downloaded pubinfo in libgutenberg
+- fixed bug exposed by implementation of downloaded pubinfo in libgutenberg
 
 0.12.14 September 30, 2022
 - add tests for conversion from txt source
