@@ -1,3 +1,12 @@
+0.12.14 September 30, 2022
+- add tests for conversion from txt source
+- boilerplate marking was duplicating an id. The code was incoherent. Cleaned this up.
+- don't turn top-level html comments into non-comments. in BS4, Comment is a subclass of NavigableString! Thanks @G4OEU!
+- removed redundant enclose_text()
+- `--make=kindle` and `--make=all` no longer make `kindle.noimages`
+- stop warning about external links that start with 'https://www.gutenberg.org/'
+- More helpful message when file not found
+
 0.12.13 September 23, 2022
 - fix reversion in txt production because GutenbergTextParser needs caching
 

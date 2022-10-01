@@ -54,7 +54,7 @@ DEPENDENCIES = collections.OrderedDict((
     ('html', ('html.images', 'html.noimages')),
     ('epub', ('epub.images', 'epub.noimages')),
     ('epub3', ('epub3.images',)),
-    ('kindle', ('kindle.images', 'kindle.noimages')),
+    ('kindle', ('kindle.images',)),
     ('kf8', ('kf8.images',)),
     ('pdf', ('pdf.images', 'pdf.noimages')),
     ('txt', ('txt.utf-8', 'txt.iso-8859-1', 'txt.us-ascii')),
@@ -202,7 +202,10 @@ def get_dc(job):
     """ Get DC for book. """
     url = job.url
     parser = ParserFactory.ParserFactory.create(url)
-    parser.parse()
+    try:
+        parser.parse()
+    except AttributeError as e:
+        raise Exception(f'the file {job.url} could not be found or was unparsable')
     if options.is_job_queue:
         dc = PGDCObject()
         dc.load_from_database(job.ebook)
@@ -595,6 +598,7 @@ def main():
         except Exception as e:
             error('Job failed for type %s from %s', job.type, job.url)
             exception(e)
+            return 1
 
     packager = PackagerFactory.create(options.packager, 'push')
     if packager:

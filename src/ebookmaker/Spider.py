@@ -179,7 +179,10 @@ class Spider(object):
         """ Enqueue url for parsing."""
         if is_doc:
             if not self.is_included_url(attribs):
-                warning('External link in %s: %s' % (attribs.referrer, attribs.url))
+                if attribs.url and attribs.url.startswith('https://www.gutenberg.org/'):
+                    info('PG link in %s: %s', attribs.referrer, attribs.url)
+                else: 
+                    warning('External link in %s: %s', attribs.referrer, attribs.url)
                 return
             if depth >= self.max_depth:
                 critical('Omitted file %s due to depth > max_depth' % attribs.url)
