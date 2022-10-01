@@ -1,5 +1,6 @@
 0.12.15 (October 1, 2022
 - fixed bug exposed by implementation of downloaded pubinfo in libgutenberg
+- updated libgutenberg to 0.10.5 to fix an older bug revealed by rendering bugfix
 
 0.12.14 September 30, 2022
 - add tests for conversion from txt source
