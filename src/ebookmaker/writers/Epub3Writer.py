@@ -324,7 +324,7 @@ class ContentOPF(object):
             self.item_id += 1
             id_ = 'item%d' % self.item_id
 
-        if prop == 'cover':
+        if prop == 'cover-image':
             self.add_coverpage(url, id_)
         manifest_atts = {'href': url, 'id': id_, 'media-type': mediatype}
         if mediatype == 'image/svg+xml':

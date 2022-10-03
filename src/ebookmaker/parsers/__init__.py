@@ -458,7 +458,7 @@ class HTMLParserBase(ParserBase):
             if src not in manifest:
                 debug("strip_links: Replacing <img> with src %s not in manifest." % src)
                 image.tag = NS.xhtml.span
-                image.content = image.get('alt', '')
+                image.text = image.get('alt', '')
                 for attr  in image.attrib:
                     if attr not in COREATTRS:
                         del image.attrib[attr]
