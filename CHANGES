@@ -1,6 +1,6 @@
 0.12.16
 - fix bug in removal of legacy elements
-
+- add back enclose_text removed in 0.12.14; it wasn't redundant
 
 0.12.15 October 1, 2022
 - fixed bug exposed by implementation of downloaded pubinfo in libgutenberg
