@@ -1,4 +1,4 @@
-0.12.16
+0.12.16 October 3, 2022
 - fix bug in removal of legacy elements
 - add back enclose_text removed in 0.12.14; it wasn't redundant
 - when an img is removed, replace it with alt text. fixes #123
