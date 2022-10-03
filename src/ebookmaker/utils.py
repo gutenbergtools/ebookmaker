@@ -67,6 +67,6 @@ def replace_elements(xhtml, deprecated):
                 add_class(elem, 'xhtml_' + tag)
                 elem.tag = getattr(NS.xhtml, deprecated[tag])
             else:
-                elem.getparent().remove(meta)
+                elem.getparent().remove(elem)
             deprecated_used.add(tag)
     return deprecated_used
