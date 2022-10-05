@@ -116,7 +116,7 @@ REPLACEMENTS = [
     ('font', 'size', 'font-size', lambda x: FONT_SIZES.get(x.strip(), 'medium')),
     ('table td th', 'height', 'height', css_len),
     ('table td th pre', 'width', 'width', css_len),
-    ('li ol ul', 'type', 'list-style-type', lambda x: LIST_STYLES.get(x.strip(), '')),
+    ('li ol ul', 'type', 'list-style-type', lambda x: LIST_STYLES.get(x.strip(), x.strip())),
 ]
 
 CSS_FOR_REPLACED = {
