@@ -1,4 +1,4 @@
-0.12.17
+0.12.17 October 6, 2022
 - handle pre-html5 type attribute of `ul` properly
 - continue processing job queue after a parse failure
 
