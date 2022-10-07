@@ -596,9 +596,9 @@ def main():
                 dc.session.close()
                 dc.session = None # probably overkill
         except Exception as e:
-            error('Job failed for type %s from %s', job.type, job.url)
+            critical('Job failed for type %s from %s', job.type, job.url)
             exception(e)
-            return 1
+            continue
 
     packager = PackagerFactory.create(options.packager, 'push')
     if packager:

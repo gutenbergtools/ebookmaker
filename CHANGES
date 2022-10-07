@@ -1,3 +1,7 @@
+0.12.17 October 6, 2022
+- handle pre-html5 type attribute of `ul` properly
+- continue processing job queue after a parse failure
+
 0.12.16 October 3, 2022
 - fix bug in removal of legacy elements
 - add back enclose_text removed in 0.12.14; it wasn't redundant
