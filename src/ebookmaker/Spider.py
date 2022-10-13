@@ -12,9 +12,9 @@ Distributable under the GNU General Public License Version 3 or newer.
 Rudimentary Web Spider
 
 """
-
-import os.path
+import copy
 import fnmatch
+import os.path
 
 from six.moves import urllib
 
@@ -99,6 +99,10 @@ class Spider(object):
             self.add_redirection(parser.attribs.orig_url, url)
             parser.pre_parse()
             self.parsers.append(parser)
+            
+            # the following code alters the the dom tree, so make a copy of the tree
+            if hasattr(parser, 'xhtml') and parser.xhtml is not None:
+                parser._xhtml = copy.deepcopy(parser.xhtml)
 
             # look for more documents to add to the queue
             debug("Requesting iterlinks for: %s ..." % url)

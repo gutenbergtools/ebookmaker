@@ -471,13 +471,6 @@ class Parser(HTMLParserBase):
         self.max_blanks = 0
         self.pars = []
 
-    def reset(self):
-        """ we DO want to cache the html here! 
-
-        """
-        pass
-
-
     def get_charset_from_meta(self):
         """ Parse text for hints about charset. """
 
