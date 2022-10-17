@@ -57,7 +57,7 @@ This ebook is for the use of anyone anywhere in the United States and most other
     </div>
     <div class="vspace" style="height: 2em"><br /></div>
         <div style="text-align:center">
-            <span>*** START OF THIS PROJECT GUTENBERG EBOOK {html.escape(dc.title_no_subtitle.upper())} ***</span>
+            <span>*** START OF THE PROJECT GUTENBERG EBOOK {html.escape(dc.title_no_subtitle.upper())} ***</span>
         </div>
 </section>
 '''
@@ -76,7 +76,7 @@ holder on this work are set forth at the beginning of this work.</p>
     pg_footer = f'''
 <section class="pg-boilerplate pgheader" id="pg-footer" lang='en' xml:lang='en' xmlns="http://www.w3.org/1999/xhtml">
         <div style="text-align:center">
-            <span>*** END OF THIS PROJECT GUTENBERG EBOOK {html.escape(dc.title_no_subtitle.upper())} ***</span>
+            <span>*** END OF THE PROJECT GUTENBERG EBOOK {html.escape(dc.title_no_subtitle.upper())} ***</span>
         </div>
 
 <div style='display:block; margin:1em 0'>

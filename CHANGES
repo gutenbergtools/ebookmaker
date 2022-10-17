@@ -1,3 +1,7 @@
+0.12.19 October xx, 2022
+- tweak boilerplate to align with PG practice
+- use `*** START OF THE` instead of `*** START OF THIS`. PG shifted from `THIS` to `THE` around #64000.
+
 0.12.18 October 12, 2022
 - changed caching strategy after analysis showed large cost for changes made in 0.12.12
 
