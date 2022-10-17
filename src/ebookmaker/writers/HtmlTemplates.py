@@ -38,7 +38,7 @@ def pgheader(dc):
         rights = 'This is a *copyrighted* Project Gutenberg eBook, details below.'
     else:
         rights = '''
-This ebook is for the use of anyone anywhere in the United States and most other parts of the world at no cost and with almost no restrictions whatsoever. You may copy it, give it away or re-use it under the terms of the <a class="reference internal" href="#project-gutenberg-license">Project Gutenberg License</a> included with this ebook or online at <a class="reference external" href="https://www.gutenberg.org/license">https://www.gutenberg.org/license</a>. If you are not located in the United States, you’ll have to check the laws of the country where you are located before using this eBook.'''
+This ebook is for the use of anyone anywhere in the United States and most other parts of the world at no cost and with almost no restrictions whatsoever. You may copy it, give it away or re-use it under the terms of the Project Gutenberg License included with this ebook or online at <a class="reference external" href="https://www.gutenberg.org">www.gutenberg.org</a>. If you are not located in the United States, you’ll have to check the laws of the country where you are located before using this eBook.'''
 
     pg_header = f'''
 <section class="pg-boilerplate pgheader" id="pg-header" xml:lang="en" lang="en" xmlns="http://www.w3.org/1999/xhtml">
@@ -57,7 +57,7 @@ This ebook is for the use of anyone anywhere in the United States and most other
     </div>
     <div class="vspace" style="height: 2em"><br /></div>
         <div style="text-align:center">
-            <span>*** START OF THIS PROJECT GUTENBERG EBOOK ***</span>
+            <span>*** START OF THIS PROJECT GUTENBERG EBOOK {html.escape(dc.title_no_subtitle.upper())} ***</span>
         </div>
 </section>
 '''
@@ -76,7 +76,7 @@ holder on this work are set forth at the beginning of this work.</p>
     pg_footer = f'''
 <section class="pg-boilerplate pgheader" id="pg-footer" lang='en' xml:lang='en' xmlns="http://www.w3.org/1999/xhtml">
         <div style="text-align:center">
-            <span>*** END OF THIS PROJECT GUTENBERG EBOOK ***</span>
+            <span>*** END OF THIS PROJECT GUTENBERG EBOOK {html.escape(dc.title_no_subtitle.upper())} ***</span>
         </div>
 
 <div style='display:block; margin:1em 0'>
