@@ -16,6 +16,7 @@ from __future__ import unicode_literals
 import re
 import os
 import cchardet
+import copy
 from cherrypy.lib import httputil
 import six
 from six.moves import urllib
@@ -175,11 +176,12 @@ class ParserBase(object):
     def reset(self):
         """ Make the parser safe for re-use.
 
-        This method is called before parser is reused and should be implemented if
-        data from a previous use needs cleaning up. 
+        This method is called before parser is reused. 
 
         """
         pass
+
+
 
 
     def pre_parse(self):
@@ -364,10 +366,13 @@ class HTMLParserBase(ParserBase):
         ParserBase.__init__(self, attribs)
         self.attribs.mediatype = ParserAttributes.HeaderElement(mt.xhtml)
         self.xhtml = None
+        self._xhtml = None
 
 
     def reset(self):
-        self.xhtml = None
+        if self._xhtml is not None:
+            self.xhtml = self._xhtml
+            self._xhtml = None
 
 
     @staticmethod

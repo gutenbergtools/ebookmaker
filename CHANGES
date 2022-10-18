@@ -1,3 +1,10 @@
+0.12.19 October 17, 2022
+- tweak boilerplate to align with PG practice
+- use `*** START OF THE` instead of `*** START OF THIS`. PG shifted from `THIS` to `THE` around #64000.
+
+0.12.18 October 12, 2022
+- changed caching strategy after analysis showed large cost for changes made in 0.12.12
+
 0.12.17 October 6, 2022
 - handle pre-html5 type attribute of `ul` properly
 - continue processing job queue after a parse failure
