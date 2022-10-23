@@ -45,7 +45,7 @@ if __name__ == "__main__":
             'roman',
             'requests',
             'six>=1.4.1',
-            'libgutenberg[covers]>=0.10.5',
+            'libgutenberg[covers]>=0.10.8',
             'cchardet',
             'beautifulsoup4',
         ],

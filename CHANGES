@@ -1,3 +1,7 @@
+0.12.19 October xx, 2022
+- don't wipe source credit if there's an update credit from the db.
+- require libgutenberg>=0.10.8
+
 0.12.19 October 17, 2022
 - tweak boilerplate to align with PG practice
 - use `*** START OF THE` instead of `*** START OF THIS`. PG shifted from `THIS` to `THE` around #64000.

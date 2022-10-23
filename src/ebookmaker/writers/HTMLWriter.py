@@ -158,11 +158,10 @@ class Writer(writers.HTMLishWriter):
     @staticmethod
     def replace_boilerplate(job, tree):
         # get text after the divider, put in dc.credit if not already there
-        if not job.dc.credit:
-            for pre in xpath(tree, '//*[@id="pg-header"]//xhtml:pre'):
-                divided = DIVIDER.split(' '.join(pre.itertext()))
-                if len(divided) > 1:
-                    job.dc.credit = divided[1]
+        for pre in xpath(tree, '//*[@id="pg-header"]//xhtml:pre'):
+            divided = DIVIDER.split(' '.join(pre.itertext()))
+            if len(divided) > 1:
+                job.dc.add_credit(divided[1])
 
         body = None
         for body in xpath(tree, '//xhtml:body'):
