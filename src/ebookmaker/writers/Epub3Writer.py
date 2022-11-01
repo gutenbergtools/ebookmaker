@@ -95,33 +95,49 @@ div.figcenter span.caption {
 a.pgkilled {
    text-decoration: none;
    }
-img.x-ebookmaker-cover {max-width: 100%;}
+.x-ebookmaker-cover {
+      background-color: grey;
+      text-align: center;
+      padding: 0pt;
+      margin: 0pt;
+      page-break-after: always;
+      text-indent: 0;
+      width: 100%;
+      height: 100%;
+    }
 
-@media (orientation: landscape) {
-    img.x-ebookmaker-cover {height: 100%;}
-    }
-@media (orientation: portrait) {
-    img.x-ebookmaker-cover {width: 100%;}
-    }
+body.x-ebookmaker-coverpage {
+    margin: 0;
+    padding: 0;
+}
 """
 
 class OEBPSContainer(EpubWriter.OEBPSContainer):
     """ Class representing an OEBPS Container. """
 
 
-    def add_image_wrapper(self, img_url, img_title):
+    def add_cover_wrapper(self, parser):
         """ Add a HTML file wrapping img_url. """
-        img_title = quoteattr(img_title)
         filename = 'wrap%04d.xhtml' % self.wrappers
         self.wrappers += 1
-        self.add_bytes(filename,
-                       parsers.IMAGE_WRAPPER.format(src=img_url,
-                                                    title=img_title,
-                                                    backlink="",
-                                                    wrapper_class='x-ebookmaker-cover',
-                                                    doctype=gg.HTML5_DOCTYPE,
-                                                    style=parsers.STYLE_LINK),
-                       mt.xhtml)
+        (cover_x, cover_y) = parser.get_image_dimen()
+        wrapper = f'''
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>"Cover"</title>
+    <link href="pgepub.css" rel="stylesheet"/>
+  </head>
+<body class="x-ebookmaker-coverpage">
+  <div class="x-ebookmaker-cover">
+    <svg xmlns="http://www.w3.org/2000/svg" height="100%" preserveAspectRatio="xMidYMid meet" version="1.1" viewBox="0 0 {cover_x} {cover_y}" width="100%" xmlns:xlink="http://www.w3.org/1999/xlink">
+      <image width="{cover_x}" height="{cover_y}" xlink:href="{Writer.url2filename(parser.attribs.url)}"/>
+    </svg>
+  </div>
+</body>
+</html>        
+'''
+        self.add_bytes(filename, wrapper, mt.xhtml)
         return filename
 
 
@@ -345,7 +361,8 @@ class ContentOPF(object):
             # make a new one
             id_ = None
 
-        id_ = self.manifest_item(url, mediatype, id_)
+        prop = 'svg' if id_ == 'coverpage-wrapper' else None
+        id_ = self.manifest_item(url, mediatype, id_, prop=prop)
 
         # HACK: ADE needs cover flow as first element
         # but we don't know if we have a native coverpage until the manifest is complete
@@ -567,16 +584,18 @@ class Writer(EpubWriter.Writer):
 
             for p in parserlist:
                 if 'icon' in p.attribs.rel:
-                    cover_url = p.attribs.url
+                    cover_parser = p
                     break
             else:
                 # no  cover items. should not happen
                 critical('no cover image available. turn on --generate_cover option')
-                cover_url = ''
+                cover_parser = None
 
             #register an ADE cover
-            href = ocf.add_image_wrapper(Writer.url2filename(cover_url), 'Cover')
-            opf.spine_item(href, mt.xhtml, id_='coverpage-wrapper', first=True)
+            if cover_parser:
+                href = ocf.add_cover_wrapper(cover_parser)
+                opf.spine_item(href, mt.xhtml, id_='coverpage-wrapper', first=True)
+                
 
             opf.rewrite_links(self.url2filename)
             ocf.add_unicode('content.opf', str(opf))
