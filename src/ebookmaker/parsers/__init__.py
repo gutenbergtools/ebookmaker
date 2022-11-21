@@ -486,7 +486,12 @@ class HTMLParserBase(ParserBase):
                 i += 1
 
         def get_header_text(header):
-            """ clean header text """
+            """ clean header text
+                also, replace breaks with whitespace. tidy used to put whitespace around <br>
+                elements. PPs relied on this behavior, so we're stuck. """
+            for br in xpath(header, '//xhtml:br'):
+                br.tail = br.tail or '\n'
+
             text = gg.normalize(etree.tostring(header,
                                                method="text",
                                                encoding=six.text_type,

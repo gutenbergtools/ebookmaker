@@ -1,3 +1,7 @@
+0.12.20 
+- add whitespace to `<br>` elements in headers. tidy used to put whitespace around `<br>` elements. PPs relied on this behavior, so we're stuck.
+
+
 0.12.20 November 1, 2022
 - add logging for empty img[alt] attributes
 
