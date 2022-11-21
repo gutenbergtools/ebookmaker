@@ -108,6 +108,8 @@ a.pgkilled {
    text-decoration: none;
    }
 img.x-ebookmaker-cover {max-width: 100%;}
+#pg-header {page-break-after: always;}
+#pg-footer {page-break-before: always;}
 """
 
 OPS_TEXT_MEDIATYPES = set((
