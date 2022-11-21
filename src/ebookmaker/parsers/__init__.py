@@ -66,6 +66,7 @@ URI_MARK_CHARS = "-_.!~*'()"
 URI_RESERVED_CHARS = ';/?:@&=+$,'
 
 RE_URI_FRAGMENT = re.compile('[' + URI_MARK_CHARS + URI_RESERVED_CHARS + '%A-Za-z0-9]+')
+RE_NO_WS = re.compile(r'^\S.*')
 
 # all bogus encoding names used in PG go in here
 BOGUS_CHARSET_NAMES = {'iso-latin-1': 'iso-8859-1',
@@ -490,7 +491,8 @@ class HTMLParserBase(ParserBase):
                 also, replace breaks with whitespace. tidy used to put whitespace around <br>
                 elements. PPs relied on this behavior, so we're stuck. """
             for br in xpath(header, '//xhtml:br'):
-                br.tail = br.tail or '\n'
+                if RE_NO_WS.match(str(br.tail)):
+                    br.tail = '\n' + str(br.tail)
 
             text = gg.normalize(etree.tostring(header,
                                                method="text",
