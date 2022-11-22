@@ -27,6 +27,8 @@ from ebookmaker import parsers
 from ebookmaker.CommonCode import Options
 from ebookmaker.ParserFactory import ParserFactory
 
+NO_ALT_TEXT = 'Empty alt text for %s. See https://www.w3.org/WAI/tutorials/images/ for info on accessible alt text.'
+
 options = Options()
 
 class Spider(object):
@@ -159,7 +161,7 @@ class Spider(object):
                         
                 elif tag in (NS.xhtml.img, NS.xhtml.style):
                     if 'alt' in elem.attrib and elem.attrib['alt'] == '':
-                        error('Empty alt tag for %s', url)
+                        warning(NO_ALT_TEXT, url)
                     self.enqueue(queue, depth, new_attribs, False)
                 elif tag == NS.xhtml.link:
                     if new_attribs.rel.intersection(('stylesheet', 'icon')):
