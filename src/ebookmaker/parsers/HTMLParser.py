@@ -95,6 +95,21 @@ DEPRECATED = {
     'vspace': '*',
 }
 
+COMPLEX_REPLACEMENTS = [(
+    'table', 'align', {
+        'right': [('display', 'table'), ('float', 'right')],
+        'left': [('display', 'table'), ('float', 'left')],
+        'center': [('display', 'table'), ('margin-left', 'auto'), ('margin-right', 'auto')],
+    }), (
+    'img', 'align', {
+        'right': [('float', 'right'),],
+        'left': [('float', 'left'),],
+        'middle': [('vertical-align', 'baseline'),],
+        'top': [('vertical-align', 'text-top'),],
+        'bottom': [('vertical-align', 'text-bottom'),],
+    })
+]
+
 ALLOWED_IN_BODY = {
     NS.xhtml.address, NS.xhtml.article, NS.xhtml.blockquote, f'{NS.xhtml.de}l', NS.xhtml.div,
     NS.xhtml.dl, NS.xhtml.figure, NS.xhtml.footer, 
@@ -110,7 +125,6 @@ REPLACEMENTS = [
     ('caption div h1 h2 h3 h4 h5 h5 p', 'align', 'text-align', lambda x: x),
     ('hr', 'width', 'width', css_len),
     ('hr', 'size', 'border', css_len),
-    ('img table', 'align', 'float', lambda x: x),
     ('font', 'color', 'color', lambda x: x),
     ('font', 'face', 'font-family', lambda x: x),
     ('font', 'size', 'font-size', lambda x: FONT_SIZES.get(x.strip(), 'medium')),
@@ -364,6 +378,17 @@ class Parser(HTMLParserBase):
                     del elem.attrib[attr]
                     if cssattr:
                         add_style(elem, style=f'{cssattr}: {val2css(val)};')
+
+        # complex css replacements
+        for (tags, attr, styles) in COMPLEX_REPLACEMENTS:
+            for tag in tags.split():
+                for elem in xpath(self.xhtml, f"//xhtml:{tag}[@{attr}]"):
+                    if elem.attrib[attr]:
+                        val = elem.attrib[attr]
+                    del elem.attrib[attr]
+                    repls = styles.get(val, [])
+                    for cssattr, valcss in repls:
+                        add_style(elem, style=f'{cssattr}: {valcss};')
 
         # if source has epub attributes, change them to data attributes
         self.convert_epub_attribs()

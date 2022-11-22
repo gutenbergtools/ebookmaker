@@ -2,6 +2,7 @@
 - add whitespace to `<br>` elements in headers. tidy used to put whitespace around `<br>` elements. PPs relied on this behavior, so we're stuck.
 - add pagebreak css for EPUB2 boilerplate
 - changed log level for empty img[alt] from ERROR to WARNING
+- fix replacement css for table[align] and img[align]
 
 
 0.12.20 November 1, 2022
