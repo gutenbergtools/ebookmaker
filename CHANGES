@@ -5,6 +5,7 @@
 - fix replacement css for table[align] and img[align]
 - fix incorrect css for bgcolor attributes
 - fix incorrect css for clear='all'
+- changed the approach to replacing `<center>` - there's additional css for tables in a center element.
 
 
 0.12.20 November 1, 2022
