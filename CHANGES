@@ -4,6 +4,7 @@
 - changed log level for empty img[alt] from ERROR to WARNING
 - fix replacement css for table[align] and img[align]
 - fix incorrect css for bgcolor attributes
+- fix incorrect css for clear='all'
 
 
 0.12.20 November 1, 2022

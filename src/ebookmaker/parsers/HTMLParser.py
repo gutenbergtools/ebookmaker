@@ -121,7 +121,7 @@ ALLOWED_IN_BODY = {
 
 REPLACEMENTS = [
     ('*', 'bgcolor', 'background-color', lambda x: x),
-    ('br', 'clear', 'clear', lambda x: x),
+    ('br', 'clear', 'clear', lambda x: 'both' if x == 'all' else x),
     ('caption div h1 h2 h3 h4 h5 h5 p', 'align', 'text-align', lambda x: x),
     ('hr', 'width', 'width', css_len),
     ('hr', 'size', 'border', css_len),
