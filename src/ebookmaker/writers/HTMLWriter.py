@@ -44,7 +44,7 @@ CSS_FOR_REPLACED = {
     .xhtml_center {text-align: center; display: block;}
     .xhtml_center table {
         display: table;
-        text-align: start;
+        text-align: left;
         margin-left: auto;
         margin-right: auto;
         }''',
