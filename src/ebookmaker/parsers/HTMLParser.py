@@ -95,6 +95,21 @@ DEPRECATED = {
     'vspace': '*',
 }
 
+COMPLEX_REPLACEMENTS = [(
+    'table', 'align', {
+        'right': [('display', 'table'), ('float', 'right')],
+        'left': [('display', 'table'), ('float', 'left')],
+        'center': [('display', 'table'), ('margin-left', 'auto'), ('margin-right', 'auto')],
+    }), (
+    'img', 'align', {
+        'right': [('float', 'right'),],
+        'left': [('float', 'left'),],
+        'middle': [('vertical-align', 'baseline'),],
+        'top': [('vertical-align', 'text-top'),],
+        'bottom': [('vertical-align', 'text-bottom'),],
+    })
+]
+
 ALLOWED_IN_BODY = {
     NS.xhtml.address, NS.xhtml.article, NS.xhtml.blockquote, f'{NS.xhtml.de}l', NS.xhtml.div,
     NS.xhtml.dl, NS.xhtml.figure, NS.xhtml.footer, 
@@ -105,12 +120,11 @@ ALLOWED_IN_BODY = {
 }
 
 REPLACEMENTS = [
-    ('*', 'bgcolor', 'color', lambda x: x),
-    ('br', 'clear', 'clear', lambda x: x),
+    ('*', 'bgcolor', 'background-color', lambda x: x),
+    ('br', 'clear', 'clear', lambda x: 'both' if x == 'all' else x),
     ('caption div h1 h2 h3 h4 h5 h5 p', 'align', 'text-align', lambda x: x),
     ('hr', 'width', 'width', css_len),
     ('hr', 'size', 'border', css_len),
-    ('img table', 'align', 'float', lambda x: x),
     ('font', 'color', 'color', lambda x: x),
     ('font', 'face', 'font-family', lambda x: x),
     ('font', 'size', 'font-size', lambda x: FONT_SIZES.get(x.strip(), 'medium')),
@@ -365,6 +379,17 @@ class Parser(HTMLParserBase):
                     if cssattr:
                         add_style(elem, style=f'{cssattr}: {val2css(val)};')
 
+        # complex css replacements
+        for (tags, attr, styles) in COMPLEX_REPLACEMENTS:
+            for tag in tags.split():
+                for elem in xpath(self.xhtml, f"//xhtml:{tag}[@{attr}]"):
+                    if elem.attrib[attr]:
+                        val = elem.attrib[attr]
+                    del elem.attrib[attr]
+                    repls = styles.get(val, [])
+                    for cssattr, valcss in repls:
+                        add_style(elem, style=f'{cssattr}: {valcss};')
+
         # if source has epub attributes, change them to data attributes
         self.convert_epub_attribs()
 
@@ -516,9 +541,13 @@ class Parser(HTMLParserBase):
             return
 
         debug("HTMLParser.pre_parse() ...")
-
+        if b'xmlns=' in self.bytes_content() or b'-//W3C//DTD' in self.bytes_content():
+            bs_parser = 'lxml'
+        else:
+            info('using html.parser')
+            bs_parser = 'html.parser'
         try:
-            soup = BeautifulSoup(self.bytes_content(), 'lxml', exclude_encodings=["us-ascii"])
+            soup = BeautifulSoup(self.bytes_content(), bs_parser, exclude_encodings=["us-ascii"])
         except:
             critical('failed to parse %s', self.attribs.url)
             raise EbookmakerBadFileException('failed parsing')

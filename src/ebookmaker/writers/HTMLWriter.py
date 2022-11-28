@@ -40,7 +40,14 @@ CSS_FOR_REPLACED = {
     'big': ".xhtml_big {font-size: larger;}",
     'tt': ".xhtml_tt {font-family: monospace;}",
     # add some needed CSS3
-    '*': ".xhtml_center {justify-content: center; display: flex;}",
+    '*': '''
+    .xhtml_center {text-align: center; display: block;}
+    .xhtml_center table {
+        display: table;
+        text-align: left;
+        margin-left: auto;
+        margin-right: auto;
+        }''',
 }
 
 ## from https://hg.mozilla.org/mozilla-central/file/3fd770ef6a65/layout/style/html.css#l310
@@ -115,11 +122,18 @@ DIVIDER = re.compile(r'\*\*+.*\*\*+')
 
 def serialize(xhtml):
     """ mode is html or xml """
-    return etree.tostring(xhtml,
+    htmlbytes = etree.tostring(xhtml,
                           method='html',
                           doctype=gg.HTML5_DOCTYPE,
                           encoding='utf-8',
                           pretty_print=False)
+
+    # lxml refuses to omit close tags for these elements
+    for newtag in [b'</wbr>',]:
+        htmlbytes = htmlbytes.replace(newtag, b'')
+
+    return htmlbytes
+
 
 class Writer(writers.HTMLishWriter):
     """ Class for writing HTML files. """
@@ -407,7 +421,6 @@ class Writer(writers.HTMLishWriter):
         for tfoot in xpath(html, "//xhtml:table/xhtml:tfoot"):
             table = tfoot.getparent()
             table.append(tfoot)
-
 
         ##### cleanup #######
 
