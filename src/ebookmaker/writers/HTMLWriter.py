@@ -122,11 +122,18 @@ DIVIDER = re.compile(r'\*\*+.*\*\*+')
 
 def serialize(xhtml):
     """ mode is html or xml """
-    return etree.tostring(xhtml,
+    htmlbytes = etree.tostring(xhtml,
                           method='html',
                           doctype=gg.HTML5_DOCTYPE,
                           encoding='utf-8',
                           pretty_print=False)
+
+    # lxml refuses to omit close tags for these elements
+    for newtag in [b'</wbr>',]:
+        htmlbytes = htmlbytes.replace(newtag, b'')
+
+    return htmlbytes
+
 
 class Writer(writers.HTMLishWriter):
     """ Class for writing HTML files. """
@@ -414,7 +421,6 @@ class Writer(writers.HTMLishWriter):
         for tfoot in xpath(html, "//xhtml:table/xhtml:tfoot"):
             table = tfoot.getparent()
             table.append(tfoot)
-
 
         ##### cleanup #######
 

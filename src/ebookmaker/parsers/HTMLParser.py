@@ -541,9 +541,13 @@ class Parser(HTMLParserBase):
             return
 
         debug("HTMLParser.pre_parse() ...")
-
+        if b'xmlns=' in self.bytes_content() or b'-//W3C//DTD' in self.bytes_content():
+            bs_parser = 'lxml'
+        else:
+            info('using html.parser')
+            bs_parser = 'html.parser'
         try:
-            soup = BeautifulSoup(self.bytes_content(), 'lxml', exclude_encodings=["us-ascii"])
+            soup = BeautifulSoup(self.bytes_content(), bs_parser, exclude_encodings=["us-ascii"])
         except:
             critical('failed to parse %s', self.attribs.url)
             raise EbookmakerBadFileException('failed parsing')

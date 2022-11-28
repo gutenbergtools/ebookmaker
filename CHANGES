@@ -6,7 +6,10 @@
 - fix incorrect css for bgcolor attributes
 - fix incorrect css for clear='all'
 - changed the approach to replacing `<center>` - there's additional css for tables in a center element.
-
+- the HTML void element `wbr` is not recognized by lxml. for this reason, we had to
+    - switch to `html.parser` for files likely to be html5 (not xml)
+    - we're using `html.parser` for files that don't set `xmlns` attribute and don't declare a PUBLIC doctype `-//W3C//DTD`, which should be any non-xml HTML5 file. Only 151 files in our collection satisfy this criterion so far.
+    - explicitly remove stray end tags: `</wbr>` after writing to out bytes for the html5 file
 
 0.12.20 November 1, 2022
 - add logging for empty img[alt] attributes
