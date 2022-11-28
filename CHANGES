@@ -1,4 +1,4 @@
-0.12.21 
+0.12.22 November 28, 2022
 - add whitespace to `<br>` elements in headers. tidy used to put whitespace around `<br>` elements. PPs relied on this behavior, so we're stuck.
 - add pagebreak css for EPUB2 boilerplate
 - changed log level for empty img[alt] from ERROR to WARNING
@@ -13,7 +13,7 @@
 - add svg cover from #132
 - remove 'svg' property for stand-alone svg files; this property is meant for files that embed svg.
 
-0.12.20 November 1, 2022
+0.12.21 November 1, 2022
 - add logging for empty img[alt] attributes
 
 0.12.20 October 23, 2022
