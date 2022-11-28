@@ -343,8 +343,6 @@ class ContentOPF(object):
         if prop == 'cover-image':
             self.add_coverpage(url, id_)
         manifest_atts = {'href': url, 'id': id_, 'media-type': mediatype}
-        if mediatype == 'image/svg+xml':
-            prop = add_prop(prop, 'svg')
         if prop:
             manifest_atts['properties'] = prop
         self.manifest.append(
