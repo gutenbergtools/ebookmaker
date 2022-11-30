@@ -996,7 +996,7 @@ class Writer(writers.HTMLishWriter):
             if len(elem) > 0:
                 elem[-1].tail = elem[-1].tail + after if elem[-1].tail else after
             else:
-                elem.text = elem.text +after
+                elem.text = elem.text + after
 
         # nested quotes
         for q in xpath(xhtml, "//xhtml:q//xhtml:q"):
