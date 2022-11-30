@@ -48,6 +48,7 @@ if __name__ == "__main__":
             'libgutenberg[covers]>=0.10.8',
             'cchardet',
             'beautifulsoup4',
+            'html5lib',
         ],
     
         package_data = {

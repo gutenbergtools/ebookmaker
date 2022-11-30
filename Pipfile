@@ -12,3 +12,4 @@ libgutenberg = ">=0.10.9"
 psycopg2 = "*"
 docutils = ">=0.18.1"
 ebookmaker = {editable = true, path = "."}
+html5lib = "*"

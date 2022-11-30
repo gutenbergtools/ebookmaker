@@ -544,8 +544,8 @@ class Parser(HTMLParserBase):
         if b'xmlns=' in self.bytes_content() or b'-//W3C//DTD' in self.bytes_content():
             bs_parser = 'lxml'
         else:
-            info('using html.parser')
-            bs_parser = 'html.parser'
+            info('using html5lib')
+            bs_parser = 'html5lib'
         try:
             soup = BeautifulSoup(self.bytes_content(), bs_parser, exclude_encodings=["us-ascii"])
         except:
