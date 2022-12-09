@@ -5,7 +5,7 @@
 
 from setuptools import setup
 
-VERSION = '0.12.22'
+VERSION = '0.12.23'
 
 if __name__ == "__main__":
  
@@ -48,6 +48,7 @@ if __name__ == "__main__":
             'libgutenberg[covers]>=0.10.8',
             'cchardet',
             'beautifulsoup4',
+            'html5lib',
         ],
     
         package_data = {

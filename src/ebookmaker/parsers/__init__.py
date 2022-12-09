@@ -492,7 +492,7 @@ class HTMLParserBase(ParserBase):
                 elements. PPs relied on this behavior, so we're stuck. """
             for br in xpath(header, '//xhtml:br'):
                 if RE_NO_WS.match(str(br.tail)):
-                    br.tail = '\n' + str(br.tail)
+                    br.tail = '\n' + str(br.tail) if br.tail else '\n'
 
             text = gg.normalize(etree.tostring(header,
                                                method="text",
