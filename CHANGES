@@ -1,3 +1,6 @@
+0.12.24 Dexember xx, 2022
+- use same method as Autocat3 for resering PubInfo
+
 0.12.23 November 29, 2022
 - fix the fix to the whitespace around `<br>` to fix issue with 'None' appearing in EPUBS
 - switch to `html5lib` for files likely to be html5 (not xml). This has the effect of closing any tags for empty elements not closed in the source file. Much slower than the C-based parsers used for XHTML, but probably not a big hit because results are cached.
