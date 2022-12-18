@@ -28,6 +28,13 @@ def pgheader(dc):
             return ''
         return f"<p style='display:block; margin-top:1em; margin-bottom:1em; margin-left:2em; text-indent:-2em'><strong>{key}</strong>: {html.escape(val)}</p>"
 
+    def dcauthlist(dc):
+        cre_list = ''
+        for creator in dc.authors:
+            print(f'{creator.role} : {creator.name}')
+            cre_list += pstyle(creator.role, dc.make_pretty_name(creator.name)) + '\n'
+        return cre_list
+
     language_list = []
     lang = ''
     for language in dc.languages:
@@ -48,7 +55,7 @@ This ebook is for the use of anyone anywhere in the United States and most other
     <div class="container" id="pg-machine-header">
         {pstyle('Title', dc.title_no_subtitle)}
         {pstyle('Subtitle', dc.subtitle)}
-        {pstyle('Author', dc.authors_short())}
+        {dcauthlist(dc)}
         {pstyle('Release Date', 
             f'{dc.release_date.strftime(hr_format)} [EBook #{dc.project_gutenberg_id}]')}
         {pstyle('Language', ', '.join(language_list))}
