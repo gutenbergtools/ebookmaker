@@ -87,6 +87,19 @@ def mark_soup(soup):
             return True
         divider = check_patterns(node, markers)
         if divider:
+
+            # the following mess deals with the case where the marker includes 
+            # '<span>something</span) end of marker **' (as in titles with language tags)
+            if divider.next_sibling and divider.next_sibling.name == 'span':
+                if divider.next_sibling.next_sibling and not divider.next_sibling.next_sibling.name:
+                    new_divider_string = str(divider.string + divider.next_sibling.string + 
+                                          divider.next_sibling.next_sibling.string)
+                    divider.insert_before(new_divider_string)
+                    divider = divider.previous_sibling
+                    divider.next_sibling.extract()
+                    divider.next_sibling.extract()
+                    divider.next_sibling.extract()
+
             # first, copy the Node - it contains the divider
             node_for_divider = copy.copy(node)
             divider_copy = check_patterns(node_for_divider, markers)
