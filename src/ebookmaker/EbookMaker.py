@@ -143,10 +143,10 @@ def check_cover_size(p):
         dimen = p.get_image_dimen()
         if (dimen[0] * dimen[1]) > COVERPAGE_MIN_AREA:
             return True
-        else:
-            p_url = p.url if hasattr(p, 'url') else ''
-            warning("coverpage candidate %s is too small (%d x %d)" %
-                    (p_url, dimen[0], dimen[1]))
+
+        p_url = p.url if hasattr(p, 'url') else ''
+        warning("coverpage candidate %s is too small (%d x %d)" %
+                (p_url, dimen[0], dimen[1]))
     return False
 
 

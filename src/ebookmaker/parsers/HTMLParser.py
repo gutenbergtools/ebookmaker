@@ -112,7 +112,7 @@ COMPLEX_REPLACEMENTS = [(
 
 ALLOWED_IN_BODY = {
     NS.xhtml.address, NS.xhtml.article, NS.xhtml.blockquote, f'{NS.xhtml.de}l', NS.xhtml.div,
-    NS.xhtml.dl, NS.xhtml.figure, NS.xhtml.footer, 
+    NS.xhtml.dl, NS.xhtml.figure, NS.xhtml.footer,
     NS.xhtml.h1, NS.xhtml.h2, NS.xhtml.h3, NS.xhtml.h4, NS.xhtml.h5, NS.xhtml.h6,
     NS.xhtml.header, NS.xhtml.hr, NS.xhtml.ins, NS.xhtml.noscript, NS.xhtml.ol, NS.xhtml.p,
     NS.xhtml.pre, NS.xhtml.section, NS.xhtml.script, NS.xhtml.table, NS.xhtml.ul,
@@ -459,11 +459,10 @@ class Parser(HTMLParserBase):
                 coverpage.attrib.update(cover_attrs)
                 debug("overrode link to coverpage with %s." % coverpage_url)
 
-            else:
-                for head in xpath(self.xhtml, "/xhtml:html/xhtml:head"):
-                    head.append(parsers.em.link(rel='icon', href=coverpage_url,
-                                                type='image/x-cover'))
-                    debug("Inserted link to coverpage %s." % coverpage_url)
+            for head in xpath(self.xhtml, "/xhtml:html/xhtml:head"):
+                head.append(parsers.em.link(rel='icon', href=coverpage_url,
+                                            type='image/x-cover'))
+                debug("Inserted link to coverpage %s." % coverpage_url)
             return
 
         for coverpage in coverpages:
@@ -516,15 +515,15 @@ class Parser(HTMLParserBase):
             if m and m.group(1):
                 html = fix_bad_entity(m.group(1), html)
                 return self.__parse(html)
-            else:
-                error("Failed to parse file because: %s" % what)
-                mline = re.search(r'line\s(\d+),', str(what))
-                if mline:
-                    lineno = int(mline.group(1))
-                    if html:
-                        error("Line %d: %s" % (lineno, html.splitlines()[lineno - 1]))
-                    else:
-                        error("empty document")
+
+            error("Failed to parse file because: %s" % what)
+            mline = re.search(r'line\s(\d+),', str(what))
+            if mline:
+                lineno = int(mline.group(1))
+                if html:
+                    error("Line %d: %s" % (lineno, html.splitlines()[lineno - 1]))
+                else:
+                    error("empty document")
 
 
     def pre_parse(self):
@@ -565,7 +564,7 @@ class Parser(HTMLParserBase):
         soup.html['xmlns'] = NS.xhtml
 
         # ancient browsers didn't understand stylesheets, so xml comments were used to hide the
-        # style text. Our CSS parser is too modern to remember this, it seems. 
+        # style text. Our CSS parser is too modern to remember this, it seems.
         # So we needed to un-comment the style text
         xmlcomment = re.compile(r'<!--(.*?)-->', re.S)
         for commented_style in soup.find_all('style', string=xmlcomment):

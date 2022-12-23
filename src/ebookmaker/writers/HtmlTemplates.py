@@ -31,7 +31,6 @@ def pgheader(dc):
     def dcauthlist(dc):
         cre_list = ''
         for creator in dc.authors:
-            print(f'{creator.role} : {creator.name}')
             cre_list += pstyle(creator.role, dc.make_pretty_name(creator.name)) + '\n'
         return cre_list
 
