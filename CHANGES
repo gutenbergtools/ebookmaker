@@ -4,6 +4,7 @@
 - don't set exclude_encodings param for html5lib parser
 - improve info log message for parser selection
 - header removal was messed up by language tags in the marker. removed them
+- MIN_CHUNK_SIZE reduced from 1024 bytes to 256 bytes. fixes #147
 
 0.12.23 November 29, 2022
 - fix the fix to the whitespace around `<br>` to fix issue with 'None' appearing in EPUBS
