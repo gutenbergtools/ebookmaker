@@ -581,11 +581,11 @@ def main():
             output_files[job.type] = job.outputfile
             if job.type.startswith('kindle'):
                 absoutputdir = os.path.abspath(job.outputdir)
-                if job.type == 'kindle.images':
+                if job.type == 'kindle.images' and 'epub.images' in output_files:
                     job.url = os.path.join(absoutputdir, output_files['epub.images'])
-                elif job.type == 'kindle.noimages':
+                elif job.type == 'kindle.noimages' and 'epub.noimages' in output_files:
                     job.url = os.path.join(absoutputdir, output_files['epub.noimages'])
-            if job.type.startswith('kf8'):
+            if job.type.startswith('kf8') and 'epub3.images' in output_files:
                 absoutputdir = os.path.abspath(job.outputdir)
                 job.url = os.path.join(absoutputdir, output_files['epub3.images'])
 
