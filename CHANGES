@@ -1,4 +1,4 @@
-0.12.24 Dexember xx, 2022
+0.12.24 December 26, 2022
 - use same method as Autocat3 for resering PubInfo
 - in generated header, render each creator on a separate line
 - don't set exclude_encodings param for html5lib parser

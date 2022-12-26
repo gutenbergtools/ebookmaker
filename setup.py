@@ -5,7 +5,7 @@
 
 from setuptools import setup
 
-VERSION = '0.12.23'
+VERSION = '0.12.24'
 
 if __name__ == "__main__":
  
