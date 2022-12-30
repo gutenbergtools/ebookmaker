@@ -31,7 +31,7 @@ from ebookmaker.CommonCode import Options
 options = Options()
 
 MAX_CHUNK_SIZE = 100 * 1024  # bytes
-MIN_CHUNK_SIZE = 1024  # bytes
+MIN_CHUNK_SIZE = 256  # bytes
 
 SECTIONS = [
     ('div.section', 0.0),

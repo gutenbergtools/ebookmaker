@@ -143,10 +143,10 @@ def check_cover_size(p):
         dimen = p.get_image_dimen()
         if (dimen[0] * dimen[1]) > COVERPAGE_MIN_AREA:
             return True
-        else:
-            p_url = p.url if hasattr(p, 'url') else ''
-            warning("coverpage candidate %s is too small (%d x %d)" %
-                    (p_url, dimen[0], dimen[1]))
+
+        p_url = p.url if hasattr(p, 'url') else ''
+        warning("coverpage candidate %s is too small (%d x %d)" %
+                (p_url, dimen[0], dimen[1]))
     return False
 
 
@@ -581,11 +581,11 @@ def main():
             output_files[job.type] = job.outputfile
             if job.type.startswith('kindle'):
                 absoutputdir = os.path.abspath(job.outputdir)
-                if job.type == 'kindle.images':
+                if job.type == 'kindle.images' and 'epub.images' in output_files:
                     job.url = os.path.join(absoutputdir, output_files['epub.images'])
-                elif job.type == 'kindle.noimages':
+                elif job.type == 'kindle.noimages' and 'epub.noimages' in output_files:
                     job.url = os.path.join(absoutputdir, output_files['epub.noimages'])
-            if job.type.startswith('kf8'):
+            if job.type.startswith('kf8') and 'epub3.images' in output_files:
                 absoutputdir = os.path.abspath(job.outputdir)
                 job.url = os.path.join(absoutputdir, output_files['epub3.images'])
 
