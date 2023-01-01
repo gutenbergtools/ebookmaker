@@ -58,7 +58,7 @@ This ebook is for the use of anyone anywhere in the United States and most other
         {pstyle('Release Date', 
             f'{dc.release_date.strftime(hr_format)} [EBook #{dc.project_gutenberg_id}]')}
         {pstyle('Language', ', '.join(language_list))}
-        {pstyle('Original Publication', dc.pubinfo.marc())}
+        {pstyle('Original Publication', dc.strip_marc_subfields(dc.pubinfo.marc()))}
         {pstyle('Credits', dc.credit)}
     </div>
     <div class="vspace" style="height: 2em"><br /></div>
