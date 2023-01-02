@@ -1,3 +1,6 @@
+0.12.26
+- add workaround for bad checksums in a small number of PNG files
+
 0.12.25 January 1, 2023
 - forgot to strip marc subfields in pubinfo
 
