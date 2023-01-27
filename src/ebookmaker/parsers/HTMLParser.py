@@ -253,7 +253,8 @@ class Parser(HTMLParserBase):
             href = link.get('href')
             hre, frag = urllib.parse.urldefrag(href)
             if frag:
-                frag = self._fix_internal_frag(frag)
+                if frag and not hre:
+                    frag = self._fix_internal_frag(frag)
 
                 if not frag:
                     # non-recoverable ill-formed frag
