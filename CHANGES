@@ -1,4 +1,6 @@
 0.12.26
+- 
+- add css `all` to supported attributes. (Introduced in 2013, supported mostly everywhere, REC since 2021.)
 - add workaround for bad checksums in a small number of PNG files
 - don't delete links to external resources when the fragment is not a valid xml identifier
 

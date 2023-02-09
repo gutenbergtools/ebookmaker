@@ -11,12 +11,15 @@ Distributable under the GNU General Public License Version 3 or newer.
 Common code for EbookMaker and EbookConverter.
 
 """
+import datetime
 import os
-import os.path
 
 from six.moves import configparser
 
 from libgutenberg.CommonOptions import Options
+from libgutenberg.GutenbergGlobals import archive2files
+from libgutenberg.Logger import debug, error
+from . import parsers
 
 class Struct(object):
     pass
@@ -53,6 +56,31 @@ class Job(object):
         for k, v in self.__dict__.items():
             l.append("%s: %s" % (k, v))
         return '\n'.join(l)
+
+
+    def last_updated(self):
+        if not self.url or not self.ebook:
+            return None
+        print('Getting update date for %s', self.url)
+        print(parsers.webify_url(os.path.dirname(self.url)))
+        if hasattr(self.dc, 'files'):
+            for file in self.dc.files:
+                file_url = os.path.join(options.config.FILESDIR, archive2files(self.ebook, 'dirs/' + file.archive_path))
+                print(file_url)
+                if self.url == file_url:
+                    self.dc.update_date = file.filemtime.date()
+                    return file.filemtime
+
+        path = self.url[7:] if self.url.startswith('file:///') else self.url          
+        try:
+            statinfo = os.stat(path)
+            modified = datetime.datetime.fromtimestamp(statinfo.st_mtime)
+            if self.dc:
+                self.dc.update_date = modified.date()
+            return modified
+        except FileNotFoundError as e:
+            error(e)
+            return
 
 
 def add_dependencies(targets, deps, order=None):
