@@ -9,7 +9,7 @@ import ebookmaker
 
 class TestFromRst(unittest.TestCase):
     def setUp(self):
-        self.sample_dir = os.path.join(os.path.dirname(__file__),'samples')
+        self.sample_dir = os.path.join(os.path.dirname(__file__), 'files')
 
     def test_33968(self):
         book_id = '33968'

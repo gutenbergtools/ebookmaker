@@ -9,8 +9,8 @@ import ebookmaker
 
 class TestFromHtm(unittest.TestCase):
     def setUp(self):
-        self.sample_dir = os.path.join(os.path.dirname(__file__),'samples')
-        self.out_dir = os.path.join(os.path.dirname(__file__),'out')
+        self.sample_dir = os.path.join(os.path.dirname(__file__), 'files')
+        self.out_dir = os.path.join(os.path.dirname(__file__), 'out')
 
     def test_43172(self):
         book_id = '43172'
