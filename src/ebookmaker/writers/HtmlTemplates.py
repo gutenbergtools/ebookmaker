@@ -13,6 +13,65 @@ import html
 import lxml
 from lxml import etree
 
+CSS_FOR_HEADER = '''
+#pg-header div, #pg-footer div {
+    all: initial;
+    display: block;
+    margin-top: 1em;
+    margin-bottom: 1em;
+    margin-left: 2em;
+}
+#pg-footer div.agate {
+    font-size: 90%;
+    margin-top: 0;
+    margin-bottom: 0;
+    text-align: center;
+}
+#pg-footer li {
+    all: initial;
+    display: block;
+    margin-top: 1em;
+    margin-bottom: 1em;
+    text-indent: -0.6em;
+}
+#pg-footer div.secthead {
+    font-size: 110%;
+    font-weight: bold;
+}
+#pg-footer #project-gutenberg-license {
+    font-size: 110%;
+    margin-top: 0;
+    margin-bottom: 0;
+    text-align: center;
+}
+#pg-header h2 {
+    text-align: center;
+    font-size: 110%;
+}
+#pg-footer h2 {
+    text-align: center;
+    font-size: 120%;
+    font-weight: normal;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+#pg-header #pg-machine-header p {
+    text-indent: -4em;
+    padding-left: 4em;
+    margin-top: 1em;
+}
+#pg-header #pg-machine-header strong {
+    font-weight: normal;
+}
+#pg-header #pg-start-separator, #pg-footer #pg-end-separator {
+    margin-bottom: 3em;
+    margin-left: 0;
+    margin-right: auto;
+    margin-top: 2em;
+    text-align: center
+}
+'''
+
 pg_date = datetime.date(1971, 12, 1)
 try:
     hr_format = "%B %-d, %Y"
@@ -24,9 +83,11 @@ except ValueError:
 
 def pgheader(dc):
     def pstyle(key, val):
+        key = key.capitalize()
         if not val:
             return ''
-        return f"<p style='display:block; margin-top:1em; margin-bottom:1em; margin-left:2em; text-indent:-2em'><strong>{key}</strong>: {html.escape(val)}</p>"
+        val = '<br/>'.join([html.escape(v) for v in val.split('\n')])
+        return f"<p><strong>{key}</strong>: {val}</p>"
 
     def dcauthlist(dc):
         cre_list = ''
@@ -36,6 +97,7 @@ def pgheader(dc):
 
     language_list = []
     lang = ''
+    nl = '\n'
     for language in dc.languages:
         lang = lang if lang else language.id 
         language_list.append(language.language)
@@ -45,24 +107,25 @@ def pgheader(dc):
     else:
         rights = '''
 This ebook is for the use of anyone anywhere in the United States and most other parts of the world at no cost and with almost no restrictions whatsoever. You may copy it, give it away or re-use it under the terms of the Project Gutenberg License included with this ebook or online at <a class="reference external" href="https://www.gutenberg.org">www.gutenberg.org</a>. If you are not located in the United States, you’ll have to check the laws of the country where you are located before using this eBook.'''
-
+    if dc.update_date - dc.release_date < datetime.timedelta(days=14):
+        updated = ''
+    else:
+        updated = nl + f'Most recently updated: {dc.update_date.strftime(hr_format)}'
     pg_header = f'''
 <section class="pg-boilerplate pgheader" id="pg-header" xml:lang="en" lang="en" xmlns="http://www.w3.org/1999/xhtml">
-    <h2 style='text-align:center; font-size:1.2em; font-weight:bold'>The Project Gutenberg eBook of <span lang='{lang}' xml:lang='{lang}'>{html.escape(dc.title_no_subtitle)}</span>, by {html.escape(dc.authors_short())}</h2>
-    <div style='display:block; margin:1em 0'>{rights}</div>
+    <h2>The Project Gutenberg eBook of <span lang='{lang}' xml:lang='{lang}'>{html.escape(dc.title_no_subtitle)}</span>, by {html.escape(dc.authors_short())}</h2>
+    <div>{rights}</div>
 
     <div class="container" id="pg-machine-header">
-        {pstyle('Title', dc.title_no_subtitle)}
-        {pstyle('Subtitle', dc.subtitle)}
+        {pstyle('Title', dc.title_no_subtitle + nl + dc.subtitle)}
         {dcauthlist(dc)}
         {pstyle('Release Date', 
-            f'{dc.release_date.strftime(hr_format)} [EBook #{dc.project_gutenberg_id}]')}
+            f'{dc.release_date.strftime(hr_format)} [EBook #{dc.project_gutenberg_id}]' + updated)}
         {pstyle('Language', ', '.join(language_list))}
-        {pstyle('Original Publication', dc.strip_marc_subfields(dc.pubinfo.marc()))}
+        {pstyle('Original Publication', dc.pubinfo.marc())}
         {pstyle('Credits', dc.credit)}
     </div>
-    <div class="vspace" style="height: 2em"><br /></div>
-        <div style="text-align:center">
+        <div id='pg-start-separator'>
             <span>*** START OF THE PROJECT GUTENBERG EBOOK {html.escape(dc.title_no_subtitle.upper())} ***</span>
         </div>
 </section>
@@ -71,26 +134,26 @@ This ebook is for the use of anyone anywhere in the United States and most other
     
 
 def pgfooter(dc):
-    copyright_addition = '''<p>This particular work is one of the few individual works protected
+    copyright_addition = '''<div>This particular work is one of the few individual works protected
 by copyright law in the United States and most of the remainder of the
 world, included in the Project Gutenberg collection with the
 permission of the copyright holder. Information on the copyright owner
 for this particular work and the terms of use imposed by the copyright
-holder on this work are set forth at the beginning of this work.</p>
+holder on this work are set forth at the beginning of this work.</div>
     ''' if 'copyright' in dc.rights else ''
 
     pg_footer = f'''
 <section class="pg-boilerplate pgheader" id="pg-footer" lang='en' xml:lang='en' xmlns="http://www.w3.org/1999/xhtml">
-        <div style="text-align:center">
+        <div id='pg-end-separator'>
             <span>*** END OF THE PROJECT GUTENBERG EBOOK {html.escape(dc.title_no_subtitle.upper())} ***</span>
         </div>
 
-<div style='display:block; margin:1em 0'>
+<div>
 Updated editions will replace the previous one&#8212;the old editions will
 be renamed.
 </div>
 
-<div style='display:block; margin:1em 0'>
+<div>
 Creating the works from print editions not protected by U.S. copyright
 law means that no one owns a United States copyright in these works,
 so the Foundation (and you!) can copy and distribute it in the United
@@ -111,11 +174,11 @@ by U.S. copyright law. Redistribution is subject to the trademark
 license, especially commercial redistribution.
 </div>
 
-<div style='margin-top:1em; font-size:1.1em; text-align:center' id='project-gutenberg-license'>START: FULL LICENSE</div>
-<h2 style='text-align:center;font-size:0.9em'>THE FULL PROJECT GUTENBERG LICENSE</h2>
-<div style='text-align:center;font-size:0.9em'>PLEASE READ THIS BEFORE YOU DISTRIBUTE OR USE THIS WORK</div>
+<div id='project-gutenberg-license'>START: FULL LICENSE</div>
+<h2>THE FULL PROJECT GUTENBERG LICENSE</h2>
+<div class='agate'>PLEASE READ THIS BEFORE YOU DISTRIBUTE OR USE THIS WORK</div>
 
-<div style='display:block; margin:1em 0'>
+<div>
 To protect the Project Gutenberg&#8482; mission of promoting the free
 distribution of electronic works, by using or distributing this work
 (or any other work associated in any way with the phrase &#8220;Project
@@ -124,11 +187,11 @@ Project Gutenberg&#8482; License available with this file or online at
 www.gutenberg.org/license.
 </div>
 
-<div style='display:block; font-size:1.1em; margin:1em 0; font-weight:bold'>
+<div class='secthead'>
 Section 1. General Terms of Use and Redistributing Project Gutenberg&#8482; electronic works
 </div>
 
-<div style='display:block; margin:1em 0'>
+<div>
 1.A. By reading or using any part of this Project Gutenberg&#8482;
 electronic work, you indicate that you have read, understand, agree to
 and accept all the terms of this license and intellectual property
@@ -141,7 +204,7 @@ by the terms of this agreement, you may obtain a refund from the person
 or entity to whom you paid the fee as set forth in paragraph 1.E.8.
 </div>
 
-<div style='display:block; margin:1em 0'>
+<div>
 1.B. &#8220;Project Gutenberg&#8221; is a registered trademark. It may only be
 used on or associated in any way with an electronic work by people who
 agree to be bound by the terms of this agreement. There are a few
@@ -153,7 +216,7 @@ agreement and help preserve free future access to Project Gutenberg&#8482;
 electronic works. See paragraph 1.E below.
 </div>
 
-<div style='display:block; margin:1em 0'>
+<div>
 1.C. The Project Gutenberg Literary Archive Foundation (&#8220;the
 Foundation&#8221; or PGLAF), owns a compilation copyright in the collection
 of Project Gutenberg&#8482; electronic works. Nearly all the individual
@@ -173,7 +236,7 @@ you share it without charge with others.
 </div>
 
 {copyright_addition}
-<div style='display:block; margin:1em 0'>
+<div>
 1.D. The copyright laws of the place where you are located also govern
 what you can do with this work. Copyright laws in most countries are
 in a constant state of change. If you are outside the United States,
@@ -185,11 +248,11 @@ representations concerning the copyright status of any work in any
 country other than the United States.
 </div>
 
-<div style='display:block; margin:1em 0'>
+<div>
 1.E. Unless you have removed all references to Project Gutenberg:
 </div>
 
-<div style='display:block; margin:1em 0'>
+<div>
 1.E.1. The following sentence, with active links to, or other
 immediate access to, the full Project Gutenberg&#8482; License must appear
 prominently whenever any copy of a Project Gutenberg&#8482; work (any work
@@ -199,7 +262,7 @@ performed, viewed, copied or distributed:
 </div>
 
 <blockquote>
-  <div style='display:block; margin:1em 0'>
+  <div>
     This eBook is for the use of anyone anywhere in the United States and most
     other parts of the world at no cost and with almost no restrictions
     whatsoever. You may copy it, give it away or re-use it under the terms
@@ -210,7 +273,7 @@ performed, viewed, copied or distributed:
   </div>
 </blockquote>
 
-<div style='display:block; margin:1em 0'>
+<div>
 1.E.2. If an individual Project Gutenberg&#8482; electronic work is
 derived from texts not protected by U.S. copyright law (does not
 contain a notice indicating that it is posted with permission of the
@@ -223,7 +286,7 @@ obtain permission for the use of the work and the Project Gutenberg&#8482;
 trademark as set forth in paragraphs 1.E.8 or 1.E.9.
 </div>
 
-<div style='display:block; margin:1em 0'>
+<div>
 1.E.3. If an individual Project Gutenberg&#8482; electronic work is posted
 with the permission of the copyright holder, your use and distribution
 must comply with both paragraphs 1.E.1 through 1.E.7 and any
@@ -233,13 +296,13 @@ posted with the permission of the copyright holder found at the
 beginning of this work.
 </div>
 
-<div style='display:block; margin:1em 0'>
+<div>
 1.E.4. Do not unlink or detach or remove the full Project Gutenberg&#8482;
 License terms from this work, or any files containing a part of this
 work or any other work associated with Project Gutenberg&#8482;.
 </div>
 
-<div style='display:block; margin:1em 0'>
+<div>
 1.E.5. Do not copy, display, perform, distribute or redistribute this
 electronic work, or any part of this electronic work, without
 prominently displaying the sentence set forth in paragraph 1.E.1 with
@@ -247,7 +310,7 @@ active links or immediate access to the full terms of the Project
 Gutenberg&#8482; License.
 </div>
 
-<div style='display:block; margin:1em 0'>
+<div>
 1.E.6. You may convert to and distribute this work in any binary,
 compressed, marked up, nonproprietary or proprietary form, including
 any word processing or hypertext form. However, if you provide access
@@ -261,21 +324,20 @@ Vanilla ASCII&#8221; or other form. Any alternate format must include the
 full Project Gutenberg&#8482; License as specified in paragraph 1.E.1.
 </div>
 
-<div style='display:block; margin:1em 0'>
+<div>
 1.E.7. Do not charge a fee for access to, viewing, displaying,
 performing, copying or distributing any Project Gutenberg&#8482; works
 unless you comply with paragraph 1.E.8 or 1.E.9.
 </div>
 
-<div style='display:block; margin:1em 0'>
+<div>
 1.E.8. You may charge a reasonable fee for copies of or providing
 access to or distributing Project Gutenberg&#8482; electronic works
 provided that:
 </div>
 
-<div style='margin-left:0.7em;'>
-    <div style='text-indent:-0.7em'>
-        &#8226; You pay a royalty fee of 20% of the gross profits you derive from
+<ul>
+    <li>&#8226; You pay a royalty fee of 20% of the gross profits you derive from
         the use of Project Gutenberg&#8482; works calculated using the method
         you already use to calculate your applicable taxes. The fee is owed
         to the owner of the Project Gutenberg&#8482; trademark, but he has
@@ -287,32 +349,29 @@ provided that:
         Gutenberg Literary Archive Foundation at the address specified in
         Section 4, &#8220;Information about donations to the Project Gutenberg
         Literary Archive Foundation.&#8221;
-    </div>
+    </li>
 
-    <div style='text-indent:-0.7em'>
-        &#8226; You provide a full refund of any money paid by a user who notifies
+    <li>&#8226; You provide a full refund of any money paid by a user who notifies
         you in writing (or by e-mail) within 30 days of receipt that s/he
         does not agree to the terms of the full Project Gutenberg&#8482;
         License. You must require such a user to return or destroy all
         copies of the works possessed in a physical medium and discontinue
         all use of and all access to other copies of Project Gutenberg&#8482;
         works.
-    </div>
+    </li>
 
-    <div style='text-indent:-0.7em'>
-        &#8226; You provide, in accordance with paragraph 1.F.3, a full refund of
+    <li>&#8226; You provide, in accordance with paragraph 1.F.3, a full refund of
         any money paid for a work or a replacement copy, if a defect in the
         electronic work is discovered and reported to you within 90 days of
         receipt of the work.
-    </div>
+    </li>
 
-    <div style='text-indent:-0.7em'>
-        &#8226; You comply with all other terms of this agreement for free
+    <li>&#8226; You comply with all other terms of this agreement for free
         distribution of Project Gutenberg&#8482; works.
-    </div>
-</div>
+    </li>
+</ul>
 
-<div style='display:block; margin:1em 0'>
+<div>
 1.E.9. If you wish to charge a fee or distribute a Project
 Gutenberg&#8482; electronic work or group of works on different terms than
 are set forth in this agreement, you must obtain permission in writing
@@ -321,11 +380,11 @@ the Project Gutenberg&#8482; trademark. Contact the Foundation as set
 forth in Section 3 below.
 </div>
 
-<div style='display:block; margin:1em 0'>
+<div>
 1.F.
 </div>
 
-<div style='display:block; margin:1em 0'>
+<div>
 1.F.1. Project Gutenberg volunteers and employees expend considerable
 effort to identify, do copyright research on, transcribe and proofread
 works not protected by U.S. copyright law in creating the Project
@@ -338,7 +397,7 @@ other medium, a computer virus, or computer codes that damage or
 cannot be read by your equipment.
 </div>
 
-<div style='display:block; margin:1em 0'>
+<div>
 1.F.2. LIMITED WARRANTY, DISCLAIMER OF DAMAGES - Except for the &#8220;Right
 of Replacement or Refund&#8221; described in paragraph 1.F.3, the Project
 Gutenberg Literary Archive Foundation, the owner of the Project
@@ -354,7 +413,7 @@ INCIDENTAL DAMAGES EVEN IF YOU GIVE NOTICE OF THE POSSIBILITY OF SUCH
 DAMAGE.
 </div>
 
-<div style='display:block; margin:1em 0'>
+<div>
 1.F.3. LIMITED RIGHT OF REPLACEMENT OR REFUND - If you discover a
 defect in this electronic work within 90 days of receiving it, you can
 receive a refund of the money (if any) you paid for it by sending a
@@ -369,14 +428,14 @@ the second copy is also defective, you may demand a refund in writing
 without further opportunities to fix the problem.
 </div>
 
-<div style='display:block; margin:1em 0'>
+<div>
 1.F.4. Except for the limited right of replacement or refund set forth
 in paragraph 1.F.3, this work is provided to you &#8216;AS-IS&#8217;, WITH NO
 OTHER WARRANTIES OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT
 LIMITED TO WARRANTIES OF MERCHANTABILITY OR FITNESS FOR ANY PURPOSE.
 </div>
 
-<div style='display:block; margin:1em 0'>
+<div>
 1.F.5. Some states do not allow disclaimers of certain implied
 warranties or the exclusion or limitation of certain types of
 damages. If any disclaimer or limitation set forth in this agreement
@@ -387,7 +446,7 @@ unenforceability of any provision of this agreement shall not void the
 remaining provisions.
 </div>
 
-<div style='display:block; margin:1em 0'>
+<div>
 1.F.6. INDEMNITY - You agree to indemnify and hold the Foundation, the
 trademark owner, any agent or employee of the Foundation, anyone
 providing copies of Project Gutenberg&#8482; electronic works in
@@ -401,11 +460,11 @@ additions or deletions to any Project Gutenberg&#8482; work, and (c) any
 Defect you cause.
 </div>
 
-<div style='display:block; font-size:1.1em; margin:1em 0; font-weight:bold'>
+<div class='secthead'>
 Section 2. Information about the Mission of Project Gutenberg&#8482;
 </div>
 
-<div style='display:block; margin:1em 0'>
+<div>
 Project Gutenberg&#8482; is synonymous with the free distribution of
 electronic works in formats readable by the widest variety of
 computers including obsolete, old, middle-aged and new computers. It
@@ -413,7 +472,7 @@ exists because of the efforts of hundreds of volunteers and donations
 from people in all walks of life.
 </div>
 
-<div style='display:block; margin:1em 0'>
+<div>
 Volunteers and financial support to provide volunteers with the
 assistance they need are critical to reaching Project Gutenberg&#8482;&#8217;s
 goals and ensuring that the Project Gutenberg&#8482; collection will
@@ -425,11 +484,11 @@ Archive Foundation and how your efforts and donations can help, see
 Sections 3 and 4 and the Foundation information page at www.gutenberg.org.
 </div>
 
-<div style='display:block; font-size:1.1em; margin:1em 0; font-weight:bold'>
+<div class='secthead'>
 Section 3. Information about the Project Gutenberg Literary Archive Foundation
 </div>
 
-<div style='display:block; margin:1em 0'>
+<div>
 The Project Gutenberg Literary Archive Foundation is a non-profit
 501(c)(3) educational corporation organized under the laws of the
 state of Mississippi and granted tax exempt status by the Internal
@@ -439,18 +498,18 @@ Archive Foundation are tax deductible to the full extent permitted by
 U.S. federal laws and your state&#8217;s laws.
 </div>
 
-<div style='display:block; margin:1em 0'>
+<div>
 The Foundation&#8217;s business office is located at 809 North 1500 West,
 Salt Lake City, UT 84116, (801) 596-1887. Email contact links and up
 to date contact information can be found at the Foundation&#8217;s website
 and official page at www.gutenberg.org/contact
 </div>
 
-<div style='display:block; font-size:1.1em; margin:1em 0; font-weight:bold'>
+<div class='secthead'>
 Section 4. Information about Donations to the Project Gutenberg Literary Archive Foundation
 </div>
 
-<div style='display:block; margin:1em 0'>
+<div>
 Project Gutenberg&#8482; depends upon and cannot survive without widespread
 public support and donations to carry out its mission of
 increasing the number of public domain and licensed works that can be
@@ -460,7 +519,7 @@ array of equipment including outdated equipment. Many small donations
 status with the IRS.
 </div>
 
-<div style='display:block; margin:1em 0'>
+<div>
 The Foundation is committed to complying with the laws regulating
 charities and charitable donations in all 50 states of the United
 States. Compliance requirements are not uniform and it takes a
@@ -471,31 +530,31 @@ DONATIONS or determine the status of compliance for any particular state
 visit <a href="https://www.gutenberg.org/donate/">www.gutenberg.org/donate</a>.
 </div>
 
-<div style='display:block; margin:1em 0'>
+<div>
 While we cannot and do not solicit contributions from states where we
 have not met the solicitation requirements, we know of no prohibition
 against accepting unsolicited donations from donors in such states who
 approach us with offers to donate.
 </div>
 
-<div style='display:block; margin:1em 0'>
+<div>
 International donations are gratefully accepted, but we cannot make
 any statements concerning tax treatment of donations received from
 outside the United States. U.S. laws alone swamp our small staff.
 </div>
 
-<div style='display:block; margin:1em 0'>
+<div>
 Please check the Project Gutenberg web pages for current donation
 methods and addresses. Donations are accepted in a number of other
 ways including checks, online payments and credit card donations. To
 donate, please visit: www.gutenberg.org/donate
 </div>
 
-<div style='display:block; font-size:1.1em; margin:1em 0; font-weight:bold'>
+<div class='secthead'>
 Section 5. General Information About Project Gutenberg&#8482; electronic works
 </div>
 
-<div style='display:block; margin:1em 0'>
+<div>
 Professor Michael S. Hart was the originator of the Project
 Gutenberg&#8482; concept of a library of electronic works that could be
 freely shared with anyone. For forty years, he produced and
@@ -503,7 +562,7 @@ distributed Project Gutenberg&#8482; eBooks with only a loose network of
 volunteer support.
 </div>
 
-<div style='display:block; margin:1em 0'>
+<div>
 Project Gutenberg&#8482; eBooks are often created from several printed
 editions, all of which are confirmed as not protected by copyright in
 the U.S. unless a copyright notice is included. Thus, we do not
@@ -511,12 +570,12 @@ necessarily keep eBooks in compliance with any particular paper
 edition.
 </div>
 
-<div style='display:block; margin:1em 0'>
+<div>
 Most people start at our website which has the main PG search
 facility: <a href="https://www.gutenberg.org">www.gutenberg.org</a>.
 </div>
 
-<div style='display:block; margin:1em 0'>
+<div>
 This website includes information about Project Gutenberg&#8482;,
 including how to make donations to the Project Gutenberg Literary
 Archive Foundation, how to help produce our new eBooks, and how to
