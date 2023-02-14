@@ -13,12 +13,14 @@ Common code for EbookMaker and EbookConverter.
 """
 import datetime
 import os
+import re
 
 from six.moves import configparser
 
 from libgutenberg.CommonOptions import Options
 from libgutenberg.GutenbergGlobals import archive2files
-from libgutenberg.Logger import debug, error
+from libgutenberg.Logger import debug, error, warning
+from libgutenberg.Models import File
 from . import parsers
 
 class Struct(object):
@@ -172,6 +174,73 @@ def dir_from_url(url):
         dir = os.path.dirname(os.path.abspath(url))
     return dir
 
+
+RE_SIMPATH = re.compile(r'^\d/')
+RE_PGNUM = re.compile(r'/(\d\d+/.*)')
+def path_from_file(f):
+    """
+    In some places, we need to get a file system path from a database file object
+    these objects have `archive_path` properties, which are meant to be resolved with respect to a 
+    home directory with the assistance of some simlinks. There are 2 types, one that
+    starts with 'cache/epub/NNNN' (where NNNN is the ebook number) and another that 
+    starts with 'N/N/N/NNNN', which gets simlinked to 'files/NNNN`. (a third type, 
+    starting with 'etext' is obsolete and should no longer be encountered.
+    
+    this method need to deal with three cases.
+    1. the production environment
+    2. a development environment
+    3. a test environment
+    
+    These environments are characterized by configuration variables (set by parse_config_and_args): 
+    FILESDIR  - should be a 'file:' URL
+        on prod: file:///public/vhost/g/gutenberg/html/
+    CACHEDIR - should be a file system path
+        on prod: /public/vhost/g/gutenberg/html/cache/epub
+
+    for good measure, the paths might include Windows partitions ('c:')
+    
+    """
+    if isinstance(f, File):
+        archive_path = f.archive_path
+    elif isinstance(f, str):
+        archive_path = f
+    else:       
+        error('%s is not a string or a libgutenberg.Models.File object', f)
+        return
+
+    if hasattr(options.config, 'FILESDIR'):
+        if not options.config.FILESDIR[-1] == '/':
+            filesdir = dir_from_url(options.config.FILESDIR + '/')
+        else:
+            filesdir = dir_from_url(options.config.FILESDIR)
+    else:
+        # use home dir
+        filesdir = os.path.expanduser("~")
+        warning('Not configured, using %s for FILESDIR', filesdir)
+    print(filesdir)
+    if hasattr(options.config, 'CACHEDIR'):
+        cachedir = dir_from_url(options.config.CACHEDIR)        
+    else:
+        # use home dir
+        cachedir = os.path.expanduser("~/cache/epub/")
+        warning('Not configured, using %s for CACHE', cachedir)
+    print(cachedir)
+    if archive_path.startswith('cache/epub/'):
+        # generated file
+        return os.path.join(cachedir, archive_path[11:])
+    if RE_SIMPATH.search(archive_path):
+        # files directory, replace 1/2/3/1234 with files/1234
+        if archive_path[0] == '0':
+            # special case for single digits
+            return os.path.join(filesdir, 'files', archive_path[2:])
+        else:
+            pgnum = RE_PGNUM.search(archive_path)
+            if pgnum:
+                return os.path.join(filesdir, 'files', pgnum.group(1))
+    # legacy pattern, shouldn't be there, but give it a try
+    warning('%s is an obsolete or incomplete archive path', archive_path)
+    return os.path.join('filesdir', 'dirs', archive_path)
+            
 
 def find_candidates(path, file_filter=lambda x: True):
     """ walk the directory containing path, return files satisfying file_filter 

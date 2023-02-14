@@ -3,6 +3,7 @@
 - add css `all` to supported attributes. (Introduced in 2013, supported mostly everywhere, REC since 2021.)
 - add workaround for bad checksums in a small number of PNG files
 - don't delete links to external resources when the fragment is not a valid xml identifier
+- add a method to CommonCode to help map libgutenberg.Models.File objects to files in the filesystem
 
 0.12.25 January 1, 2023
 - forgot to strip marc subfields in pubinfo
