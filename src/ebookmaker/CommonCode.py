@@ -63,15 +63,12 @@ class Job(object):
     def last_updated(self):
         if not self.url or not self.ebook:
             return None
-        print('Getting update date for %s', self.url)
-        print(parsers.webify_url(os.path.dirname(self.url)))
         if hasattr(self.dc, 'files'):
             for file in self.dc.files:
-                file_url = os.path.join(options.config.FILESDIR, archive2files(self.ebook, 'dirs/' + file.archive_path))
-                print(file_url)
+                file_url = parsers.webify_url(path_from_file(file))
                 if self.url == file_url:
-                    self.dc.update_date = file.filemtime.date()
-                    return file.filemtime
+                    self.dc.update_date = file.modified.date()
+                    return file.modified
 
         path = self.url[7:] if self.url.startswith('file:///') else self.url          
         try:
