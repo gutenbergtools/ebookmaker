@@ -1,4 +1,4 @@
-0.12.27 February 15,2023
+0.12.28 February 15,2023
 - the boilerplate header and footer has been refactored to move css styling to a stylesheet.
 - css styling for boilerplate header and footer revised to better match current submission style
 - metadata listing revised to better match current submission style
