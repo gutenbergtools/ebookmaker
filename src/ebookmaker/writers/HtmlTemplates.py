@@ -60,6 +60,11 @@ CSS_FOR_HEADER = '''
     padding-left: 4em;
     margin-top: 1em;
 }
+#pg-header #pg-header-authlist p {
+    margin-left: -2em;
+    margin-top: 0;
+    margin-bottom: 0;
+}
 #pg-header #pg-machine-header strong {
     font-weight: normal;
 }
@@ -107,6 +112,7 @@ def pgheader(dc):
     else:
         rights = '''
 This ebook is for the use of anyone anywhere in the United States and most other parts of the world at no cost and with almost no restrictions whatsoever. You may copy it, give it away or re-use it under the terms of the Project Gutenberg License included with this ebook or online at <a class="reference external" href="https://www.gutenberg.org">www.gutenberg.org</a>. If you are not located in the United States, you’ll have to check the laws of the country where you are located before using this eBook.'''
+    
     if dc.update_date - dc.release_date < datetime.timedelta(days=14):
         updated = ''
     else:
@@ -118,7 +124,9 @@ This ebook is for the use of anyone anywhere in the United States and most other
 
     <div class="container" id="pg-machine-header">
         {pstyle('Title', dc.title_no_subtitle + nl + dc.subtitle)}
+        <div id='pg-header-authlist'>
         {dcauthlist(dc)}
+        </div>
         {pstyle('Release Date', 
             f'{dc.release_date.strftime(hr_format)} [EBook #{dc.project_gutenberg_id}]' + updated)}
         {pstyle('Language', ', '.join(language_list))}
