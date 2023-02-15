@@ -61,7 +61,7 @@ class Job(object):
 
 
     def last_updated(self):
-        if not self.url or not self.ebook:
+        if not self.url:
             return None
         if hasattr(self.dc, 'files'):
             for file in self.dc.files:
@@ -70,7 +70,7 @@ class Job(object):
                     self.dc.update_date = file.modified.date()
                     return file.modified
 
-        path = self.url[7:] if self.url.startswith('file:///') else self.url          
+        path = path_from_file(self.url)
         try:
             statinfo = os.stat(path)
             modified = datetime.datetime.fromtimestamp(statinfo.st_mtime)
