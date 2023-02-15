@@ -1,4 +1,4 @@
-0.12.28 February 15,2023
+0.12.29 February 15,2023
 - the boilerplate header and footer has been refactored to move css styling to a stylesheet.
 - css styling for boilerplate header and footer revised to better match current submission style
 - metadata listing revised to better match current submission style
@@ -12,6 +12,8 @@
 - 'most recently updated' in header is now taken from the file modification date for the source file. when run from Ebookconverter, the file.modified value from the database is used.
 - for EPUB2, HTML5 elements such as `figure` are converted to `div` with a class corresponding to the name of the replaced class. Since the default style for `figure` is different than for `div` some CSS is inserted to change the default style. With this version, that style is now inserted at the beginning of the `head` element rather than at the end so that it is easier to override with css from the source file. fixes #151
 - display of original publication data is cleaned up
+- text added to credit from parsed html is logged to facilitate moving it to the db.
+
 
 0.12.25 January 1, 2023
 - forgot to strip marc subfields in pubinfo

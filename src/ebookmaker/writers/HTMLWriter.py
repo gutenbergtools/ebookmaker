@@ -176,6 +176,7 @@ class Writer(writers.HTMLishWriter):
             divided = DIVIDER.split(' '.join(pre.itertext()))
             if len(divided) > 1:
                 job.dc.add_credit(divided[1])
+                info('Text added to Credit: %s', divided[1])
 
         body = None
         for body in xpath(tree, '//xhtml:body'):
