@@ -1,10 +1,15 @@
 0.12.26
+- the boilerplate header and footer has been refactored to move css styling to a stylesheet.
+- css styling for boilerplate header and footer revised to better match current submission style
+- metadata listing revised to better match current submission style
+- TODO: improve creator listing. Needs a spec in line with the reality of sames and authorlists and with intended use cases.
 - reorganized test directory to facilitate new tests
 - add css `all` to supported attributes. (Introduced in 2013, supported mostly everywhere, REC since 2021.)
 - add workaround for bad checksums in a small number of PNG files
 - don't delete links to external resources when the fragment is not a valid xml identifier
 - add a method to CommonCode to help map libgutenberg.Models.File objects to files in the filesystem
 - ebookmaker strips floating pagenumbers, replacing them with page anchors when the content of the float is < 13 characters. Turns out Roman numeral page numbers can exceed the limit. This limit has been removed for floating elements with class 'pagenum'. fixed #155
+- 'most recently updated' in header is now taken from the file modification date for the source file. when run from Ebookconverter, the file.modified value from the database is used.
 
 0.12.25 January 1, 2023
 - forgot to strip marc subfields in pubinfo
