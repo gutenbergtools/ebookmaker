@@ -214,14 +214,12 @@ def path_from_file(f):
         # use home dir
         filesdir = os.path.expanduser("~")
         warning('Not configured, using %s for FILESDIR', filesdir)
-    print(filesdir)
     if hasattr(options.config, 'CACHEDIR'):
         cachedir = dir_from_url(options.config.CACHEDIR)        
     else:
         # use home dir
         cachedir = os.path.expanduser("~/cache/epub/")
-        warning('Not configured, using %s for CACHE', cachedir)
-    print(cachedir)
+        info('Not configured, using %s for CACHE', cachedir)
     if archive_path.startswith('cache/epub/'):
         # generated file
         return os.path.join(cachedir, archive_path[11:])
