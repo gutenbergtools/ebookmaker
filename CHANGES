@@ -10,6 +10,7 @@
 - add a method to CommonCode to help map libgutenberg.Models.File objects to files in the filesystem
 - ebookmaker strips floating pagenumbers, replacing them with page anchors when the content of the float is < 13 characters. Turns out Roman numeral page numbers can exceed the limit. This limit has been removed for floating elements with class 'pagenum'. fixed #155
 - 'most recently updated' in header is now taken from the file modification date for the source file. when run from Ebookconverter, the file.modified value from the database is used.
+- for EPUB2, HTML5 elements such as `figure` are converted to `div` with a class corresponding to the name of the replaced class. Since the default style for `figure` is different than for `div` some CSS is inserted to change the default style. With this version, that style is now inserted at the beginning of the `head` element rather than at the end so that it is easier to override with css from the source file. fixes #155
 
 0.12.25 January 1, 2023
 - forgot to strip marc subfields in pubinfo
