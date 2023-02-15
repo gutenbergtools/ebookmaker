@@ -130,7 +130,7 @@ This ebook is for the use of anyone anywhere in the United States and most other
         {pstyle('Release Date', 
             f'{dc.release_date.strftime(hr_format)} [EBook #{dc.project_gutenberg_id}]' + updated)}
         {pstyle('Language', ', '.join(language_list))}
-        {pstyle('Original Publication', dc.pubinfo.marc())}
+        {pstyle('Original Publication', str(dc.pubinfo))}
         {pstyle('Credits', dc.credit)}
     </div>
         <div id='pg-start-separator'>
