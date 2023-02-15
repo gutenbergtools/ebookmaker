@@ -70,7 +70,7 @@ class Job(object):
                     self.dc.update_date = file.modified.date()
                     return file.modified
 
-        path = path_from_file(self.url)
+        path = self.url[7:] if self.url.startswith('file:///') else self.url
         try:
             statinfo = os.stat(path)
             modified = datetime.datetime.fromtimestamp(statinfo.st_mtime)
