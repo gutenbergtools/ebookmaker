@@ -1,5 +1,25 @@
+0.12.29 February 15,2023
+- the boilerplate header and footer has been refactored to move css styling to a stylesheet.
+- css styling for boilerplate header and footer revised to better match current submission style
+- metadata listing revised to better match current submission style
+- TODO: improve creator listing. Needs a spec in line with the reality of names and authorlists and with intended use cases.
+- reorganized test directory to facilitate new tests
+- add css `all` to supported attributes. (Introduced in 2013, supported mostly everywhere, REC since 2021.)
+- add workaround for bad checksums in a small number of PNG files
+- don't delete links to external resources when the fragment is not a valid xml identifier
+- add a method to CommonCode to help map libgutenberg.Models.File objects to files in the filesystem
+- ebookmaker strips floating pagenumbers, replacing them with page anchors when the content of the float is < 13 characters. Turns out Roman numeral page numbers can exceed the limit. This limit has been removed for floating elements with class 'pagenum'. fixed #155
+- 'most recently updated' in header is now taken from the file modification date for the source file. when run from Ebookconverter, the file.modified value from the database is used.
+- for EPUB2, HTML5 elements such as `figure` are converted to `div` with a class corresponding to the name of the replaced class. Since the default style for `figure` is different than for `div` some CSS is inserted to change the default style. With this version, that style is now inserted at the beginning of the `head` element rather than at the end so that it is easier to override with css from the source file. fixes #151
+- display of original publication data is cleaned up
+- text added to credit from parsed html is logged to facilitate moving it to the db.
+
+
+0.12.25 January 1, 2023
+- forgot to strip marc subfields in pubinfo
+
 0.12.24 December 26, 2022
-- use same method as Autocat3 for resering PubInfo
+- use same method as Autocat3 for rendering PubInfo
 - in generated header, render each creator on a separate line
 - don't set exclude_encodings param for html5lib parser
 - improve info log message for parser selection

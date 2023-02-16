@@ -800,8 +800,10 @@ class Writer(writers.HTMLishWriter):
                                                    method="text",
                                                    encoding=str,
                                                    with_tail=False))
-                if len(text) > 10:
+                if len(text) > 10 and class_ != 'pagenum':
                     # safeguard against removing things that are not pagenumbers
+                    warning('%s class element not removed because text is %s long',
+                        class_, len(text))
                     continue
 
                 if not text:

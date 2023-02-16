@@ -5,7 +5,7 @@
 
 from setuptools import setup
 
-VERSION = '0.12.24'
+VERSION = '0.12.29'
 
 if __name__ == "__main__":
  
@@ -45,7 +45,7 @@ if __name__ == "__main__":
             'roman',
             'requests',
             'six>=1.4.1',
-            'libgutenberg[covers]>=0.10.13',
+            'libgutenberg[covers]>=0.10.16',
             'cchardet',
             'beautifulsoup4',
             'html5lib',

@@ -15,11 +15,11 @@ import ebookmaker
 from ebookmaker import CommonCode
 from ebookmaker import ParserFactory
 from ebookmaker import WriterFactory
-from ebookmaker.CommonCode import Options
+from ebookmaker.CommonCode import Options, path_from_file
 from ebookmaker.EbookMaker import config
 from ebookmaker.EbookMaker import DEPENDENCIES, BUILD_ORDER
 from ebookmaker.packagers import PackagerFactory
-from ebookmaker.parsers import BROKEN
+from ebookmaker.parsers import BROKEN, webify_url
 
 options = Options()
 
@@ -30,6 +30,8 @@ class TestLoad(unittest.TestCase):
         Logger.set_log_level(options.verbose)
         options.types = options.types or ['all']
         options.types = CommonCode.add_dependencies(options.types, DEPENDENCIES, BUILD_ORDER)
+        options.config.CACHEDIR = os.path.join(os.path.dirname(__file__), 'cache/epub')
+        options.config.FILESDIR = webify_url(os.path.join(os.path.dirname(__file__), 'files/'))
         debug("Building types: %s" % ' '.join(options.types))
  
     def test_parsers(self):
@@ -52,3 +54,9 @@ class TestLoad(unittest.TestCase):
     def test_packagers(self):
         PackagerFactory.load_packagers()
 
+    def test_dirs(self):
+        print(path_from_file('cache/epub/1234/test'))
+        self.assertTrue(path_from_file('cache/epub/1234/test').endswith(
+            'cache/epub/1234/test'))
+        print(path_from_file('1/2/3/1234/test'))
+        self.assertTrue(path_from_file('1/2/3/1234/test').endswith('files/1234/test'))

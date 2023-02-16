@@ -144,7 +144,7 @@ class Writer(writers.HTMLishWriter):
         source = gg.archive2files(
             options.ebook, job.url)
 
-        if hasattr(options.config, 'FILESDIR'):
+        if hasattr(options.config, 'FILESDIR') and hasattr(options.config, 'PGURL'):
             job.dc.source = source.replace(options.config.FILESDIR, options.config.PGURL)
 
         for head in xpath(tree, '//xhtml:head'):
@@ -176,6 +176,7 @@ class Writer(writers.HTMLishWriter):
             divided = DIVIDER.split(' '.join(pre.itertext()))
             if len(divided) > 1:
                 job.dc.add_credit(divided[1])
+                info('Text added to Credit: %s', divided[1])
 
         body = None
         for body in xpath(tree, '//xhtml:body'):
@@ -435,10 +436,11 @@ class Writer(writers.HTMLishWriter):
 
         deprecated_used.add('*')  # '*' provides for css rules that are always added
         css_for_deprecated = ' '.join([CSS_FOR_REPLACED.get(tag, '') for tag in deprecated_used])
+        elem = etree.Element(NS.xhtml.style)
+        elem.text = HtmlTemplates.CSS_FOR_HEADER
         if css_for_deprecated.strip():
-            elem = etree.Element(NS.xhtml.style)
-            elem.text = css_for_deprecated
-            html.find(NS.xhtml.head).insert(1, elem) # right after charset declaration
+            elem.text += css_for_deprecated
+        html.find(NS.xhtml.head).insert(1, elem) # right after charset declaration
 
 
     def build(self, job):

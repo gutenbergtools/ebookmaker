@@ -151,7 +151,7 @@ class HTMLishWriter(BaseWriter):
             for head in gg.xpath(xhtml, '//xhtml:head'):
                 style = em.style(css_as_string, type='text/css')
                 style.tail = '\n'
-                head.append(style)
+                head.insert(0, style)
 
     @staticmethod
     def add_body_class(xhtml, classname):

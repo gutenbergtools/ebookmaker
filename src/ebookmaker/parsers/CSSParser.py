@@ -36,6 +36,7 @@ PG_CSS_PROFILE = (
         'justify-content': 'center',
         'speak': r'auto|never|always',
         'speak-as': 'normal|spell-out|digits|literal-punctuation|no-punctuation',
+        'all': 'initial|inherit|unset',
     },
     None
 )

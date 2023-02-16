@@ -131,7 +131,6 @@ def mark_soup(soup):
     try:
         body = soup.html.body
     except:
-        print('no body')
         return
 
     found_top = mark_bp(body, 'pg-header', TOP_MARKERS, top=True)

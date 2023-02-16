@@ -577,6 +577,8 @@ def main():
         try:
             info('Job starting for type %s from %s', job.type, job.url)
             dc = get_dc(job) # this is when doc at job.url gets parsed!
+            job.dc = dc
+            job.last_updated()
             job.outputfile = job.outputfile or make_output_filename(job.type, dc)
             output_files[job.type] = job.outputfile
             if job.type.startswith('kindle'):
@@ -590,7 +592,6 @@ def main():
                 job.url = os.path.join(absoutputdir, output_files['epub3.images'])
 
             options.outputdir = job.outputdir
-            job.dc = dc
             do_job(job)
             if dc and hasattr(dc, 'session') and dc.session:
                 dc.session.close()
