@@ -174,9 +174,9 @@ class Writer(writers.HTMLishWriter):
         # get text after the divider, put in dc.credit if not already there
         for pre in xpath(tree, '//*[@id="pg-header"]//xhtml:pre'):
             divided = DIVIDER.split(' '.join(pre.itertext()))
-            if len(divided) > 1:
+            if len(divided) > 1 and len(divided[1].strip()) > 0:
                 job.dc.add_credit(divided[1])
-                info('Text added to Credit: %s', divided[1])
+                info('Text added to Credit: %s', divided[1].strip())
 
         body = None
         for body in xpath(tree, '//xhtml:body'):

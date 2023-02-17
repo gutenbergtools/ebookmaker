@@ -1,3 +1,7 @@
+0.12.30
+- only try to add credit from text if it's not empty
+
+
 0.12.29 February 15,2023
 - the boilerplate header and footer has been refactored to move css styling to a stylesheet.
 - css styling for boilerplate header and footer revised to better match current submission style
