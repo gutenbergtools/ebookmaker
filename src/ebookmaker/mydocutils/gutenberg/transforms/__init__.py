@@ -143,7 +143,7 @@ class VariablesTransform (docutils.transforms.Transform):
                     date = datetime.datetime.strftime (date, '%B %d, %Y')
                 except ValueError:
                     date = 'unknown date'
-                s += 'Release Date: %s [EBook #%s]\n' % (date, getone ('PG.Id', '999999'))
+                s += 'Release Date: %s [eBook #%s]\n' % (date, getone ('PG.Id', '999999'))
 
                 for item in getmany ('PG.Reposted', []):
                     try:
