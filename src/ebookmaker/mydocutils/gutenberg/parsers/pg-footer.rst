@@ -307,7 +307,7 @@ Gutenberg Literary Archive Foundation was created to provide a secure
 and permanent future for Project Gutenberg™ and future generations. To
 learn more about the Project Gutenberg Literary Archive Foundation and
 how your efforts and donations can help, see Sections 3 and 4 and the
-Foundation web page at http://www.pglaf.org .
+Foundation web page at https://www.pglaf.org .
 
 
 Section 3. Information about the Project Gutenberg Literary Archive Foundation
