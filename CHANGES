@@ -1,5 +1,6 @@
 0.12.30
 - only try to add credit from text if it's not empty
+- add css protection for h2 in pg-header. (all:revert is what we really want, but it's not REC yet). addresses #165
 
 
 0.12.29 February 15,2023

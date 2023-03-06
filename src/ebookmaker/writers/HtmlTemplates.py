@@ -45,6 +45,7 @@ CSS_FOR_HEADER = '''
     text-align: center;
 }
 #pg-header h2 {
+    all: inherit;
     text-align: center;
     font-size: 110%;
 }
