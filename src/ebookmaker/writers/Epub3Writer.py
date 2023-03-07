@@ -152,6 +152,7 @@ class Toc(TocNCX):
                                          nsmap={None: str(NS.xhtml), 'epub': str(NS.epub)})
 
 
+
     def __unicode__(self):
         """ Serialize toc.em as unicode string. """
         em = self.elementmaker
@@ -391,6 +392,10 @@ class ContentOPF(object):
         """ Add TOC to manifest and spine. """
         self.manifest_item(url, mt.xhtml, id_='ncx', prop='nav')
 
+    def toc2_item(self, url):
+        """ Add epub2 TOC to manifest and spine. """
+        self.manifest_item(url, 'application/x-dtbncx+xml', id_='ncx2')
+        self.spine.attrib['toc'] = 'ncx2'
 
     def pagemap_item(self, url):
         """ Add page-map to manifest and spine. """
@@ -549,7 +554,7 @@ class Writer(EpubWriter.Writer):
                         rule.style.removeProperty('top')
                         rule.style.removeProperty('bottom')
 
-    def shipout(self, job, parserlist, ncx):
+    def shipout(self, job, parserlist, ncx, ncx2):
         """ Build the zip file. """
 
         try:
@@ -579,6 +584,10 @@ class Writer(EpubWriter.Writer):
 
             opf.toc_item('toc.xhtml')
             ocf.add_unicode('toc.xhtml', str(ncx))
+            
+            opf.toc2_item('toc.ncx')
+            ocf.add_unicode('toc.ncx', str(ncx2))
+
 
             for p in parserlist:
                 if 'icon' in p.attribs.rel:
@@ -610,6 +619,7 @@ class Writer(EpubWriter.Writer):
         """ Build epub """
 
         ncx = Toc(job.dc)
+        ncx2 = TocNCX(job.dc)
         parserlist = []
         css_count = 0
         boilerplate_done = False
@@ -676,6 +686,7 @@ class Writer(EpubWriter.Writer):
                         # build up TOC
                         # has side effects on xhtml
                         ncx.toc += p.make_toc(xhtml)
+                        ncx2.toc += p.make_toc(xhtml)
 
                         # allows authors to customize css for epub
                         self.add_body_class(xhtml, 'x-ebookmaker')
@@ -730,11 +741,15 @@ class Writer(EpubWriter.Writer):
             # also in the TOC
             if not ncx.toc:
                 ncx.toc.append([job.spider.parsers[0].attribs.url, 'Start', 1])
+            if not ncx2.toc:
+                ncx2.toc.append([job.spider.parsers[0].attribs.url, 'Start', 1])
             chunker.rewrite_internal_links_toc(ncx.toc)
+            chunker.rewrite_internal_links_toc(ncx2.toc)
 
             # make absolute links zip-filename-compatible
             chunker.rewrite_links(self.url2filename)
             ncx.rewrite_links(self.url2filename)
+            ncx2.rewrite_links(self.url2filename)
 
             # Do away with the chunker and copy all chunks into new parsers.
             # These are fake parsers that never actually parsed anything,
@@ -744,7 +759,7 @@ class Writer(EpubWriter.Writer):
                 p.xhtml = chunk
                 parserlist.append(p)
 
-            self.shipout(job, parserlist, ncx)
+            self.shipout(job, parserlist, ncx, ncx2)
 
         except Exception as what:
             exception("Error building Epub: %s" % what)
