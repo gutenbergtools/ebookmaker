@@ -2,6 +2,7 @@
 - only try to add credit from text if it's not empty
 - add css protection for h2 in pg-header. (all:revert is what we really want, but it's not REC yet). addresses #165
 - don't qualify heading elements - use ids instead. https://github.com/CSSLint/csslint/wiki/Disallow-qualified-headings
+- remove author from boilerplate heading #161
 
 
 
