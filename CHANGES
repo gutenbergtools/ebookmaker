@@ -1,13 +1,17 @@
-0.12.30
+0.12.30 March 8, 2013
+Note about side-loading files on Kobo devices.
+An issue with side-loading files onto Kobo devices causes the wrong rendering engine to be used for our EPUB3 files, resulting in (among other things), the absence of a TOC for the book. This version of ebookmaker adds an EPUB2-style table of contents in the EPUB3 files to mitigate this issue, as well as to improve compatibility of our EPUB3 files on older devices, such as Nook. This is common practice in the ebook industry. We will continue to produce EPUB2 files, which often render better on older devices, as well as on the older Kobo rendering engine currently invoked for side-loaded books. Kobo is aware of the issue with side-loaded EPUB3, and we expect that the issue will eventually be fixed. In the meantime, Kobo rendering of EPUB3 should NOT be considered when authoring new HTML5 books.
+
+- include an NCX toc file to improve EPUB3 compatibility with side-loaded kobo/older devices #167
+- remove public identifier from NCX files (including EPUB2) - causes validation error for EPUB3
 - only try to add credit from text if it's not empty
-- add css protection for h2 in pg-header. (all:revert is what we really want, but it's not REC yet). addresses #165
-- don't qualify heading elements - use ids instead. https://github.com/CSSLint/csslint/wiki/Disallow-qualified-headings
-- remove author from boilerplate heading #161
-- include an NCX file to improve compatibility with sideloaded kobo/nook #167
-- remove public identifier from NCX file for EPUB2 - causes validation error for EPUB3
+- improve css for h2 in pg-header with `all:inherit`. (`all:revert` is what we really want, but it's not REC yet). addresses #165
+- don't qualify heading elements in CSS - use ids instead. https://github.com/CSSLint/csslint/wiki/Disallow-qualified-headings
+- remove author from boilerplate section heading #161
+- libgutenberg 0.10.17 removes $c and $v subfield markers from titles
 
 
-0.12.29 February 15,2023
+0.12.29 February 15, 2023
 - the boilerplate header and footer has been refactored to move css styling to a stylesheet.
 - css styling for boilerplate header and footer revised to better match current submission style
 - metadata listing revised to better match current submission style
