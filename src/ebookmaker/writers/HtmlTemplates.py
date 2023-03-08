@@ -44,11 +44,13 @@ CSS_FOR_HEADER = '''
     margin-bottom: 0;
     text-align: center;
 }
-#pg-header h2 {
+#pg-header-heading {
+    all: inherit;
     text-align: center;
     font-size: 110%;
 }
-#pg-footer h2 {
+#pg-footer-heading {
+    all: inherit;
     text-align: center;
     font-size: 120%;
     font-weight: normal;
@@ -119,7 +121,7 @@ This ebook is for the use of anyone anywhere in the United States and most other
         updated = nl + f'Most recently updated: {dc.update_date.strftime(hr_format)}'
     pg_header = f'''
 <section class="pg-boilerplate pgheader" id="pg-header" xml:lang="en" lang="en" xmlns="http://www.w3.org/1999/xhtml">
-    <h2>The Project Gutenberg eBook of <span lang='{lang}' xml:lang='{lang}'>{html.escape(dc.title_no_subtitle)}</span>, by {html.escape(dc.authors_short())}</h2>
+    <h2 id='pg-header-heading'>The Project Gutenberg eBook of <span lang='{lang}' xml:lang='{lang}'>{html.escape(dc.title_no_subtitle)}</span></h2>
     <div>{rights}</div>
 
     <div class="container" id="pg-machine-header">
@@ -128,7 +130,7 @@ This ebook is for the use of anyone anywhere in the United States and most other
         {dcauthlist(dc)}
         </div>
         {pstyle('Release Date', 
-            f'{dc.release_date.strftime(hr_format)} [EBook #{dc.project_gutenberg_id}]' + updated)}
+            f'{dc.release_date.strftime(hr_format)} [eBook #{dc.project_gutenberg_id}]' + updated)}
         {pstyle('Language', ', '.join(language_list))}
         {pstyle('Original Publication', str(dc.pubinfo))}
         {pstyle('Credits', dc.credit)}
@@ -183,7 +185,7 @@ license, especially commercial redistribution.
 </div>
 
 <div id='project-gutenberg-license'>START: FULL LICENSE</div>
-<h2>THE FULL PROJECT GUTENBERG LICENSE</h2>
+<h2 id='pg-footer-heading'>THE FULL PROJECT GUTENBERG LICENSE</h2>
 <div class='agate'>PLEASE READ THIS BEFORE YOU DISTRIBUTE OR USE THIS WORK</div>
 
 <div>

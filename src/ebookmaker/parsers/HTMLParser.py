@@ -430,7 +430,6 @@ class Parser(HTMLParserBase):
 
         css_for_deprecated = ' '.join([CSS_FOR_REPLACED.get(tag, '') for tag in deprecated_used])
         if css_for_deprecated.strip():
-            print(f'css_for_deprecated: {css_for_deprecated}')
             elem = etree.Element(NS.xhtml.style)
             elem.text = css_for_deprecated
             self.xhtml.find(NS.xhtml.head).insert(1, elem) # right after charset declaration
