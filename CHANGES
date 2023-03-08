@@ -3,7 +3,8 @@
 - add css protection for h2 in pg-header. (all:revert is what we really want, but it's not REC yet). addresses #165
 - don't qualify heading elements - use ids instead. https://github.com/CSSLint/csslint/wiki/Disallow-qualified-headings
 - remove author from boilerplate heading #161
-
+- include an NCX file to improve compatibility with sideloaded kobo/nook #167
+- remove public identifier from NCX file for EPUB2 - causes validation error for EPUB3
 
 
 0.12.29 February 15,2023

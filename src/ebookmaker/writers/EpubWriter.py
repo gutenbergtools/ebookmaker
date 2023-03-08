@@ -424,7 +424,6 @@ class TocNCX(object):
 
         toc_ncx = "%s\n\n%s" % (gg.XML_DECLARATION,
                                 etree.tostring(ncx,
-                                               doctype=gg.NCX_DOCTYPE,
                                                encoding=str,
                                                pretty_print=True))
         if options.verbose >= 3:
