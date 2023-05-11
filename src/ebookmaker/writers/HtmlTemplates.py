@@ -94,12 +94,21 @@ def pgheader(dc):
         if not val:
             return ''
         val = '<br/>'.join([html.escape(v) for v in val.split('\n')])
-        return f"<p><strong>{key}</strong>: {val}</p>"
+        if key:
+            return f"<p><strong>{key}</strong>: {val}</p>"
+        else:
+            # roughly line up additional vals under previous 
+            return f"<p><span style='padding-left: 7.5ex'> </span>{val}</p>"
 
     def dcauthlist(dc):
         cre_list = ''
+        block_role = ''
         for creator in dc.authors:
-            cre_list += pstyle(creator.role, dc.make_pretty_name(creator.name)) + '\n'
+            if block_role != creator.role:
+                cre_list += pstyle(creator.role, dc.make_pretty_name(creator.name)) + '\n'
+                block_role = creator.role
+            else:
+                cre_list += pstyle('', dc.make_pretty_name(creator.name)) + '\n'
         return cre_list
 
     language_list = []
@@ -140,6 +149,7 @@ This ebook is for the use of anyone anywhere in the United States and most other
         </div>
 </section>
 '''
+    print(lang)
     return etree.fromstring(pg_header, lxml.html.XHTMLParser())
     
 
