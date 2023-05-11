@@ -540,7 +540,8 @@ class HTMLParserBase(ParserBase):
                         and 'x-ebookmaker-important' not in header.get('class', '')):
                     # common error in PG: <h2>by Lewis Carroll</h2> should
                     # yield no TOC entry
-                    warning('dropping by-heading in %s: %s', self.attribs.url, text.lower())
+                    warning(f'dropping by-heading in {self.attribs.url}: {text.lower()}')
+                    warning('use x-ebookmaker-important class if this headig should be in TOC')
                     continue
 
                 try:

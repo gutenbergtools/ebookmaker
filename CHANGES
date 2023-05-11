@@ -1,5 +1,6 @@
 0.12.31 May xx, 2023
 - add ' | Project Gutenberg' to title element for uniformity
+- add helpful comment in by-heading warning message
 
 0.12.30 March 8, 2023
 Note about side-loading files on Kobo devices.
