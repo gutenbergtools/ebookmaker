@@ -167,7 +167,7 @@ class Writer(writers.HTMLishWriter):
 
         # fix empty title elements
         for title in xpath(tree, '//xhtml:title[not(text())]'):
-            title.text = job.dc.title
+            title.text = f'{job.dc.title} | Project Gutenberg'
 
     @staticmethod
     def replace_boilerplate(job, tree):
