@@ -1,7 +1,11 @@
 0.12.31 May xx, 2023
 - add ' | Project Gutenberg' to title element for uniformity
 - add helpful comment in by-heading warning message
-- in metadata header, omit role label for all but first when multiple creators have the same role
+- in metadata header, omit role label for all but first when multiple creators have the same role. Fixes #181.
+- when there is no pg header or pg-footer recognized, an INFO message is logged instead of a warning. The message indicates that it is an error for white-washed files. Fixes #184. 
+- Ebookmaker no longer inserts generated boilerplate when none is recognized in an html source file.
+When the source file is plain text only, boilerplate IS inserted. The only things needed to trigger boilerplate insertion are the strings `*** START OF THE PROJECT GUTENBERG EBOOK ***` and `*** END OF THE PROJECT GUTENBERG EBOOK ***` in a `pre`, `div`, or `p` element. 
+
 
 0.12.30 March 8, 2023
 Note about side-loading files on Kobo devices.

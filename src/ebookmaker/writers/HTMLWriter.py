@@ -196,8 +196,8 @@ class Writer(writers.HTMLishWriter):
             parent.replace(pg_header, new_bp)
             break
         else:
-            body.insert(0, new_bp)
-            warning('No pg-header found, inserted a generated one')
+            #body.insert(0, new_bp)
+            info('No pg-header found, not inserting a generated one.')
             
         new_bp = HtmlTemplates.pgfooter(job.dc)
 
@@ -210,8 +210,8 @@ class Writer(writers.HTMLishWriter):
             parent.replace(pg_footer, new_bp)
             break
         else:
-            body.append(new_bp)
-            warning('No pg-footer found, inserted a generated one')
+            #body.append(new_bp)
+            info('No pg-footer found, not inserting a generated one')
 
         for pg_smallprint in xpath(tree, '//*[@id="pg-smallprint"]'):
             pg_smallprint.getparent().remove(pg_smallprint)

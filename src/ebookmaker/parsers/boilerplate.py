@@ -134,12 +134,14 @@ def mark_soup(soup):
         return
 
     found_top = mark_bp(body, 'pg-header', TOP_MARKERS, top=True)
+    if not found_top:
+        info('No PG header found. This is an ERROR for white-washed files.')
+
     found_bottom = mark_bp(body, 'pg-footer', BOTTOM_MARKERS, top=False)
-    '''if not found_bottom:
-        found_smallprint = mark_bp(body, 'pg-smallprint', SMALLPRINT_MARKERS, top=True)
-    else:
-        found_smallprint = False'''
-    return found_top or found_bottom #or found_smallprint
+    if not found_bottom:
+        info('No PG footer found. This is an ERROR for white-washed files.')
+
+    return found_top or found_bottom
 
 
 def strip_headers_from_txt(text):
@@ -160,7 +162,9 @@ def strip_headers_from_txt(text):
         return  text, None, text
     header_text, divider, text = markers_split(text, TOP_MARKERS)
     if divider is None:
-        pg_header = ''
+        pg_header = '<pre id="pg-header"></pre>'
+        info('No PG header found. This is an ERROR for white-washed files.')
+
     else:
         divider_tail = ''
         if '\n' in text:
@@ -174,7 +178,8 @@ def strip_headers_from_txt(text):
 
     text, divider, footer_text = markers_split(text, BOTTOM_MARKERS)
     if divider is None:
-        pg_footer = ''
+        pg_footer = '<pre id="pg-footer"></pre>'
+        info('No PG footer found. This is an ERROR for white-washed files.')
     else:
         pg_footer = '\n'.join(['<pre id="pg-footer">',
                                divider,
