@@ -149,7 +149,6 @@ This ebook is for the use of anyone anywhere in the United States and most other
         </div>
 </section>
 '''
-    print(lang)
     return etree.fromstring(pg_header, lxml.html.XHTMLParser())
     
 
