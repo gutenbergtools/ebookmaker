@@ -25,7 +25,7 @@ from libgutenberg.MediaTypes import mediatypes as mt
 from ebookmaker import parsers
 from ebookmaker.parsers import ParserBase
 
-RE_ELEMENT = re.compile(r'((?:^|\s)[a-z0-9]+)', re.I)
+RE_ELEMENT = re.compile(r'\[[^\]]*\]|((?:^|\s|\+|>|~|,)[a-z0-9]+)', re.I)
 
 mediatypes = (mt.css, )
 
@@ -98,12 +98,13 @@ class Parser(ParserBase):
 
     @staticmethod
     def lowercase_selectors(sheet):
-        """ make selectors lowercase to match xhtml tags """
+        """ make element names in selectors lowercase to match xhtml tags """
         for rule in sheet:
             if rule.type == rule.STYLE_RULE:
                 for sel in rule.selectorList:
-                    sel.selectorText = RE_ELEMENT.sub(lambda m: m.group(1).lower(),
-                                                      sel.selectorText)
+                    sel.selectorText = RE_ELEMENT.sub(
+                        lambda m: m.group(1).lower() if m.group(1) else m.group(0),
+                        sel.selectorText)
 
     def make_links_absolute(self):
         """ make links absolute """

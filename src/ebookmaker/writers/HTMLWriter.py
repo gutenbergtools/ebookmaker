@@ -26,7 +26,7 @@ from libgutenberg.Logger import debug, exception, info, error, warning
 
 from ebookmaker import writers
 from ebookmaker.CommonCode import Options
-from ebookmaker.parsers import webify_url
+from ebookmaker.parsers import webify_url, CSSParser
 from ebookmaker.parsers.CSSParser import cssutils
 from ebookmaker.utils import (
     add_class, add_style, css_len, check_lang, replace_elements, gg, xpath, NS
@@ -430,6 +430,7 @@ class Writer(writers.HTMLishWriter):
         for style in xpath(html, "//xhtml:style"):
             if style.text:
                 sheet = cssparser.parseString(style.text)
+                CSSParser.Parser.lowercase_selectors(sheet)
                 Writer.fix_incompatible_css(sheet)
                 Writer.fix_css_for_deprecated(sheet, tags=deprecated_used)
                 style.text = sheet.cssText.decode("utf-8")
