@@ -1,5 +1,6 @@
-0.12.31 May xx, 2023
-- add ' | Project Gutenberg' to title element for uniformity
+0.12.31 June xx, 2023
+- Ebookmaker has been normalizing case in css selectors for EPUB. However, the regexp being used was overbroad and didn't exclude text in selectors that used attribute value comparisons. At the same time, the regep was missing selectors that used , ~ + and > expressions. This regexp and the lower casing code has been fixed. In addition, we now also normalize element selector case in generated HTML, since we are normalizing the the HTML element case.
+- add ' | Project Gutenberg' to title element for uniformity. fixes #183
 - add helpful comment in by-heading warning message
 - in metadata header, omit role label for all but first when multiple creators have the same role. Fixes #181.
 - when there is no pg header or pg-footer recognized, an INFO message is logged instead of a warning. The message indicates that it is an error for white-washed files. Fixes #184. 
