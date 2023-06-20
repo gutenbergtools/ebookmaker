@@ -47,7 +47,8 @@ CSS_FOR_HEADER = '''
 #pg-header-heading {
     all: inherit;
     text-align: center;
-    font-size: 110%;
+    font-size: 120%;
+    font-weight:bold;
 }
 #pg-footer-heading {
     all: inherit;
@@ -130,7 +131,7 @@ This ebook is for the use of anyone anywhere in the United States and most other
         updated = nl + f'Most recently updated: {dc.update_date.strftime(hr_format)}'
     pg_header = f'''
 <section class="pg-boilerplate pgheader" id="pg-header" xml:lang="en" lang="en" xmlns="http://www.w3.org/1999/xhtml">
-    <h2 id='pg-header-heading'>The Project Gutenberg eBook of <span lang='{lang}' xml:lang='{lang}'>{html.escape(dc.title_no_subtitle)}</span></h2>
+    <p id='pg-header-heading'>The Project Gutenberg eBook of <span lang='{lang}' xml:lang='{lang}'>{html.escape(dc.title_no_subtitle)}</span></p>
     <div>{rights}</div>
 
     <div class="container" id="pg-machine-header">
