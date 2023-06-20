@@ -1,4 +1,5 @@
 0.12.31 June xx, 2023
+- Ebookmaker's parser no longer crashes when fed a document with SCRIPT elements containing bare "&" characters. Script elements are still removed. This was a problem exhibited when trying to convert HTML from PG Australia.
 - Ebookmaker has been normalizing case in css selectors for EPUB. However, the regexp being used was overbroad and didn't exclude text in selectors that used attribute value comparisons. At the same time, the regep was missing selectors that used , ~ + and > expressions. This regexp and the lower casing code has been fixed. In addition, we now also normalize element selector case in generated HTML, since we are normalizing the the HTML element case.
 - add ' | Project Gutenberg' to title element for uniformity. fixes #183
 - add helpful comment in by-heading warning message
