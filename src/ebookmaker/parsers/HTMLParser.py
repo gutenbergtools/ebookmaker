@@ -496,6 +496,15 @@ class Parser(HTMLParserBase):
                 should_be = str(soup)
                 return html.replace(f'&{entity};', should_be)
             return html.replace(f'&{entity};', entity)
+        def fix_amp(line, html):
+            line = int(line) - 1
+            lines = html.split('\n')
+            warning(f"Fixing problem unescaped & on line {line + 1}: {lines[line]}")
+            if '&' in lines[line]:
+                lines[line] = lines[line].replace('&', '&amp;', 1)
+                return '\n'.join(lines)
+            else:
+                return
         # remove xml decl and doctype, we will add the correct one before serializing
         # html = re.compile('^.*<html ', re.I | re.S).sub('<html ', html)
 
@@ -515,7 +524,11 @@ class Parser(HTMLParserBase):
             if m and m.group(1):
                 html = fix_bad_entity(m.group(1), html)
                 return self.__parse(html)
-
+            m = re.search(r"expecting ';', line (\d+)", str(what))
+            if m and m.group(1):
+                html = fix_amp(m.group(1), html)
+                if html:
+                    return self.__parse(html)
             error("Failed to parse file because: %s" % what)
             mline = re.search(r'line\s(\d+),', str(what))
             if mline:
@@ -526,7 +539,7 @@ class Parser(HTMLParserBase):
                     error("empty document")
 
 
-    def pre_parse(self):
+    def pre_parse(self, parser=None):
         """
         Pre-parse a html ebook.
 
@@ -540,7 +553,7 @@ class Parser(HTMLParserBase):
             return
 
         debug("HTMLParser.pre_parse() ...")
-        if b'xmlns=' in self.bytes_content() or b'-//W3C//DTD' in self.bytes_content():
+        if b'xmlns=' in self.bytes_content() or b'-//W3C//DTD X' in self.bytes_content():
             info('using an XML parser')
             bs_parser = 'lxml'
             extra_params = {'exclude_encodings':["us-ascii"]}
