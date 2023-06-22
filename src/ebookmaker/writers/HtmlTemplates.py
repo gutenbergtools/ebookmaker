@@ -60,11 +60,13 @@ CSS_FOR_HEADER = '''
 }
 #pg-header #pg-machine-header p {
     text-indent: -4em;
-    padding-left: 4em;
+    margin-left: 4em;
     margin-top: 1em;
+    margin-bottom: 0;
+    font-size: initial
 }
-#pg-header #pg-header-authlist p {
-    margin-left: -2em;
+#pg-header #pg-header-authlist {
+    all: initial;
     margin-top: 0;
     margin-bottom: 0;
 }
@@ -99,7 +101,7 @@ def pgheader(dc):
             return f"<p><strong>{key}</strong>: {val}</p>"
         else:
             # roughly line up additional vals under previous 
-            return f"<p><span style='padding-left: 7.5ex'> </span>{val}</p>"
+            return f"<p style='margin-top:0'><span style='padding-left: 7.5ex'> </span>{val}</p>"
 
     def dcauthlist(dc):
         cre_list = ''
@@ -131,7 +133,7 @@ This ebook is for the use of anyone anywhere in the United States and most other
         updated = nl + f'Most recently updated: {dc.update_date.strftime(hr_format)}'
     pg_header = f'''
 <section class="pg-boilerplate pgheader" id="pg-header" xml:lang="en" lang="en" xmlns="http://www.w3.org/1999/xhtml">
-    <p id='pg-header-heading'>The Project Gutenberg eBook of <span lang='{lang}' xml:lang='{lang}'>{html.escape(dc.title_no_subtitle)}</span></p>
+    <h2 id='pg-header-heading' class='x-ebookmaker-notoc'>The Project Gutenberg eBook of <span lang='{lang}' xml:lang='{lang}'>{html.escape(dc.title_no_subtitle)}</span></h2>
     <div>{rights}</div>
 
     <div class="container" id="pg-machine-header">

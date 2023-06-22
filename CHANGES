@@ -1,4 +1,6 @@
 0.12.31 June xx, 2023
+- A new ebookmaker-specific class, `x-ebookmaker-notoc` has been added to help html authors control which headings are added to the table of contents. The `h2` element in the boilerplate header resulted in funny-looking TOCs. The `x-ebookmaker-notoc` class prevents the boilerplate header from being added to the TOC. fixes #117
+- CSS for the boilerplate headeer has been tweaked to better protect its format from the document CSS, and to better match the fomatting used by the workflow tool.
 - Ebookmaker's parser no longer crashes when fed a document with SCRIPT elements containing bare "&" characters. Script elements are still removed. This was a problem exhibited when trying to convert HTML from PG Australia.
 - Ebookmaker has been normalizing case in css selectors for EPUB. However, the regexp being used was overbroad and didn't exclude text in selectors that used attribute value comparisons. At the same time, the regep was missing selectors that used , ~ + and > expressions. This regexp and the lower casing code has been fixed. In addition, we now also normalize element selector case in generated HTML, since we are normalizing the the HTML element case.
 - add ' | Project Gutenberg' to title element for uniformity. fixes #183

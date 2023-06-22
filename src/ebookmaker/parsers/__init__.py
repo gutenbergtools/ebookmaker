@@ -533,6 +533,8 @@ class HTMLParserBase(ParserBase):
 
             if header.get('class', '').find('pageno') > -1:
                 toc.append(["%s#%s" % (self.attribs.url, get_id(header)), text, -1])
+            elif 'x-ebookmaker-notoc' in header.get('class', '').split():
+                pass
             else:
                 # header
                 if ((text.lower().startswith('by ')
