@@ -139,6 +139,7 @@ CSS_FOR_REPLACED = {
     'font': "",
 }
 
+RE_NOT_XML_NAMECHAR = re.compile(r'[^\w.-]')
 
 def nfc(_str):
     return unicodedata.normalize('NFC', EntitySubstitution.substitute_xml(_str))
@@ -159,7 +160,7 @@ class Parser(HTMLParserBase):
         xml:id cannot start with digit, very common in pg.
 
         """
-
+        id_ = RE_NOT_XML_NAMECHAR.sub('_', id_)
         if not parsers.RE_XML_NAME.match(id_):
             id_ = 'id_' + id_
 
@@ -189,6 +190,7 @@ class Parser(HTMLParserBase):
             except Exception:
                 pass # too broken to fix
 
+        id_ = RE_NOT_XML_NAMECHAR.sub('_', id_)
         # An xml:id cannot start with a digit, a very common mistake
         # in pg.
 

@@ -54,11 +54,11 @@ REB_PG_CHARSET = re.compile(br"^Character Set Encoding:\s+([-\w\d]+)\s*$", re.I 
 # [#x1-#x8] | [#xB-#xC] | [#xE-#x1F] | [#x7F-#x84] | [#x86-#x9F]
 RE_RESTRICTED = re.compile('[\x01-\x08\x0b\x0c\x0e-\x1f\x7f-\x84\x86-\x9f]')
 
-XML_NAMESTARTCHAR = ':A-Z_a-z\u00c0-\u00d6\u00d8-\u00f6\u00f8-\u02ff' \
+XML_NAMESTARTCHAR = 'A-Z_a-z\u00c0-\u00d6\u00d8-\u00f6\u00f8-\u02ff' \
                     '\u0370-\u037d\u037f-\u1fff\u200c-\u200d\u2070-\u218f' \
                     '\u2c00-\u2fef\u3001-\ud7ff\uf900-\ufdcf\ufdf0-\ufffd'
                     # u'\U00010000-\U000effff'
-XML_NAMECHAR = '-.0-9\u00b7\u0300-\u036f\u203f-\u2040' + XML_NAMESTARTCHAR
+XML_NAMECHAR = XML_NAMESTARTCHAR + '.0-9\u00b7\u0300-\u036f\u203f-\u2040-'
 
 RE_XML_NAME = re.compile('^[%s][%s]*$' % (XML_NAMESTARTCHAR, XML_NAMECHAR))
 
