@@ -1049,9 +1049,6 @@ class Writer(writers.HTMLishWriter):
                 tag.tag = NS.xhtml.div
                 writers.HTMLWriter.add_class(tag, newtag)
 
-        if 'figure' in usedtags:
-            Writer.add_internal_css(xhtml, 'div.figure {margin: 1em 40px;}')     
-
 
     @staticmethod
     def strip_links(xhtml, manifest):
