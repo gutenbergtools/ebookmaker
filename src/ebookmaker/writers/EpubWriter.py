@@ -1043,7 +1043,7 @@ class Writer(writers.HTMLishWriter):
                 del elem.attrib[attr]
 
         usedtags = set()
-        for newtag in ['figcaption', 'figure', 'footer', 'header', 'section']:
+        for newtag in ['article', 'figcaption', 'figure', 'footer', 'header', 'section']:
             for tag in xpath(xhtml, f'//xhtml:{newtag}'):
                 usedtags.add(newtag)
                 tag.tag = NS.xhtml.div
