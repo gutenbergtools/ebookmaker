@@ -113,7 +113,7 @@ def pgheader(dc):
         rights = 'This is a *copyrighted* Project Gutenberg eBook, details below.'
     else:
         rights = '''
-This ebook is for the use of anyone anywhere in the United States and most other parts of the world at no cost and with almost no restrictions whatsoever. You may copy it, give it away or re-use it under the terms of the Project Gutenberg License included with this ebook or online at <a class="reference external" href="https://www.gutenberg.org">www.gutenberg.org</a>. If you are not located in the United States, you’ll have to check the laws of the country where you are located before using this eBook.'''
+This ebook is for the use of anyone anywhere in the United States and most other parts of the world at no cost and with almost no restrictions whatsoever. You may copy it, give it away or re-use it under the terms of the Project Gutenberg License included with this ebook or online at <a class="reference external" href="https://www.gutenberg.org">www.gutenberg.org</a>. If you are not located in the United States, you will have to check the laws of the country where you are located before using this eBook.'''
     
     if dc.update_date - dc.release_date < datetime.timedelta(days=14):
         updated = ''
