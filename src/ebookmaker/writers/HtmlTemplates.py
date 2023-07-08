@@ -488,7 +488,7 @@ holder on this work are set forth at the beginning of this work.
 
 headerb = re.sub('INSERT COPYRIGHT STATEMENT HERE', '', headerb_template)
 
-headerb_copy = re.sub('INSERT COPYRIGHT STATEMENT HERE', '{copyright_statement}', headerb_template)
+headerb_copy = re.sub('INSERT COPYRIGHT STATEMENT HERE', '{copyright_addition}', headerb_template)
 
 CSS_FOR_HEADER = '''
 #pg-header div, #pg-footer div {
