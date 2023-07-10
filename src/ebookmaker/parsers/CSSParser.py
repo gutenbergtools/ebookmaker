@@ -28,7 +28,6 @@ from ebookmaker.parsers import ParserBase
 RE_ELEMENT = re.compile(r'\[[^\]]*\]|((?:^|\s|\+|>|~|,)[a-z0-9]+)', re.I)
 
 mediatypes = (mt.css, )
-
 PG_CSS_PROFILE = (
     'Added Properties for Project Gutenberg',
     {
@@ -37,8 +36,15 @@ PG_CSS_PROFILE = (
         'speak': r'auto|never|always',
         'speak-as': 'normal|spell-out|digits|literal-punctuation|no-punctuation',
         'all': 'initial|inherit|unset',
+        # added to update css fonts level 3
+        'font-variant-numeric': r'normal|{font-variant-attrs}(\s+{font-variant-attrs})*'
     },
-    None
+    {
+        'numeric-figure-values': 'lining-nums|oldstyle-nums',
+        'numeric-spacing-values': 'proportional-nums|tabular-nums',
+        'numeric-fraction-values': 'diagonal-fractions|stacked-fractions',
+        'font-variant-attrs': '{numeric-figure-values}|{numeric-spacing-values}|{numeric-fraction-values}|ordinal|slashed-zero',
+    }
 )
 
 cssutils.profile.addProfiles([PG_CSS_PROFILE])

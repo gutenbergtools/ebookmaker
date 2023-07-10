@@ -1,4 +1,5 @@
-0.12.31 June xx, 2023
+0.12.31 July xx, 2023
+- added font-variant-numeric to the custom PG css profile. CSS Utils implemented CSS3-fonts before it was finalized, so it was missing font-variant-numeric. Fixes #188
 - removed polyfill css for `figure` in deprecated to EPUB2. The added CSS just caused problems. Fixes #151
 - the HTML5 element `article` has been added to the down-conversion list for EPUB2 output. Fixes #172.
 - when ebookmaker transforms `a[name]` attributes into `id` attributes, whitespace or non-alphanumeric characters in the name result in invalid identifiers. These are dropped in the transformation to EPUB. Code has been added to transform these name attributes into valid xml identifiers. Fixes #173
