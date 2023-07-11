@@ -14,6 +14,7 @@ import lxml
 import re
 from lxml import etree
 
+
 headera = '''
 <div style='display:block; margin:1em 0'>
 This eBook is for the use of anyone anywhere in the United States and
