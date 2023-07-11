@@ -101,14 +101,14 @@ def pgheader(dc):
             return f"<p><strong>{key}</strong>: {val}</p>"
         else:
             # roughly line up additional vals under previous 
-            return f"<p style='margin-top:0'><span style='padding-left: 7.5ex'> </span>{val}</p>"
+            return f"               <p style='margin-top:0'><span style='padding-left: 7.5ex'> </span>{val}</p>"
 
     def dcauthlist(dc):
         cre_list = ''
         block_role = ''
         for creator in dc.authors:
             if block_role != creator.role:
-                cre_list += pstyle(creator.role, dc.make_pretty_name(creator.name)) + '\n'
+                cre_list +=  '        ' + pstyle(creator.role, dc.make_pretty_name(creator.name)) + '\n'
                 block_role = creator.role
             else:
                 cre_list += pstyle('', dc.make_pretty_name(creator.name)) + '\n'
@@ -139,7 +139,7 @@ This ebook is for the use of anyone anywhere in the United States and most other
     <div class="container" id="pg-machine-header">
         {pstyle('Title', dc.title_no_subtitle + nl + dc.subtitle)}
         <div id='pg-header-authlist'>
-        {dcauthlist(dc)}
+{dcauthlist(dc)}
         </div>
         {pstyle('Release Date', 
             f'{dc.release_date.strftime(hr_format)} [eBook #{dc.project_gutenberg_id}]' + updated)}

@@ -1,4 +1,5 @@
 0.12.31 July xx, 2023
+- ebookmaker was not adding boilerplate (including metadata) when the source file was txt. Now it does. 
 - added font-variant-numeric to the custom PG css profile. CSS Utils implemented CSS3-fonts before it was finalized, so it was missing font-variant-numeric. Fixes #188
 - removed polyfill css for `figure` in deprecated to EPUB2. The added CSS just caused problems. Fixes #151
 - the HTML5 element `article` has been added to the down-conversion list for EPUB2 output. Fixes #172.
