@@ -152,7 +152,7 @@ class Parser(HTMLParserBase):
     and convert it to xhtml suitable for ePub packaging.
 
     """
-
+    seen_ids = set()
     @staticmethod
     def _fix_id(id_):
         """ Fix more common mistakes in ids.
@@ -220,7 +220,6 @@ class Parser(HTMLParserBase):
         # try to fix ill-formed ids
         if self.xhtml is None:
             return
-        seen_ids = set()
 
         for anchor in ids_and_names(self.xhtml):
             id_ = anchor.get('id') or anchor.get('name')
@@ -239,11 +238,11 @@ class Parser(HTMLParserBase):
                 continue
 
             # well-formed id
-            if id_ in seen_ids:
+            if id_ in self.seen_ids:
                 error("Dropping duplicate id '%s' in %s" % (id_, self.attribs.url))
                 continue
 
-            seen_ids.add(id_)
+            self.seen_ids.add(id_)
             anchor.set('id', id_)
 
 
@@ -270,7 +269,7 @@ class Parser(HTMLParserBase):
                     # we have url + frag
                     link.set('href', "%s#%s" % (hre, urllib.parse.quote(frag.encode('utf-8'))))
                     self.add_class(link, 'pgexternal')
-                elif frag in seen_ids:
+                elif frag in self.seen_ids:
                     # we have only frag
                     link.set('href', "#%s" % urllib.parse.quote(frag.encode('utf-8')))
                     self.add_class(link, 'pginternal')
@@ -304,8 +303,15 @@ class Parser(HTMLParserBase):
                 new_p.append(elem)
 
 
+    idnum = 0
     def _to_xhtml11(self):
-        """ Make vanilla xhtml more conform to xhtml 1.1 """
+        """ Make vanilla xhtml more conform to xhtml 1.1 or the html5 equivalent """
+        
+        def captionid():
+            while ('ebm_caption' + str(self.idnum)) in self.seen_ids:
+                self.idnum += 1
+            return 'ebm_caption' + str(self.idnum)
+                
 
         # Change content-type meta to application/xhtml+xml.
         for meta in xpath(self.xhtml, "/xhtml:html/xhtml:head/xhtml:meta[@http-equiv]"):
@@ -427,6 +433,26 @@ class Parser(HTMLParserBase):
 
         # enclose text the way tidy does
         self.enclose_text()
+
+        # add figure role and aria-labelledby to figures/captions denoted by classname
+        caption_path = "//xhtml:*[contains(@class, 'caption')]"
+        figures = []
+        for caption in xpath(self.xhtml, caption_path):
+            if caption.tag not in {NS.xhtml.div, NS.xhtml.p, NS.xhtml.span}:
+                continue
+            for figure in caption.iterancestors():
+                figclass = figure.attrib.get('class', '')
+                if ('fig' in figclass or 'illus' in figclass)           \
+                        and figure.tag in {NS.xhtml.div, NS.xhtml.p}    \
+                        and figure not in figures                       \
+                        and 'role' not in figure.attrib:
+                    # it's a figure!
+                    figures.append(figure)
+                    caption.attrib['id'] = caption.attrib.get('id', captionid())
+                    self.seen_ids.add(caption.attrib['id'])
+                    figure.attrib['role'] = 'figure'
+                    figure.attrib['aria-labelledby'] = caption.attrib['id']
+                    break
 
         ##### cleanup #######
 
