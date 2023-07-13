@@ -569,7 +569,7 @@ outside the United States. U.S. laws alone swamp our small staff.
 Please check the Project Gutenberg web pages for current donation
 methods and addresses. Donations are accepted in a number of other
 ways including checks, online payments and credit card donations. To
-donate, please visit: www.gutenberg.org/donate
+donate, please visit: www.gutenberg.org/donate.
 </div>
 
 <div class='secthead'>
