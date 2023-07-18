@@ -221,6 +221,7 @@ class Parser(HTMLParserBase):
         if self.xhtml is None:
             return
 
+        self.seen_ids = set()
         for anchor in ids_and_names(self.xhtml):
             id_ = anchor.get('id') or anchor.get('name')
 
