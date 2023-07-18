@@ -2,7 +2,7 @@
 #  -*- mode: python; indent-tabs-mode: nil; -*- coding: utf-8 -*-
 
 """
-HeaderStrings.py
+TemplateStrings.py
 
 Copyright 2023 by Project Gutenberg
 
