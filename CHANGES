@@ -1,4 +1,4 @@
-0.12.31 July xx, 2023
+0.12.31 July 18, 2023
 - to facilitate use of their by other applications, boilerplate strings are now exposed as strings in the writers.TemplateStrings module.
 - to improve accessibility in the backfile, ebookmaker now recognizes figures and captions which use class names like 'figcenter' and 'caption'. `role='figure'` and `aria-labelledby` attributes are added to the element used as a figure. New source files should not use this markup,  the HTML5 `figure` and `figcaption` elements are preferred. Addresses fixes #178.
 - ebookmaker was not adding boilerplate (including metadata) when the source file was txt. Now it does. 
