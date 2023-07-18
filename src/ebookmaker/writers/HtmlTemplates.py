@@ -65,7 +65,7 @@ def pgheader(dc):
         updated = nl + f'Most recently updated: {dc.update_date.strftime(hr_format)}'
     pg_header = f'''
 <section class="pg-boilerplate pgheader" id="pg-header" xml:lang="en" lang="en" xmlns="http://www.w3.org/1999/xhtml">
-    <h2 id='pg-header-heading' class='x-ebookmaker-notoc'>The Project Gutenberg eBook of <span lang='{lang}' xml:lang='{lang}'>{html.escape(dc.title_no_subtitle)}</span></h2>
+    <h2 id='pg-header-heading' title=''>The Project Gutenberg eBook of <span lang='{lang}' xml:lang='{lang}'>{html.escape(dc.title_no_subtitle)}</span></h2>
     {rights}
 
     <div class="container" id="pg-machine-header">
