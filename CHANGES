@@ -1,4 +1,5 @@
-0.12.31 July 18, 2023
+0.12.32 July 19, 2023
+- Updated a deprecated constant in ImageParser for compatibility with Pillow 10.0
 - to facilitate use of their by other applications, boilerplate strings are now exposed as strings in the writers.TemplateStrings module.
 - to improve accessibility in the backfile, ebookmaker now recognizes figures and captions which use class names like 'figcenter' and 'caption'. `role='figure'` and `aria-labelledby` attributes are added to the element used as a figure. New source files should not use this markup,  the HTML5 `figure` and `figcaption` elements are preferred. Addresses fixes #178.
 - ebookmaker was not adding boilerplate (including metadata) when the source file was txt. Now it does. 
@@ -17,6 +18,7 @@
 - Ebookmaker no longer inserts generated boilerplate when none is recognized in an html source file.
 When the source file is plain text only, boilerplate IS inserted. The only things needed to trigger boilerplate insertion are the strings `*** START OF THE PROJECT GUTENBERG EBOOK ***` and `*** END OF THE PROJECT GUTENBERG EBOOK ***` in a `pre`, `div`, or `p` element. 
 
+0.12.32 July 18, 2023. not released.
 
 0.12.30 March 8, 2023
 Note about side-loading files on Kobo devices.
