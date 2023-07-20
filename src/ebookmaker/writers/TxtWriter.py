@@ -25,6 +25,9 @@ from libgutenberg.GutenbergGlobals import SkipOutputFormat, mkdir_for_filename
 from ebookmaker import ParserFactory
 from ebookmaker import writers
 from ebookmaker.CommonCode import Options
+from ebookmaker.parsers.boilerplate import strip_headers_from_txt
+
+from .HtmlTemplates import pgheader, pgfooter
 
 options = Options()
 
@@ -32,6 +35,14 @@ options = Options()
 u2u = {
     0x2010: '-',  # unicode HYPHEN to HYPHEN-MINUS. Many Windows fonts lack this.
     }
+
+
+def insert_boilerplate(job, text):
+    text, header, footer = strip_headers_from_txt(text)
+    pg_header = pgheader(job.dc).text_content()
+    pg_footer = pgfooter(job.dc).text_content()
+    return pg_header + text + pg_footer
+
 
 class Writer(writers.BaseWriter):
     """ Class to write PG plain text. """
@@ -118,6 +129,8 @@ class Writer(writers.BaseWriter):
             return
         else:
             data = parser.unicode_content()
+        
+        data = insert_boilerplate(job, data)
 
         data = data.encode('utf_8_sig' if encoding == 'utf-8' else encoding, 'unitame')
 

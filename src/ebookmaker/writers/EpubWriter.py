@@ -1043,14 +1043,11 @@ class Writer(writers.HTMLishWriter):
                 del elem.attrib[attr]
 
         usedtags = set()
-        for newtag in ['figcaption', 'figure', 'footer', 'header', 'section']:
+        for newtag in ['article', 'figcaption', 'figure', 'footer', 'header', 'section']:
             for tag in xpath(xhtml, f'//xhtml:{newtag}'):
                 usedtags.add(newtag)
                 tag.tag = NS.xhtml.div
                 writers.HTMLWriter.add_class(tag, newtag)
-
-        if 'figure' in usedtags:
-            Writer.add_internal_css(xhtml, 'div.figure {margin: 1em 40px;}')     
 
 
     @staticmethod

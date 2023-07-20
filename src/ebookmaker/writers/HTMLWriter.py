@@ -26,7 +26,7 @@ from libgutenberg.Logger import debug, exception, info, error, warning
 
 from ebookmaker import writers
 from ebookmaker.CommonCode import Options
-from ebookmaker.parsers import webify_url
+from ebookmaker.parsers import webify_url, CSSParser
 from ebookmaker.parsers.CSSParser import cssutils
 from ebookmaker.utils import (
     add_class, add_style, css_len, check_lang, replace_elements, gg, xpath, NS
@@ -167,7 +167,7 @@ class Writer(writers.HTMLishWriter):
 
         # fix empty title elements
         for title in xpath(tree, '//xhtml:title[not(text())]'):
-            title.text = job.dc.title
+            title.text = f'{job.dc.title} | Project Gutenberg'
 
     @staticmethod
     def replace_boilerplate(job, tree):
@@ -196,8 +196,8 @@ class Writer(writers.HTMLishWriter):
             parent.replace(pg_header, new_bp)
             break
         else:
-            body.insert(0, new_bp)
-            warning('No pg-header found, inserted a generated one')
+            #body.insert(0, new_bp)
+            info('No pg-header found, not inserting a generated one.')
             
         new_bp = HtmlTemplates.pgfooter(job.dc)
 
@@ -210,8 +210,8 @@ class Writer(writers.HTMLishWriter):
             parent.replace(pg_footer, new_bp)
             break
         else:
-            body.append(new_bp)
-            warning('No pg-footer found, inserted a generated one')
+            #body.append(new_bp)
+            info('No pg-footer found, not inserting a generated one')
 
         for pg_smallprint in xpath(tree, '//*[@id="pg-smallprint"]'):
             pg_smallprint.getparent().remove(pg_smallprint)
@@ -430,6 +430,7 @@ class Writer(writers.HTMLishWriter):
         for style in xpath(html, "//xhtml:style"):
             if style.text:
                 sheet = cssparser.parseString(style.text)
+                CSSParser.Parser.lowercase_selectors(sheet)
                 Writer.fix_incompatible_css(sheet)
                 Writer.fix_css_for_deprecated(sheet, tags=deprecated_used)
                 style.text = sheet.cssText.decode("utf-8")

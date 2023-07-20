@@ -139,6 +139,7 @@ CSS_FOR_REPLACED = {
     'font': "",
 }
 
+RE_NOT_XML_NAMECHAR = re.compile(r'[^\w.-]')
 
 def nfc(_str):
     return unicodedata.normalize('NFC', EntitySubstitution.substitute_xml(_str))
@@ -151,7 +152,7 @@ class Parser(HTMLParserBase):
     and convert it to xhtml suitable for ePub packaging.
 
     """
-
+    seen_ids = set()
     @staticmethod
     def _fix_id(id_):
         """ Fix more common mistakes in ids.
@@ -159,7 +160,7 @@ class Parser(HTMLParserBase):
         xml:id cannot start with digit, very common in pg.
 
         """
-
+        id_ = RE_NOT_XML_NAMECHAR.sub('_', id_)
         if not parsers.RE_XML_NAME.match(id_):
             id_ = 'id_' + id_
 
@@ -189,6 +190,7 @@ class Parser(HTMLParserBase):
             except Exception:
                 pass # too broken to fix
 
+        id_ = RE_NOT_XML_NAMECHAR.sub('_', id_)
         # An xml:id cannot start with a digit, a very common mistake
         # in pg.
 
@@ -218,8 +220,8 @@ class Parser(HTMLParserBase):
         # try to fix ill-formed ids
         if self.xhtml is None:
             return
-        seen_ids = set()
 
+        self.seen_ids = set()
         for anchor in ids_and_names(self.xhtml):
             id_ = anchor.get('id') or anchor.get('name')
 
@@ -237,11 +239,11 @@ class Parser(HTMLParserBase):
                 continue
 
             # well-formed id
-            if id_ in seen_ids:
+            if id_ in self.seen_ids:
                 error("Dropping duplicate id '%s' in %s" % (id_, self.attribs.url))
                 continue
 
-            seen_ids.add(id_)
+            self.seen_ids.add(id_)
             anchor.set('id', id_)
 
 
@@ -268,7 +270,7 @@ class Parser(HTMLParserBase):
                     # we have url + frag
                     link.set('href', "%s#%s" % (hre, urllib.parse.quote(frag.encode('utf-8'))))
                     self.add_class(link, 'pgexternal')
-                elif frag in seen_ids:
+                elif frag in self.seen_ids:
                     # we have only frag
                     link.set('href', "#%s" % urllib.parse.quote(frag.encode('utf-8')))
                     self.add_class(link, 'pginternal')
@@ -302,8 +304,15 @@ class Parser(HTMLParserBase):
                 new_p.append(elem)
 
 
+    idnum = 0
     def _to_xhtml11(self):
-        """ Make vanilla xhtml more conform to xhtml 1.1 """
+        """ Make vanilla xhtml more conform to xhtml 1.1 or the html5 equivalent """
+        
+        def captionid():
+            while ('ebm_caption' + str(self.idnum)) in self.seen_ids:
+                self.idnum += 1
+            return 'ebm_caption' + str(self.idnum)
+                
 
         # Change content-type meta to application/xhtml+xml.
         for meta in xpath(self.xhtml, "/xhtml:html/xhtml:head/xhtml:meta[@http-equiv]"):
@@ -426,6 +435,26 @@ class Parser(HTMLParserBase):
         # enclose text the way tidy does
         self.enclose_text()
 
+        # add figure role and aria-labelledby to figures/captions denoted by classname
+        caption_path = "//xhtml:*[contains(@class, 'caption')]"
+        figures = []
+        for caption in xpath(self.xhtml, caption_path):
+            if caption.tag not in {NS.xhtml.div, NS.xhtml.p, NS.xhtml.span}:
+                continue
+            for figure in caption.iterancestors():
+                figclass = figure.attrib.get('class', '')
+                if ('fig' in figclass or 'illus' in figclass)           \
+                        and figure.tag in {NS.xhtml.div, NS.xhtml.p}    \
+                        and figure not in figures                       \
+                        and 'role' not in figure.attrib:
+                    # it's a figure!
+                    figures.append(figure)
+                    caption.attrib['id'] = caption.attrib.get('id', captionid())
+                    self.seen_ids.add(caption.attrib['id'])
+                    figure.attrib['role'] = 'figure'
+                    figure.attrib['aria-labelledby'] = caption.attrib['id']
+                    break
+
         ##### cleanup #######
 
         css_for_deprecated = ' '.join([CSS_FOR_REPLACED.get(tag, '') for tag in deprecated_used])
@@ -496,6 +525,15 @@ class Parser(HTMLParserBase):
                 should_be = str(soup)
                 return html.replace(f'&{entity};', should_be)
             return html.replace(f'&{entity};', entity)
+        def fix_amp(line, html):
+            line = int(line) - 1
+            lines = html.split('\n')
+            warning(f"Fixing problem unescaped & on line {line + 1}: {lines[line]}")
+            if '&' in lines[line]:
+                lines[line] = lines[line].replace('&', '&amp;', 1)
+                return '\n'.join(lines)
+            else:
+                return
         # remove xml decl and doctype, we will add the correct one before serializing
         # html = re.compile('^.*<html ', re.I | re.S).sub('<html ', html)
 
@@ -515,7 +553,11 @@ class Parser(HTMLParserBase):
             if m and m.group(1):
                 html = fix_bad_entity(m.group(1), html)
                 return self.__parse(html)
-
+            m = re.search(r"expecting ';', line (\d+)", str(what))
+            if m and m.group(1):
+                html = fix_amp(m.group(1), html)
+                if html:
+                    return self.__parse(html)
             error("Failed to parse file because: %s" % what)
             mline = re.search(r'line\s(\d+),', str(what))
             if mline:
@@ -526,7 +568,7 @@ class Parser(HTMLParserBase):
                     error("empty document")
 
 
-    def pre_parse(self):
+    def pre_parse(self, parser=None):
         """
         Pre-parse a html ebook.
 
@@ -540,7 +582,7 @@ class Parser(HTMLParserBase):
             return
 
         debug("HTMLParser.pre_parse() ...")
-        if b'xmlns=' in self.bytes_content() or b'-//W3C//DTD' in self.bytes_content():
+        if b'xmlns=' in self.bytes_content() or b'-//W3C//DTD X' in self.bytes_content():
             info('using an XML parser')
             bs_parser = 'lxml'
             extra_params = {'exclude_encodings':["us-ascii"]}
@@ -590,7 +632,7 @@ class Parser(HTMLParserBase):
 
         marked = mark_soup(soup)
         if not marked:
-            warning('no boilerplate found in %s', self.attribs.url)
+            info('No boilerplate found in %s', self.attribs.url)
 
         html = soup.decode(formatter=nfc_formatter)
         if not html:

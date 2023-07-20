@@ -52,7 +52,7 @@ class Parser(ParserBase):
             if scale < 1.0:
                 dimen = (int(image.size[0] * scale), int(image.size[1] * scale))
                 was = "(was %d x %d scale=%.2f) " % (image.size[0], image.size[1], scale)
-                image = image.resize(dimen, Image.ANTIALIAS)
+                image = image.resize(dimen, Image.LANCZOS)
             return was, image
 
         def get_image_data(image, format_, quality='keep'):

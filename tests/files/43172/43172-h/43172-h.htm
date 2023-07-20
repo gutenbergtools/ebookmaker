@@ -40,7 +40,7 @@ div.footnotes {page-break-before: always; font-size: 90%; padding-top: 3em;}
 .pagenum, .pageno  {position: absolute; right: 5%; font-style: normal;
   font-weight: normal; font-size: 65%; text-align: right; color: #999999;
   background-color: #ffffff; clear: left;}
-
+.textnumvariants {font-variant-numeric: oldstyle-nums diagonal-fractions;}
 .pad4 {margin-top: 4em;}
 .pad2 {margin-top: 2em;}
 
@@ -62,6 +62,9 @@ div.footnotes {page-break-before: always; font-size: 90%; padding-top: 3em;}
 .poem p.i2 {text-indent: -1em;}
 .poem p.i6 {text-indent: 6em;}
 .punti {letter-spacing: 1em;}
+
+.BLOCK H3.subhead, h3 > P[title="Omelets with Liqueur"], a[title="Omelets with Liqueur"] ,h3>P, a[HREF^="https"] P~UL {
+    page-break-before: avoid;}
 @media handheld {
 	big { font-size: 18pt;}
 }
@@ -189,7 +192,7 @@ by I.
 <br />
 <span class="smcap">Rivoluzione e Misoneismo.</span>
 </h2>
-
+<H3 class='subhead' title="Omelets ]with Liqueur">Just testing</H3>
 <p>
 Quella che si suole chiamare Rivoluzione dell'89,
 non fu che una grande rivolta e un grande

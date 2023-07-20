@@ -78,7 +78,7 @@ epub.noimages kindle.noimages pdf.noimages
 epub.images kindle.images pdf.images
 epub3.images kf8.images
 cover.small cover.medium
-qrcode rdf facebook twitter null""".split()
+qrcode rdf facebook twitter mastodon null""".split()
 
 FILENAMES = {
     'html.noimages': '{id}-noimages-h.html',

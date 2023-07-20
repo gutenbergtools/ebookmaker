@@ -1,3 +1,25 @@
+0.12.32 July 19, 2023
+- Updated a deprecated constant in ImageParser for compatibility with Pillow 10.0
+- to facilitate use of their by other applications, boilerplate strings are now exposed as strings in the writers.TemplateStrings module.
+- to improve accessibility in the backfile, ebookmaker now recognizes figures and captions which use class names like 'figcenter' and 'caption'. `role='figure'` and `aria-labelledby` attributes are added to the element used as a figure. New source files should not use this markup,  the HTML5 `figure` and `figcaption` elements are preferred. Addresses fixes #178.
+- ebookmaker was not adding boilerplate (including metadata) when the source file was txt. Now it does. 
+- added font-variant-numeric to the custom PG css profile. CSS Utils implemented CSS3-fonts before it was finalized, so it was missing font-variant-numeric. Fixes #188
+- removed polyfill css for `figure` in deprecated to EPUB2. The added CSS just caused problems. Fixes #151
+- the HTML5 element `article` has been added to the down-conversion list for EPUB2 output. Fixes #172.
+- when ebookmaker transforms `a[name]` attributes into `id` attributes, whitespace or non-alphanumeric characters in the name result in invalid identifiers. These are dropped in the transformation to EPUB. Code has been added to transform these name attributes into valid xml identifiers. Fixes #173
+- `title=''` has been added to the `h2` element of the boilerplate header. This suppresses an awkward TOC entry in EPUB. fixes #117
+- CSS for the boilerplate headeer has been tweaked to better protect its format from the document CSS, and to better match the fomatting used by the workflow tool.
+- Ebookmaker's parser no longer crashes when fed a document with SCRIPT elements containing bare "&" characters. Script elements are still removed. This was a problem exhibited when trying to convert HTML from PG Australia.
+- Ebookmaker has been normalizing case in css selectors for EPUB. However, the regexp being used was overbroad and didn't exclude text in selectors that used attribute value comparisons. At the same time, the regep was missing selectors that used , ~ + and > expressions. This regexp and the lower casing code has been fixed. In addition, we now also normalize element selector case in generated HTML, since we are normalizing the the HTML element case.
+- add ' | Project Gutenberg' to title element for uniformity. fixes #183
+- add helpful comment in by-heading warning message
+- in metadata header, omit role label for all but first when multiple creators have the same role. Fixes #181.
+- when there is no pg header or pg-footer recognized, an INFO message is logged instead of a warning. The message indicates that it is an error for white-washed files. Fixes #184. 
+- Ebookmaker no longer inserts generated boilerplate when none is recognized in an html source file.
+When the source file is plain text only, boilerplate IS inserted. The only things needed to trigger boilerplate insertion are the strings `*** START OF THE PROJECT GUTENBERG EBOOK ***` and `*** END OF THE PROJECT GUTENBERG EBOOK ***` in a `pre`, `div`, or `p` element. 
+
+0.12.32 July 18, 2023. not released.
+
 0.12.30 March 8, 2023
 Note about side-loading files on Kobo devices.
 An issue with side-loading files onto Kobo devices causes the wrong rendering engine to be used for our EPUB3 files, resulting in (among other things), the absence of a TOC for the book. This version of ebookmaker adds an EPUB2-style table of contents in the EPUB3 files to mitigate this issue, as well as to improve compatibility of our EPUB3 files on older devices, such as Nook. This is common practice in the ebook industry. We will continue to produce EPUB2 files, which often render better on older devices, as well as on the older Kobo rendering engine currently invoked for side-loaded books. Kobo is aware of the issue with side-loaded EPUB3, and we expect that the issue will eventually be fixed. In the meantime, Kobo rendering of EPUB3 should NOT be considered when authoring new HTML5 books.

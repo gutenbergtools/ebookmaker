@@ -677,14 +677,12 @@ class Parser(HTMLParserBase):
 
         for body in xpath(self.xhtml, '//xhtml:body'):
             xhtmlparser = lxml.html.XHTMLParser()
-            if pg_header:
-                body.append(etree.fromstring(pg_header, xhtmlparser))
+            body.append(etree.fromstring(pg_header, xhtmlparser))
             for par in self.pars:
                 p = etree.fromstring(self.ship_out(par), xhtmlparser)
                 p.tail = '\n\n'
                 body.append(p)
-            if pg_footer:
-                body.append(etree.fromstring(pg_footer, xhtmlparser))
+            body.append(etree.fromstring(pg_footer, xhtmlparser))
 
         self.pars = []
 
