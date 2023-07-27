@@ -55,7 +55,7 @@ def pgheader(dc):
         language_list.append(language.language)
 
     if 'copyright' in dc.rights:
-        rights = HEADERA.format(copyrighted=COPYRGIHTED)    
+        rights = HEADERA.format(copyrighted=COPYRIGHTED)    
     else:
         rights = HEADERA.format(copyrighted='')
 

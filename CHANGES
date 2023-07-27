@@ -1,3 +1,6 @@
+0.12.34 July 27, 2023
+- fixed typo affecting in-copyright books
+
 0.12.33 July 20, 2023
 - replaced CSS4 value in CSS - was logging an error
 
