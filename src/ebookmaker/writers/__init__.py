@@ -30,6 +30,7 @@ from ebookmaker import ParserFactory
 from ebookmaker.CommonCode import Options
 from ebookmaker.Version import VERSION, GENERATOR
 
+import textwrap
 
 options = Options()
 
@@ -46,7 +47,7 @@ class BaseWriter(object):
     """
 
     VALIDATOR = None
-    
+
     def build(self, job):
         """ override this in a real writer """
         pass
@@ -61,6 +62,55 @@ class BaseWriter(object):
         with open(filename, 'wb') as fp:
             fp.write(bytes_)
 
+    @staticmethod
+    def writec_with_crlf(filename, bytes_):
+        t = bytes_.splitlines()
+        u = []
+        for item in t:  # convert to strings
+            u.append(item.decode('utf-8'))
+
+        u2 = []
+        for line in u:
+            if len(line) > 75 and not "Most recently updated" in line:
+                w = textwrap.wrap(line, width=72)
+                for wline in w:
+                    u2.append(wline)
+                continue
+            else:
+                u2.append(line)
+
+        v = []
+        squash = True
+        prev_line_empty = False
+        for line in u2:
+            if "END OF THE P" in line:
+                squash = True
+            if squash:
+                line = line.lstrip() # everything left justified
+
+                if "Most recently updated" in line:
+                    linesp = line.split(']')
+                    v.append(linesp[0] + "]")
+                    v.append("    " + linesp[1])
+                    v.append("")
+                    continue
+
+                if "START OF THE P" in line:
+                    squash = False
+
+                if line.strip() == "":
+                    if not prev_line_empty:
+                        v.append(line)
+                    prev_line_empty = True
+                else:
+                    v.append(line)
+                    prev_line_empty = False
+            else:
+                v.append(line)
+
+        with open(filename, 'w') as file:
+            for i,line in enumerate(v):
+                file.write(line.rstrip() + "\n")
 
     def validate(self, job):
         """ Validate generated file using external tools. """
@@ -179,5 +229,3 @@ class HTMLishWriter(BaseWriter):
                 link = em.link(href=url, rel='stylesheet', type='text/css')
                 link.tail = '\n'
                 head.append(link)
-
-
