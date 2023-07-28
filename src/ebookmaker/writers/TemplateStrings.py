@@ -63,7 +63,7 @@ CSS_FOR_HEADER = '''
     margin-left: 4em;
     margin-top: 1em;
     margin-bottom: 0;
-    font-size: initial
+    font-size: medium
 }
 #pg-header #pg-header-authlist {
     all: initial;

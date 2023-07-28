@@ -1,3 +1,9 @@
+0.12.34 July 27, 2023
+- fixed typo affecting in-copyright books
+
+0.12.33 July 20, 2023
+- replaced CSS4 value in CSS - was logging an error
+
 0.12.32 July 19, 2023
 - Updated a deprecated constant in ImageParser for compatibility with Pillow 10.0
 - to facilitate use of their by other applications, boilerplate strings are now exposed as strings in the writers.TemplateStrings module.
