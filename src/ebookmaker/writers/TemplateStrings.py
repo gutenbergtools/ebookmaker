@@ -83,12 +83,12 @@ CSS_FOR_HEADER = '''
 '''
 
 HEADERA = '''
-<div>This ebook is for the use of anyone anywhere in the United States and 
-most other parts of the world at no cost and with almost no restrictions 
-whatsoever. You may copy it, give it away or re-use it under the terms 
-of the Project Gutenberg License included with this ebook or online 
-at <a class="reference external" href="https://www.gutenberg.org">www.gutenberg.org</a>. If you are not located in the United States, 
-you will have to check the laws of the country where you are located 
+<div>This ebook is for the use of anyone anywhere in the United States and
+most other parts of the world at no cost and with almost no restrictions
+whatsoever. You may copy it, give it away or re-use it under the terms
+of the Project Gutenberg License included with this ebook or online
+at <a class="reference external" href="https://www.gutenberg.org">www.gutenberg.org</a>. If you are not located in the United States,
+you will have to check the laws of the country where you are located
 before using this eBook.</div>
 {copyrighted}
 '''
@@ -142,7 +142,9 @@ license, especially commercial redistribution.
 </div>
 
 <div id='project-gutenberg-license'>START: FULL LICENSE</div>
+
 <h2 id='pg-footer-heading'>THE FULL PROJECT GUTENBERG LICENSE</h2>
+
 <div class='agate'>PLEASE READ THIS BEFORE YOU DISTRIBUTE OR USE THIS WORK</div>
 
 <div>
@@ -154,7 +156,8 @@ Project Gutenberg™ License available with this file or online at
 www.gutenberg.org/license.
 </div>
 <div class='secthead'>
-Section 1. General Terms of Use and Redistributing Project Gutenberg™ electronic works
+Section 1. General Terms of Use and Redistributing Project Gutenberg™
+electronic works
 </div>
 <div>
 1.A. By reading or using any part of this Project Gutenberg™
@@ -439,7 +442,8 @@ to date contact information can be found at the Foundation’s website
 and official page at www.gutenberg.org/contact
 </div>
 <div class='secthead'>
-Section 4. Information about Donations to the Project Gutenberg Literary Archive Foundation
+Section 4. Information about Donations to the Project Gutenberg
+Literary Archive Foundation
 </div>
 <div>
 Project Gutenberg™ depends upon and cannot survive without widespread
@@ -509,4 +513,6 @@ subscribe to our email newsletter to hear about new eBooks.
 headerb = HEADERB.format(copyright_addition='')
 headerb_copy = HEADERB.format(copyright_addition=COPYRIGHT_ADDITION)
 headerb_txt = re.sub(r'<[^>]+>', '', headerb)
+headerb_txt = re.sub(r'\n\n\n', '\n\n', headerb_txt)
 headerb_copy_txt = re.sub(r'<[^>]+>', '', headerb_copy)
+headerb_copy_txt = re.sub(r'\n\n\n', '\n\n', headerb_copy_txt)
