@@ -129,7 +129,7 @@ class Writer(writers.BaseWriter):
             return
         else:
             data = parser.unicode_content()
-        
+
         data = insert_boilerplate(job, data)
 
         data = data.encode('utf_8_sig' if encoding == 'utf-8' else encoding, 'unitame')
