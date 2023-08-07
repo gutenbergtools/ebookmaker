@@ -193,8 +193,7 @@ Project Gutenberg™ name associated with the work. You can easily
 comply with the terms of this agreement by keeping this work in the
 same format with its attached full Project Gutenberg™ License when
 you share it without charge with others.
-</div>
-{copyright_addition}<div>
+</div>{copyright_addition}<div>
 1.D. The copyright laws of the place where you are located also govern
 what you can do with this work. Copyright laws in most countries are
 in a constant state of change. If you are outside the United States,
