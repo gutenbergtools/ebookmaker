@@ -119,8 +119,7 @@ HEADERB = '''
 <div>
 Updated editions will replace the previous one—the old editions will
 be renamed.
-</div>
-<div>
+</div><div>
 Creating the works from print editions not protected by U.S. copyright
 law means that no one owns a United States copyright in these works,
 so the Foundation (and you!) can copy and distribute it in the United
@@ -145,21 +144,18 @@ license, especially commercial redistribution.
 
 <h2 id='pg-footer-heading'>THE FULL PROJECT GUTENBERG LICENSE</h2>
 
-<div class='agate'>PLEASE READ THIS BEFORE YOU DISTRIBUTE OR USE THIS WORK</div>
-
-<div>
+<div class='agate'>PLEASE READ THIS BEFORE YOU DISTRIBUTE OR USE THIS WORK
+</div><div>
 To protect the Project Gutenberg™ mission of promoting the free
 distribution of electronic works, by using or distributing this work
 (or any other work associated in any way with the phrase “Project
 Gutenberg”), you agree to comply with all the terms of the Full
 Project Gutenberg™ License available with this file or online at
 www.gutenberg.org/license.
-</div>
-<div class='secthead'>
+</div><div class='secthead'>
 Section 1. General Terms of Use and Redistributing Project Gutenberg™
 electronic works
-</div>
-<div>
+</div><div>
 1.A. By reading or using any part of this Project Gutenberg™
 electronic work, you indicate that you have read, understand, agree to
 and accept all the terms of this license and intellectual property
@@ -170,8 +166,7 @@ possession. If you paid a fee for obtaining a copy of or access to a
 Project Gutenberg™ electronic work and you do not agree to be bound
 by the terms of this agreement, you may obtain a refund from the person
 or entity to whom you paid the fee as set forth in paragraph 1.E.8.
-</div>
-<div>
+</div><div>
 1.B. “Project Gutenberg” is a registered trademark. It may only be
 used on or associated in any way with an electronic work by people who
 agree to be bound by the terms of this agreement. There are a few
@@ -181,8 +176,7 @@ paragraph 1.C below. There are a lot of things you can do with Project
 Gutenberg™ electronic works if you follow the terms of this
 agreement and help preserve free future access to Project Gutenberg™
 electronic works. See paragraph 1.E below.
-</div>
-<div>
+</div><div>
 1.C. The Project Gutenberg Literary Archive Foundation (“the
 Foundation” or PGLAF), owns a compilation copyright in the collection
 of Project Gutenberg™ electronic works. Nearly all the individual
@@ -200,8 +194,7 @@ comply with the terms of this agreement by keeping this work in the
 same format with its attached full Project Gutenberg™ License when
 you share it without charge with others.
 </div>
-{copyright_addition}
-<div>
+{copyright_addition}<div>
 1.D. The copyright laws of the place where you are located also govern
 what you can do with this work. Copyright laws in most countries are
 in a constant state of change. If you are outside the United States,
@@ -211,20 +204,16 @@ distributing or creating derivative works based on this work or any
 other Project Gutenberg™ work. The Foundation makes no
 representations concerning the copyright status of any work in any
 country other than the United States.
-</div>
-<div>
+</div><div>
 1.E. Unless you have removed all references to Project Gutenberg:
-</div>
-<div>
+</div><div>
 1.E.1. The following sentence, with active links to, or other
 immediate access to, the full Project Gutenberg™ License must appear
 prominently whenever any copy of a Project Gutenberg™ work (any work
 on which the phrase “Project Gutenberg” appears, or with which the
 phrase “Project Gutenberg” is associated) is accessed, displayed,
 performed, viewed, copied or distributed:
-</div>
-<blockquote>
-  <div>
+</div><blockquote><div>
     This eBook is for the use of anyone anywhere in the United States and most
     other parts of the world at no cost and with almost no restrictions
     whatsoever. You may copy it, give it away or re-use it under the terms
@@ -232,9 +221,7 @@ performed, viewed, copied or distributed:
     at <a href="https://www.gutenberg.org">www.gutenberg.org</a>. If you
     are not located in the United States, you will have to check the laws
     of the country where you are located before using this eBook.
-  </div>
-</blockquote>
-<div>
+  </div></blockquote><div>
 1.E.2. If an individual Project Gutenberg™ electronic work is
 derived from texts not protected by U.S. copyright law (does not
 contain a notice indicating that it is posted with permission of the
@@ -245,8 +232,7 @@ Gutenberg” associated with or appearing on the work, you must comply
 either with the requirements of paragraphs 1.E.1 through 1.E.7 or
 obtain permission for the use of the work and the Project Gutenberg™
 trademark as set forth in paragraphs 1.E.8 or 1.E.9.
-</div>
-<div>
+</div><div>
 1.E.3. If an individual Project Gutenberg™ electronic work is posted
 with the permission of the copyright holder, your use and distribution
 must comply with both paragraphs 1.E.1 through 1.E.7 and any
@@ -254,20 +240,17 @@ additional terms imposed by the copyright holder. Additional terms
 will be linked to the Project Gutenberg™ License for all works
 posted with the permission of the copyright holder found at the
 beginning of this work.
-</div>
-<div>
+</div><div>
 1.E.4. Do not unlink or detach or remove the full Project Gutenberg™
 License terms from this work, or any files containing a part of this
 work or any other work associated with Project Gutenberg™.
-</div>
-<div>
+</div><div>
 1.E.5. Do not copy, display, perform, distribute or redistribute this
 electronic work, or any part of this electronic work, without
 prominently displaying the sentence set forth in paragraph 1.E.1 with
 active links or immediate access to the full terms of the Project
 Gutenberg™ License.
-</div>
-<div>
+</div><div>
 1.E.6. You may convert to and distribute this work in any binary,
 compressed, marked up, nonproprietary or proprietary form, including
 any word processing or hypertext form. However, if you provide access
@@ -279,18 +262,15 @@ to the user, provide a copy, a means of exporting a copy, or a means
 of obtaining a copy upon request, of the work in its original “Plain
 Vanilla ASCII” or other form. Any alternate format must include the
 full Project Gutenberg™ License as specified in paragraph 1.E.1.
-</div>
-<div>
+</div><div>
 1.E.7. Do not charge a fee for access to, viewing, displaying,
 performing, copying or distributing any Project Gutenberg™ works
 unless you comply with paragraph 1.E.8 or 1.E.9.
-</div>
-<div>
+</div><div>
 1.E.8. You may charge a reasonable fee for copies of or providing
 access to or distributing Project Gutenberg™ electronic works
 provided that:
-</div>
-<ul>
+</div><ul>
     <li>• You pay a royalty fee of 20% of the gross profits you derive from
         the use of Project Gutenberg™ works calculated using the method
         you already use to calculate your applicable taxes. The fee is owed
@@ -320,19 +300,16 @@ provided that:
     <li>• You comply with all other terms of this agreement for free
         distribution of Project Gutenberg™ works.
     </li>
-</ul>
-<div>
+</ul><div>
 1.E.9. If you wish to charge a fee or distribute a Project
 Gutenberg™ electronic work or group of works on different terms than
 are set forth in this agreement, you must obtain permission in writing
 from the Project Gutenberg Literary Archive Foundation, the manager of
 the Project Gutenberg™ trademark. Contact the Foundation as set
 forth in Section 3 below.
-</div>
-<div>
+</div><div>
 1.F.
-</div>
-<div>
+</div><div>
 1.F.1. Project Gutenberg volunteers and employees expend considerable
 effort to identify, do copyright research on, transcribe and proofread
 works not protected by U.S. copyright law in creating the Project
@@ -343,8 +320,7 @@ or corrupt data, transcription errors, a copyright or other
 intellectual property infringement, a defective or damaged disk or
 other medium, a computer virus, or computer codes that damage or
 cannot be read by your equipment.
-</div>
-<div>
+</div><div>
 1.F.2. LIMITED WARRANTY, DISCLAIMER OF DAMAGES - Except for the “Right
 of Replacement or Refund” described in paragraph 1.F.3, the Project
 Gutenberg Literary Archive Foundation, the owner of the Project
@@ -358,8 +334,7 @@ TRADEMARK OWNER, AND ANY DISTRIBUTOR UNDER THIS AGREEMENT WILL NOT BE
 LIABLE TO YOU FOR ACTUAL, DIRECT, INDIRECT, CONSEQUENTIAL, PUNITIVE OR
 INCIDENTAL DAMAGES EVEN IF YOU GIVE NOTICE OF THE POSSIBILITY OF SUCH
 DAMAGE.
-</div>
-<div>
+</div><div>
 1.F.3. LIMITED RIGHT OF REPLACEMENT OR REFUND - If you discover a
 defect in this electronic work within 90 days of receiving it, you can
 receive a refund of the money (if any) you paid for it by sending a
@@ -372,14 +347,12 @@ or entity providing it to you may choose to give you a second
 opportunity to receive the work electronically in lieu of a refund. If
 the second copy is also defective, you may demand a refund in writing
 without further opportunities to fix the problem.
-</div>
-<div>
+</div><div>
 1.F.4. Except for the limited right of replacement or refund set forth
 in paragraph 1.F.3, this work is provided to you ‘AS-IS’, WITH NO
 OTHER WARRANTIES OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT
 LIMITED TO WARRANTIES OF MERCHANTABILITY OR FITNESS FOR ANY PURPOSE.
-</div>
-<div>
+</div><div>
 1.F.5. Some states do not allow disclaimers of certain implied
 warranties or the exclusion or limitation of certain types of
 damages. If any disclaimer or limitation set forth in this agreement
@@ -388,8 +361,7 @@ agreement shall be interpreted to make the maximum disclaimer or
 limitation permitted by the applicable state law. The invalidity or
 unenforceability of any provision of this agreement shall not void the
 remaining provisions.
-</div>
-<div>
+</div><div>
 1.F.6. INDEMNITY - You agree to indemnify and hold the Foundation, the
 trademark owner, any agent or employee of the Foundation, anyone
 providing copies of Project Gutenberg™ electronic works in
@@ -401,18 +373,15 @@ the following which you do or cause to occur: (a) distribution of this
 or any Project Gutenberg™ work, (b) alteration, modification, or
 additions or deletions to any Project Gutenberg™ work, and (c) any
 Defect you cause.
-</div>
-<div class='secthead'>
+</div><div class='secthead'>
 Section 2. Information about the Mission of Project Gutenberg™
-</div>
-<div>
+</div><div>
 Project Gutenberg™ is synonymous with the free distribution of
 electronic works in formats readable by the widest variety of
 computers including obsolete, old, middle-aged and new computers. It
 exists because of the efforts of hundreds of volunteers and donations
 from people in all walks of life.
-</div>
-<div>
+</div><div>
 Volunteers and financial support to provide volunteers with the
 assistance they need are critical to reaching Project Gutenberg™’s
 goals and ensuring that the Project Gutenberg™ collection will
@@ -422,11 +391,9 @@ and permanent future for Project Gutenberg™ and future
 generations. To learn more about the Project Gutenberg Literary
 Archive Foundation and how your efforts and donations can help, see
 Sections 3 and 4 and the Foundation information page at www.gutenberg.org.
-</div>
-<div class='secthead'>
+</div><div class='secthead'>
 Section 3. Information about the Project Gutenberg Literary Archive Foundation
-</div>
-<div>
+</div><div>
 The Project Gutenberg Literary Archive Foundation is a non-profit
 501(c)(3) educational corporation organized under the laws of the
 state of Mississippi and granted tax exempt status by the Internal
@@ -434,18 +401,15 @@ Revenue Service. The Foundation’s EIN or federal tax identification
 number is 64-6221541. Contributions to the Project Gutenberg Literary
 Archive Foundation are tax deductible to the full extent permitted by
 U.S. federal laws and your state’s laws.
-</div>
-<div>
+</div><div>
 The Foundation’s business office is located at 809 North 1500 West,
 Salt Lake City, UT 84116, (801) 596-1887. Email contact links and up
 to date contact information can be found at the Foundation’s website
 and official page at www.gutenberg.org/contact
-</div>
-<div class='secthead'>
+</div><div class='secthead'>
 Section 4. Information about Donations to the Project Gutenberg
 Literary Archive Foundation
-</div>
-<div>
+</div><div>
 Project Gutenberg™ depends upon and cannot survive without widespread
 public support and donations to carry out its mission of
 increasing the number of public domain and licensed works that can be
@@ -453,8 +417,7 @@ freely distributed in machine-readable form accessible by the widest
 array of equipment including outdated equipment. Many small donations
 ($1 to $5,000) are particularly important to maintaining tax exempt
 status with the IRS.
-</div>
-<div>
+</div><div>
 The Foundation is committed to complying with the laws regulating
 charities and charitable donations in all 50 states of the United
 States. Compliance requirements are not uniform and it takes a
@@ -463,46 +426,38 @@ with these requirements. We do not solicit donations in locations
 where we have not received written confirmation of compliance. To SEND
 DONATIONS or determine the status of compliance for any particular state
 visit <a href="https://www.gutenberg.org/donate/">www.gutenberg.org/donate</a>.
-</div>
-<div>
+</div><div>
 While we cannot and do not solicit contributions from states where we
 have not met the solicitation requirements, we know of no prohibition
 against accepting unsolicited donations from donors in such states who
 approach us with offers to donate.
-</div>
-<div>
+</div><div>
 International donations are gratefully accepted, but we cannot make
 any statements concerning tax treatment of donations received from
 outside the United States. U.S. laws alone swamp our small staff.
-</div>
-<div>
+</div><div>
 Please check the Project Gutenberg web pages for current donation
 methods and addresses. Donations are accepted in a number of other
 ways including checks, online payments and credit card donations. To
 donate, please visit: www.gutenberg.org/donate.
-</div>
-<div class='secthead'>
+</div><div class='secthead'>
 Section 5. General Information About Project Gutenberg™ electronic works
-</div>
-<div>
+</div><div>
 Professor Michael S. Hart was the originator of the Project
 Gutenberg™ concept of a library of electronic works that could be
 freely shared with anyone. For forty years, he produced and
 distributed Project Gutenberg™ eBooks with only a loose network of
 volunteer support.
-</div>
-<div>
+</div><div>
 Project Gutenberg™ eBooks are often created from several printed
 editions, all of which are confirmed as not protected by copyright in
 the U.S. unless a copyright notice is included. Thus, we do not
 necessarily keep eBooks in compliance with any particular paper
 edition.
-</div>
-<div>
+</div><div>
 Most people start at our website which has the main PG search
 facility: <a href="https://www.gutenberg.org">www.gutenberg.org</a>.
-</div>
-<div>
+</div><div>
 This website includes information about Project Gutenberg™,
 including how to make donations to the Project Gutenberg Literary
 Archive Foundation, how to help produce our new eBooks, and how to
@@ -513,6 +468,4 @@ subscribe to our email newsletter to hear about new eBooks.
 headerb = HEADERB.format(copyright_addition='')
 headerb_copy = HEADERB.format(copyright_addition=COPYRIGHT_ADDITION)
 headerb_txt = re.sub(r'<[^>]+>', '', headerb)
-headerb_txt = re.sub(r'\n\n\n', '\n\n', headerb_txt)
 headerb_copy_txt = re.sub(r'<[^>]+>', '', headerb_copy)
-headerb_copy_txt = re.sub(r'\n\n\n', '\n\n', headerb_copy_txt)
