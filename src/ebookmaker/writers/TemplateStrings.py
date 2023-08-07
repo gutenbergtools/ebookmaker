@@ -94,8 +94,7 @@ before using this eBook.</div>
 '''
 
 COPYRIGHTED = '''
-<div>
-<div>*** This is a COPYRIGHTED Project Gutenberg eBook. Details Below. ***</div>
+<div><div>*** This is a COPYRIGHTED Project Gutenberg eBook. Details Below. ***</div>
 <div>***     Please follow the copyright guidelines in this file.      ***</div>
 </div>
 '''
@@ -106,13 +105,13 @@ headera_txt = re.sub(r'<[^>]+>', '', headera)
 headera_copy_txt = re.sub(r'<[^>]+>', '', headera_copy)
 
 
-COPYRIGHT_ADDITION = '''<div>
-This particular work is one of the few individual works protected
+COPYRIGHT_ADDITION = '''<div>This particular work is one of the few individual works protected
 by copyright law in the United States and most of the remainder of the
 world, included in the Project Gutenberg collection with the
 permission of the copyright holder. Information on the copyright owner
 for this particular work and the terms of use imposed by the copyright
-holder on this work are set forth at the beginning of this work.</div>
+holder on this work are set forth at the beginning of this work.
+</div>
 '''
 
 HEADERB = '''

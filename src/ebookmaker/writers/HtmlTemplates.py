@@ -27,24 +27,24 @@ except ValueError:
 def pgheader(dc):
     def pstyle(key, val):
         key = key.capitalize()
-        if not val:
+        if not key or not val:
             return ''
-        val = '<br/>'.join([html.escape(v) for v in val.split('\n')])
-        if key:
-            return f"<p><strong>{key}</strong>: {val}</p>"
+        val = '<br/> '.join([html.escape(v) for v in val.split('\n')])
+        if key == 'previous':
+            return "<p style='margin-top:0'><span style='padding-left: 7.5ex'> </span>{val}</p>" + nl
         else:
-            # roughly line up additional vals under previous 
-            return f"               <p style='margin-top:0'><span style='padding-left: 7.5ex'> </span>{val}</p>"
+            return f'''<p><strong>{key}</strong>: {val}</p>{nl}'''
 
     def dcauthlist(dc):
         cre_list = ''
         block_role = ''
         for creator in dc.authors:
             if block_role != creator.role:
-                cre_list +=  '        ' + pstyle(creator.role, dc.make_pretty_name(creator.name)) + '\n'
+                cre_list +=  pstyle(creator.role, dc.make_pretty_name(creator.name))
                 block_role = creator.role
             else:
-                cre_list += pstyle('', dc.make_pretty_name(creator.name)) + '\n'
+                # roughly line up additional vals under previous 
+                cre_list += '        ' + pstyle('previous', dc.make_pretty_name(creator.name))
         return cre_list
 
     language_list = []
@@ -62,29 +62,24 @@ def pgheader(dc):
     if dc.update_date - dc.release_date < datetime.timedelta(days=14):
         updated = ''
     else:
-        updated = nl + f'Most recently updated: {dc.update_date.strftime(hr_format)}'
-    pg_header = f'''
-<section class="pg-boilerplate pgheader" id="pg-header" xml:lang="en" lang="en" xmlns="http://www.w3.org/1999/xhtml">
-    <h2 id='pg-header-heading' title=''>The Project Gutenberg eBook of <span lang='{lang}' xml:lang='{lang}'>{html.escape(dc.title_no_subtitle)}</span></h2>
-    {rights}
-
-    <div class="container" id="pg-machine-header">
-        {pstyle('Title', dc.title_no_subtitle + nl + dc.subtitle)}
-        <div id='pg-header-authlist'>
-{dcauthlist(dc)}
-        </div>
-        {pstyle('Release Date', 
+        updated = f' Most recently updated: {dc.update_date.strftime(hr_format)}'
+    pg_header = '<section class="pg-boilerplate pgheader" id="pg-header" xml:lang="en" lang="en" xmlns="http://www.w3.org/1999/xhtml">'
+    pg_header += "<h2 id='pg-header-heading' title=''>"
+    pg_header += 'The Project Gutenberg eBook of '
+    pg_header += f'''<span lang='{lang}' xml:lang='{lang}'>{html.escape(dc.title_no_subtitle)}</span></h2>
+    {rights}<div class="container" id="pg-machine-header">{pstyle('Title', 
+        dc.title_no_subtitle + nl + dc.subtitle)}
+<div id='pg-header-authlist'>{dcauthlist(dc)}</div>
+{pstyle('Release Date', 
             f'{dc.release_date.strftime(hr_format)} [eBook #{dc.project_gutenberg_id}]' + updated)}
-        {pstyle('Language', ', '.join(language_list))}
-        {pstyle('Original Publication', str(dc.pubinfo))}
-        {pstyle('Credits', dc.credit)}
-    </div>
-        <div id='pg-start-separator'>
-            <span>*** START OF THE PROJECT GUTENBERG EBOOK {html.escape(dc.title_no_subtitle.upper())} ***</span>
-        </div>
-</section>
+{pstyle('Language', ', '.join(language_list))}
+{pstyle('Original Publication', str(dc.pubinfo))}
+{pstyle('Credits', dc.credit)}
+</div><div id='pg-start-separator'>
+<span>*** START OF THE PROJECT GUTENBERG EBOOK {html.escape(dc.title_no_subtitle.upper())} ***</span>
+</div></section>
 '''
-    return etree.fromstring(pg_header, lxml.html.XHTMLParser())
+    return etree.fromstring(pg_header.replace('\n\n\n', '\n\n'), lxml.html.XHTMLParser())
     
 
 def pgfooter(dc):
