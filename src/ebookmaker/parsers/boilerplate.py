@@ -167,7 +167,7 @@ def strip_headers_from_txt(text):
                     after = sections[-1]
                 return before, divider.group(0), after
         return  text, None, text
-    header_text, divider, text = markers_split(text, TOP_MARKERS)
+    header_text, divider, text = markers_split(text, TOP_MARKERS + SMALLPRINT_MARKERS)
     if divider is None:
         pg_header = '<pre id="pg-header"></pre>'
         info('No PG header found. This is an ERROR for white-washed files.')
