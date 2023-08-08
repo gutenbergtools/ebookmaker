@@ -158,7 +158,10 @@ def strip_headers_from_txt(text):
                     (before, after) = sections
                     if MARKER_END.search(after.split('\n')[0]):
                         # remove first line of after
-                        after = after.split('\n', 1)[1]
+                        if len(after.split('\n')) > 1:
+                            after = after.split('\n', 1)[1]
+                        else:
+                            after = ''
                 else:
                     before = ' '.join(sections[0:-1])
                     after = sections[-1]
