@@ -29,9 +29,9 @@ def pgheader(dc):
         key = key.capitalize()
         if not key or not val:
             return ''
-        val = '<br/> '.join([html.escape(v) for v in val.split('\n')])
-        if key == 'previous':
-            return "<p style='margin-top:0'><span style='padding-left: 7.5ex'> </span>{val}</p>" + nl
+        val = '<br/>\n'.join([html.escape(v) for v in val.split('\n')])
+        if key == 'Previous':
+            return f'''<p style='margin-top:0'><span style='padding-left: 7.5ex'>{padding}</span>{val}</p>{nl}'''
         else:
             return f'''<p><strong>{key}</strong>: {val}</p>{nl}'''
 
@@ -44,11 +44,12 @@ def pgheader(dc):
                 block_role = creator.role
             else:
                 # roughly line up additional vals under previous 
-                cre_list += '        ' + pstyle('previous', dc.make_pretty_name(creator.name))
+                cre_list += padding + pstyle('Previous', dc.make_pretty_name(creator.name))
         return cre_list
 
     language_list = []
     lang = ''
+    padding = "        "
     nl = '\n'
     for language in dc.languages:
         lang = lang if lang else language.id 
@@ -62,13 +63,12 @@ def pgheader(dc):
     if dc.update_date - dc.release_date < datetime.timedelta(days=14):
         updated = ''
     else:
-        updated = f' Most recently updated: {dc.update_date.strftime(hr_format)}'
+        updated = f'{nl}{padding}Most recently updated: {dc.update_date.strftime(hr_format)}'
     pg_header = '<section class="pg-boilerplate pgheader" id="pg-header" xml:lang="en" lang="en" xmlns="http://www.w3.org/1999/xhtml">'
     pg_header += "<h2 id='pg-header-heading' title=''>"
     pg_header += 'The Project Gutenberg eBook of '
     pg_header += f'''<span lang='{lang}' xml:lang='{lang}'>{html.escape(dc.title_no_subtitle)}</span></h2>
-    {rights}<div class="container" id="pg-machine-header">{pstyle('Title', 
-        dc.title_no_subtitle + nl + dc.subtitle)}
+    {rights}<div class='container' id='pg-machine-header'>{pstyle('Title', dc.title_no_subtitle)}{pstyle('Previous', dc.subtitle) if dc.subtitle  else ''}
 <div id='pg-header-authlist'>{dcauthlist(dc)}</div>
 {pstyle('Release Date', 
             f'{dc.release_date.strftime(hr_format)} [eBook #{dc.project_gutenberg_id}]' + updated)}
