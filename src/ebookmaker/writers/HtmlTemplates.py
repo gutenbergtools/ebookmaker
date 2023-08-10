@@ -29,7 +29,7 @@ def pgheader(dc):
         key = key.capitalize()
         if not key or not val:
             return ''
-        val = '<br/>\n'.join([html.escape(v) for v in val.split('\n')])
+        val = f'<br/>\n{padding}'.join([html.escape(v) for v in val.split('\n')])
         if key == 'Previous':
             return f'''<p style='margin-top:0'><span style='padding-left: 7.5ex'>{padding}</span>{val}</p>{nl}'''
         else:
@@ -40,11 +40,11 @@ def pgheader(dc):
         block_role = ''
         for creator in dc.authors:
             if block_role != creator.role:
-                cre_list +=  pstyle(creator.role, dc.make_pretty_name(creator.name))
+                cre_list +=  nl + pstyle(creator.role, dc.make_pretty_name(creator.name))
                 block_role = creator.role
             else:
                 # roughly line up additional vals under previous 
-                cre_list += padding + pstyle('Previous', dc.make_pretty_name(creator.name))
+                cre_list += pstyle('Previous', dc.make_pretty_name(creator.name))
         return cre_list
 
     language_list = []
