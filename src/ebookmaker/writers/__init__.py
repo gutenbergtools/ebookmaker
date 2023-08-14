@@ -46,7 +46,7 @@ class BaseWriter(object):
     """
 
     VALIDATOR = None
-    
+
     def build(self, job):
         """ override this in a real writer """
         pass

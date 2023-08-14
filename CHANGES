@@ -1,3 +1,8 @@
+0.12.35 August 10, 2023
+- fixed crash when END sentinel is on the last line
+- turned on the SMALLPRINT_MARKERS
+- cleaned up spacing and formatting of generated txt files
+
 0.12.34 July 27, 2023
 - fixed typo affecting in-copyright books
 
