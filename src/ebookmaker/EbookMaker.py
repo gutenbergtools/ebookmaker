@@ -599,6 +599,7 @@ def main():
                 dc.session.close()
                 dc.session = None # probably overkill
         except Exception as e:
+            Logger.ebook = job.ebook
             critical('Job failed for type %s from %s', job.type, job.url)
             exception(e)
             continue
