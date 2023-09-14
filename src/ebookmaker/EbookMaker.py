@@ -200,12 +200,14 @@ def generate_cover(dir, dc):
 
 def get_dc(job):
     """ Get DC for book. """
-    url = job.url
-    parser = ParserFactory.ParserFactory.create(url)
-    try:
-        parser.parse()
-    except AttributeError as e:
-        raise Exception(f'the file {job.url} could not be found or was unparsable')
+    if job.url:
+        url = job.url
+        parser = ParserFactory.ParserFactory.create(url)
+        try:
+            parser.parse()
+        except AttributeError as e:
+            raise Exception(f'the file {job.url} could not be found or was unparsable')
+
     if options.is_job_queue:
         dc = PGDCObject()
         dc.load_from_database(job.ebook)

@@ -1,3 +1,6 @@
+0.12.36 September xx, 2023
+- Ebookmaker no longer needs a parsable source file to use metadata-only writers. So, RDF, and QRcodes, and posts to Mastodon and Facebook, can be made using only the database. This change should also save execution time, as parsing of the source files is no longer done for each of these outputs.
+
 0.12.35 August 10, 2023
 - fixed crash when END sentinel is on the last line
 - turned on the SMALLPRINT_MARKERS
