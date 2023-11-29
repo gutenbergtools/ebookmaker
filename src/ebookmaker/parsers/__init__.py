@@ -93,7 +93,11 @@ IMAGE_WRAPPER = """<?xml version="1.0"?>{doctype}
   </body>
 </html>"""
 
+RE_PG_OLD_HOST = re.compile(r'http://(www\.)?gutenberg\.org')
+RE_PG_HTML_URL = re.compile(r'([^a-zA-Z0-9./?=_%:-])https://(www\.)?gutenberg\.org/files/(\d+)/\3-h/\3-h\.htm([^a-zA-Z0-9./?=_%:-])')
+REPL_PG_HTML5_URL = r'\g<1>https://www.gutenberg.org/cache/epub/\g<3>/pg\g<3>-images.html\g<4>'
 # exported
+
 em = ElementMaker(makeelement=lxml.html.xhtml_parser.makeelement,
                   namespace=str(NS.xhtml),
                   nsmap={None: str(NS.xhtml)})
@@ -113,6 +117,9 @@ def webify_url(url):
         url = url[1:]
     return 'file:///' + url
 
+def update_urls(text):
+    text = RE_PG_OLD_HOST.sub('https://www.gutenberg.org', text)
+    return RE_PG_HTML_URL.sub(REPL_PG_HTML5_URL, text)
 
 
 class ParserAttributes(object): # pylint: disable=too-few-public-methods
@@ -281,6 +288,8 @@ class ParserBase(object):
             # normalize line-endings
             if '\r' in data or '\u2028' in data:
                 data = '\n'.join(data.splitlines())
+            data = update_urls(data)
+
             self.unicode_buffer = data
 
         return self.unicode_buffer
