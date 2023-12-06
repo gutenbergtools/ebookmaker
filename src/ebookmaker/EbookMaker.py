@@ -227,12 +227,14 @@ def get_dc(job):
         debug("No RST header found.")
         try:
             dc.load_from_parser(parser)
-        except (ValueError, AttributeError, UnicodeError):
+        except (ValueError, AttributeError, UnicodeError) as pe:
             debug("No HTML header found.")
+            debug(pe)
             try:
                 dc.load_from_pgheader(parser.unicode_content())
-            except (ValueError, UnicodeError):
+            except (ValueError, UnicodeError) as e:
                 debug("No PG header found.")
+                debug(e)                
 
     dc.source = parser.attribs.url
     dc.title = options.title or dc.title or 'NA'
