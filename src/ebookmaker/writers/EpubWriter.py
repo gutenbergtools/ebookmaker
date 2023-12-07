@@ -1297,6 +1297,7 @@ class Writer(writers.HTMLishWriter):
         parserlist = []
         css_count = 0
         boilerplate_done = False
+        idmap = {}
 
         # add CSS parser
         self.add_external_css(job.spider, None, PRIVATE_CSS, 'pgepub.css')
@@ -1308,6 +1309,7 @@ class Writer(writers.HTMLishWriter):
             # do images early as we need the new dimensions later
             for p in job.spider.parsers:
                 if hasattr(p, 'resize_image'):
+                    unsized_url = p.attribs.url
                     if 'icon' in p.attribs.rel:
                         if job.subtype == '.noimages':
                             np = p.resize_image(MAX_NOIMAGE_SIZE, MAX_COVER_DIMEN)
@@ -1324,6 +1326,8 @@ class Writer(writers.HTMLishWriter):
                     else:
                         np = p.resize_image(MAX_IMAGE_SIZE, MAX_IMAGE_DIMEN)
                         np.id = p.attribs.get('id')
+                    if unsized_url != p.attribs.url:
+                        idmap[unsized_url] = p.attribs.url
                     parserlist.append(np)
 
             for p in job.spider.parsers:
@@ -1352,6 +1356,9 @@ class Writer(writers.HTMLishWriter):
                             HTMLWriter.Writer.replace_boilerplate(job, xhtml)
                             boilerplate_done = True
 
+                        # rewrite the changed image links
+                        p.remap_links(idmap)
+                        
                         xhtml.make_links_absolute(base_url=p.attribs.url)
                         self.fix_html5(xhtml)
 
@@ -1376,7 +1383,6 @@ class Writer(writers.HTMLishWriter):
                             # omit for future subtype '.v3'
                             self.reflow_pre(xhtml)
                             self.render_q(xhtml)
-
 
                         # strip all links to items not in manifest
                         p.strip_links(xhtml, job.spider.dict_urls_mediatypes())

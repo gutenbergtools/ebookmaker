@@ -25,11 +25,14 @@ from libgutenberg.Logger import debug, error
 from libgutenberg.MediaTypes import mediatypes as mt
 from ebookmaker.parsers import ParserBase
 from ebookmaker.ParserFactory import ParserFactory
+from . import ParserAttributes
 
 # works around problems with bad checksums in a small number of png files
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 mediatypes = (mt.jpeg, mt.png, mt.gif, mt.svg)
+
+
 
 class Parser(ParserBase):
     """Parse an image.
@@ -86,6 +89,9 @@ class Parser(ParserBase):
                 format_ = output_format
             if format_ == 'gif':
                 format_ = 'png'
+                self.attribs.url +=  '.png'
+                self.attribs.orig_mediatype = self.attribs.mediatype
+                self.attribs.mediatype = ParserAttributes.HeaderElement(mt.png)
             if format_ == 'jpeg' and unsized_image.mode.lower() not in ('rgb', 'l'):
                 unsized_image = unsized_image.convert('RGB')
 

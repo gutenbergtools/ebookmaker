@@ -1,9 +1,10 @@
-0.12.37 November xx, 2023
+0.12.37 December xx, 2023
 - added `bgsound` to list of removed elements
 - added 'initial` as an allowed value for the CSS properties `display`, `margin-*`, `font-*`, `text-*`, and  `padding-*`. This has been part of W3C REC for over 2 years and is primarily useful for reproducing the behavior of the deprecated HTML4 align attribute in HTML5. 
 - Improved rendering of tables with respect to the deprecated `align` attribute.
 - added handling for the deprecated `color` attribute on `hr` elements.
-- updates pg urls in the backfile to https, updates links to html4 files to html5 files. fixed #194
+- updates pg urls in the backfile to https, updates links to html4 files to html5 files. fixed #194 
+- fixes bug where gif files are converted to png, but the manifest gives them the wrong mediatype. Fixes #207.
 
 
 0.12.36 September 20, 2023

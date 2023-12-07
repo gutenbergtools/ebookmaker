@@ -623,6 +623,7 @@ class Writer(EpubWriter.Writer):
         parserlist = []
         css_count = 0
         boilerplate_done = False
+        idmap = {}
 
         # add CSS parsers
         self.add_external_css(job.spider, None, PRIVATE_CSS, 'pgepub.css')
@@ -634,6 +635,7 @@ class Writer(EpubWriter.Writer):
             # do images early as we need the new dimensions later
             for p in job.spider.parsers:
                 if hasattr(p, 'resize_image'):
+                    unsized_url = p.attribs.url
                     if 'icon' in p.attribs.rel:
                         np = p.resize_image(MAX_IMAGE_SIZE, MAX_COVER_DIMEN)
                         np.id = p.attribs.get('id', 'coverpage')
@@ -644,6 +646,8 @@ class Writer(EpubWriter.Writer):
                     else:
                         np = p.resize_image(MAX_IMAGE_SIZE, MAX_IMAGE_DIMEN)
                         np.id = p.attribs.get('id')
+                    if unsized_url != p.attribs.url:
+                        idmap[unsized_url] = p.attribs.url
                     parserlist.append(np)
 
             for p in job.spider.parsers:
@@ -665,6 +669,10 @@ class Writer(EpubWriter.Writer):
                     else:
                         # make a copy so we can mess around
                         p.parse()
+
+                        # rewrite the changed image links
+                        p.remap_links(idmap)
+
                         xhtml = copy.deepcopy(p.xhtml) if hasattr(p, 'xhtml') else None
 
                     if xhtml is not None:

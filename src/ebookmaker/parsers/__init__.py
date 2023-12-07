@@ -93,7 +93,7 @@ IMAGE_WRAPPER = """<?xml version="1.0"?>{doctype}
   </body>
 </html>"""
 
-RE_PG_OLD_HOST = re.compile(r'http://(www\.)?gutenberg\.org')
+RE_PG_OLD_HOST = re.compile(r'http://(www\.)?gutenberg\.(org|net)/')
 RE_PG_HTML_URL = re.compile(r'([^a-zA-Z0-9./?=_%:-])https://(www\.)?gutenberg\.org/files/(\d+)/\3-h/\3-h\.htm([^a-zA-Z0-9./?=_%:-])')
 REPL_PG_HTML5_URL = r'\g<1>https://www.gutenberg.org/cache/epub/\g<3>/pg\g<3>-images.html\g<4>'
 # exported
@@ -118,7 +118,7 @@ def webify_url(url):
     return 'file:///' + url
 
 def update_urls(text):
-    text = RE_PG_OLD_HOST.sub('https://www.gutenberg.org', text)
+    text = RE_PG_OLD_HOST.sub('https://www.gutenberg.org/', text)
     return RE_PG_HTML_URL.sub(REPL_PG_HTML5_URL, text)
 
 
