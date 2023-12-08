@@ -1,3 +1,7 @@
+0.12.38 December 8, 2023
+- fixed reversion where adding display: initial over-wrote the addition of display:flex
+
+
 0.12.37 December 7, 2023
 - added `bgsound` to list of removed elements
 - added 'initial` as an allowed value for the CSS properties `display`, `margin-*`, `font-*`, `text-*`, and  `padding-*`. This has been part of W3C REC for over 2 years and is primarily useful for reproducing the behavior of the deprecated HTML4 align attribute in HTML5. 
