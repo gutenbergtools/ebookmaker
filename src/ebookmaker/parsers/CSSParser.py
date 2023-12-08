@@ -31,7 +31,7 @@ mediatypes = (mt.css, )
 PG_CSS_PROFILE = (
     'Added Properties for Project Gutenberg',
     {
-        'display': 'flex',
+        'display': 'flex|initial',
         'justify-content': 'center',
         'speak': r'auto|never|always',
         'speak-as': 'normal|spell-out|digits|literal-punctuation|no-punctuation',
@@ -41,11 +41,10 @@ PG_CSS_PROFILE = (
         'font-variant-numeric': r'normal|{font-variant-attrs}(\s+{font-variant-attrs})*',
 
         # (partial) update to CSS Cascading and Inheritance Level 3
-        'display': 'initial',
         'font-family': 'initial',
         'font-size': 'initial',
         'font-style': 'initial',
-        'font-variant':'initial',
+        'font-variant': 'initial',
         'font-weight': 'initial',
         'font': 'initial',
         'margin-right': 'initial',
