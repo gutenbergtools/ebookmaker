@@ -1,3 +1,18 @@
+0.12.37 December 7, 2023
+- added `bgsound` to list of removed elements
+- added 'initial` as an allowed value for the CSS properties `display`, `margin-*`, `font-*`, `text-*`, and  `padding-*`. This has been part of W3C REC for over 2 years and is primarily useful for reproducing the behavior of the deprecated HTML4 align attribute in HTML5. 
+- Improved rendering of tables with respect to the deprecated `align` attribute.
+- added handling for the deprecated `color` attribute on `hr` elements.
+- updates pg urls in the backfile to https, updates links to html4 files to html5 files. fixed #194 
+- fixes #207 bug where gif files are converted to png, but the manifest gives them the wrong mediatype.
+- libgutenberg 0.10.19
+
+
+0.12.36 September 20, 2023
+Nothing in this release should affect usage without Ebookconverter (e.g. Online Ebookmaker).
+- Ebookmaker no longer needs a parsable source file to use metadata-only writers. So, RDF, and QRcodes, and posts to Mastodon and Facebook, can be made using only the database. This change should also save execution time, as parsing of the source files is no longer done for each of these outputs. RDF files can now be made for "books" that aren't books, such as data files, audio files, etc.
+- ebook number on Logger is set even if parse fails.
+
 0.12.35 August 10, 2023
 - fixed crash when END sentinel is on the last line
 - turned on the SMALLPRINT_MARKERS

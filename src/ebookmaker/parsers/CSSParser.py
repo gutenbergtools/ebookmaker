@@ -36,8 +36,32 @@ PG_CSS_PROFILE = (
         'speak': r'auto|never|always',
         'speak-as': 'normal|spell-out|digits|literal-punctuation|no-punctuation',
         'all': 'initial|inherit|unset',
+
         # added to update css fonts level 3
-        'font-variant-numeric': r'normal|{font-variant-attrs}(\s+{font-variant-attrs})*'
+        'font-variant-numeric': r'normal|{font-variant-attrs}(\s+{font-variant-attrs})*',
+
+        # (partial) update to CSS Cascading and Inheritance Level 3
+        'display': 'initial',
+        'font-family': 'initial',
+        'font-size': 'initial',
+        'font-style': 'initial',
+        'font-variant':'initial',
+        'font-weight': 'initial',
+        'font': 'initial',
+        'margin-right': 'initial',
+        'margin-left': 'initial',
+        'margin-top': 'initial',
+        'margin-bottom': 'initial',
+        'margin': 'initial',
+        'padding-top': 'initial',
+        'padding-right': 'initial',
+        'padding-bottom': 'initial',
+        'padding-left': 'initial',
+        'padding': 'initial',
+        'text-align': 'initial',
+        'text-decoration': 'initial',
+        'text-indent': 'initial',
+        'text-transform': 'initial',
     },
     {
         'numeric-figure-values': 'lining-nums|oldstyle-nums',

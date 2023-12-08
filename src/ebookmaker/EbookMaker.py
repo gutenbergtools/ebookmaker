@@ -200,12 +200,14 @@ def generate_cover(dir, dc):
 
 def get_dc(job):
     """ Get DC for book. """
-    url = job.url
-    parser = ParserFactory.ParserFactory.create(url)
-    try:
-        parser.parse()
-    except AttributeError as e:
-        raise Exception(f'the file {job.url} could not be found or was unparsable')
+    if job.url:
+        url = job.url
+        parser = ParserFactory.ParserFactory.create(url)
+        try:
+            parser.parse()
+        except AttributeError as e:
+            raise Exception(f'the file {job.url} could not be found or was unparsable')
+
     if options.is_job_queue:
         dc = PGDCObject()
         dc.load_from_database(job.ebook)
@@ -225,12 +227,14 @@ def get_dc(job):
         debug("No RST header found.")
         try:
             dc.load_from_parser(parser)
-        except (ValueError, AttributeError, UnicodeError):
+        except (ValueError, AttributeError, UnicodeError) as pe:
             debug("No HTML header found.")
+            debug(pe)
             try:
                 dc.load_from_pgheader(parser.unicode_content())
-            except (ValueError, UnicodeError):
+            except (ValueError, UnicodeError) as e:
                 debug("No PG header found.")
+                debug(e)                
 
     dc.source = parser.attribs.url
     dc.title = options.title or dc.title or 'NA'
@@ -597,6 +601,7 @@ def main():
                 dc.session.close()
                 dc.session = None # probably overkill
         except Exception as e:
+            Logger.ebook = job.ebook
             critical('Job failed for type %s from %s', job.type, job.url)
             exception(e)
             continue

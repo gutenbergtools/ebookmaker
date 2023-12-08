@@ -28,7 +28,7 @@ from libgutenberg.MediaTypes import mediatypes as mt
 
 from ebookmaker import parsers
 from ebookmaker.CommonCode import Options, EbookmakerBadFileException
-from ebookmaker.utils import add_style, css_len, replace_elements, xpath
+from ebookmaker.utils import add_class, add_style, css_len, replace_elements, xpath
 from . import HTMLParserBase
 from .boilerplate import mark_soup
 
@@ -74,6 +74,7 @@ REPLACE_ELEMENTS = {
     'center': 'div',
     'blink': 'span',
     'embed': None,
+    'bgsound': None,
 }
 
 DEPRECATED = {
@@ -125,6 +126,7 @@ REPLACEMENTS = [
     ('caption div h1 h2 h3 h4 h5 h5 p', 'align', 'text-align', lambda x: x),
     ('hr', 'width', 'width', css_len),
     ('hr', 'size', 'border', css_len),
+    ('hr', 'color', 'color', lambda x: x),
     ('font', 'color', 'color', lambda x: x),
     ('font', 'face', 'font-family', lambda x: x),
     ('font', 'size', 'font-size', lambda x: FONT_SIZES.get(x.strip(), 'medium')),
@@ -138,6 +140,12 @@ CSS_FOR_REPLACED = {
     'center': "",
     'font': "",
 }
+
+CSS_FOR_ADDED ={
+    'xhtml_div_align': '.xhtml_div_align table {display: inline-table; text-align:initial}',
+    'xhtml_p_align': '.xhtml_div_align table {display: inline-table; text-align:initial}',
+}
+
 
 RE_NOT_XML_NAMECHAR = re.compile(r'[^\w.-]')
 
@@ -380,6 +388,7 @@ class Parser(HTMLParserBase):
             elem.set(NS.xml.lang, lang)
 
         # strip deprecated attributes
+        added_classes = set()
         for (tags, attr, cssattr, val2css) in REPLACEMENTS:
             for tag in tags.split():
                 for elem in xpath(self.xhtml, f"//xhtml:{tag}[@{attr}]"):
@@ -388,6 +397,10 @@ class Parser(HTMLParserBase):
                     del elem.attrib[attr]
                     if cssattr:
                         add_style(elem, style=f'{cssattr}: {val2css(val)};')
+                    class_to_set = f'xhtml_{tag}_{attr}'
+                    add_class(elem, class_to_set)
+                    added_classes.add(class_to_set)
+                    
 
         # complex css replacements
         for (tags, attr, styles) in COMPLEX_REPLACEMENTS:
@@ -458,6 +471,7 @@ class Parser(HTMLParserBase):
         ##### cleanup #######
 
         css_for_deprecated = ' '.join([CSS_FOR_REPLACED.get(tag, '') for tag in deprecated_used])
+        css_for_deprecated += ''.join([CSS_FOR_ADDED.get(class_, '') for class_ in added_classes])
         if css_for_deprecated.strip():
             elem = etree.Element(NS.xhtml.style)
             elem.text = css_for_deprecated
