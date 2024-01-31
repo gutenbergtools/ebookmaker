@@ -1,3 +1,7 @@
+0.12.39 January 31, 2024
+- fixed an EPUB3 problem affecting kobo reader when a book has more than 10 chapters - read order was being sorted as a string.
+
+
 0.12.38 December 8, 2023
 - fixed reversion where adding display: initial over-wrote the addition of display:flex
 

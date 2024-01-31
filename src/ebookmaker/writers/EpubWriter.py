@@ -414,7 +414,7 @@ class TocNCX(object):
 
         # remove gaps in playOrder
         play_orders = list(self.play_orders)
-        play_orders.sort()
+        play_orders.sort(key=lambda s: int(s))
         for np in xpath(ncx, '//ncx:*[@playOrder]'):
             po = np.attrib['playOrder']
             np.attrib['playOrder'] = str(play_orders.index(po) + 1)
