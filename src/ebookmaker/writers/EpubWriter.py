@@ -100,6 +100,9 @@ h2 {
 div.figcenter span.caption {
    display: block;
    }
+span.u {
+    text-decoration: underline;
+}
 .pgmonospaced {
    font-family: monospace;
    font-size: 0.9em
@@ -1042,11 +1045,19 @@ class Writer(writers.HTMLishWriter):
             for elem in xpath(xhtml, f"//xhtml:{tag}[@{attr}]"):
                 del elem.attrib[attr]
 
+        # replace html5 block tags
         usedtags = set()
         for newtag in ['article', 'figcaption', 'figure', 'footer', 'header', 'section']:
             for tag in xpath(xhtml, f'//xhtml:{newtag}'):
                 usedtags.add(newtag)
                 tag.tag = NS.xhtml.div
+                writers.HTMLWriter.add_class(tag, newtag)
+
+        # replace html5 inline tags
+        for newtag in ['u']:
+            for tag in xpath(xhtml, f'//xhtml:{newtag}'):
+                usedtags.add(newtag)
+                tag.tag = NS.xhtml.span
                 writers.HTMLWriter.add_class(tag, newtag)
 
 
