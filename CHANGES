@@ -1,3 +1,11 @@
+0.13
+- implement HTML5/EPUB3 audio element for sound files
+    - links to mp3 and ogg are replaced with HTML5 audio elements during initial parsing
+    - HTML `audio` elements are deprecated to links for EPUB2 files
+    - mp3 and ogg files will be included in EPUB3 files.
+    - because PPers have been hiding links to sound files for ebook files using `x-ebookmaker` CSS, we are adding CSS to unhide elements that contain the audio elements, for EPUB3 only.
+
+
 0.12.38 December 8, 2023
 - fixed reversion where adding display: initial over-wrote the addition of display:flex
 
