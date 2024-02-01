@@ -1042,6 +1042,22 @@ class Writer(writers.HTMLishWriter):
             for elem in xpath(xhtml, f"//xhtml:{tag}[@{attr}]"):
                 del elem.attrib[attr]
 
+        # translate the audio element
+        for tag in xpath(xhtml, '//xhtml:audio'):
+            debug('found audio')
+            tag.tag = NS.xhtml.span
+            title = tag.attrib.get('title', None)
+            tag.text = '['
+            # possible audio attributes
+            for att in ['controls', 'crossorigin', 'preload', 'autoplay', 'loop', 'muted']:
+                tag.attrib.pop(att, None)
+            for source in tag.findall(NS.xhtml.source):
+                source.tag = NS.xhtml.a
+                source.attrib['href'] = source.attrib.pop('src', None)
+                source.text = title or source.attrib.pop('type', 'Listen')
+                source.attrib.pop('media', None)
+                source.tail = ']'
+
         usedtags = set()
         for newtag in ['article', 'figcaption', 'figure', 'footer', 'header', 'section']:
             for tag in xpath(xhtml, f'//xhtml:{newtag}'):
