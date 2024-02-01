@@ -129,7 +129,7 @@ def serialize(xhtml):
                           pretty_print=False)
 
     # lxml refuses to omit close tags for these elements
-    for newtag in [b'</wbr>',]:
+    for newtag in [b'</wbr>', b'</source>']:
         htmlbytes = htmlbytes.replace(newtag, b'')
 
     return htmlbytes

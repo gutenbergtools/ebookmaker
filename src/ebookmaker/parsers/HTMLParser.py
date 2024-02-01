@@ -10,6 +10,7 @@ Copyright 2009 by Marcello Perathoner
 Distributable under the GNU General Public License Version 3 or newer.
 
 """
+import copy
 import re
 import unicodedata
 
@@ -141,11 +142,15 @@ CSS_FOR_REPLACED = {
     'font': "",
 }
 
-CSS_FOR_ADDED ={
+CSS_FOR_ADDED = {
     'xhtml_div_align': '.xhtml_div_align table {display: inline-table; text-align:initial}',
     'xhtml_p_align': '.xhtml_div_align table {display: inline-table; text-align:initial}',
 }
 
+SOUND_TYPES = {
+    '.mp3': 'audio/mpeg',
+    '.ogg': 'audio/ogg; codecs=opus',
+}
 
 RE_NOT_XML_NAMECHAR = re.compile(r'[^\w.-]')
 
@@ -468,6 +473,29 @@ class Parser(HTMLParserBase):
                     figure.attrib['aria-labelledby'] = caption.attrib['id']
                     break
 
+        # use html5 audio element instead of links to mp3, ogg files
+        for snd, snd_mime in SOUND_TYPES.items():
+            snd_path = f"//xhtml:a[substring(@href, string-length(@href) - 3) = '{snd}']"
+            for link in xpath(self.xhtml, snd_path):
+                link.tag = NS.xhtml.audio
+                attrib = copy.deepcopy(link.attrib)
+                attrib['title'] = link.text
+                attrib['controls'] = 'controls'
+                link.clear(keep_tail=True)
+                link.attrib.update(attrib)
+                source = etree.Element(NS.xhtml.source)
+                source.attrib['src'] = link.attrib['href']
+                del link.attrib['href']
+                source.attrib['type'] = snd_mime
+                link.append(source)
+                #swallow surrounding parens
+                link.tail = re.sub(r'^ *[\]\}\)]', '', link.tail)
+                link.getprevious().tail = re.sub(r'[\[\]\( *$]', '', link.getprevious().tail)
+                # enable over-riding directives to hide this link
+                self.add_class(link.getparent(), 'pgshow')
+                
+                
+        
         ##### cleanup #######
 
         css_for_deprecated = ' '.join([CSS_FOR_REPLACED.get(tag, '') for tag in deprecated_used])
