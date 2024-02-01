@@ -52,6 +52,10 @@ from . import EpubWriter, HTMLWriter
 
 options = Options()
 
+OPS_AUDIO_MEDIATYPES = set((
+    'audio/mpeg',
+    'audio/ogg',                  # Used for raster graphics
+))
 
 match_link_url = re.compile(r'^https?://', re.I)
 match_non_link = re.compile(r'[a-zA-Z0-9_\-\.]*(#.*)?$')
@@ -110,6 +114,10 @@ body.x-ebookmaker-coverpage {
     margin: 0;
     padding: 0;
 }
+body.x-ebookmaker.x-ebookmaker-3  .pgshow {
+    visibility: visible;
+    display: initial;
+    }
 """
 
 class OEBPSContainer(EpubWriter.OEBPSContainer):
@@ -731,6 +739,7 @@ class Writer(EpubWriter.Writer):
                         # to something that isn't recognized as content
                         p.attribs.mediatype = parsers.ParserAttributes.HeaderElement('text/xml')
             for p in job.spider.parsers:
+                debug(p.attribs.mediatype)
                 if str(p.attribs.mediatype) == 'text/css':
                     p.parse()
                 if hasattr(p, 'sheet') and p.sheet:
@@ -741,6 +750,8 @@ class Writer(EpubWriter.Writer):
                     parserlist.append(p)
                 if str(p.attribs.mediatype) in OPS_FONT_TYPES:
                     warning('font file embedded: %s ;  check its license!', p.attribs.url)
+                    parserlist.append(p)
+                if str(p.attribs.mediatype) in OPS_AUDIO_MEDIATYPES:
                     parserlist.append(p)
 
             # after splitting html into chunks we have to rewrite all

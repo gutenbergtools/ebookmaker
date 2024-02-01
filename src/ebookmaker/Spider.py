@@ -48,6 +48,8 @@ class Spider(object):
         self.include_mediatypes += options.include_mediatypes
         if job.subtype == '.images' or job.type == 'rst.gen':
             self.include_mediatypes.append('image/*')
+        if job.type == 'epub3.images':
+            self.include_mediatypes.append('audio/*')
         if job.type == 'html.images':
             self.include_mediatypes.append('*/*')
         self.exclude_urls = []
@@ -168,7 +170,7 @@ class Spider(object):
                         self.enqueue(queue, depth, new_attribs, False)
                     else:
                         self.enqueue(queue, depth + 1, new_attribs, True)
-                elif tag == NS.xhtml.object:
+                elif tag in (NS.xhtml.object, NS.xhtml.source):
                     self.enqueue(queue, depth, new_attribs, False)
 
         debug("End of retrieval")
