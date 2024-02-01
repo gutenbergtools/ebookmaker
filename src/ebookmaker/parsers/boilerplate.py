@@ -51,7 +51,7 @@ SMALLPRINT_MARKERS = [
     re.compile(r"\**END THE SMALL PRINT", re.I),
     re.compile(r"\** ?These \w+ Were Prepared By Thousands", re.I),
 ]
-MARKER_END = re.compile(r"\**")
+MARKER_END = re.compile(r"\*+")
 
 def prune(root, divider, after=True):
     ''' prune parts of the root element before or after a divider  '''
@@ -153,18 +153,11 @@ def strip_headers_from_txt(text):
         for marker in markers:
             divider = marker.search(text)
             if divider:
-                sections = text.split(divider.group(0))
-                if len(sections) == 2:
-                    (before, after) = sections
-                    if MARKER_END.search(after.split('\n')[0]):
-                        # remove first line of after
-                        if len(after.split('\n')) > 1:
-                            after = after.split('\n', 1)[1]
-                        else:
-                            after = ''
-                else:
-                    before = ' '.join(sections[0:-1])
-                    after = sections[-1]
+                before, after = text.split(divider.group(0), maxsplit=1)
+                after_sections = MARKER_END.split(after, maxsplit=1)
+                if len(after_sections) == 2 and len(after_sections[0]) < 500:
+                    after = after_sections[1]
+                
                 return before, divider.group(0), after
         return  text, None, text
     header_text, divider, text = markers_split(text, TOP_MARKERS + SMALLPRINT_MARKERS)

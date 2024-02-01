@@ -1,3 +1,10 @@
+0.12.39 January 31, 2024
+- fixed an EPUB3 problem affecting kobo reader when a book has more than 10 chapters - read order was being sorted as a string.
+- for EPUB2, added a deprecation for `u` elements. fixes #210
+- fixed multiline handling of MARKER_END in text boilerplate. fixes #209
+- libgutenberg 0.10.20
+
+
 0.12.38 December 8, 2023
 - fixed reversion where adding display: initial over-wrote the addition of display:flex
 
