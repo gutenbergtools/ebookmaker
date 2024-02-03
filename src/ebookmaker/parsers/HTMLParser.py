@@ -84,11 +84,13 @@ DEPRECATED = {
     'background': 'body',
     'bgcolor': 'body',
     'border': 'img ',
+    'charset': 'a',
     'compact': '*',
     'hspace': '*',
     'link': 'body',
     'noshade': 'hr',
     'nowrap': '*',
+    'rev': 'a',
     'start': 'ol',
     'text': 'body',
     'value': 'li',
@@ -332,6 +334,11 @@ class Parser(HTMLParserBase):
             if meta.get('http-equiv').lower() == 'content-type':
                 meta.getparent().remove(meta)
 
+        # remove meta elements with non-nametoken names
+        for meta in xpath(self.xhtml, "/xhtml:html/xhtml:head/xhtml:meta[@name]"):
+            if not parsers.RE_XML_NAME.match(meta.get('name')):
+                meta.getparent().remove(meta)
+
         # drop javascript
 
         for script in xpath(self.xhtml, "//xhtml:script"):
@@ -479,15 +486,18 @@ class Parser(HTMLParserBase):
             for link in xpath(self.xhtml, snd_path):
                 link.tag = NS.xhtml.audio
                 attrib = copy.deepcopy(link.attrib)
-                attrib['title'] = link.text
-                attrib['controls'] = 'controls'
                 link.clear(keep_tail=True)
+                attrib['title'] = link.text or ''
+                attrib['controls'] = 'controls'
                 link.attrib.update(attrib)
+
                 source = etree.Element(NS.xhtml.source)
                 source.attrib['src'] = link.attrib['href']
-                del link.attrib['href']
                 source.attrib['type'] = snd_mime
                 link.append(source)
+                for att in parsers.A_NOT_GLOBAL:
+                    link.attrib.pop(att, None)
+
                 #swallow surrounding parens
                 link.tail = re.sub(r'^ *[\]\}\)]', '', link.tail)
                 link.getprevious().tail = re.sub(r'[\[\]\( *$]', '', link.getprevious().tail)

@@ -1040,7 +1040,9 @@ class Writer(writers.HTMLishWriter):
                 elem.set(attr, fill)
 
         # remove html5-only attribute
-        attrs_to_remove = [('*', 'role'),('*', 'aria-label'),('*', 'aria-labelledby'),]
+        attrs_to_remove = [('*', 'role'),('*', 'aria-label'),('*', 'aria-labelledby'),
+            ('*', 'itemid'), ('*', 'itemprop'), ('*', 'itemref'), ('*', 'itemscope'),
+            ('*', 'itemtype'),]
         for (tag, attr) in attrs_to_remove:
             for elem in xpath(xhtml, f"//xhtml:{tag}[@{attr}]"):
                 del elem.attrib[attr]
@@ -1094,7 +1096,9 @@ class Writer(writers.HTMLishWriter):
             if not href.startswith('file:'):
                 continue
             debug("strip_links: Deleting <a> to file not in manifest: %s" % href)
-            del link.attrib['href']
+            link.tag = NS.xhtml.a
+            for att in parsers.A_NOT_GLOBAL:
+                link.attrib.pop(att, None)
 
 
     @staticmethod

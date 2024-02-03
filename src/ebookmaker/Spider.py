@@ -29,6 +29,12 @@ from ebookmaker.ParserFactory import ParserFactory
 
 NO_ALT_TEXT = 'Empty alt text for %s. See https://www.w3.org/WAI/tutorials/images/ for info on accessible alt text.'
 
+OPS_AUDIO_MEDIATYPES = set((
+    'audio/mpeg',
+    'audio/ogg; codecs=opus',
+    'audio/ogg',  # need both because spider believes type attribute
+))
+
 options = Options()
 
 class Spider(object):
@@ -49,7 +55,7 @@ class Spider(object):
         if job.subtype == '.images' or job.type == 'rst.gen':
             self.include_mediatypes.append('image/*')
         if job.type == 'epub3.images':
-            self.include_mediatypes.append('audio/*')
+            self.include_mediatypes.extend([str(mt) for mt in OPS_AUDIO_MEDIATYPES])
         if job.type == 'html.images':
             self.include_mediatypes.append('*/*')
         self.exclude_urls = []
@@ -187,6 +193,7 @@ class Spider(object):
 
     def enqueue(self, queue, depth, attribs, is_doc):
         """ Enqueue url for parsing."""
+
         if is_doc:
             if not self.is_included_url(attribs):
                 if attribs.url and attribs.url.startswith('https://www.gutenberg.org/'):
@@ -197,6 +204,7 @@ class Spider(object):
             if depth >= self.max_depth:
                 critical('Omitted file %s due to depth > max_depth' % attribs.url)
                 return
+        
         if not self.is_included_mediatype(attribs) and not self.is_included_relation(attribs):
             return
         elif not self.is_included_url(attribs) and not self.is_included_relation(attribs):
@@ -235,6 +243,7 @@ class Spider(object):
         if attribs.orig_mediatype is None:
             mediatype = MediaTypes.guess_type(attribs.url)
             if mediatype:
+                
                 attribs.orig_mediatype = attribs.HeaderElement(mediatype)
             else:
                 return None

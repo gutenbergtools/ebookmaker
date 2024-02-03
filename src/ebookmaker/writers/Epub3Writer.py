@@ -33,6 +33,7 @@ from ebookmaker import ParserFactory
 from ebookmaker import HTMLChunker
 from ebookmaker.CommonCode import Options
 from ebookmaker.Version import VERSION, GENERATOR
+from ebookmaker.Spider import OPS_AUDIO_MEDIATYPES
 
 from .EpubWriter import (
     MAX_IMAGE_SIZE,
@@ -52,10 +53,6 @@ from . import EpubWriter, HTMLWriter
 
 options = Options()
 
-OPS_AUDIO_MEDIATYPES = set((
-    'audio/mpeg',
-    'audio/ogg',                  # Used for raster graphics
-))
 
 match_link_url = re.compile(r'^https?://', re.I)
 match_non_link = re.compile(r'[a-zA-Z0-9_\-\.]*(#.*)?$')
@@ -748,9 +745,11 @@ class Writer(EpubWriter.Writer):
                         p.strip_images()
                     p.rewrite_links(self.url2filename)
                     parserlist.append(p)
+                    continue
                 if str(p.attribs.mediatype) in OPS_FONT_TYPES:
                     warning('font file embedded: %s ;  check its license!', p.attribs.url)
                     parserlist.append(p)
+                    continue
                 if str(p.attribs.mediatype) in OPS_AUDIO_MEDIATYPES:
                     parserlist.append(p)
 
