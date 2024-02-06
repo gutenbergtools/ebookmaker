@@ -38,18 +38,18 @@ from libgutenberg.Logger import critical, info, debug, warning, error
 
 
 TOP_MARKERS = [
-    re.compile(r"\*+ ?START OF TH(E|IS) PROJECT GUTENBERG", re.I),
+    re.compile(r"\*+ ?START\s+OF\s+TH(E|IS)\s+PROJECT\s+GUTENBERG", re.I),
 ]
 BOTTOM_MARKERS = [
-    re.compile(r"\** ?END OF TH(E|IS) PROJECT GUTENBERG", re.I),
-    re.compile(r"\** ?Ende dieses Projekt Gutenberg", re.I),
-    re.compile(r"\** ?END OF PROJECT GUTENBERG", re.I),
-    re.compile(r"\** ?End of the Project Gutenberg", re.I),
+    re.compile(r"\** ?END\s+OF\s+TH(E|IS)\s+PROJECT\s+GUTENBERG", re.I),
+    re.compile(r"\** ?Ende\w*dieses\w*Projekt\w*Gutenberg", re.I),
+    re.compile(r"\** ?END\s+OF\s+PROJECT\s+GUTENBERG", re.I),
+    re.compile(r"\** ?End\s+of\s+the\s+Project\s+Gutenberg", re.I),
 ]
 SMALLPRINT_MARKERS = [
-    re.compile(r"\** ?END\*? ?THE SMALL PRINT", re.I),
-    re.compile(r"\**END THE SMALL PRINT", re.I),
-    re.compile(r"\** ?These \w+ Were Prepared By Thousands", re.I),
+    re.compile(r"\** ?END\*? ?THE\s+SMALL\s+PRINT", re.I),
+    re.compile(r"\**END\s+THE\s+SMALL\s+PRINT", re.I),
+    re.compile(r"\** ?These\s+\w+\s+Were\s+Prepared\s+By\s+Thousands", re.I),
 ]
 MARKER_END = re.compile(r"\*+")
 
