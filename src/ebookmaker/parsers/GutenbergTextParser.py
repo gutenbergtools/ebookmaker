@@ -676,7 +676,7 @@ class Parser(HTMLParserBase):
         )
 
         for body in xpath(self.xhtml, '//xhtml:body'):
-            xhtmlparser = lxml.html.XHTMLParser()
+            xhtmlparser = lxml.html.XHTMLParser(huge_tree=True)
             body.append(etree.fromstring(pg_header, xhtmlparser))
             for par in self.pars:
                 p = etree.fromstring(self.ship_out(par), xhtmlparser)
