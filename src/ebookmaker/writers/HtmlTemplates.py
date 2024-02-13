@@ -67,7 +67,7 @@ def pgheader(dc):
     pg_header = '<section class="pg-boilerplate pgheader" id="pg-header" xml:lang="en" lang="en" xmlns="http://www.w3.org/1999/xhtml">'
     pg_header += "<h2 id='pg-header-heading' title=''>"
     pg_header += 'The Project Gutenberg eBook of '
-    pg_header += f'''<span lang='{lang}' xml:lang='{lang}'>{html.escape(dc.title_no_subtitle)}</span></h2>
+    pg_header += f'''<span lang='{lang}' xml:lang='{lang}' id='pg-title-no-subtitle'>{html.escape(dc.title_no_subtitle)}</span></h2>
     {rights}<div class='container' id='pg-machine-header'>{pstyle('Title', dc.title_no_subtitle)}{pstyle('Previous', dc.subtitle) if dc.subtitle  else ''}
 <div id='pg-header-authlist'>{dcauthlist(dc)}</div>
 {pstyle('Release Date', 
