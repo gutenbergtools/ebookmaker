@@ -1,9 +1,17 @@
+
 0.13
 - implement HTML5/EPUB3 audio element for sound files
     - links to mp3 and ogg are replaced with HTML5 audio elements during initial parsing
     - HTML `audio` elements are deprecated to links for EPUB2 files
     - mp3 and ogg files will be included in EPUB3 files.
     - because PPers have been hiding links to sound files for ebook files using `x-ebookmaker` CSS, we are adding CSS to unhide elements that contain the audio elements, for EPUB3 only.
+
+
+0.12.40 February 9, 2024
+- fixed an issue parsing large text files. "The Entire Project Gutenberg Works of Mark Twain" was 1.2M.
+- fixed an issue detecting multiline boilerplate markers.
+- added an id 'pg-title-no-subtitle' to a span containing dc.title_no_subtitle
+
 
 0.12.39 January 31, 2024
 - fixed an EPUB3 problem affecting kobo reader when a book has more than 10 chapters - read order was being sorted as a string.
