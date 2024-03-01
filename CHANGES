@@ -1,7 +1,8 @@
-0.12.41 March xx, 2024
+0.12.41 March 01, 2024
 - clean up txt boilerplate. fixes easy parts of #220
 - refactor `enclose_text()` to properly deal with html4 transitional files
 - don't allow non-images as img src
+- libgutenberg 0.10.22 (fixes 508 attribute issue)
 
 
 0.12.40 February 9, 2024
