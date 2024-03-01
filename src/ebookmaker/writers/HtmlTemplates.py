@@ -67,9 +67,16 @@ def pgheader(dc):
     pg_header = '<section class="pg-boilerplate pgheader" id="pg-header" xml:lang="en" lang="en" xmlns="http://www.w3.org/1999/xhtml">'
     pg_header += "<h2 id='pg-header-heading' title=''>"
     pg_header += 'The Project Gutenberg eBook of '
-    pg_header += f'''<span lang='{lang}' xml:lang='{lang}' id='pg-title-no-subtitle'>{html.escape(dc.title_no_subtitle)}</span></h2>
-    {rights}<div class='container' id='pg-machine-header'>{pstyle('Title', dc.title_no_subtitle)}{pstyle('Previous', dc.subtitle) if dc.subtitle  else ''}
-<div id='pg-header-authlist'>{dcauthlist(dc)}</div>
+    pg_header += f'''<span lang='{lang}' xml:lang='{lang}' id='pg-title-no-subtitle'>{
+        html.escape(dc.title_no_subtitle)
+    }</span></h2>
+    {rights}<div class='container' id='pg-machine-header'>{
+        pstyle('Title', dc.title_no_subtitle)
+    }{
+        pstyle('Previous', dc.subtitle) if dc.subtitle  else ''
+    }<div id='pg-header-authlist'>{
+        dcauthlist(dc)
+    }</div>
 {pstyle('Release Date', 
             f'{dc.release_date.strftime(hr_format)} [eBook #{dc.project_gutenberg_id}]' + updated)}
 {pstyle('Language', ', '.join(language_list))}
@@ -87,9 +94,9 @@ def pgfooter(dc):
 
     pg_footer = f'''
 <section class="pg-boilerplate pgheader" id="pg-footer" lang='en' xml:lang='en' xmlns="http://www.w3.org/1999/xhtml">
-        <div id='pg-end-separator'>
-            <span>*** END OF THE PROJECT GUTENBERG EBOOK {html.escape(dc.title_no_subtitle.upper())} ***</span>
-        </div>
+<div id='pg-end-separator'>
+<span>*** END OF THE PROJECT GUTENBERG EBOOK {html.escape(dc.title_no_subtitle.upper())} ***</span>
+</div>
 
     {HEADERB.format(copyright_addition=copyright_addition)}
 </section>

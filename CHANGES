@@ -1,3 +1,6 @@
+0.12.41 March xx, 2024
+- clean up txt boilerplate. fixes #220
+
 0.12.40 February 9, 2024
 - fixed an issue parsing large text files. "The Entire Project Gutenberg Works of Mark Twain" was 1.2M.
 - fixed an issue detecting multiline boilerplate markers.
