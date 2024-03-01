@@ -162,7 +162,10 @@ class Spider(object):
                 elif tag in (NS.xhtml.img, NS.xhtml.style):
                     if 'alt' in elem.attrib and elem.attrib['alt'] == '':
                         warning(NO_ALT_TEXT, url)
-                    self.enqueue(queue, depth, new_attribs, False)
+                    if tag == NS.xhtml.style or self.is_image(new_attribs):
+                        self.enqueue(queue, depth, new_attribs, False)
+                    else:
+                        error(f"{url} is not a supported image type")
                 elif tag == NS.xhtml.link:
                     if new_attribs.rel.intersection(('stylesheet', 'icon')):
                         self.enqueue(queue, depth, new_attribs, False)
