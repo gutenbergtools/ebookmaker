@@ -18,7 +18,7 @@ from six.moves import urllib
 import lxml.html
 from lxml import etree
 
-from bs4 import BeautifulSoup, NavigableString, Comment
+from bs4 import BeautifulSoup, Comment, NavigableString, Tag
 from bs4.formatter import EntitySubstitution, HTMLFormatter
 
 
@@ -112,12 +112,10 @@ COMPLEX_REPLACEMENTS = [(
 ]
 
 ALLOWED_IN_BODY = {
-    NS.xhtml.address, NS.xhtml.article, NS.xhtml.blockquote, f'{NS.xhtml.de}l', NS.xhtml.div,
-    NS.xhtml.dl, NS.xhtml.figure, NS.xhtml.footer,
-    NS.xhtml.h1, NS.xhtml.h2, NS.xhtml.h3, NS.xhtml.h4, NS.xhtml.h5, NS.xhtml.h6,
-    NS.xhtml.header, NS.xhtml.hr, NS.xhtml.ins, NS.xhtml.noscript, NS.xhtml.ol, NS.xhtml.p,
-    NS.xhtml.pre, NS.xhtml.section, NS.xhtml.script, NS.xhtml.table, NS.xhtml.ul,
-    NS.svg.svg,
+    "address", "article", "blockquote", "del", "div", "dl", "figure", "footer",
+    "h1", "h2", "h3", "h4", "h5", "h6",
+    "header", "hr", "ins", "noscript", "ol", "p",
+    "pre", "section", "script", "table", "ul", "svg",
 }
 
 REPLACEMENTS = [
@@ -140,10 +138,11 @@ CSS_FOR_REPLACED = {
     'center': "",
     'font': "",
 }
-
-CSS_FOR_ADDED ={
+BODY_WRAPPER_CLASS = 'pg_body_wrapper'
+CSS_FOR_ADDED = {
     'xhtml_div_align': '.xhtml_div_align table {display: inline-table; text-align:initial}',
     'xhtml_p_align': '.xhtml_div_align table {display: inline-table; text-align:initial}',
+    BODY_WRAPPER_CLASS: '.%s {display: inline;}' % BODY_WRAPPER_CLASS,
 }
 
 
@@ -156,11 +155,14 @@ nfc_formatter = HTMLFormatter(entity_substitution=nfc)
 
 class Parser(HTMLParserBase):
     """ Parse a HTML Text
-
     and convert it to xhtml suitable for ePub packaging.
 
     """
-    seen_ids = set()
+    def __init__(self, attribs=None):
+        super().__init__(attribs=attribs)
+        self.added_classes = set()
+        self.seen_ids = set()
+
     @staticmethod
     def _fix_id(id_):
         """ Fix more common mistakes in ids.
@@ -300,16 +302,6 @@ class Parser(HTMLParserBase):
                     elem.attrib[new_key] = val
 
 
-    def enclose_text(self):
-        """ same as setting enclose-text option on tidy;
-        ' enclose any text it finds in the body element within a <P> element.
-        This is useful when you want to take existing HTML and use it with a style sheet.'
-        """
-        for elem in self.xhtml.body:
-            if elem.tag not in ALLOWED_IN_BODY:
-                new_p = elem.makeelement(NS.xhtml.p)
-                elem.addprevious(new_p)
-                new_p.append(elem)
 
 
     idnum = 0
@@ -388,7 +380,6 @@ class Parser(HTMLParserBase):
             elem.set(NS.xml.lang, lang)
 
         # strip deprecated attributes
-        added_classes = set()
         for (tags, attr, cssattr, val2css) in REPLACEMENTS:
             for tag in tags.split():
                 for elem in xpath(self.xhtml, f"//xhtml:{tag}[@{attr}]"):
@@ -399,7 +390,7 @@ class Parser(HTMLParserBase):
                         add_style(elem, style=f'{cssattr}: {val2css(val)};')
                     class_to_set = f'xhtml_{tag}_{attr}'
                     add_class(elem, class_to_set)
-                    added_classes.add(class_to_set)
+                    self.added_classes.add(class_to_set)
                     
 
         # complex css replacements
@@ -445,8 +436,7 @@ class Parser(HTMLParserBase):
         # deprecated elements -  replace with <span/div class="xhtml_{tag name}">
         deprecated_used = replace_elements(self.xhtml, REPLACE_ELEMENTS)
 
-        # enclose text the way tidy does
-        self.enclose_text()
+
 
         # add figure role and aria-labelledby to figures/captions denoted by classname
         caption_path = "//xhtml:*[contains(@class, 'caption')]"
@@ -471,7 +461,9 @@ class Parser(HTMLParserBase):
         ##### cleanup #######
 
         css_for_deprecated = ' '.join([CSS_FOR_REPLACED.get(tag, '') for tag in deprecated_used])
-        css_for_deprecated += ''.join([CSS_FOR_ADDED.get(class_, '') for class_ in added_classes])
+        css_for_deprecated += ''.join(
+            [CSS_FOR_ADDED.get(class_, '') for class_ in self.added_classes]
+        )
         if css_for_deprecated.strip():
             elem = etree.Element(NS.xhtml.style)
             elem.text = css_for_deprecated
@@ -635,14 +627,28 @@ class Parser(HTMLParserBase):
         for commented_style in soup.find_all('style', string=csscomment):
             commented_style.string = csscomment.sub('', str(commented_style.string))
 
-        # wrap bare strings at body top level
-        # same as setting enclose-text option on tidy;
+        """ same as setting enclose-text option on tidy;
+        ' enclose any text it finds in the body element within a <P> element.
+        This is useful when you want to take existing HTML and use it with a style sheet.'
+        """
         for elem in soup.html.body.contents:
-            if isinstance(elem, NavigableString) and str(elem).strip(' \n\r\t'):
-                if not isinstance(elem, Comment):
-                    p = soup.new_tag('p')
-                    p.string = str(elem)
-                    elem.replace_with(p)
+            if isinstance(elem, Comment):
+                continue
+            elif isinstance(elem, NavigableString):
+                if str(elem).strip(' \n\r\t'):
+                    new_div = soup.new_tag('div')
+                    new_div['class'] = BODY_WRAPPER_CLASS
+                    new_div.string = str(elem)
+                    elem.replace_with(new_div)
+                    self.added_classes.add(BODY_WRAPPER_CLASS)
+            elif isinstance(elem, Tag):
+                if elem.name not in ALLOWED_IN_BODY:
+                    new_div = soup.new_tag('div')
+                    new_div['class'] = BODY_WRAPPER_CLASS
+                    elem.wrap(new_div)
+                    self.added_classes.add(BODY_WRAPPER_CLASS)
+
+
 
         marked = mark_soup(soup)
         if not marked:
