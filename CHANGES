@@ -5,6 +5,18 @@
     - HTML `audio` elements are deprecated to links for EPUB2 files
     - mp3 and ogg files will be included in EPUB3 files.
     - because PPers have been hiding links to sound files for ebook files using `x-ebookmaker` CSS, we are adding CSS to unhide elements that contain the audio elements, for EPUB3 only.
+- implement PDF generation from html5
+    - remove html.noimages, pdf.noimages.
+
+
+
+
+
+
+
+
+
+
 
 
 0.12.40 February 9, 2024
