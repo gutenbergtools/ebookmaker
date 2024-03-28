@@ -23,6 +23,7 @@ import requests
 
 from libgutenberg.Logger import critical, debug, error, info
 from libgutenberg import MediaTypes
+import libgutenberg.GutenbergGlobals as gg
 from ebookmaker.CommonCode import Options
 from ebookmaker.Version import VERSION
 from ebookmaker import parsers
@@ -60,6 +61,7 @@ class ParserFactory(object):
     """
 
     parsers = {} # cache: parsers[url] = parser
+    sources = {} # sources[outfile] = source
 
     @staticmethod
     def get(attribs):
@@ -83,6 +85,18 @@ class ParserFactory(object):
             attribs = parsers.ParserAttributes()
 
         # debug("Need parser for %s" % url)
+        
+        # first check if input url is in output directory (we've already made it!)
+        if gg.is_same_path(os.path.abspath(options.outputdir), os.path.dirname(url)):
+            # find the file (and the parser) used to make the file
+            if url in cls.sources: 
+                if cls.sources[url] in cls.parsers:
+                    parser = cls.parsers[cls.sources[url]]
+                    parser.reset()
+                    parser.attribs.update(attribs)
+                    return parser
+                
+        
 
         if url in cls.parsers:
             # debug("... reusing parser for %s" % url)

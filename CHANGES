@@ -7,6 +7,11 @@
     - because PPers have been hiding links to sound files for ebook files using `x-ebookmaker` CSS, we are adding CSS to unhide elements that contain the audio elements, for EPUB3 only.
 - implement PDF generation from html5
     - remove html.noimages, pdf.noimages.
+    - Add html.images as a pd requirement
+    
+- Flow optimization
+    - store sourcefiles in ParserFactor to enable skipping the duplicate html parse
+
 
 
 

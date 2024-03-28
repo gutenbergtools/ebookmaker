@@ -484,6 +484,7 @@ def do_job(job):
 
         writer = WriterFactory.create(job.maintype)
         writer.build(job)
+        ParserFactory.ParserFactory.sources[job.outputfile] = job.url
 
         if options.validate:
             writer.validate(job)
