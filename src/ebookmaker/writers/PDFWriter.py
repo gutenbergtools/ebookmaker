@@ -25,6 +25,7 @@ from ebookmaker.CommonCode import Options
 
 options = Options()
 
+PDFCSS = os.path.join(os.path.dirname(__file__), './pdf.css')
 
 class Writer(writers.BaseWriter):
     """ Class to write PDF. """
@@ -43,7 +44,28 @@ class Writer(writers.BaseWriter):
         parser = ParserFactory.ParserFactory.create(inputfilename)
 
         if  hasattr(parser, 'xhtml'):
+            info('Making PDF Output from HTML5')
             try:
+                pagedjs = subprocess.run(
+                    [
+                        'pagedjs-cli',
+                        ' --style', PDFCSS,
+                        '-o', outputfilename,
+                        '-i', job.url
+                    ],
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE
+                )
+            except OSError as what:
+                error(f"Pagedjs error: {what}")
+                raise SkipOutputFormat
+            if pagedjs.returncode > 0:
+                error(f"couldn't make pdf for {job.url}")
+                error(pagedjs.stderr.rstrip())
+            info(pagedjs.stdout.rstrip())
+                
+                
+
 
         elif hasattr(parser, 'rst2xetex'): 
             info('Making PDF Output from RST')
