@@ -1,4 +1,3 @@
-
 0.13
 - implement HTML5/EPUB3 audio element for sound files
     - links to mp3 and ogg are replaced with HTML5 audio elements during initial parsing
@@ -22,6 +21,15 @@
 
 
 
+
+0.12.42 April 01, 2024
+- fixed rst -> epub3 conversion
+
+0.12.41 March 01, 2024
+- clean up txt boilerplate. fixes easy parts of #220
+- refactor `enclose_text()` to properly deal with html4 transitional files
+- don't allow non-images as img src
+- libgutenberg 0.10.22 (fixes 508 attribute issue)
 
 
 0.12.40 February 9, 2024
