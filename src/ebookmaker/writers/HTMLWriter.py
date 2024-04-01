@@ -21,13 +21,14 @@ import uuid
 
 from lxml import etree
 
-
 from libgutenberg.Logger import debug, exception, info, error, warning
 
 from ebookmaker import writers
 from ebookmaker.CommonCode import Options
 from ebookmaker.parsers import webify_url, CSSParser
 from ebookmaker.parsers.CSSParser import cssutils
+from cssutils import css
+
 from ebookmaker.utils import (
     add_class, add_style, css_len, check_lang, replace_elements, gg, xpath, NS
 )
@@ -274,6 +275,34 @@ class Writer(writers.HTMLishWriter):
 
 
     @staticmethod
+    def fix_body_css(sheet):
+        """ 
+            print output can't put margins on body
+        """
+        rules_to_add = []
+        rules_to_del = []
+        at_media = css.CSSRuleList()
+        for rule in sheet:
+            if rule.type == rule.STYLE_RULE and 'body' in rule.selectorText:
+                for selector in rule.selectorList:
+                    if selector.selectorText == 'body':
+                        rule.selectorText = re.sub(r'body[ ,]*', rule.selectorText, '')
+                        if not rule.selectorText.strip():
+                            rules_to_del.append(rule)
+                        rules_to_add.append(css.CSSStyleRule(selectorText='.pagedjs_page_content > div', style=rule.style))
+                        at_media.insert(0, css.CSSStyleRule(selectorText='body', style=rule.style))
+        for rule in rules_to_del:
+            sheet.deleteRule(rule)
+        for rule in rules_to_add:
+            sheet.add(rule)
+        if len(at_media) > 0:
+            media = css.CSSMediaRule(mediaText='screen')
+            at_media.reverse()
+            media.cssRules = at_media
+            sheet.add(media)
+        
+
+    @staticmethod
     def fix_incompatible_css(sheet):
         """ Strip CSS properties and values that are not HTML5 compatible.
             Unpack "media handheld" rules
@@ -303,6 +332,7 @@ class Writer(writers.HTMLishWriter):
                 if rule.type == rule.STYLE_RULE:
                     for selector in rule.selectorList:
                         selector.selectorText = tagre.sub(tagsub, selector.selectorText)
+
 
     @staticmethod
     def xhtml_to_html(html):
@@ -433,6 +463,7 @@ class Writer(writers.HTMLishWriter):
                 CSSParser.Parser.lowercase_selectors(sheet)
                 Writer.fix_incompatible_css(sheet)
                 Writer.fix_css_for_deprecated(sheet, tags=deprecated_used)
+                Writer.fix_body_css(sheet)
                 style.text = sheet.cssText.decode("utf-8")
 
         deprecated_used.add('*')  # '*' provides for css rules that are always added
@@ -521,6 +552,7 @@ class Writer(writers.HTMLishWriter):
 
                     if hasattr(p, 'sheet') and p.sheet:
                         self.fix_incompatible_css(p.sheet)
+                        self.fix_body_css(p.sheet)
 
                     try:
                         with open(outfile, 'wb') as fp_dest:
