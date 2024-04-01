@@ -25,7 +25,7 @@ from ebookmaker.CommonCode import Options
 
 options = Options()
 
-PDFCSS = os.path.join(os.path.dirname(__file__), './pdf.css')
+PDFCSS = os.path.join(os.path.dirname(__file__), 'pdf.css')
 
 class Writer(writers.BaseWriter):
     """ Class to write PDF. """
@@ -49,19 +49,19 @@ class Writer(writers.BaseWriter):
                 pagedjs = subprocess.run(
                     [
                         'pagedjs-cli',
-                        ' --style', PDFCSS,
+                        job.url,
+                        '--style', PDFCSS,
                         '-o', outputfilename,
-                        '-i', job.url
                     ],
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.PIPE
+                    capture_output=True
                 )
             except OSError as what:
                 error(f"Pagedjs error: {what}")
                 raise SkipOutputFormat
             if pagedjs.returncode > 0:
-                error(f"couldn't make pdf for {job.url}")
+                critical(f"couldn't make pdf for {job.url}")
                 error(pagedjs.stderr.rstrip())
+                raise SkipOutputFormat
             info(pagedjs.stdout.rstrip())
                 
                 
