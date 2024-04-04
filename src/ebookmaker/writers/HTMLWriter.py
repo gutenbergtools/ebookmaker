@@ -279,27 +279,55 @@ class Writer(writers.HTMLishWriter):
         """ 
             print output can't put margins on body
         """
-        rules_to_add = []
-        rules_to_del = []
-        at_media = css.CSSRuleList()
-        for rule in sheet:
+        SHOULD_MOVE = re.compile(r'^(margin-?|padding-?).*')
+        def style_filter(style, patt=SHOULD_MOVE ):
+            in_style = copy.copy(style)
+            out_style = copy.copy(style)
+            for p in list(style):
+                if patt.match(p.name):
+                    out_style.removeProperty(p.name)
+                else:
+                    in_style.removeProperty(p.name)
+            return (in_style, out_style)
+            
+        old_rules = sheet.cssRules.copy()
+        sheet.cssRules.clear()
+
+        for rule in old_rules:
             if rule.type == rule.STYLE_RULE and 'body' in rule.selectorText:
                 for selector in rule.selectorList:
+                    # if there are selectors like 'body.CLASSNAME' we shouldn't need to worry
+                    # because they won't stick to the print body anyway 
                     if selector.selectorText == 'body':
-                        rule.selectorText = re.sub(r'body[ ,]*', rule.selectorText, '')
-                        if not rule.selectorText.strip():
-                            rules_to_del.append(rule)
-                        rules_to_add.append(css.CSSStyleRule(selectorText='.pagedjs_page_content > div', style=rule.style))
-                        at_media.insert(0, css.CSSStyleRule(selectorText='body', style=rule.style))
-        for rule in rules_to_del:
-            sheet.deleteRule(rule)
-        for rule in rules_to_add:
-            sheet.add(rule)
-        if len(at_media) > 0:
-            media = css.CSSMediaRule(mediaText='screen')
-            at_media.reverse()
-            media.cssRules = at_media
-            sheet.add(media)
+                        # separate properties we can't have on print body from the others
+                        should_move_sty, can_keep_sty = style_filter(rule.style) 
+                
+                        # make a rule that keeps the properties that have been set on body
+                        if len(list(can_keep_sty)) > 0:
+                            new_rule = css.CSSStyleRule(selectorText='body', style=can_keep_sty)
+                            sheet.add(new_rule)
+ 
+                        if len(list(should_move_sty)) > 0:
+                            # make a rule that will apply to the screen body
+                            at_rules = css.CSSRuleList()
+                            at_rules.insert(0, css.CSSStyleRule(
+                                selectorText='body', style=should_move_sty))
+                            new_rule = css.CSSMediaRule(mediaText='screen')
+                            new_rule.cssRules = at_rules
+                            sheet.add(new_rule)
+                
+                            # make a rule that will apply to the page divs
+                            new_rule = css.CSSStyleRule(
+                                selectorText='.pagedjs_page_content > div', style=should_move_sty)
+                            sheet.add(new_rule)
+                    else:
+                        # other selectors
+                        new_rule = css.CSSStyleRule(
+                            selectorText=selector.selectorText, style=rule.style)
+                        sheet.add(new_rule)
+                   
+            else:
+                sheet.add(rule)
         
 
     @staticmethod
