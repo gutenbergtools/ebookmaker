@@ -107,7 +107,7 @@ class HTMLChunker(object):
         for c in xpath(template, '//xhtml:body'):
 
             # descend while elem has only one child
-            while len(c) == 1:
+            while len(c) == 1 and c[0].tag not in NEVER_SPLIT:
                 c = c[0]
 
             # clear children but save attributes
@@ -130,7 +130,7 @@ class HTMLChunker(object):
         self.chunk = copy.deepcopy(template)
         self.chunk_size = 0
         self.chunk_body = xpath(self.chunk, "//xhtml:body")[0]
-        while len(self.chunk_body) == 1:
+        while len(self.chunk_body) == 1 and self.chunk_body[0].tag not in NEVER_SPLIT:
             self.chunk_body = self.chunk_body[0]
         self.nosplit = False
 
@@ -180,7 +180,7 @@ class HTMLChunker(object):
         for body in xpath(tree, "//xhtml:body"):
             # we can't split a node that has only one child
             # descend while elem has only one child
-            while len(body) == 1:
+            while len(body) == 1 and body[0].tag not in NEVER_SPLIT:
                 body = body[0]
 
             debug("body tag is %s" % body.tag)
