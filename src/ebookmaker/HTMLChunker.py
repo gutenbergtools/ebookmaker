@@ -113,13 +113,8 @@ class HTMLChunker(object):
             # clear children but save attributes
             attributes = c.attrib.items()
             c.clear()
-            # was tentative fix for patological one-element-html case
-            # for child in c:
-            #     c.remove(child)
             for a in attributes:
                 c.set(a[0], a[1])
-
-        # debug(etree.tostring(template))
 
         return template
 
