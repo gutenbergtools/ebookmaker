@@ -165,9 +165,10 @@ class HTMLChunker(object):
         attribs.url = chunk_name
         attribs.id = chunk_id
         attribs.comment = comment
-        self.chunks.append((self.chunk, attribs) )
+        if self.chunk_size > 0:
+            self.chunks.append((self.chunk, attribs) )
 
-        debug("Adding chunk %s (%d bytes) %s" % (chunk_name, self.chunk_size, chunk_id))
+            debug("Adding chunk %s (%d bytes) %s" % (chunk_name, self.chunk_size, chunk_id))
 
 
     def split(self, tree, attribs):
