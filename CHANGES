@@ -4,6 +4,7 @@
     - no longer splits elements in NEVER_SPLIT list when they are only children. #226
 - fix missing empty line in txt output for copyrighted books #222
 - made copyright addition in header/footer case-insensitive
+- adds NFC unicode normalization to text parser #218
 
 
 0.12.42 April 01, 2024

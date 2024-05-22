@@ -20,6 +20,7 @@ import copy
 from cherrypy.lib import httputil
 import six
 from six.moves import urllib
+import unicodedata
 
 import lxml.html
 from lxml import etree
@@ -120,7 +121,6 @@ def webify_url(url):
 def update_urls(text):
     text = RE_PG_OLD_HOST.sub('https://www.gutenberg.org/', text)
     return RE_PG_HTML_URL.sub(REPL_PG_HTML5_URL, text)
-
 
 class ParserAttributes(object): # pylint: disable=too-few-public-methods
     """ Object to hold attributes for the lifetime of a parser.
@@ -284,6 +284,9 @@ class ParserBase(object):
                     self.unicode_buffer = ''
                 else:
                     raise UnicodeError("Text in Klingon encoding ... giving up.")
+            # NFC
+            data = unicodedata.normalize('NFC', data)
+            debug('NFC normalized data')
 
             # normalize line-endings
             if '\r' in data or '\u2028' in data:
