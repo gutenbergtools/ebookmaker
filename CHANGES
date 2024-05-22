@@ -1,10 +1,14 @@
-0.12.43 May xx, 2024
+0.12.43 May 22, 2024
 - fixed chunker bugs:
     - no longer emits empty chunks (was happening with large child elements of body) #224
     - no longer splits elements in NEVER_SPLIT list when they are only children. #226
 - fix missing empty line in txt output for copyrighted books #222
 - made copyright addition in header/footer case-insensitive
 - adds NFC unicode normalization to text parser #218
+- libgutenberg 0.10.5
+    - don't strip periods from title_no_subtitle
+    - The `heading` column in the database's author-book many to many table was being ignored by much of our code. The result was that multiple authors were being listed in alphabetical order. now, the heading column is used and the first sort column for the authors of a book, and the authors other than the first author are have heading=2 (instead of the default `heading=1`) set on initial metadata load. The cataloguer can reset the heading numbers, but does not wish the order of authors other than the "main" author to be tracked in the database.
+    - fixed a reversion in 0.10.10 that made author name matching case sensitive.
 
 
 0.12.42 April 01, 2024
