@@ -109,6 +109,13 @@ FILENAMES = {
 
 COVERPAGE_MIN_AREA = 200 * 200
 
+def id_from_filename(fn):
+    idmatch = re.search(r'\d+', fn)
+    if idmatch:
+        return int(idmatch.group(0))
+    else:
+        return 0
+
 def make_output_filename(type_, dc):
     """ Make a suitable filename for output type. """
     name_token = options.outputfile or dc.project_gutenberg_id
@@ -206,6 +213,7 @@ def get_dc(job):
         try:
             parser.parse()
         except AttributeError as e:
+            critical('the file {job.url} could not be found or was unparsable')
             raise Exception(f'the file {job.url} could not be found or was unparsable')
 
     if options.is_job_queue:
@@ -601,8 +609,8 @@ def main():
                 dc.session.close()
                 dc.session = None # probably overkill
         except Exception as e:
-            Logger.ebook = job.ebook
-            critical('Job failed for type %s from %s', job.type, job.url)
+            Logger.ebook = job.ebook or id_from_filename(job.url)
+            critical(f'Job #{Logger.ebook} failed for type {job.type} from {job.url}' )
             exception(e)
             continue
 
