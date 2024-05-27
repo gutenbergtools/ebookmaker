@@ -1,5 +1,20 @@
+0.12.43 May 22, 2024
+- fixed chunker bugs:
+    - no longer emits empty chunks (was happening with large child elements of body) #224
+    - no longer splits elements in NEVER_SPLIT list when they are only children. #226
+- fix missing empty line in txt output for copyrighted books #222
+- made copyright addition in header/footer case-insensitive
+- adds NFC unicode normalization to text parser #218
+- libgutenberg 0.10.5
+    - don't strip periods from title_no_subtitle
+    - The `heading` column in the database's author-book many to many table was being ignored by much of our code. The result was that multiple authors were being listed in alphabetical order. now, the heading column is used and the first sort column for the authors of a book, and the authors other than the first author are have heading=2 (instead of the default `heading=1`) set on initial metadata load. The cataloguer can reset the heading numbers, but does not wish the order of authors other than the "main" author to be tracked in the database.
+    - fixed a reversion in 0.10.10 that made author name matching case sensitive.   
+- get ebook number from filename if parse fails #225 
+
+
 0.12.42 April 01, 2024
 - fixed rst -> epub3 conversion
+
 
 0.12.41 March 01, 2024
 - clean up txt boilerplate. fixes easy parts of #220
@@ -12,6 +27,7 @@
 - fixed an issue parsing large text files. "The Entire Project Gutenberg Works of Mark Twain" was 1.2M.
 - fixed an issue detecting multiline boilerplate markers.
 - added an id 'pg-title-no-subtitle' to a span containing dc.title_no_subtitle
+
 
 0.12.39 January 31, 2024
 - fixed an EPUB3 problem affecting kobo reader when a book has more than 10 chapters - read order was being sorted as a string.
