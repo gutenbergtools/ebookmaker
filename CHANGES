@@ -1,3 +1,7 @@
+0.12.44 August, 2024
+- generated covers are now 1400x2100 to comply with Apple Books recommended minimum width. #234
+
+
 0.12.43 May 22, 2024
 - fixed chunker bugs:
     - no longer emits empty chunks (was happening with large child elements of body) #224
