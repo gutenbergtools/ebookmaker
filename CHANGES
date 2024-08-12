@@ -1,5 +1,5 @@
 0.12.44 August, 2024
-- generated covers are now 1400x2100 to comply with Apple Books recommended minimum width. #234
+- generated covers are now 1600x2400 to comply with Apple Books recommended minimum width and DP guidelines https://www.pgdp.net/wiki/DP_Official_Documentation:PP_and_PPV/Post-Processing_FAQ#Information_for_all_types_of_cover #234
 
 
 0.12.43 May 22, 2024
