@@ -271,6 +271,7 @@ class ContentOPF(object):
 
     def __init__(self):
         self.nsmap = gg.build_nsmap('opf dc dcterms xsi')
+        self.lang = None
 
         # FIXME: remove this when lxml is fixed
         # workaround for lxml fat-fingering the default attribute namespaces
@@ -295,7 +296,7 @@ class ContentOPF(object):
         assert len(self.spine) > 0, 'No spine item in content.opf.'
 
         package = self.opf.package(
-            **{'version': '3.0', 'unique-identifier': 'id'}) # FIXME add version to instance
+            **{'version': '3.0', 'unique-identifier': 'id', NS.xml.lang: self.lang})
         package.append(self.metadata)
         package.append(self.manifest)
         package.append(self.spine)
@@ -465,7 +466,9 @@ class ContentOPF(object):
 
         for language in dc.languages:
             self.metadata.append(dcterms.language(language.id))
-
+            if not self.lang:
+                self.lang = language.id  # assume first lang is main lang
+ 
         for subject in dc.subjects:
             self.metadata.append(dcterms.subject(subject.subject))
 
