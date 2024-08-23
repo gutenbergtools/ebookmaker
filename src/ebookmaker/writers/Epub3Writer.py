@@ -487,6 +487,9 @@ class ContentOPF(object):
                 source = urllib.parse.urljoin(options.config.PGURL, source)
 
         self.metadata.append(dcterms.source(source))
+        
+        # accessibility Metadata
+        self.metadata.append(self.opf.meta('textual', {'property': 'schema:accessMode'}))
 
 
     def add_coverpage(self, url, id_):
