@@ -123,7 +123,7 @@ class OEBPSContainer(EpubWriter.OEBPSContainer):
         (cover_x, cover_y) = parser.get_image_dimen()
         wrapper = f'''
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
   <head>
     <title>"Cover"</title>
     <link href="pgepub.css" rel="stylesheet"/>
@@ -213,7 +213,7 @@ class Toc(TocNCX):
         """ Build the toc. """
         em = self.elementmaker
 
-        root = em.nav(**{EPUB_TYPE: 'toc'})
+        root = em.nav(**{EPUB_TYPE: 'toc', 'role': 'doc-toc', 'aria-label': 'Table of Contents'})
         toctop = em.ol()
         root.append(toctop)
 
@@ -250,7 +250,7 @@ class Toc(TocNCX):
     def _make_pagelist(self, toc):
         """ Build the page list. """
         em = self.elementmaker
-        root = em.nav(**{EPUB_TYPE: 'landmarks'})
+        root = em.nav(**{EPUB_TYPE: 'landmarks', 'aria-label': 'Page List'})
         pagelist_top = em.ol(**{'id': 'pages', 'class': 'pagelist'})
         root.append(pagelist_top)
 
@@ -490,6 +490,17 @@ class ContentOPF(object):
         
         # accessibility Metadata
         self.metadata.append(self.opf.meta('textual', {'property': 'schema:accessMode'}))
+        self.metadata.append(self.opf.meta(
+            'readingOrder', {'property': 'schema:accessibilityFeature'}))
+        self.metadata.append(self.opf.meta('none', {'property': 'schema:accessibilityHazard'}))
+        # TODO: reimplement these indicators when alt text has been reviewed and audio included
+        #self.metadata.append(self.opf.meta(
+        #    'alternativeText', {'property': 'schema:accessibilityFeature'}))
+        self.metadata.append(self.opf.meta(
+            'textual,visual', {'property': 'schema:accessModeSufficient'}))
+        self.metadata.append(self.opf.meta(
+            'This publication may not have complete alternative text descriptions.', {
+            'property': 'schema:accessibilitySummary'}))
 
 
     def add_coverpage(self, url, id_):

@@ -81,7 +81,7 @@ COREATTRS = ["class", "dir", "id", "lang", "style", "title"]
 
 STYLE_LINK = '<link href="pgepub.css" rel="stylesheet"/>'
 IMAGE_WRAPPER = """<?xml version="1.0"?>{doctype}
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
   <head>
     <title>{title}</title>
     {style}
