@@ -3,6 +3,7 @@
 - added accessibility metadata to EPUB3 content.ocf as suggested by ACE
 - added aria labels and roles to nav elements of EPUB3 content.ocf and toc.xhtml
 - added lang attribute to wrapper file html elements as suggested by ACE
+- fix opengraph urls in HTYML metadata #235 
 
 0.12.43 May 22, 2024
 - fixed chunker bugs:

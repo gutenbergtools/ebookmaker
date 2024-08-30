@@ -23,8 +23,10 @@ from lxml import etree
 
 
 from libgutenberg.Logger import debug, exception, info, error, warning
+from libgutenberg.GutenbergGlobals import PG_URL
 
 from ebookmaker import writers
+from ebookmaker.EbookMaker import FILENAMES
 from ebookmaker.CommonCode import Options
 from ebookmaker.parsers import webify_url, CSSParser
 from ebookmaker.parsers.CSSParser import cssutils
@@ -135,6 +137,12 @@ def serialize(xhtml):
     return htmlbytes
 
 
+def canonical_url(dc, type_):
+    textnum = dc.project_gutenberg_id or '00000'
+    filename = FILENAMES.get(type_, 'pg{id}.' + type_).format(id=textnum)
+    return f'{PG_URL}cache/epub/{textnum}/{filename}'
+
+
 class Writer(writers.HTMLishWriter):
     """ Class for writing HTML files. """
     VALIDATOR = 'HTML_VALIDATOR'
@@ -159,11 +167,8 @@ class Writer(writers.HTMLishWriter):
         for dcmitype in job.dc.dcmitypes:
             self.add_prop(tree, "og:type", dcmitype.id)
         info(job.main)
-        web_url = urljoin(job.dc.canonical_url, job.outputfile)
-        self.add_prop(tree, "og:url", web_url)
-        canonical_cover_name = 'pg%s.cover.medium.jpg' % job.dc.project_gutenberg_id
-        cover_url = urljoin(job.dc.canonical_url, canonical_cover_name)
-        self.add_prop(tree, "og:image", cover_url)
+        self.add_prop(tree, "og:url", canonical_url(job.dc, job.type))
+        self.add_prop(tree, "og:image", canonical_url(job.dc, 'cover.medium'))
 
         # fix empty title elements
         for title in xpath(tree, '//xhtml:title[not(text())]'):
