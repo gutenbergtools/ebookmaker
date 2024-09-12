@@ -46,7 +46,7 @@ if __name__ == "__main__":
             'requests',
             'six>=1.4.1',
             'libgutenberg[covers]>=0.10.22',
-            'cchardet',
+            'cchardet==2.2.0a2',
             'beautifulsoup4',
             'html5lib',
         ],
