@@ -10,6 +10,7 @@ Copyright 2009 by Marcello Perathoner
 Distributable under the GNU General Public License Version 3 or newer.
 
 """
+
 import re
 import unicodedata
 
@@ -148,6 +149,8 @@ CSS_FOR_ADDED = {
 
 RE_NOT_XML_NAMECHAR = re.compile(r'[^\w.-]')
 
+NO_ALT_TEXT = 'Empty alt text for %s. See https://github.com/gutenbergtools/ebookmaker/blob/master/docs/alt-text.md'
+
 def nfc(_str):
     return unicodedata.normalize('NFC', EntitySubstitution.substitute_xml(_str))
 
@@ -224,6 +227,8 @@ class Parser(HTMLParserBase):
                 yield node
             for node in xpath(xhtml, "//xhtml:a[@name]"):
                 yield node
+            for node in xpath(xhtml, "//xhtml:img[not(@id)]"):
+                yield node
 
         # move anchor name to id
         # 'id' values are more strict than 'name' values
@@ -241,6 +246,9 @@ class Parser(HTMLParserBase):
                 del anchor.attrib['id']
             if NS.xml.id in anchor.attrib:
                 del anchor.attrib[NS.xml.id]
+            if not id_:
+                # we want every img to have an id_
+                id_ = f"img_{anchor.get('src')}"
 
             id_ = self._fix_id(id_)
 
@@ -250,8 +258,15 @@ class Parser(HTMLParserBase):
 
             # well-formed id
             if id_ in self.seen_ids:
-                error("Dropping duplicate id '%s' in %s" % (id_, self.attribs.url))
-                continue
+                if anchor.tag == NS.xhtml.img:
+                    # more than one img referencing an image file
+                    n = 1
+                    while f'{id_}_{n}' not in self.seen_ids:
+                        n += 1
+                    id_ = f'{id_}_{n}'
+                else:
+                    error("dropping duplicate id '%s' in %s" % (id_, self.attribs.url))
+                    continue
 
             self.seen_ids.add(id_)
             anchor.set('id', id_)
@@ -457,6 +472,29 @@ class Parser(HTMLParserBase):
                     figure.attrib['role'] = 'figure'
                     figure.attrib['aria-labelledby'] = caption.attrib['id']
                     break
+        
+        # process alt tags
+        for elem in xpath(self.xhtml, "//xhtml:img"):
+            infigure = False
+            labeled = elem.get('aria-labelledby')
+            if labeled and labeled in self.seen_ids:
+                continue
+            if elem.get('role') == 'presentation':
+                continue
+            alt = elem.get('alt').split('\r\n')[0]
+            if not alt:
+                # check if it's in a figure
+                parent = elem.getparent()              
+                while parent is not None:
+                    if parent.tag == NS.xhtml.figure:
+                        infigure = True
+                        break
+                    parent = parent.getparent()
+                if not infigure:
+                    warning(NO_ALT_TEXT, elem.get('src'))
+            id_ = elem.get('id')
+            info(f'[ALTTEXT]{self.attribs.url},{id_},{alt},{elem.get("src")},{infigure}')
+                
 
         ##### cleanup #######
 

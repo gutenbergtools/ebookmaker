@@ -5,7 +5,13 @@
 - added lang attribute to wrapper file html elements as suggested by ACE
 - fix opengraph urls in HTYML metadata #235
 - update cchardet to solve problems installing on python 3.11
-
+- alt-text logging is restructured
+    - empty alt-text warnings are now suppressed in figures
+    - empty alt-text warnings are now suppressed when role='presentation' or aria-labelledby attributes are present
+    - the alt text examination is moved from the Spider module to the HTMLParser module.
+    - ids are assigned to all img elements to facilitate alt-text mitigation. 
+    - alt-text logging is improved.
+    - empty alt-text warnings now reference a newly add doc page.
 
 0.12.43 May 22, 2024
 - fixed chunker bugs:

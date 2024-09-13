@@ -128,8 +128,8 @@ class ParserAttributes(object): # pylint: disable=too-few-public-methods
     Typical attributes held here would be:
       - url
       - orig_url
-      - mediatpye
-      - orig_mediatpye
+      - mediatype
+      - orig_mediatype
       - referrer
       - id
 

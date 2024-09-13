@@ -343,12 +343,6 @@ class Writer(writers.HTMLishWriter):
             for elem in xpath(html, f"//xhtml:{tag}[@{attr}]"):
                 del elem.attrib[attr]
 
-        # set required attributes
-        attrs_to_fill = [('img', 'alt', '')]
-        for (tag, attr, fill) in attrs_to_fill:
-            for elem in xpath(html, f"//xhtml:{tag}[not(@{attr})]"):
-                elem.set(attr, fill)
-
         # remove not_empty attributes
         nullattrs_to_remove = ['height', 'width']
         for attr in nullattrs_to_remove:
