@@ -112,6 +112,12 @@ body.x-ebookmaker-coverpage {
 }
 """
 
+def alt_text_good(book_id):
+    # stub implementation which allows listing books with good alt text in config file
+    return str(book_id) in options.good_alt_text.split() if hasattr(
+        options, 'good_alt_text') else False
+
+
 class OEBPSContainer(EpubWriter.OEBPSContainer):
     """ Class representing an OEBPS Container. """
 
@@ -490,16 +496,19 @@ class ContentOPF(object):
         
         # accessibility Metadata
         self.metadata.append(self.opf.meta('textual', {'property': 'schema:accessMode'}))
-        self.metadata.append(self.opf.meta(
-            'readingOrder', {'property': 'schema:accessibilityFeature'}))
+        self.metadata.append(self.opf.meta('readingOrder', {
+            'property': 'schema:accessibilityFeature'}))
         self.metadata.append(self.opf.meta('none', {'property': 'schema:accessibilityHazard'}))
-        # TODO: reimplement these indicators when alt text has been reviewed and audio included
-        #self.metadata.append(self.opf.meta(
-        #    'alternativeText', {'property': 'schema:accessibilityFeature'}))
-        self.metadata.append(self.opf.meta(
-            'textual,visual', {'property': 'schema:accessModeSufficient'}))
-        self.metadata.append(self.opf.meta(
-            'This publication may not have complete alternative text descriptions.', {
+        if alt_text_good(dc.project_gutenberg_id):
+            self.metadata.append(self.opf.meta('alternativeText', {
+                'property': 'schema:accessibilityFeature'}))
+            a11y_summary = 'This publication has complete alternative text descriptions.'
+        else:
+            a11y_summary = 'This publication may not have complete alternative text descriptions.'
+        # TODO: reimplement this indicators when audio included
+        self.metadata.append(self.opf.meta('textual,visual', {
+            'property': 'schema:accessModeSufficient'}))
+        self.metadata.append(self.opf.meta(a11y_summary, {
             'property': 'schema:accessibilitySummary'}))
 
 
