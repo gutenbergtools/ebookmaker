@@ -8,9 +8,9 @@ pylint = "*"
 
 [packages]
 e1839a8 = {path = ".",editable = true}
-libgutenberg = "==0.10.25"
+libgutenberg = "==0.10.26"
 psycopg2 = "*"
 docutils = ">=0.18.1"
 html5lib = "*"
-ebookmaker = {file = ".", editable = true}
 cchardet = "==2.2.0a2"
+ebookmaker = {file = ".", editable = true}
