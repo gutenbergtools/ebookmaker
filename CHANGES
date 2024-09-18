@@ -1,4 +1,4 @@
-0.12.44 September 17, 2024
+0.12.45 September 18, 2024
 - generated covers are now 1600x2400 to comply with Apple Books recommended minimum width and DP guidelines https://www.pgdp.net/wiki/DP_Official_Documentation:PP_and_PPV/Post-Processing_FAQ#Information_for_all_types_of_cover #234
 - added accessibility metadata to EPUB3 content.ocf as suggested by ACE
 - stub implementation to allow assertions of good alt text in config.
@@ -13,7 +13,7 @@
     - ids are assigned to all img elements to facilitate alt-text mitigation. 
     - alt-text logging is improved.
     - empty alt-text warnings now reference a newly add doc page.
-
+- bug in 0.12.44 fixed
 
 0.12.43 May 22, 2024
 - fixed chunker bugs:

@@ -261,7 +261,7 @@ class Parser(HTMLParserBase):
                 if anchor.tag == NS.xhtml.img:
                     # more than one img referencing an image file
                     n = 1
-                    while f'{id_}_{n}' not in self.seen_ids:
+                    while f'{id_}_{n}' in self.seen_ids:
                         n += 1
                     id_ = f'{id_}_{n}'
                 else:
