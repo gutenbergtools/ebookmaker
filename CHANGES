@@ -4,7 +4,7 @@
 - stub implementation to allow assertions of good alt text in config.
 - added aria labels and roles to nav elements of EPUB3 content.ocf and toc.xhtml
 - added lang attribute to wrapper file html elements as suggested by ACE
-- fix opengraph urls in HTYML metadata #235
+- fix opengraph urls in HTML metadata #235
 - update cchardet to solve problems installing on python 3.11
 - alt-text logging is restructured
     - empty alt-text warnings are now suppressed in figures
@@ -12,8 +12,8 @@
     - the alt text examination is moved from the Spider module to the HTMLParser module.
     - ids are assigned to all img elements to facilitate alt-text mitigation. 
     - alt-text logging is improved.
-    - empty alt-text warnings now reference a newly add doc page.
-- bug in 0.12.44 fixed
+    - empty alt-text warnings now reference a newly added doc page: https://github.com/gutenbergtools/ebookmaker/blob/master/docs/alt-text.md
+- bug in undeployed 0.12.44 fixed
 
 0.12.43 May 22, 2024
 - fixed chunker bugs:
