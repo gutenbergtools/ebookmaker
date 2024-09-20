@@ -81,7 +81,7 @@ COREATTRS = ["class", "dir", "id", "lang", "style", "title"]
 
 STYLE_LINK = '<link href="pgepub.css" rel="stylesheet"/>'
 IMAGE_WRAPPER = """<?xml version="1.0"?>{doctype}
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
   <head>
     <title>{title}</title>
     {style}
@@ -128,8 +128,8 @@ class ParserAttributes(object): # pylint: disable=too-few-public-methods
     Typical attributes held here would be:
       - url
       - orig_url
-      - mediatpye
-      - orig_mediatpye
+      - mediatype
+      - orig_mediatype
       - referrer
       - id
 
