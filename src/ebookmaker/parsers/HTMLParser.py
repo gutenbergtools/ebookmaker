@@ -474,15 +474,22 @@ class Parser(HTMLParserBase):
                     break
         
         # process alt tags
+        # work around bug in w3c validator: 
         for elem in xpath(self.xhtml, "//xhtml:img"):
             infigure = False
             labeled = elem.get('aria-labelledby')
             if labeled and labeled in self.seen_ids:
                 continue
-            if elem.get('role') == 'presentation':
-                continue
-            alt = elem.get('alt').split('\r\n')[0]
+            alt = elem.get('alt', '').split('\r\n')[0]
             if not alt:
+                if elem.get('role') == 'presentation':
+                    del elem.attrib['role']
+                    elem.attrib['alt'] = ''
+                    continue
+                # created synonym for role to work around validator bug
+                if elem.get('data-role') == 'presentation':
+                    elem.attrib['alt'] = ''
+                    continue
                 # check if it's in a figure
                 parent = elem.getparent()              
                 while parent is not None:
