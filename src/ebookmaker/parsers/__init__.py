@@ -88,7 +88,7 @@ IMAGE_WRAPPER = """<?xml version="1.0"?>{doctype}
   </head>
   <body>
     <div style="text-align: center">
-      <img src="{src}" alt={title} class="{wrapper_class}" />
+      <img src="{src}" alt="{title}" class="{wrapper_class}" />
       {backlink}
     </div>
   </body>
