@@ -80,6 +80,8 @@ BOGUS_CHARSET_NAMES = {'iso-latin-1': 'iso-8859-1',
 COREATTRS = ["class", "dir", "id", "lang", "style", "title"]
 
 STYLE_LINK = '<link href="pgepub.css" rel="stylesheet"/>'
+
+# note: title is prequoted
 IMAGE_WRAPPER = """<?xml version="1.0"?>{doctype}
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en">
   <head>
