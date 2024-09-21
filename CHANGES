@@ -1,4 +1,4 @@
-0.12.46 September 20, 2024
+0.12.47 September 20, 2024
 - because of a validator bug, the W3C recommended markup for images with fails w3c validation. We have made `data-role' a synonym for `role` in this context, allowing files thus declare the "presentaionn" role to do so without raising a validation error. https://github.com/validator/validator/issues/1599
 
 0.12.45 September 18, 2024
