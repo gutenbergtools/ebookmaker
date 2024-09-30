@@ -1,3 +1,7 @@
+0.12.48 wip
+- improve alt-text logging, refactor filesdir
+
+
 0.12.47 September 20, 2024
 - because of a validator bug, the W3C recommended markup for images with `role="presentation"` fails w3c validation. We have made `data-role' a synonym for `role` in this context, allowing files that use the "presentation" role to do so without raising a validation error. https://github.com/validator/validator/issues/1599
 

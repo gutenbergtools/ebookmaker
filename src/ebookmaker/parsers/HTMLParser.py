@@ -23,12 +23,12 @@ from bs4 import BeautifulSoup, Comment, NavigableString, Tag
 from bs4.formatter import EntitySubstitution, HTMLFormatter
 
 
-from libgutenberg.GutenbergGlobals import NS
+from libgutenberg.GutenbergGlobals import make_url_relative, NS
 from libgutenberg.Logger import critical, info, debug, warning, error
 from libgutenberg.MediaTypes import mediatypes as mt
 
 from ebookmaker import parsers
-from ebookmaker.CommonCode import Options, EbookmakerBadFileException
+from ebookmaker.CommonCode import filesdir, Options, EbookmakerBadFileException
 from ebookmaker.utils import add_class, add_style, css_len, replace_elements, xpath
 from . import HTMLParserBase
 from .boilerplate import mark_soup
@@ -500,7 +500,10 @@ class Parser(HTMLParserBase):
                 if not infigure:
                     warning(NO_ALT_TEXT, elem.get('src'))
             id_ = elem.get('id')
-            info(f'[ALTTEXT]{self.attribs.url},{id_},{alt},{elem.get("src")},{infigure}')
+            rel_url = make_url_relative(parsers.webify_url(filesdir()), self.attribs.url)
+            src_rel_url = make_url_relative(self.attribs.url, elem.get("src"))
+            alt = alt.replace('"','""').replace("'","''")
+            info(f'[ALTTEXT]{rel_url},{id_},"{alt}",{src_rel_url},{infigure}')
                 
 
         ##### cleanup #######
