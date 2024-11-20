@@ -1,5 +1,6 @@
 0.12.48 wip
 - improve alt-text logging, refactor filesdir
+- fixed a very old bug that affects only EPUB2 files generated from html that references GIF files in CSS. It's long been the case that Ebookmaker converts gif files to png for EPUB packaging, and this bug was fixed for EPUB3 files when EPUB3 support was added.
 
 
 0.12.47 September 20, 2024

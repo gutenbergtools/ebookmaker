@@ -1361,6 +1361,10 @@ class Writer(writers.HTMLishWriter):
                     else:
                         # make a copy so we can mess around
                         p.parse()
+
+                        # rewrite the changed image links
+                        p.remap_links(idmap)
+
                         xhtml = copy.deepcopy(p.xhtml) if hasattr(p, 'xhtml') else None
                     if xhtml is not None:
                         if not boilerplate_done:
