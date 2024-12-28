@@ -11,11 +11,13 @@ Distributable under the GNU General Public License Version 3 or newer.
 Common code for EbookMaker and EbookConverter.
 
 """
+import csv
 import datetime
 import json
 import os
 import re
 
+from io import StringIO
 from six.moves import configparser
 
 from libgutenberg.CommonOptions import Options
@@ -282,5 +284,8 @@ class EbookAltText:
         if self._alt_map != None:
             return self._alt_map.get(img_id, '')
             
-
-
+def csv_escape(items):
+    buf = StringIO()
+    csvwriter = csv.writer(buf, dialect="excel")
+    csvwriter.writerow(items)
+    return buf.getvalue()

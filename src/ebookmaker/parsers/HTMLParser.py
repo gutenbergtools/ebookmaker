@@ -28,7 +28,7 @@ from libgutenberg.Logger import critical, info, debug, warning, error
 from libgutenberg.MediaTypes import mediatypes as mt
 
 from ebookmaker import parsers
-from ebookmaker.CommonCode import (EbookAltText, EbookmakerBadFileException,
+from ebookmaker.CommonCode import (csv_escape, EbookAltText, EbookmakerBadFileException,
                                    filesdir, Options, pgnum_from_url)
 from ebookmaker.utils import add_class, add_style, css_len, replace_elements, xpath
 from . import HTMLParserBase
@@ -514,7 +514,7 @@ class Parser(HTMLParserBase):
             rel_url = make_url_relative(parsers.webify_url(filesdir()), self.attribs.url)
             src_rel_url = make_url_relative(self.attribs.url, elem.get("src"))
             alt = alt.replace('"','""').replace("'","''")
-            info(f'[ALTTEXT]{rel_url},{id_},"{alt}",{src_rel_url},{infigure}')
+            info(f'[ALTTEXT]{csv_escape([rel_url, id_, alt, src_rel_url, infigure])}')
                 
 
         ##### cleanup #######
