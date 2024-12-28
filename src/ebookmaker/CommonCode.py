@@ -283,9 +283,10 @@ class EbookAltText:
     def get(self, img_id):
         if self._alt_map != None:
             return self._alt_map.get(img_id, '')
-            
+
+ONELINE = re.compile(r'[\r\n]+')
 def csv_escape(items):
     buf = StringIO()
     csvwriter = csv.writer(buf, dialect="excel")
-    csvwriter.writerow(items)
+    csvwriter.writerow([ONELINE.sub(' ', str(item)) for item in items])
     return buf.getvalue()
