@@ -31,7 +31,7 @@ from libgutenberg.MediaTypes import mediatypes as mt
 from ebookmaker import parsers
 from ebookmaker import ParserFactory
 from ebookmaker import HTMLChunker
-from ebookmaker.CommonCode import Options
+from ebookmaker.CommonCode import EbookAltText, Options
 from ebookmaker.Version import VERSION, GENERATOR
 
 from .EpubWriter import (
@@ -113,9 +113,7 @@ body.x-ebookmaker-coverpage {
 """
 
 def alt_text_good(book_id):
-    # stub implementation which allows listing books with good alt text in config file
-    return str(book_id) in options.good_alt_text.split() if hasattr(
-        options, 'good_alt_text') else False
+    return EbookAltText(book_id).get('x') != None
 
 
 class OEBPSContainer(EpubWriter.OEBPSContainer):
