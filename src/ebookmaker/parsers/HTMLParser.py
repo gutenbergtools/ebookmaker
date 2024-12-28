@@ -28,7 +28,8 @@ from libgutenberg.Logger import critical, info, debug, warning, error
 from libgutenberg.MediaTypes import mediatypes as mt
 
 from ebookmaker import parsers
-from ebookmaker.CommonCode import filesdir, Options, EbookmakerBadFileException
+from ebookmaker.CommonCode import (EbookAltText, EbookmakerBadFileException,
+                                   filesdir, Options, pgnum_from_url)
 from ebookmaker.utils import add_class, add_style, css_len, replace_elements, xpath
 from . import HTMLParserBase
 from .boilerplate import mark_soup
@@ -165,6 +166,9 @@ class Parser(HTMLParserBase):
         super().__init__(attribs=attribs)
         self.added_classes = set()
         self.seen_ids = set()
+        self.alter = EbookAltText(pgnum_from_url(attribs.orig_url))
+
+
 
     @staticmethod
     def _fix_id(id_):
@@ -476,6 +480,11 @@ class Parser(HTMLParserBase):
         # process alt tags
         # work around bug in w3c validator: 
         for elem in xpath(self.xhtml, "//xhtml:img"):
+            id_ = elem.get('id')
+            if self.alter.get(id_) != None:  # it's None if there is no json file
+                alt = self.alter.get(id_)
+                elem.attrib['alt'] = alt
+                continue
             infigure = False
             labeled = elem.get('aria-labelledby')
             if labeled and labeled in self.seen_ids:
@@ -486,10 +495,12 @@ class Parser(HTMLParserBase):
                     del elem.attrib['role']
                     elem.attrib['alt'] = ''
                     continue
+
                 # created synonym for role to work around validator bug
                 if elem.get('data-role') == 'presentation':
                     elem.attrib['alt'] = ''
                     continue
+
                 # check if it's in a figure
                 parent = elem.getparent()              
                 while parent is not None:
@@ -499,7 +510,7 @@ class Parser(HTMLParserBase):
                     parent = parent.getparent()
                 if not infigure:
                     warning(NO_ALT_TEXT, elem.get('src'))
-            id_ = elem.get('id')
+
             rel_url = make_url_relative(parsers.webify_url(filesdir()), self.attribs.url)
             src_rel_url = make_url_relative(self.attribs.url, elem.get("src"))
             alt = alt.replace('"','""').replace("'","''")

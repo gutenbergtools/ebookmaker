@@ -32,8 +32,6 @@ class TestFromHtm(unittest.TestCase):
         for out in outs:
             self.assertTrue(os.path.exists(os.path.join(self.out_dir, out % book_id)))
             os.remove(os.path.join(self.out_dir, out % book_id))
-        os.remove(os.path.join(self.out_dir, 'images/image.jpg'))              
-        os.rmdir(os.path.join(self.out_dir, 'images'))              
 
     def test_43172_nocover(self):
         book_id = '43172'
@@ -58,5 +56,5 @@ class TestFromHtm(unittest.TestCase):
         for out in outs:
             self.assertTrue(os.path.exists(os.path.join(self.out_dir, out % book_id)))
             os.remove(os.path.join(self.out_dir, out % book_id))
-            
-        
+        os.remove(os.path.join(self.out_dir, 'images/image.jpg'))              
+        os.rmdir(os.path.join(self.out_dir, 'images'))              

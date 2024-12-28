@@ -4,7 +4,7 @@
 """
 CommonCode.py
 
-Copyright 2014-2021 by Marcello Perathoner and Project Gutenberg
+Copyright 2014-2024 by Marcello Perathoner and Project Gutenberg
 
 Distributable under the GNU General Public License Version 3 or newer.
 
@@ -12,6 +12,7 @@ Common code for EbookMaker and EbookConverter.
 
 """
 import datetime
+import json
 import os
 import re
 
@@ -19,7 +20,7 @@ from six.moves import configparser
 
 from libgutenberg.CommonOptions import Options
 from libgutenberg.GutenbergGlobals import archive2files
-from libgutenberg.Logger import debug, error, warning
+from libgutenberg.Logger import debug, info, error, warning
 from libgutenberg.Models import File
 from . import parsers
 
@@ -174,6 +175,13 @@ def dir_from_url(url):
 
 RE_SIMPATH = re.compile(r'^\d/')
 RE_PGNUM = re.compile(r'/(\d\d+/.*)')
+RE_FATNUM = re.compile(r'/(\d\d+)/')
+
+def pgnum_from_url(url):
+    longest = '0'
+    for num in  RE_FATNUM.findall(url):
+        longest = num if len(num) > len(longest) else longest
+    return longest
 
 def filesdir():
     if hasattr(options.config, 'FILESDIR'):
@@ -252,3 +260,27 @@ def find_candidates(path, file_filter=lambda x: True):
             fpath = os.path.join(root, fname)
             if file_filter(fpath):
                 yield fpath
+
+ALTTEXT_DIR = os.path.join(PRIVATE, 'logs', 'alt')
+
+class EbookAltText:
+    _alt_map = None
+    
+    def __init__(self, ebook):
+        alt_text_file = os.path.join(ALTTEXT_DIR, f'alt{ebook}.json')
+        if os.path.exists(alt_text_file):
+            with open(alt_text_file, 'r') as data:
+                try:
+                    self._alt_map = json.loads(data.read())
+                except json.decoder.JSONDecodeError as jde:
+                    self._alt_map = None
+                    error(f'{alt_text_file} is not valid json. {jde}')
+                    
+
+    # note that this returns None if there is no alt text file for the ebook
+    def get(self, img_id):
+        if self._alt_map != None:
+            return self._alt_map.get(img_id, '')
+            
+
+
