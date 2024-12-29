@@ -1054,7 +1054,7 @@ class Writer(writers.HTMLishWriter):
                 writers.HTMLWriter.add_class(tag, newtag)
 
         # replace html5 inline tags
-        for newtag in ['u']:
+        for newtag in ['u', 'ruby', 'rt', 'rp']:
             for tag in xpath(xhtml, f'//xhtml:{newtag}'):
                 usedtags.add(newtag)
                 tag.tag = NS.xhtml.span

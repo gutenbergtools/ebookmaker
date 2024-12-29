@@ -77,6 +77,7 @@ REPLACE_ELEMENTS = {
     'blink': 'span',
     'embed': None,
     'bgsound': None,
+    'rb': 'span',
 }
 
 DEPRECATED = {
