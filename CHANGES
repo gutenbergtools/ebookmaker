@@ -4,6 +4,9 @@
 - added alt-text insertion capability in HTMLParser. In checks for a json file in the logs directory. Added some code to test that it works. Implemented the alt_text_good method to update the EPUB3 accessibility data.
 - added gd, nv, and oj to the 3 to 2 language table, fixing #243
 - csv escape the [ALTTEXT] log entries. fixes #246
+- empty string in alt text WARNING changed to INFO. (total 179,161 occurrences)
+- common decorative image indicators now removed from alt text with a WARNING and data-role="presentation" added. (total 6,288 occurrences)
+- common inappropriate alt text messages now replaced with "" and an ERROR message. (total 16420 occurrences)
 
 
 0.12.47 September 20, 2024
