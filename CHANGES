@@ -7,6 +7,7 @@
 - empty string in alt text WARNING changed to INFO. (total 179,161 occurrences)
 - common decorative image indicators now removed from alt text with a WARNING and data-role="presentation" added. (total 6,288 occurrences)
 - common inappropriate alt text messages now replaced with "" and an ERROR message. (total 16420 occurrences)
+- added removal for aria-* and role attributes for EPUB2 files.
 
 
 0.12.47 September 20, 2024
