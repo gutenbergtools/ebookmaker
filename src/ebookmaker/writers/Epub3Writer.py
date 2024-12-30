@@ -551,6 +551,11 @@ class Writer(EpubWriter.Writer):
                     del e.attrib[key]
                     new_key = getattr(NS.epub, key[10:])
                     e.attrib[new_key] = val
+        # other end of work-around for validator bug
+        for e in xpath(xhtml, "//xhtml:img[@data-role]"):
+            role = e.attrib['data-role']
+            e.attrib['role'] = role
+            del e.attrib['data-role']
 
     @staticmethod
     def fix_incompatible_css(sheet):
