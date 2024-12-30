@@ -478,14 +478,14 @@ class Parser(HTMLParserBase):
                     figure.attrib['aria-labelledby'] = caption.attrib['id']
                     break
         
-        # process alt tags
-        # work around bug in w3c validator: 
+        # process img tags
         for elem in xpath(self.xhtml, "//xhtml:img"):
             id_ = elem.get('id')
             if self.alter.get(id_) != None:  # it's None if there is no json file
                 alt = self.alter.get(id_)
                 elem.attrib['alt'] = alt
                 continue
+
             infigure = False
             labeled = elem.get('aria-labelledby')
             if labeled and labeled in self.seen_ids:
@@ -514,7 +514,6 @@ class Parser(HTMLParserBase):
 
             rel_url = make_url_relative(parsers.webify_url(filesdir()), self.attribs.url)
             src_rel_url = make_url_relative(self.attribs.url, elem.get("src"))
-            alt = alt.replace('"','""').replace("'","''")
             info(f'[ALTTEXT]{csv_escape([rel_url, id_, alt, src_rel_url, infigure])}')
                 
 

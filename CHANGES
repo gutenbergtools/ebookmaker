@@ -3,6 +3,7 @@
 - fixed a very old bug that affects only EPUB2 files generated from html that references GIF files in CSS. It's long been the case that Ebookmaker converts gif files to png for EPUB packaging, and this bug was fixed for EPUB3 files when EPUB3 support was added.
 - added alt-text insertion capability in HTMLParser. In checks for a json file in the logs directory. Added some code to test that it works. Implemented the alt_text_good method to update the EPUB3 accessibility data.
 - added gd, nv, and oj to the 3 to 2 language table, fixing #243
+- csv escape the [ALTTEXT] log entries. fixes #246
 
 
 0.12.47 September 20, 2024
