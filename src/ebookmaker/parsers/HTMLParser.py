@@ -23,12 +23,13 @@ from bs4 import BeautifulSoup, Comment, NavigableString, Tag
 from bs4.formatter import EntitySubstitution, HTMLFormatter
 
 
-from libgutenberg.GutenbergGlobals import NS
+from libgutenberg.GutenbergGlobals import make_url_relative, NS
 from libgutenberg.Logger import critical, info, debug, warning, error
 from libgutenberg.MediaTypes import mediatypes as mt
 
 from ebookmaker import parsers
-from ebookmaker.CommonCode import Options, EbookmakerBadFileException
+from ebookmaker.CommonCode import (csv_escape, EbookAltText, EbookmakerBadFileException,
+                                   filesdir, Options, pgnum_from_url)
 from ebookmaker.utils import add_class, add_style, css_len, replace_elements, xpath
 from . import HTMLParserBase
 from .boilerplate import mark_soup
@@ -76,6 +77,7 @@ REPLACE_ELEMENTS = {
     'blink': 'span',
     'embed': None,
     'bgsound': None,
+    'rb': 'span',
 }
 
 DEPRECATED = {
@@ -146,10 +148,27 @@ CSS_FOR_ADDED = {
     BODY_WRAPPER_CLASS: '.%s {display: inline;}' % BODY_WRAPPER_CLASS,
 }
 
+INAPPROPRIATE_ALTTEXT = {
+    "[image unavailable.]", "_", "[image not available]", " ", "illustration", "cover", "drawing",
+    "diagram", "pic", "illustration-cartoon", "image not available", "illustration", "ilustración",
+    "[this image not available]", "[imagen no disponible.]", "[image not available.]",
+    "(uncaptioned)", "[pas d’image disponible.]", "engraving", "[image unavailable]",
+    "[image unavailble.]", "image", "(unlabelled)", "glyph",
+}
+
+DECORATIVE_ALTTEXT = {
+    "decoration", "decorative line", "(decorative)", "décoration",
+    "ilustración de adorno", "dekoration", "divider", "ornamental line", "adorno", "ornament.",
+    "page deco", "decorative image", "[decorative image unavailable.]", "decorative header",
+    "adorno fin de capítulo", "ornament",
+}
 
 RE_NOT_XML_NAMECHAR = re.compile(r'[^\w.-]')
 
-NO_ALT_TEXT = 'Empty alt text for %s. See https://github.com/gutenbergtools/ebookmaker/blob/master/docs/alt-text.md'
+SEE_A11Y_INFO = "See https://www.pgdp.net/wiki/Accessible_HTML_eBooks#Alt_text"
+NO_ALT_TEXT = 'Empty alt text for %s. '
+DECORATIVE_WARNING = 'Replacing "%s" with empty string and adding role=presentation. '
+INAPPROPRIATE_ERROR = 'Replacing inaccessible alt text "%s" with empty string. '
 
 def nfc(_str):
     return unicodedata.normalize('NFC', EntitySubstitution.substitute_xml(_str))
@@ -165,6 +184,9 @@ class Parser(HTMLParserBase):
         super().__init__(attribs=attribs)
         self.added_classes = set()
         self.seen_ids = set()
+        self.alter = EbookAltText(pgnum_from_url(attribs.orig_url))
+
+
 
     @staticmethod
     def _fix_id(id_):
@@ -473,9 +495,14 @@ class Parser(HTMLParserBase):
                     figure.attrib['aria-labelledby'] = caption.attrib['id']
                     break
         
-        # process alt tags
-        # work around bug in w3c validator: 
+        # process img tags
         for elem in xpath(self.xhtml, "//xhtml:img"):
+            id_ = elem.get('id')
+            if self.alter.get(id_) != None:  # it's None if there is no json file
+                alt = self.alter.get(id_)
+                elem.attrib['alt'] = alt
+                continue
+
             infigure = False
             labeled = elem.get('aria-labelledby')
             if labeled and labeled in self.seen_ids:
@@ -486,10 +513,12 @@ class Parser(HTMLParserBase):
                     del elem.attrib['role']
                     elem.attrib['alt'] = ''
                     continue
+
                 # created synonym for role to work around validator bug
                 if elem.get('data-role') == 'presentation':
                     elem.attrib['alt'] = ''
                     continue
+
                 # check if it's in a figure
                 parent = elem.getparent()              
                 while parent is not None:
@@ -498,9 +527,22 @@ class Parser(HTMLParserBase):
                         break
                     parent = parent.getparent()
                 if not infigure:
-                    warning(NO_ALT_TEXT, elem.get('src'))
-            id_ = elem.get('id')
-            info(f'[ALTTEXT]{self.attribs.url},{id_},{alt},{elem.get("src")},{infigure}')
+                    info(NO_ALT_TEXT, elem.get('src'))
+                    info(SEE_A11Y_INFO)
+            elif alt.lower() in DECORATIVE_ALTTEXT:
+                elem.attrib['alt'] = ''
+                elem.attrib['data-role'] = 'presentation'
+                warning(DECORATIVE_WARNING, alt)
+                warning(SEE_A11Y_INFO)
+            elif alt.lower() in INAPPROPRIATE_ALTTEXT:
+                elem.attrib['alt'] = ''
+                error(INAPPROPRIATE_ERROR, alt)
+                error(SEE_A11Y_INFO)
+
+            # write img info to logs
+            rel_url = make_url_relative(parsers.webify_url(filesdir()), self.attribs.url)
+            src_rel_url = make_url_relative(self.attribs.url, elem.get("src"))
+            info(f'[ALTTEXT]{csv_escape([rel_url, id_, alt, src_rel_url, infigure])}')
                 
 
         ##### cleanup #######

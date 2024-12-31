@@ -114,9 +114,8 @@ then:
 
 `$ pipenv install -e .`
 
-`$ python setup.py test`
+`$ python -m unittest discover`
 
-Travis-CI will run tests on branches committed in the gutenbergtools org
 
 ## Notes running Ebookmaker on Windows Machine (adapted from @windymilla)
 

@@ -1040,7 +1040,7 @@ class Writer(writers.HTMLishWriter):
                 elem.set(attr, fill)
 
         # remove html5-only attribute
-        attrs_to_remove = [('*', 'role'),('*', 'aria-label'),('*', 'aria-labelledby'),]
+        attrs_to_remove = [('*', 'role'),]
         for (tag, attr) in attrs_to_remove:
             for elem in xpath(xhtml, f"//xhtml:{tag}[@{attr}]"):
                 del elem.attrib[attr]
@@ -1054,7 +1054,7 @@ class Writer(writers.HTMLishWriter):
                 writers.HTMLWriter.add_class(tag, newtag)
 
         # replace html5 inline tags
-        for newtag in ['u']:
+        for newtag in ['u', 'ruby', 'rt', 'rp']:
             for tag in xpath(xhtml, f'//xhtml:{newtag}'):
                 usedtags.add(newtag)
                 tag.tag = NS.xhtml.span
@@ -1133,6 +1133,16 @@ class Writer(writers.HTMLishWriter):
             for key in e.attrib.keys():
                 if key.startswith('data-'):
                     del e.attrib[key]
+
+    @staticmethod
+    def strip_aria_attribs(xhtml):
+        """ Epubcheck doesn't like data- attributes in EPUB2.
+        """
+        for e in xpath(xhtml, "//@*[starts-with(name(), 'aria')]/.."):
+            for key in e.attrib.keys():
+                if key.startswith('aria-'):
+                    del e.attrib[key]
+
 
 
     @staticmethod
@@ -1361,6 +1371,10 @@ class Writer(writers.HTMLishWriter):
                     else:
                         # make a copy so we can mess around
                         p.parse()
+
+                        # rewrite the changed image links
+                        p.remap_links(idmap)
+
                         xhtml = copy.deepcopy(p.xhtml) if hasattr(p, 'xhtml') else None
                     if xhtml is not None:
                         if not boilerplate_done:
@@ -1399,6 +1413,7 @@ class Writer(writers.HTMLishWriter):
                         p.strip_links(xhtml, job.spider.dict_urls_mediatypes())
                         self.strip_links(xhtml, job.spider.dict_urls_mediatypes())
                         self.strip_data_attribs(xhtml)
+                        self.strip_aria_attribs(xhtml)
 
                         self.strip_noepub(xhtml)
                         # self.strip_rst_dropcaps(xhtml)

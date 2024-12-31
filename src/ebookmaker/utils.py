@@ -37,7 +37,8 @@ def add_style(elem, style=''):
         elem.set('style', style)
 
 def check_lang(elem, lang_att):
-    three2two = {'ita': 'it', 'lat': 'la', 'heb': 'he', 'fra': 'fr', 'spa': 'es', 'deu': 'de'}
+    three2two = {'ita': 'it', 'lat': 'la', 'heb': 'he', 'fra': 'fr', 'spa': 'es', 'deu': 'de',
+                 'gla': 'gd', 'oji': 'oj', 'nav': 'nv',}
     lang_att = three2two.get(lang_att, lang_att)
     lang = elem.attrib[lang_att]
     lang_name = gg.language_map.get(lang, default=None)

@@ -4,22 +4,25 @@
 """
 CommonCode.py
 
-Copyright 2014-2021 by Marcello Perathoner and Project Gutenberg
+Copyright 2014-2024 by Marcello Perathoner and Project Gutenberg
 
 Distributable under the GNU General Public License Version 3 or newer.
 
 Common code for EbookMaker and EbookConverter.
 
 """
+import csv
 import datetime
+import json
 import os
 import re
 
+from io import StringIO
 from six.moves import configparser
 
 from libgutenberg.CommonOptions import Options
 from libgutenberg.GutenbergGlobals import archive2files
-from libgutenberg.Logger import debug, error, warning
+from libgutenberg.Logger import debug, info, error, warning
 from libgutenberg.Models import File
 from . import parsers
 
@@ -174,6 +177,26 @@ def dir_from_url(url):
 
 RE_SIMPATH = re.compile(r'^\d/')
 RE_PGNUM = re.compile(r'/(\d\d+/.*)')
+RE_FATNUM = re.compile(r'/(\d\d+)/')
+
+def pgnum_from_url(url):
+    longest = '0'
+    for num in  RE_FATNUM.findall(url):
+        longest = num if len(num) > len(longest) else longest
+    return longest
+
+def filesdir():
+    if hasattr(options.config, 'FILESDIR'):
+        if not options.config.FILESDIR[-1] == '/':
+            return dir_from_url(options.config.FILESDIR + '/')
+        else:
+            return dir_from_url(options.config.FILESDIR)
+    else:
+        # use home dir
+        _filesdir = os.path.expanduser("~")
+        warning('Not configured, using %s for FILESDIR', _filesdir)
+        return _filesdir
+    
 def path_from_file(f):
     """
     In some places, we need to get a file system path from a database file object
@@ -205,15 +228,6 @@ def path_from_file(f):
         error('%s is not a string or a libgutenberg.Models.File object', f)
         return
 
-    if hasattr(options.config, 'FILESDIR'):
-        if not options.config.FILESDIR[-1] == '/':
-            filesdir = dir_from_url(options.config.FILESDIR + '/')
-        else:
-            filesdir = dir_from_url(options.config.FILESDIR)
-    else:
-        # use home dir
-        filesdir = os.path.expanduser("~")
-        warning('Not configured, using %s for FILESDIR', filesdir)
     if hasattr(options.config, 'CACHEDIR'):
         cachedir = dir_from_url(options.config.CACHEDIR)        
     else:
@@ -227,11 +241,11 @@ def path_from_file(f):
         # files directory, replace 1/2/3/1234 with files/1234
         if archive_path[0] == '0':
             # special case for single digits
-            return os.path.join(filesdir, 'files', archive_path[2:])
+            return os.path.join(filesdir(), 'files', archive_path[2:])
         else:
             pgnum = RE_PGNUM.search(archive_path)
             if pgnum:
-                return os.path.join(filesdir, 'files', pgnum.group(1))
+                return os.path.join(filesdir(), 'files', pgnum.group(1))
     # legacy pattern, shouldn't be there, but give it a try
     warning('%s is an obsolete or incomplete archive path', archive_path)
     return os.path.join('filesdir', 'dirs', archive_path)
@@ -248,3 +262,31 @@ def find_candidates(path, file_filter=lambda x: True):
             fpath = os.path.join(root, fname)
             if file_filter(fpath):
                 yield fpath
+
+ALTTEXT_DIR = os.path.join(PRIVATE, 'logs', 'alt')
+
+class EbookAltText:
+    _alt_map = None
+    
+    def __init__(self, ebook):
+        alt_text_file = os.path.join(ALTTEXT_DIR, f'alt{ebook}.json')
+        if os.path.exists(alt_text_file):
+            with open(alt_text_file, 'r') as data:
+                try:
+                    self._alt_map = json.loads(data.read())
+                except json.decoder.JSONDecodeError as jde:
+                    self._alt_map = None
+                    error(f'{alt_text_file} is not valid json. {jde}')
+                    
+
+    # note that this returns None if there is no alt text file for the ebook
+    def get(self, img_id):
+        if self._alt_map != None:
+            return self._alt_map.get(img_id, '')
+
+ONELINE = re.compile(r'[\r\n]+')
+def csv_escape(items):
+    buf = StringIO()
+    csvwriter = csv.writer(buf, dialect="excel")
+    csvwriter.writerow([ONELINE.sub(' ', str(item)) for item in items])
+    return buf.getvalue()
