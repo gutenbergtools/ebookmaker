@@ -1,15 +1,16 @@
-0.12.48 wip
-- improve alt-text logging, refactor filesdir
+0.12.48 December 30, 2024
+- the existing warnings for empty alt attributes proved to be somewhat counterproductive. The physician's motto "first, do no harm" is wise. Empty alt attributes are in many cases the correct solution for accessibility, but there are many commonly used entries that are much worse for accessibility. Based on a census of actual alt text entries, the following changes are being made:
+    - empty WARNING  for empty strings in alt attributes is changed to an INFO message. (total 179,161 occurrences)
+    - common decorative image indicators in alt text (such as "decoration") are now removed from alt text with a WARNING and data-role="presentation" is added. (total 6,288 occurrences)
+    - common inappropriate alt text entries (such as "[image unavailable.]") are now replaced with "" and an ERROR message. (total 16420 occurrences). fixes #239
+    - improved alt-text logging, refactored filesdir
 - fixed a very old bug that affects only EPUB2 files generated from html that references GIF files in CSS. It's long been the case that Ebookmaker converts gif files to png for EPUB packaging, and this bug was fixed for EPUB3 files when EPUB3 support was added.
-- added alt-text insertion capability in HTMLParser. In checks for a json file in the logs directory. Added some code to test that it works. Implemented the alt_text_good method to update the EPUB3 accessibility data.
+- added experimental alt-text insertion capability in HTMLParser. It checks for a json file of contributed alt text in the logs directory. Added some code to test that it works. Implemented the alt_text_good method to update the EPUB3 accessibility data.
 - added gd, nv, and oj to the 3 to 2 language table, fixing #243
-- csv escape the [ALTTEXT] log entries. fixes #246
-- empty string in alt text WARNING changed to INFO. (total 179,161 occurrences)
-- common decorative image indicators now removed from alt text with a WARNING and data-role="presentation" added. (total 6,288 occurrences)
-- common inappropriate alt text messages now replaced with "" and an ERROR message. (total 16420 occurrences)
 - added removal for aria-* and role attributes for EPUB2 files.
 - restore role attribute from data-role attributes for EPUB3 files since the EPUB validator doesn't have the html5 validator's bug.
-
+- (via libgutenberg) fixed bug that caused original publication year to be omitted for pubinfo strings. Fixes #245
+- replace ruby markup for EPUB2, rb element for HTML5. (`ruby`, `rt` and `rp` are not allowed in EPUB2, and `rb`, "ruby base", is deprecated in HTML5) Fixes #244.
 
 0.12.47 September 20, 2024
 - because of a validator bug, the W3C recommended markup for images with `role="presentation"` fails w3c validation. We have made `data-role' a synonym for `role` in this context, allowing files that use the "presentation" role to do so without raising a validation error. https://github.com/validator/validator/issues/1599

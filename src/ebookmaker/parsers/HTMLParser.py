@@ -157,7 +157,7 @@ INAPPROPRIATE_ALTTEXT = {
 }
 
 DECORATIVE_ALTTEXT = {
-    "decoration", "decorative line", "(decorative)", "decoration", "décoration",
+    "decoration", "decorative line", "(decorative)", "décoration",
     "ilustración de adorno", "dekoration", "divider", "ornamental line", "adorno", "ornament.",
     "page deco", "decorative image", "[decorative image unavailable.]", "decorative header",
     "adorno fin de capítulo", "ornament",
