@@ -1,3 +1,7 @@
+0.12.49 (WIP)
+- added the "production" flag to allow context-sensitive log entries. if the flag is set, then lack of header/footer markers will be reported as CRITICAL errors; if not (the default, there will be INFO messages instead.
+
+
 0.12.48 December 30, 2024
 - the existing warnings for empty alt attributes proved to be somewhat counterproductive. The physician's motto "first, do no harm" is wise. Empty alt attributes are in many cases the correct solution for accessibility, but there are many commonly used entries that are much worse for accessibility. Based on a census of actual alt text entries, the following changes are being made:
     - empty WARNING  for empty strings in alt attributes is changed to an INFO message. (total 179,161 occurrences)

@@ -106,6 +106,13 @@ def add_common_options(ap, user_config_file):
         help="be verbose (-v -v be more verbose)")
 
     ap.add_argument(
+        "--production",
+        dest="production",
+        action="store_true",
+        help="use messages appropriate for a production context")
+
+
+    ap.add_argument(
         "--config",
         metavar="CONFIG_FILE",
         dest="config_file",
