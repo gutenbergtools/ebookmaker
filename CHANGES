@@ -1,5 +1,7 @@
 0.12.49 (WIP)
 - added the "production" flag to allow context-sensitive log entries. if the flag is set, then lack of header/footer markers will be reported as CRITICAL errors; if not (the default, there will be INFO messages instead.
+- added FILESDIR and CACHEDIR to sample conf file
+- changed the WARNING when FILESDIR was not configured to an INFO; there was already a sensible default.
 
 
 0.12.48 December 30, 2024

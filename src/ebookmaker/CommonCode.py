@@ -201,7 +201,7 @@ def filesdir():
     else:
         # use home dir
         _filesdir = os.path.expanduser("~")
-        warning('Not configured, using %s for FILESDIR', _filesdir)
+        info('Not configured, using %s for FILESDIR', _filesdir)
         return _filesdir
     
 def path_from_file(f):
