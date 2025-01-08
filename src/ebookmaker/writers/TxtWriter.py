@@ -112,7 +112,7 @@ class Writer(writers.BaseWriter):
 
         mkdir_for_filename(filename)
 
-        info("Creating plain text file: %s from %s", filename, job.url)
+        debug("Creating plain text file: %s from %s", filename, job.url)
 
         parser = ParserFactory.ParserFactory.create(job.url)
 
@@ -136,4 +136,4 @@ class Writer(writers.BaseWriter):
 
         self.write_with_crlf(filename, data)
 
-        info("Done plain text file: %s" % filename)
+        debug("Done plain text file: %s" % filename)

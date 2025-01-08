@@ -158,7 +158,7 @@ class OEBPSContainer(zipfile.ZipFile):
 
         self.zipfilename = filename
         self.oebps_path = oebps_path if oebps_path else 'OEBPS/'
-        info('Creating Epub file: %s' % filename)
+        debug('Creating Epub file: %s' % filename)
         mkdir_for_filename(filename)
 
         # open zipfile
@@ -178,7 +178,7 @@ class OEBPSContainer(zipfile.ZipFile):
 
     def commit(self):
         """ Close OCF Container. """
-        info("Done Epub file: %s" % self.zipfilename)
+        debug("Done Epub file: %s" % self.zipfilename)
         self.close()
 
 
@@ -854,7 +854,7 @@ class Writer(writers.HTMLishWriter):
                 elem.text = ''
 
             if count:
-                warning("%d elements having class %s have been rewritten." %
+                info("%d elements having class %s have been rewritten." %
                         (count, class_))
 
 

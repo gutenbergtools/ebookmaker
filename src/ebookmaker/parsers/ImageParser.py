@@ -126,7 +126,7 @@ class Parser(ParserBase):
             comment = "Image: %d x %d size=%d %s" % (
                 image.size[0], image.size[1], len(data), was
             )
-            debug(comment)
+            #debug(comment)
 
             new_parser.image_data = data
             new_parser.dimen = tuple(image.size)

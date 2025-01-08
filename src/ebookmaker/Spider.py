@@ -15,6 +15,7 @@ Rudimentary Web Spider
 import copy
 import fnmatch
 import os.path
+import re
 
 from six.moves import urllib
 
@@ -29,6 +30,8 @@ from ebookmaker.ParserFactory import ParserFactory
 
 
 options = Options()
+
+RE_PGLINK = re.compile(r'^https?://(www.|)(gutenberg|pglaf|pgdp).org(\W|$)', re.I)
 
 class Spider(object):
     """ A very rudimentary web spider. """
@@ -106,7 +109,7 @@ class Spider(object):
                 parser._xhtml = copy.deepcopy(parser.xhtml)
 
             # look for more documents to add to the queue
-            debug("Requesting iterlinks for: %s ..." % url)
+            # debug("Requesting iterlinks for: %s ..." % url)
             for url, elem in parser.iterlinks():
                 counter += 1
                 url = urllib.parse.urldefrag(url)[0]
@@ -187,7 +190,7 @@ class Spider(object):
         """ Enqueue url for parsing."""
         if is_doc:
             if not self.is_included_url(attribs):
-                if attribs.url and attribs.url.startswith('https://www.gutenberg.org/'):
+                if attribs.url and RE_PGLINK.search(attribs.url):
                     info('PG link in %s: %s', attribs.referrer, attribs.url)
                 else: 
                     warning('External link in %s: %s', attribs.referrer, attribs.url)
@@ -223,8 +226,6 @@ class Spider(object):
 
         if excluded:
             debug("Dropping excluded %s" % url)
-        if not included:
-            debug("Dropping not included %s" % url)
         return False
 
 
@@ -257,8 +258,6 @@ class Spider(object):
 
         if excluded:
             debug("Dropping excluded mediatype %s" % mediatype)
-        if not included:
-            debug("Dropping not included mediatype %s" % mediatype)
 
         return False
 

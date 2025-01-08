@@ -511,11 +511,11 @@ def do_job(job):
             # don't us GutenbergTextParser for subsequent builds
             ParserFactory.ParserFactory.parsers = {}
 
-    except SkipOutputFormat as what:
-        warning("%s" % what)
+    except SkipOutputFormat:
+        debug(f"{job.type} skipped")
 
     except Exception as what:
-        exception("%s" % what)
+        exception(f"{job.type} raises exception {what}")
 
     end_time = datetime.datetime.now()
     info(' %s made in %s' % (job.type, end_time - start_time))
@@ -587,7 +587,7 @@ def main():
     dc = None
     for job in job_queue:
         try:
-            info('Job starting for type %s from %s', job.type, job.url)
+            debug('Job starting for type %s from %s', job.type, job.url)
             dc = get_dc(job) # this is when doc at job.url gets parsed!
             job.dc = dc
             job.last_updated()

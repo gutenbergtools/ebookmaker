@@ -566,7 +566,6 @@ class Writer(EpubWriter.Writer):
         for rule in sheet:
             if rule.type == rule.MEDIA_RULE:
                 for medium in rule.media:
-                    info(f'{medium}')
                     if medium == 'handheld':
                         rule.media.deleteMedium(medium)
                         rule.media.appendMedium(HANDHELD_QUERY)

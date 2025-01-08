@@ -35,13 +35,13 @@ class Writer (writers.BaseWriter):
         outputfilename = os.path.join (os.path.abspath(job.outputdir), job.outputfile)
 
         debug ("Inputfile: %s" % inputfilename)
-        info ("Creating PDF file: %s" % outputfilename)
+        debug ("Creating PDF file: %s" % outputfilename)
 
         mkdir_for_filename(outputfilename)
         parser = ParserFactory.ParserFactory.create (inputfilename)
 
         if not hasattr (parser, 'rst2xetex'):
-            warning ('Skipping PDF Output because input mediatype is %s' % parser.mediatype())
+            debug ('Skipping PDF Output because input mediatype is %s' % parser.mediatype())
             raise SkipOutputFormat
 
         # Brain-dead xetex doesn't understand unix pipes
@@ -97,4 +97,4 @@ class Writer (writers.BaseWriter):
 
         os.chdir (cwd)
 
-        info ("Done PDF file: %s" % outputfilename)
+        debug ("Done PDF file: %s" % outputfilename)

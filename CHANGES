@@ -2,6 +2,8 @@
 - added the "production" flag to allow context-sensitive log entries. if the flag is set, then lack of header/footer markers will be reported as CRITICAL errors; if not (the default, there will be INFO messages instead.
 - added FILESDIR and CACHEDIR to sample conf file
 - changed the WARNING when FILESDIR was not configured to an INFO; there was already a sensible default.
+- it's been a long time since logging was rationalized. In general, there was much unneeded logging. Many WARNING messages were changed to INFO; many INFO messages were changed to DEBUG, and several DEBUG messages were removed, commented out, or changed to summary messages outside of a loop.
+- any link to gutenberg.org, pglaf.org, or pgdp.org are now considered gutenberg links and get an INFO message rather than a WARNING.
 
 
 0.12.48 December 30, 2024

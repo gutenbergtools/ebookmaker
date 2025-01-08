@@ -166,7 +166,7 @@ class Writer(writers.HTMLishWriter):
 
         for dcmitype in job.dc.dcmitypes:
             self.add_prop(tree, "og:type", dcmitype.id)
-        info(job.main)
+        debug(job.main)
         self.add_prop(tree, "og:url", canonical_url(job.dc, job.type))
         self.add_prop(tree, "og:image", canonical_url(job.dc, 'cover.medium'))
 
@@ -202,7 +202,7 @@ class Writer(writers.HTMLishWriter):
             break
         else:
             #body.insert(0, new_bp)
-            info('No pg-header found, not inserting a generated one.')
+            debug('No pg-header found, not inserting a generated one.')
             
         new_bp = HtmlTemplates.pgfooter(job.dc)
 
@@ -216,7 +216,7 @@ class Writer(writers.HTMLishWriter):
             break
         else:
             #body.append(new_bp)
-            info('No pg-footer found, not inserting a generated one')
+            debug('No pg-footer found, not inserting a generated one')
 
         for pg_smallprint in xpath(tree, '//*[@id="pg-smallprint"]'):
             pg_smallprint.getparent().remove(pg_smallprint)
@@ -258,7 +258,7 @@ class Writer(writers.HTMLishWriter):
 
             jobfilename = os.path.join(os.path.abspath(job.outputdir), job.outputfile)
 
-            info("Creating HTML file: %s" % jobfilename)
+            debug("Creating HTML file: %s" % jobfilename)
 
             relativeURL = os.path.basename(url)
             if relativeURL != job.outputfile:
@@ -270,10 +270,10 @@ class Writer(writers.HTMLishWriter):
         else:
             if url.startswith(webify_url(job.outputdir)):
                 relativeURL = gg.make_url_relative(webify_url(job.outputdir) + '/', url)
-                debug('output relativeURL for %s to %s : %s', webify_url(job.outputdir), url, relativeURL)
+                #debug('output relativeURL for %s to %s : %s', webify_url(job.outputdir), url, relativeURL)
             else:
                 relativeURL = gg.make_url_relative(job.main, url)
-                debug('relativeURL for %s to %s : %s', job.main, url, relativeURL)
+                #debug('relativeURL for %s to %s : %s', job.main, url, relativeURL)
 
         return os.path.join(os.path.abspath(job.outputdir), relativeURL)
 
@@ -513,7 +513,7 @@ class Writer(writers.HTMLishWriter):
                     etree.cleanup_namespaces(html)
 
                     self.write_with_crlf(outfile, serialize(html))                   
-                    info("Done generating HTML file: %s" % outfile)
+                    debug("Done generating HTML file: %s" % outfile)
 
                 else:
                     #images and css files
@@ -533,4 +533,4 @@ class Writer(writers.HTMLishWriter):
                     os.remove(outfile)
                 raise what
 
-        info("Done generating HTML: %s" % job.outputfile)
+        debug("Done generating HTML: %s" % job.outputfile)

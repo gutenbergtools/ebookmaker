@@ -739,7 +739,7 @@ class Parser(HTMLParserBase):
 
         marked = mark_soup(soup)
         if not marked:
-            info('No boilerplate found in %s', self.attribs.url)
+            debug('No boilerplate found in %s', self.attribs.url)
 
         html = soup.decode(formatter=nfc_formatter)
         if not html:

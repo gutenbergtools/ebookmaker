@@ -61,8 +61,8 @@ class Writer(writers.BaseWriter):
 
         dest_dir = os.path.abspath(job.outputdir)
 
-        info("Creating Pics directory in: %s" % dest_dir)
+        debug("Creating Pics directory in: %s" % dest_dir)
 
         self.copy_aux_files(job, dest_dir)
 
-        info("Done Pics directory in: %s" % dest_dir)
+        debug("Done Pics directory in: %s" % dest_dir)
