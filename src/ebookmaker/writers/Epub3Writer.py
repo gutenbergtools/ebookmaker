@@ -542,7 +542,7 @@ class Writer(EpubWriter.Writer):
 
     @staticmethod
     def html_for_epub3(xhtml):
-        """ Convert data-epub attribute to ebub attributes
+        """ Convert data-epub attribute to epub attributes
         """
         for e in xpath(xhtml, "//@*[starts-with(name(), 'data-epub')]/.."):
             for key in e.attrib.keys():
@@ -556,6 +556,11 @@ class Writer(EpubWriter.Writer):
             role = e.attrib['data-role']
             e.attrib['role'] = role
             del e.attrib['data-role']
+        # add namespace to math elements
+        for e in xpath(xhtml, "//xhtml:math"):
+            debug('found math')
+            e.attrib['xmlns'] = "http://www.w3.org/1998/Math/MathML"
+            debug(e)
 
     @staticmethod
     def fix_incompatible_css(sheet):
