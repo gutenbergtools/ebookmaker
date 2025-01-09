@@ -739,7 +739,8 @@ class Parser(HTMLParserBase):
 
         marked = mark_soup(soup)
         if not marked:
-            debug('No boilerplate found in %s', self.attribs.url)
+            if options.production and self.attribs.id == 'start':
+                critical('Boilerplate markers are missing in %s', self.attribs.url)
 
         html = soup.decode(formatter=nfc_formatter)
         if not html:

@@ -36,10 +36,6 @@ import soupsieve as sv
 from libgutenberg.GutenbergGlobals import xmlspecialchars
 from libgutenberg.Logger import critical, info, debug, warning, error
 
-from ebookmaker.CommonCode import Options
-
-options = Options()
-
 TOP_MARKERS = [
     re.compile(r"\*+ ?START\s+OF\s+TH(E|IS)\s+PROJECT\s+GUTENBERG", re.I),
 ]
@@ -139,17 +135,11 @@ def mark_soup(soup):
 
     found_top = mark_bp(body, 'pg-header', TOP_MARKERS, top=True)
     if not found_top:
-        if options.production:
-            critical('No PG header marker found.')
-        else:
-            info('No PG header marker found.')
+        info('No PG header marker found.')
 
     found_bottom = mark_bp(body, 'pg-footer', BOTTOM_MARKERS, top=False)
     if not found_bottom:
-        if options.production:
-            critical('No PG footer marker found.')
-        else:
-            info('No PG footer marker found.')
+        info('No PG footer marker found.')
 
     return found_top or found_bottom
 
