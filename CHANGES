@@ -13,17 +13,57 @@
 
 
 
+0.12.48 December 30, 2024
+- the existing warnings for empty alt attributes proved to be somewhat counterproductive. The physician's motto "first, do no harm" is wise. Empty alt attributes are in many cases the correct solution for accessibility, but there are many commonly used entries that are much worse for accessibility. Based on a census of actual alt text entries, the following changes are being made:
+    - empty WARNING  for empty strings in alt attributes is changed to an INFO message. (total 179,161 occurrences)
+    - common decorative image indicators in alt text (such as "decoration") are now removed from alt text with a WARNING and data-role="presentation" is added. (total 6,288 occurrences)
+    - common inappropriate alt text entries (such as "[image unavailable.]") are now replaced with "" and an ERROR message. (total 16420 occurrences). fixes #239
+    - improved alt-text logging, refactored filesdir
+- fixed a very old bug that affects only EPUB2 files generated from html that references GIF files in CSS. It's long been the case that Ebookmaker converts gif files to png for EPUB packaging, and this bug was fixed for EPUB3 files when EPUB3 support was added.
+- added experimental alt-text insertion capability in HTMLParser. It checks for a json file of contributed alt text in the logs directory. Added some code to test that it works. Implemented the alt_text_good method to update the EPUB3 accessibility data.
+- added gd, nv, and oj to the 3 to 2 language table, fixing #243
+- added removal for aria-* and role attributes for EPUB2 files.
+- restore role attribute from data-role attributes for EPUB3 files since the EPUB validator doesn't have the html5 validator's bug.
+- (via libgutenberg) fixed bug that caused original publication year to be omitted for pubinfo strings. Fixes #245
+- replace ruby markup for EPUB2, rb element for HTML5. (`ruby`, `rt` and `rp` are not allowed in EPUB2, and `rb`, "ruby base", is deprecated in HTML5) Fixes #244.
 
+0.12.47 September 20, 2024
+- because of a validator bug, the W3C recommended markup for images with `role="presentation"` fails w3c validation. We have made `data-role' a synonym for `role` in this context, allowing files that use the "presentation" role to do so without raising a validation error. https://github.com/validator/validator/issues/1599
 
+0.12.45 September 18, 2024
+- generated covers are now 1600x2400 to comply with Apple Books recommended minimum width and DP guidelines https://www.pgdp.net/wiki/DP_Official_Documentation:PP_and_PPV/Post-Processing_FAQ#Information_for_all_types_of_cover #234
+- added accessibility metadata to EPUB3 content.ocf as suggested by ACE
+- stub implementation to allow assertions of good alt text in config.
+- added aria labels and roles to nav elements of EPUB3 content.ocf and toc.xhtml
+- added lang attribute to wrapper file html elements as suggested by ACE
+- fix opengraph urls in HTML metadata #235
+- update cchardet to solve problems installing on python 3.11
+- alt-text logging is restructured
+    - empty alt-text warnings are now suppressed in figures
+    - empty alt-text warnings are now suppressed when role='presentation' or aria-labelledby attributes are present
+    - the alt text examination is moved from the Spider module to the HTMLParser module.
+    - ids are assigned to all img elements to facilitate alt-text mitigation. 
+    - alt-text logging is improved.
+    - empty alt-text warnings now reference a newly added doc page: https://github.com/gutenbergtools/ebookmaker/blob/master/docs/alt-text.md
+- bug in undeployed 0.12.44 fixed
 
-
-
-
-
+0.12.43 May 22, 2024
+- fixed chunker bugs:
+    - no longer emits empty chunks (was happening with large child elements of body) #224
+    - no longer splits elements in NEVER_SPLIT list when they are only children. #226
+- fix missing empty line in txt output for copyrighted books #222
+- made copyright addition in header/footer case-insensitive
+- adds NFC unicode normalization to text parser #218
+- libgutenberg 0.10.5
+    - don't strip periods from title_no_subtitle
+    - The `heading` column in the database's author-book many to many table was being ignored by much of our code. The result was that multiple authors were being listed in alphabetical order. now, the heading column is used and the first sort column for the authors of a book, and the authors other than the first author are have heading=2 (instead of the default `heading=1`) set on initial metadata load. The cataloguer can reset the heading numbers, but does not wish the order of authors other than the "main" author to be tracked in the database.
+    - fixed a reversion in 0.10.10 that made author name matching case sensitive.   
+- get ebook number from filename if parse fails #225 
 
 
 0.12.42 April 01, 2024
 - fixed rst -> epub3 conversion
+
 
 0.12.41 March 01, 2024
 - clean up txt boilerplate. fixes easy parts of #220

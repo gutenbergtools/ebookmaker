@@ -55,7 +55,7 @@ def pgheader(dc):
         lang = lang if lang else language.id 
         language_list.append(language.language)
 
-    if 'copyright' in dc.rights:
+    if 'copyright' in dc.rights.lower():
         rights = HEADERA.format(copyrighted=COPYRIGHTED)    
     else:
         rights = HEADERA.format(copyrighted='')
@@ -90,7 +90,7 @@ def pgheader(dc):
     
 
 def pgfooter(dc):
-    copyright_addition = COPYRIGHT_ADDITION if 'copyright' in dc.rights else ''
+    copyright_addition = COPYRIGHT_ADDITION if 'copyright' in dc.rights.lower() else ''
 
     pg_footer = f'''
 <section class="pg-boilerplate pgheader" id="pg-footer" lang='en' xml:lang='en' xmlns="http://www.w3.org/1999/xhtml">

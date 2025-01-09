@@ -1,2 +1,2 @@
-VERSION = '0.12.42'
+VERSION = '0.12.48'
 GENERATOR = 'Ebookmaker %s by Project Gutenberg'

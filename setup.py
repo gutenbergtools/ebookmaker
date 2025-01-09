@@ -46,7 +46,7 @@ if __name__ == "__main__":
             'requests',
             'six>=1.4.1',
             'libgutenberg[covers]>=0.10.22',
-            'cchardet',
+            'cchardet==2.2.0a2',
             'beautifulsoup4',
             'html5lib',
         ],
@@ -82,9 +82,9 @@ if __name__ == "__main__":
             "Operating System :: OS Independent",
             "Intended Audience :: Other Audience",
             "Programming Language :: Python",
-            "Programming Language :: Python :: 3.7",
-            "Programming Language :: Python :: 3.8",
             "Programming Language :: Python :: 3.9",
+            "Programming Language :: Python :: 3.10",
+            "Programming Language :: Python :: 3.11",
         ],
 
         platforms = 'OS-independent'

@@ -27,7 +27,6 @@ from ebookmaker import parsers
 from ebookmaker.CommonCode import Options
 from ebookmaker.ParserFactory import ParserFactory
 
-NO_ALT_TEXT = 'Empty alt text for %s. See https://www.w3.org/WAI/tutorials/images/ for info on accessible alt text.'
 
 OPS_AUDIO_MEDIATYPES = set((
     'audio/mpeg',
@@ -168,8 +167,6 @@ class Spider(object):
                         self.enqueue(queue, depth + 1, new_attribs, True)
                         
                 elif tag in (NS.xhtml.img, NS.xhtml.style):
-                    if 'alt' in elem.attrib and elem.attrib['alt'] == '':
-                        warning(NO_ALT_TEXT, url)
                     if tag == NS.xhtml.style or self.is_image(new_attribs):
                         self.enqueue(queue, depth, new_attribs, False)
                     else:

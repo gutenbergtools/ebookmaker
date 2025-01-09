@@ -31,7 +31,7 @@ from libgutenberg.MediaTypes import mediatypes as mt
 from ebookmaker import parsers
 from ebookmaker import ParserFactory
 from ebookmaker import HTMLChunker
-from ebookmaker.CommonCode import Options
+from ebookmaker.CommonCode import EbookAltText, Options
 from ebookmaker.Version import VERSION, GENERATOR
 from ebookmaker.Spider import OPS_AUDIO_MEDIATYPES
 
@@ -117,6 +117,10 @@ body.x-ebookmaker.x-ebookmaker-3  .pgshow {
     }
 """
 
+def alt_text_good(book_id):
+    return EbookAltText(book_id).get('x') != None
+
+
 class OEBPSContainer(EpubWriter.OEBPSContainer):
     """ Class representing an OEBPS Container. """
 
@@ -128,7 +132,7 @@ class OEBPSContainer(EpubWriter.OEBPSContainer):
         (cover_x, cover_y) = parser.get_image_dimen()
         wrapper = f'''
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
   <head>
     <title>"Cover"</title>
     <link href="pgepub.css" rel="stylesheet"/>
@@ -218,7 +222,7 @@ class Toc(TocNCX):
         """ Build the toc. """
         em = self.elementmaker
 
-        root = em.nav(**{EPUB_TYPE: 'toc'})
+        root = em.nav(**{EPUB_TYPE: 'toc', 'role': 'doc-toc', 'aria-label': 'Table of Contents'})
         toctop = em.ol()
         root.append(toctop)
 
@@ -255,7 +259,7 @@ class Toc(TocNCX):
     def _make_pagelist(self, toc):
         """ Build the page list. """
         em = self.elementmaker
-        root = em.nav(**{EPUB_TYPE: 'landmarks'})
+        root = em.nav(**{EPUB_TYPE: 'landmarks', 'aria-label': 'Page List'})
         pagelist_top = em.ol(**{'id': 'pages', 'class': 'pagelist'})
         root.append(pagelist_top)
 
@@ -276,6 +280,7 @@ class ContentOPF(object):
 
     def __init__(self):
         self.nsmap = gg.build_nsmap('opf dc dcterms xsi')
+        self.lang = None
 
         # FIXME: remove this when lxml is fixed
         # workaround for lxml fat-fingering the default attribute namespaces
@@ -300,7 +305,7 @@ class ContentOPF(object):
         assert len(self.spine) > 0, 'No spine item in content.opf.'
 
         package = self.opf.package(
-            **{'version': '3.0', 'unique-identifier': 'id'}) # FIXME add version to instance
+            **{'version': '3.0', 'unique-identifier': 'id', NS.xml.lang: self.lang})
         package.append(self.metadata)
         package.append(self.manifest)
         package.append(self.spine)
@@ -470,7 +475,9 @@ class ContentOPF(object):
 
         for language in dc.languages:
             self.metadata.append(dcterms.language(language.id))
-
+            if not self.lang:
+                self.lang = language.id  # assume first lang is main lang
+ 
         for subject in dc.subjects:
             self.metadata.append(dcterms.subject(subject.subject))
 
@@ -489,6 +496,23 @@ class ContentOPF(object):
                 source = urllib.parse.urljoin(options.config.PGURL, source)
 
         self.metadata.append(dcterms.source(source))
+        
+        # accessibility Metadata
+        self.metadata.append(self.opf.meta('textual', {'property': 'schema:accessMode'}))
+        self.metadata.append(self.opf.meta('readingOrder', {
+            'property': 'schema:accessibilityFeature'}))
+        self.metadata.append(self.opf.meta('none', {'property': 'schema:accessibilityHazard'}))
+        if alt_text_good(dc.project_gutenberg_id):
+            self.metadata.append(self.opf.meta('alternativeText', {
+                'property': 'schema:accessibilityFeature'}))
+            a11y_summary = 'This publication has complete alternative text descriptions.'
+        else:
+            a11y_summary = 'This publication may not have complete alternative text descriptions.'
+        # TODO: reimplement this indicators when audio included
+        self.metadata.append(self.opf.meta('textual,visual', {
+            'property': 'schema:accessModeSufficient'}))
+        self.metadata.append(self.opf.meta(a11y_summary, {
+            'property': 'schema:accessibilitySummary'}))
 
 
     def add_coverpage(self, url, id_):
@@ -532,6 +556,11 @@ class Writer(EpubWriter.Writer):
                     del e.attrib[key]
                     new_key = getattr(NS.epub, key[10:])
                     e.attrib[new_key] = val
+        # other end of work-around for validator bug
+        for e in xpath(xhtml, "//xhtml:img[@data-role]"):
+            role = e.attrib['data-role']
+            e.attrib['role'] = role
+            del e.attrib['data-role']
 
     @staticmethod
     def fix_incompatible_css(sheet):
