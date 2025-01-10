@@ -1060,6 +1060,39 @@ class Writer(writers.HTMLishWriter):
                 tag.tag = NS.xhtml.span
                 writers.HTMLWriter.add_class(tag, newtag)
 
+        # replace html5 math element
+        for tag in xpath(xhtml, f'//xhtml:math'):
+            usedtags.add("math")
+            display = tag.attrib.pop('display', None)
+            altimg = tag.attrib.pop('altimg', None)
+            alttext = tag.attrib.pop('alttext', '')
+            for attr in  ['xref', 'mode', 'overflow', 'macros']:
+                tag.attrib.pop(attr, None)
+            if display:
+                if display == 'block':
+                    tag.tag = NS.xhtml.div
+                    writers.HTMLWriter.add_class(tag, 'div')
+            else:
+                tag.tag = NS.xhtml.span
+                writers.HTMLWriter.add_class(tag, 'span')
+            if altimg:
+                attrib = tag.attrib
+                tag.clear()
+                debug(attrib)
+                tag.attrib.update(attrib)
+                img = etree.SubElement(tag, 'img')
+                img.attrib['alt'] = alttext
+                img.attrib['src'] = altimg
+            else:
+                text = tag.text_content()
+                tag.clear()
+                tag.text = text
+            
+            
+            
+
+            
+                
 
     @staticmethod
     def strip_links(xhtml, manifest):
