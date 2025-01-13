@@ -555,9 +555,7 @@ class Writer(EpubWriter.Writer):
             del e.attrib['data-role']
         # add namespace to math elements
         for e in xpath(xhtml, "//xhtml:math"):
-            debug('found math')
             e.attrib['xmlns'] = "http://www.w3.org/1998/Math/MathML"
-            debug(e)
 
     @staticmethod
     def fix_incompatible_css(sheet):
@@ -797,6 +795,8 @@ class Writer(EpubWriter.Writer):
                 p = ParserFactory.ParserFactory.get(attribs)
                 p.xhtml = chunk
                 parserlist.append(p)
+                if hasattr(p, 'finalize_html5'):
+                    p.finalize_html5(p.xhtml)
 
             self.shipout(job, parserlist, ncx, ncx2)
 

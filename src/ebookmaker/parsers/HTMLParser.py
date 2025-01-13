@@ -338,8 +338,12 @@ class Parser(HTMLParserBase):
                     del elem.attrib[key]
                     elem.attrib[new_key] = val
 
-
-
+    def finalize_html5(cls, xhtml):
+        # workaround to let lxml iterlinks for math@altimg attribute links
+        for e in xpath(xhtml, "//xhtml:math"):
+            alttimg = e.attrib.pop('src', None)
+            if alttimg:
+                e.attrib['altimg'] = alttimg
 
     idnum = 0
     def _to_xhtml11(self):
@@ -736,7 +740,10 @@ class Parser(HTMLParserBase):
                     elem.wrap(new_div)
                     self.added_classes.add(BODY_WRAPPER_CLASS)
 
-
+        # workaround to let lxml iterlinks for math@altimg attribute links
+        for elem in soup.find_all('math', altimg=True):
+            elem["src"] = elem["altimg"]
+            print(elem["altimg"])
 
         marked = mark_soup(soup)
         if not marked:

@@ -479,6 +479,8 @@ class Writer(writers.HTMLishWriter):
             elif hasattr(p, 'xhtml'):
                 p.parse()
                 xhtml = copy.deepcopy(p.xhtml)
+                if hasattr(p, 'finalize_html5'):
+                    p.finalize_html5(xhtml)
                 self.make_links_relative(xhtml, p.attribs.url)
                 rewrite_links(job, xhtml)
 

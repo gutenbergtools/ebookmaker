@@ -479,7 +479,7 @@ class HTMLParserBase(ParserBase):
             debug(f"stripped {replacements} <link>s for href not in manifest.")
 
         replacements = 0
-        for image in xpath(xhtml, '//xhtml:img[@src]'):
+        for image in xpath(xhtml, '//xhtml:*[@src]'):
             src = image.get('src')
             if src not in manifest:
                 replacements += 1

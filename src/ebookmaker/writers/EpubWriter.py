@@ -1064,7 +1064,7 @@ class Writer(writers.HTMLishWriter):
         for tag in xpath(xhtml, f'//xhtml:math'):
             usedtags.add("math")
             display = tag.attrib.pop('display', None)
-            altimg = tag.attrib.pop('altimg', None)
+            altimg = tag.attrib.pop('src', None) # altimg moved to source in pre_parse
             alttext = tag.attrib.pop('alttext', '')
             for attr in  ['xref', 'mode', 'overflow', 'macros']:
                 tag.attrib.pop(attr, None)
@@ -1078,9 +1078,8 @@ class Writer(writers.HTMLishWriter):
             if altimg:
                 attrib = tag.attrib
                 tag.clear()
-                debug(attrib)
                 tag.attrib.update(attrib)
-                img = etree.SubElement(tag, 'img')
+                img = etree.SubElement(tag, NS.xhtml.img)
                 img.attrib['alt'] = alttext
                 img.attrib['src'] = altimg
             else:
