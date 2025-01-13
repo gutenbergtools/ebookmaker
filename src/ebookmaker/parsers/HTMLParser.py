@@ -542,7 +542,8 @@ class Parser(HTMLParserBase):
             # write img info to logs
             rel_url = make_url_relative(parsers.webify_url(filesdir()), self.attribs.url)
             src_rel_url = make_url_relative(self.attribs.url, elem.get("src"))
-            info(f'[ALTTEXT]{csv_escape([rel_url, id_, alt, src_rel_url, infigure])}')
+            if options.production:
+                info(f'[ALTTEXT]{csv_escape([rel_url, id_, alt, src_rel_url, infigure])}')
                 
 
         ##### cleanup #######
