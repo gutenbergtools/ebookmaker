@@ -7,6 +7,11 @@ With this release we add some important new capabilities to Ebookmaker; other mo
     - An online service existed to generate alt text automatically from MathML: https://github.com/openstax/mathmlcloud I am trying to find out more about its status.
     - arXiv uses LaTeXML to convert LaTeX math to MathML https://math.nist.gov/~BMiller/LaTeXML/
     - fixed issue where html5 `math` element produced EPUB3 that didn't validate
+- This release adds support for inline (embedded) SVG via the `svg` element.
+    - Previous versions of Ebookmaker only supported external svg images.
+    - Because Ebookmaker is required to produce XML based output in EPUB files, inline SVG must use XML syntax rather than HTML5 syntax. This means that element and attribute names inside the `svg` element are case-sensitive, and the `svg` element MUST include an `xmlns="http://www.w3.org/2000/svg"` attribute.
+    - While use of the alt attribute on external svg images in img elements should be well understood, the impact of inline SVG on accessibility is mixed. If the svg does not contain text elements, the use of the svg title attribute is recommended. See https://www.unimelb.edu.au/accessibility/techniques/accessible-svgs for a good discussion.
+    - We remove the svg `role` attribute in EPUB2 files, because there's no way to use use it in EPUB2 files without triggering a validation error. The `role` attribute is retained for inline svg in EPUB3 files. No problems occur for HTML5 files.
 - added the "production" flag to allow context-sensitive log entries. if the flag is set, then lack of header/footer markers will be reported as CRITICAL errors; if not (the default, there will be INFO messages instead. The production flag also turns on ALTTEXT logging.
 - added FILESDIR and CACHEDIR to sample conf file
 - changed the WARNING when FILESDIR was not configured to an INFO; there was already a sensible default.

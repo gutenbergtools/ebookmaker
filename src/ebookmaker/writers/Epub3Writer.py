@@ -384,9 +384,8 @@ class ContentOPF(object):
         if hasattr(p.attribs, 'comment'):
             self.manifest.append(etree.Comment(p.attribs.comment))
         prop = None
-        for rel in p.attribs.rel:
-            if rel == 'mathml':
-                prop = rel
+        if len(p.attribs.rel):
+            prop = ' '.join(list(p.attribs.rel))
         return self.spine_item(p.attribs.url, p.mediatype(), id_=p.attribs.id, prop=prop)
 
 

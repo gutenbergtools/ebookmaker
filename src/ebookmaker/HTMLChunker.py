@@ -159,6 +159,9 @@ class HTMLChunker(object):
         for e in xpath(self.chunk, '//xhtml:math'):
             attribs.rel.add('mathml')
             break
+        for e in xpath(self.chunk, '//svg:svg'):
+            attribs.rel.add('svg')
+            break
         attribs.url = chunk_name
         attribs.id = chunk_id
         attribs.comment = comment

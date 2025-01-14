@@ -1044,6 +1044,8 @@ class Writer(writers.HTMLishWriter):
         for (tag, attr) in attrs_to_remove:
             for elem in xpath(xhtml, f"//xhtml:{tag}[@{attr}]"):
                 del elem.attrib[attr]
+        for elem in xpath(xhtml, f"//svg:svg[@role]"):
+            del elem.attrib[attr]
 
         # replace html5 block tags
         usedtags = set()

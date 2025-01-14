@@ -548,7 +548,6 @@ class Parser(HTMLParserBase):
             src_rel_url = make_url_relative(self.attribs.url, elem.get("src"))
             if options.production:
                 info(f'[ALTTEXT]{csv_escape([rel_url, id_, alt, src_rel_url, infigure])}')
-                
 
         ##### cleanup #######
 
@@ -681,9 +680,14 @@ class Parser(HTMLParserBase):
 
         debug("HTMLParser.pre_parse() ...")
         if b'xmlns=' in self.bytes_content() or b'-//W3C//DTD X' in self.bytes_content():
-            info('using an XML parser')
-            bs_parser = 'lxml'
-            extra_params = {'exclude_encodings':["us-ascii"]}
+            if b'http://www.w3.org/2000/svg' in self.bytes_content():
+                info('using an HTML5 parser because of svg xml')
+                bs_parser = 'html5lib'
+                extra_params = {}
+            else:
+                info('using an XML parser')
+                bs_parser = 'lxml'
+                extra_params = {'exclude_encodings':["us-ascii"]}
         else:
             info('using an HTML5 parser')
             bs_parser = 'html5lib'
