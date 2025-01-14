@@ -36,7 +36,6 @@ import soupsieve as sv
 from libgutenberg.GutenbergGlobals import xmlspecialchars
 from libgutenberg.Logger import critical, info, debug, warning, error
 
-
 TOP_MARKERS = [
     re.compile(r"\*+ ?START\s+OF\s+TH(E|IS)\s+PROJECT\s+GUTENBERG", re.I),
 ]
@@ -136,11 +135,11 @@ def mark_soup(soup):
 
     found_top = mark_bp(body, 'pg-header', TOP_MARKERS, top=True)
     if not found_top:
-        info('No PG header found. This is an ERROR for white-washed files.')
+        info('No PG header marker found.')
 
     found_bottom = mark_bp(body, 'pg-footer', BOTTOM_MARKERS, top=False)
     if not found_bottom:
-        info('No PG footer found. This is an ERROR for white-washed files.')
+        info('No PG footer marker found.')
 
     return found_top or found_bottom
 

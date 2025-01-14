@@ -346,8 +346,12 @@ class Parser(HTMLParserBase):
                     del elem.attrib[key]
                     elem.attrib[new_key] = val
 
-
-
+    def finalize_html5(cls, xhtml):
+        # workaround to let lxml iterlinks for math@altimg attribute links
+        for e in xpath(xhtml, "//xhtml:math"):
+            alttimg = e.attrib.pop('src', None)
+            if alttimg:
+                e.attrib['altimg'] = alttimg
 
     idnum = 0
     def _to_xhtml11(self):
@@ -555,8 +559,8 @@ class Parser(HTMLParserBase):
             # write img info to logs
             rel_url = make_url_relative(parsers.webify_url(filesdir()), self.attribs.url)
             src_rel_url = make_url_relative(self.attribs.url, elem.get("src"))
-            info(f'[ALTTEXT]{csv_escape([rel_url, id_, alt, src_rel_url, infigure])}')
-                
+            if options.production:
+                info(f'[ALTTEXT]{csv_escape([rel_url, id_, alt, src_rel_url, infigure])}')
 
         # use html5 audio element instead of links to mp3, ogg files
         for snd, snd_mime in SOUND_TYPES.items():
@@ -715,9 +719,14 @@ class Parser(HTMLParserBase):
 
         debug("HTMLParser.pre_parse() ...")
         if b'xmlns=' in self.bytes_content() or b'-//W3C//DTD X' in self.bytes_content():
-            info('using an XML parser')
-            bs_parser = 'lxml'
-            extra_params = {'exclude_encodings':["us-ascii"]}
+            if b'http://www.w3.org/2000/svg' in self.bytes_content():
+                info('using an HTML5 parser because of svg xml')
+                bs_parser = 'html5lib'
+                extra_params = {}
+            else:
+                info('using an XML parser')
+                bs_parser = 'lxml'
+                extra_params = {'exclude_encodings':["us-ascii"]}
         else:
             info('using an HTML5 parser')
             bs_parser = 'html5lib'
@@ -774,11 +783,15 @@ class Parser(HTMLParserBase):
                     elem.wrap(new_div)
                     self.added_classes.add(BODY_WRAPPER_CLASS)
 
-
+        # workaround to let lxml iterlinks for math@altimg attribute links
+        for elem in soup.find_all('math', altimg=True):
+            elem["src"] = elem["altimg"]
+            print(elem["altimg"])
 
         marked = mark_soup(soup)
         if not marked:
-            info('No boilerplate found in %s', self.attribs.url)
+            if options.production and self.attribs.id == 'start':
+                critical('Boilerplate markers are missing in %s', self.attribs.url)
 
         html = soup.decode(formatter=nfc_formatter)
         if not html:

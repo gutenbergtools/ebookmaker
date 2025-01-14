@@ -102,7 +102,7 @@ IMAGE_WRAPPER = """<?xml version="1.0"?>{doctype}
   </head>
   <body>
     <div style="text-align: center">
-      <img src="{src}" alt={title} class="{wrapper_class}" />
+      <img src="{src}" alt="" class="{wrapper_class}" />
       {backlink}
     </div>
   </body>
@@ -471,29 +471,37 @@ class HTMLParserBase(ParserBase):
         Assume links and urls are already made absolute.
 
         """
-
         if options.strip_links:
+            replacements = 0
             for link in xpath(xhtml, '//xhtml:a[@href]'):
                 href = urllib.parse.urldefrag(link.get('href'))[0]
                 if href not in manifest:
-                    debug("strip_links: Deleting <a> to %s not in manifest." % href)
+                    replacements += 1
                     del link.attrib['href']
+            if replacements:
+                debug(f"stripped {replacements} <a>s for href not in manifest.")
 
+        replacements = 0
         for link in xpath(xhtml, '//xhtml:link[@href]'):
             href = link.get('href')
             if href not in manifest:
-                debug("strip_links: Deleting <link> to %s not in manifest." % href)
+                replacements += 1
                 link.drop_tree()
+        if replacements:
+            debug(f"stripped {replacements} <link>s for href not in manifest.")
 
-        for image in xpath(xhtml, '//xhtml:img[@src]'):
+        replacements = 0
+        for image in xpath(xhtml, '//xhtml:*[@src]'):
             src = image.get('src')
             if src not in manifest:
-                debug("strip_links: Replacing <img> with src %s not in manifest." % src)
+                replacements += 1
                 image.tag = NS.xhtml.span
                 image.text = image.get('alt', '')
                 for attr  in image.attrib:
                     if attr not in COREATTRS:
                         del image.attrib[attr]
+        if replacements:
+            debug(f"stripped {replacements} <img>s for src not in manifest.")
 
 
     def make_toc(self, xhtml):

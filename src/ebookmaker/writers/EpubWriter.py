@@ -158,7 +158,7 @@ class OEBPSContainer(zipfile.ZipFile):
 
         self.zipfilename = filename
         self.oebps_path = oebps_path if oebps_path else 'OEBPS/'
-        info('Creating Epub file: %s' % filename)
+        debug('Creating Epub file: %s' % filename)
         mkdir_for_filename(filename)
 
         # open zipfile
@@ -178,7 +178,7 @@ class OEBPSContainer(zipfile.ZipFile):
 
     def commit(self):
         """ Close OCF Container. """
-        info("Done Epub file: %s" % self.zipfilename)
+        debug("Done Epub file: %s" % self.zipfilename)
         self.close()
 
 
@@ -854,7 +854,7 @@ class Writer(writers.HTMLishWriter):
                 elem.text = ''
 
             if count:
-                warning("%d elements having class %s have been rewritten." %
+                info("%d elements having class %s have been rewritten." %
                         (count, class_))
 
 
@@ -1048,6 +1048,8 @@ class Writer(writers.HTMLishWriter):
         for (tag, attr) in attrs_to_remove:
             for elem in xpath(xhtml, f"//xhtml:{tag}[@{attr}]"):
                 del elem.attrib[attr]
+        for elem in xpath(xhtml, f"//svg:svg[@role]"):
+            del elem.attrib[attr]
 
         # translate the audio element
         for tag in xpath(xhtml, '//xhtml:audio'):
@@ -1080,6 +1082,38 @@ class Writer(writers.HTMLishWriter):
                 tag.tag = NS.xhtml.span
                 writers.HTMLWriter.add_class(tag, newtag)
 
+        # replace html5 math element
+        for tag in xpath(xhtml, f'//xhtml:math'):
+            usedtags.add("math")
+            display = tag.attrib.pop('display', None)
+            altimg = tag.attrib.pop('src', None) # altimg moved to source in pre_parse
+            alttext = tag.attrib.pop('alttext', '')
+            for attr in  ['xref', 'mode', 'overflow', 'macros']:
+                tag.attrib.pop(attr, None)
+            if display:
+                if display == 'block':
+                    tag.tag = NS.xhtml.div
+                    writers.HTMLWriter.add_class(tag, 'div')
+            else:
+                tag.tag = NS.xhtml.span
+                writers.HTMLWriter.add_class(tag, 'span')
+            if altimg:
+                attrib = tag.attrib
+                tag.clear()
+                tag.attrib.update(attrib)
+                img = etree.SubElement(tag, NS.xhtml.img)
+                img.attrib['alt'] = alttext
+                img.attrib['src'] = altimg
+            else:
+                text = tag.text_content()
+                tag.clear()
+                tag.text = text
+            
+            
+            
+
+            
+                
 
     @staticmethod
     def strip_links(xhtml, manifest):
