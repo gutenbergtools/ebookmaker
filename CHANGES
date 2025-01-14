@@ -17,6 +17,16 @@ With this release we add some important new capabilities to Ebookmaker; other mo
 - changed the WARNING when FILESDIR was not configured to an INFO; there was already a sensible default.
 - it's been a long time since logging was rationalized. In general, there was much unneeded logging. Many WARNING messages were changed to INFO; many INFO messages were changed to DEBUG, and several DEBUG messages were removed, commented out, or changed to summary messages outside of a loop.
 - any link to gutenberg.org, pglaf.org, or pgdp.org are now considered gutenberg links and get an INFO message rather than a WARNING.
+- implement HTML5/EPUB3 audio element for sound files
+    - links to mp3 and ogg are replaced with HTML5 audio elements during initial parsing
+    - HTML `audio` elements are deprecated to links for EPUB2 files
+    - mp3 and ogg files will be included in EPUB3 files.
+    - because PPers have been hiding links to sound files for ebook files using `x-ebookmaker` CSS, we are adding CSS to unhide elements that contain the audio elements, for EPUB3 only.
+- grounwork for PDF generation from html5
+    - remove html.noimages, pdf.noimages.
+    - Add html.images as a pdf requirement    
+- Flow optimization
+    - store sourcefiles in ParserFactor to enable skipping the duplicate html parse
 
 
 0.12.48 December 30, 2024

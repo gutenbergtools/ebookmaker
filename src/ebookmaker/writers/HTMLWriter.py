@@ -21,7 +21,6 @@ import uuid
 
 from lxml import etree
 
-
 from libgutenberg.Logger import debug, exception, info, error, warning
 from libgutenberg.GutenbergGlobals import PG_URL
 
@@ -30,6 +29,8 @@ from ebookmaker.EbookMaker import FILENAMES
 from ebookmaker.CommonCode import Options
 from ebookmaker.parsers import webify_url, CSSParser
 from ebookmaker.parsers.CSSParser import cssutils
+from cssutils import css
+
 from ebookmaker.utils import (
     add_class, add_style, css_len, check_lang, replace_elements, gg, xpath, NS
 )
@@ -131,7 +132,7 @@ def serialize(xhtml):
                           pretty_print=False)
 
     # lxml refuses to omit close tags for these elements
-    for newtag in [b'</wbr>',]:
+    for newtag in [b'</wbr>', b'</source>']:
         htmlbytes = htmlbytes.replace(newtag, b'')
 
     return htmlbytes
@@ -181,7 +182,7 @@ class Writer(writers.HTMLishWriter):
             divided = DIVIDER.split(' '.join(pre.itertext()))
             if len(divided) > 1 and len(divided[1].strip()) > 0:
                 job.dc.add_credit(divided[1])
-                info('Text added to Credit: %s', divided[1].strip())
+                info('credit text from source file : %s', divided[1].strip())
 
         body = None
         for body in xpath(tree, '//xhtml:body'):
@@ -279,6 +280,62 @@ class Writer(writers.HTMLishWriter):
 
 
     @staticmethod
+    def fix_body_css(sheet):
+        """ 
+            print output can't put margins on body
+        """
+        SHOULD_MOVE = re.compile(r'^(margin-?|padding-?).*')
+        def style_filter(style, patt=SHOULD_MOVE ):
+            in_style = copy.copy(style)
+            out_style = copy.copy(style)
+            for p in list(style):
+                if patt.match(p.name):
+                    out_style.removeProperty(p.name)
+                else:
+                    in_style.removeProperty(p.name)
+            return (in_style, out_style)
+            
+        old_rules = sheet.cssRules.copy()
+        sheet.cssRules.clear()
+
+        for rule in old_rules:
+            if rule.type == rule.STYLE_RULE and 'body' in rule.selectorText:
+                for selector in rule.selectorList:
+                    # if there are selectors like 'body.CLASSNAME' we shouldn't need to worry
+                    # because they won't stick to the print body anyway 
+                    if selector.selectorText == 'body':
+                        # separate properties we can't have on print body from the others
+                        should_move_sty, can_keep_sty = style_filter(rule.style) 
+                
+                        # make a rule that keeps the properties that have been set on body
+                        if len(list(can_keep_sty)) > 0:
+                            new_rule = css.CSSStyleRule(selectorText='body', style=can_keep_sty)
+                            sheet.add(new_rule)
+ 
+                        if len(list(should_move_sty)) > 0:
+                            # make a rule that will apply to the screen body
+                            at_rules = css.CSSRuleList()
+                            at_rules.insert(0, css.CSSStyleRule(
+                                selectorText='body', style=should_move_sty))
+                            new_rule = css.CSSMediaRule(mediaText='screen')
+                            new_rule.cssRules = at_rules
+                            sheet.add(new_rule)
+                
+                            # make a rule that will apply to the page divs
+                            new_rule = css.CSSStyleRule(
+                                selectorText='.pagedjs_page_content > div', style=should_move_sty)
+                            sheet.add(new_rule)
+                    else:
+                        # other selectors
+                        new_rule = css.CSSStyleRule(
+                            selectorText=selector.selectorText, style=rule.style)
+                        sheet.add(new_rule)
+                   
+            else:
+                sheet.add(rule)
+        
+
+    @staticmethod
     def fix_incompatible_css(sheet):
         """ Strip CSS properties and values that are not HTML5 compatible.
             Unpack "media handheld" rules
@@ -308,6 +365,7 @@ class Writer(writers.HTMLishWriter):
                 if rule.type == rule.STYLE_RULE:
                     for selector in rule.selectorList:
                         selector.selectorText = tagre.sub(tagsub, selector.selectorText)
+
 
     @staticmethod
     def xhtml_to_html(html):
@@ -432,6 +490,7 @@ class Writer(writers.HTMLishWriter):
                 CSSParser.Parser.lowercase_selectors(sheet)
                 Writer.fix_incompatible_css(sheet)
                 Writer.fix_css_for_deprecated(sheet, tags=deprecated_used)
+                Writer.fix_body_css(sheet)
                 style.text = sheet.cssText.decode("utf-8")
 
         deprecated_used.add('*')  # '*' provides for css rules that are always added
@@ -522,6 +581,7 @@ class Writer(writers.HTMLishWriter):
 
                     if hasattr(p, 'sheet') and p.sheet:
                         self.fix_incompatible_css(p.sheet)
+                        self.fix_body_css(p.sheet)
 
                     try:
                         with open(outfile, 'wb') as fp_dest:

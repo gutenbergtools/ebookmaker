@@ -79,6 +79,18 @@ BOGUS_CHARSET_NAMES = {'iso-latin-1': 'iso-8859-1',
                        }
 COREATTRS = ["class", "dir", "id", "lang", "style", "title"]
 
+# legal on A but not GLOBAL
+A_NOT_GLOBAL = [
+    'download',
+    'href',
+    'hreflang',
+    'ping',
+    'referrerpolicy',
+    'rel',
+    'target',
+    'type',
+]
+
 STYLE_LINK = '<link href="pgepub.css" rel="stylesheet"/>'
 
 # note: title is prequoted

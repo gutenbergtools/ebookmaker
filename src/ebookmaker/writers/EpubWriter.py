@@ -1040,12 +1040,32 @@ class Writer(writers.HTMLishWriter):
                 elem.set(attr, fill)
 
         # remove html5-only attribute
-        attrs_to_remove = [('*', 'role'),]
+
+        attrs_to_remove = [('*', 'role'),('*', 'aria-label'),('*', 'aria-labelledby'),
+            ('*', 'itemid'), ('*', 'itemprop'), ('*', 'itemref'), ('*', 'itemscope'),
+            ('*', 'itemtype'),]
+
         for (tag, attr) in attrs_to_remove:
             for elem in xpath(xhtml, f"//xhtml:{tag}[@{attr}]"):
                 del elem.attrib[attr]
         for elem in xpath(xhtml, f"//svg:svg[@role]"):
             del elem.attrib[attr]
+
+        # translate the audio element
+        for tag in xpath(xhtml, '//xhtml:audio'):
+            debug('found audio')
+            tag.tag = NS.xhtml.span
+            title = tag.attrib.get('title', None)
+            tag.text = '['
+            # possible audio attributes
+            for att in ['controls', 'crossorigin', 'preload', 'autoplay', 'loop', 'muted']:
+                tag.attrib.pop(att, None)
+            for source in tag.findall(NS.xhtml.source):
+                source.tag = NS.xhtml.a
+                source.attrib['href'] = source.attrib.pop('src', None)
+                source.text = title or source.attrib.pop('type', 'Listen')
+                source.attrib.pop('media', None)
+                source.tail = ']'
 
         # replace html5 block tags
         usedtags = set()
@@ -1112,7 +1132,9 @@ class Writer(writers.HTMLishWriter):
             if not href.startswith('file:'):
                 continue
             debug("strip_links: Deleting <a> to file not in manifest: %s" % href)
-            del link.attrib['href']
+            link.tag = NS.xhtml.a
+            for att in parsers.A_NOT_GLOBAL:
+                link.attrib.pop(att, None)
 
 
     @staticmethod

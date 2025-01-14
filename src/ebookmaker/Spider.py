@@ -29,6 +29,12 @@ from ebookmaker.CommonCode import Options
 from ebookmaker.ParserFactory import ParserFactory
 
 
+OPS_AUDIO_MEDIATYPES = set((
+    'audio/mpeg',
+    'audio/ogg; codecs=opus',
+    'audio/ogg',  # need both because spider believes type attribute
+))
+
 options = Options()
 
 RE_PGLINK = re.compile(r'^https?://(www.|)(gutenberg|pglaf|pgdp).org(\W|$)', re.I)
@@ -50,6 +56,8 @@ class Spider(object):
         self.include_mediatypes += options.include_mediatypes
         if job.subtype == '.images' or job.type == 'rst.gen':
             self.include_mediatypes.append('image/*')
+        if job.type == 'epub3.images':
+            self.include_mediatypes.extend([str(mt) for mt in OPS_AUDIO_MEDIATYPES])
         if job.type == 'html.images':
             self.include_mediatypes.append('*/*')
         self.exclude_urls = []
@@ -171,7 +179,7 @@ class Spider(object):
                         self.enqueue(queue, depth, new_attribs, False)
                     else:
                         self.enqueue(queue, depth + 1, new_attribs, True)
-                elif tag == NS.xhtml.object:
+                elif tag in (NS.xhtml.object, NS.xhtml.source):
                     self.enqueue(queue, depth, new_attribs, False)
 
         debug("End of retrieval")
@@ -188,6 +196,7 @@ class Spider(object):
 
     def enqueue(self, queue, depth, attribs, is_doc):
         """ Enqueue url for parsing."""
+
         if is_doc:
             if not self.is_included_url(attribs):
                 if attribs.url and RE_PGLINK.search(attribs.url):
@@ -198,6 +207,7 @@ class Spider(object):
             if depth >= self.max_depth:
                 critical('Omitted file %s due to depth > max_depth' % attribs.url)
                 return
+        
         if not self.is_included_mediatype(attribs) and not self.is_included_relation(attribs):
             return
         elif not self.is_included_url(attribs) and not self.is_included_relation(attribs):
@@ -234,6 +244,7 @@ class Spider(object):
         if attribs.orig_mediatype is None:
             mediatype = MediaTypes.guess_type(attribs.url)
             if mediatype:
+                
                 attribs.orig_mediatype = attribs.HeaderElement(mediatype)
             else:
                 return None

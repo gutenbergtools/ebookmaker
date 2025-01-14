@@ -33,6 +33,7 @@ from ebookmaker import ParserFactory
 from ebookmaker import HTMLChunker
 from ebookmaker.CommonCode import EbookAltText, Options
 from ebookmaker.Version import VERSION, GENERATOR
+from ebookmaker.Spider import OPS_AUDIO_MEDIATYPES
 
 from .EpubWriter import (
     MAX_IMAGE_SIZE,
@@ -110,6 +111,10 @@ body.x-ebookmaker-coverpage {
     margin: 0;
     padding: 0;
 }
+body.x-ebookmaker.x-ebookmaker-3  .pgshow {
+    visibility: visible;
+    display: initial;
+    }
 """
 
 def alt_text_good(book_id):
@@ -759,6 +764,7 @@ class Writer(EpubWriter.Writer):
                         # to something that isn't recognized as content
                         p.attribs.mediatype = parsers.ParserAttributes.HeaderElement('text/xml')
             for p in job.spider.parsers:
+                debug(p.attribs.mediatype)
                 if str(p.attribs.mediatype) == 'text/css':
                     p.parse()
                 if hasattr(p, 'sheet') and p.sheet:
@@ -767,8 +773,12 @@ class Writer(EpubWriter.Writer):
                         p.strip_images()
                     p.rewrite_links(self.url2filename)
                     parserlist.append(p)
+                    continue
                 if str(p.attribs.mediatype) in OPS_FONT_TYPES:
                     warning('font file embedded: %s ;  check its license!', p.attribs.url)
+                    parserlist.append(p)
+                    continue
+                if str(p.attribs.mediatype) in OPS_AUDIO_MEDIATYPES:
                     parserlist.append(p)
 
             # after splitting html into chunks we have to rewrite all
