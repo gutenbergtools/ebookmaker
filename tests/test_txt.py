@@ -27,7 +27,6 @@ class TestFromTxt(unittest.TestCase):
             "%s.txt",
             "%s-0.txt",
             "%s-8.txt",
-            "%s-noimages-h.html",
             "%s-h.html",
         ]
         for out in outs:

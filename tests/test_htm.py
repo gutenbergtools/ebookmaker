@@ -26,7 +26,6 @@ class TestFromHtm(unittest.TestCase):
             "%s-epub.epub",
             "%s-images-epub3.epub",
             "%s-images-epub.epub",
-            "%s-noimages-h.html",
             "%s-h.html",
         ]
         for out in outs:
@@ -49,7 +48,6 @@ class TestFromHtm(unittest.TestCase):
             "%s-epub.epub",
             "%s-images-epub3.epub",
             "%s-images-epub.epub",
-            "%s-noimages-h.html",
             "%s-h.html",
             "%s-cover.png",
         ]
@@ -57,4 +55,5 @@ class TestFromHtm(unittest.TestCase):
             self.assertTrue(os.path.exists(os.path.join(self.out_dir, out % book_id)))
             os.remove(os.path.join(self.out_dir, out % book_id))
         os.remove(os.path.join(self.out_dir, 'images/image.jpg'))              
+        os.remove(os.path.join(self.out_dir, 'images/mathex.jpg'))              
         os.rmdir(os.path.join(self.out_dir, 'images'))              
