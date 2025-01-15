@@ -228,15 +228,10 @@ class Parser(HTMLParserBase):
         # See HTML 4.01 spec section B.2.
 
         if '%' in id_:
+            bytes_id = urllib.parse.unquote(id_.encode('us-ascii')) # undo the %-escaping
             try:
-                bytes_id = urllib.parse.unquote(id_.encode('us-ascii')) # undo the %-escaping
-                try:
-                    id_ = bytes_id.decode('utf-8')
-                except UnicodeError:
-                    doc_encoding = self.attribs.orig_mediatype.params.get('charset')
-                    if doc_encoding:
-                        id_ = bytes_id.decode(doc_encoding)
-            except Exception:
+                id_ = bytes_id.decode('utf-8')
+            except UnicodeError:
                 pass # too broken to fix
 
         id_ = RE_NOT_XML_NAMECHAR.sub('_', id_)

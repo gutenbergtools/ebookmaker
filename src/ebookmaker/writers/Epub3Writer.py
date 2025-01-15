@@ -762,7 +762,7 @@ class Writer(EpubWriter.Writer):
                     else:
                         # parsing xml worked, but it isn't xhtml. so we need to reset mediatype
                         # to something that isn't recognized as content
-                        p.attribs.mediatype = parsers.ParserAttributes.HeaderElement('text/xml')
+                        p.attribs.mediatype = 'text/xml'
             for p in job.spider.parsers:
                 debug(p.attribs.mediatype)
                 if str(p.attribs.mediatype) == 'text/css':

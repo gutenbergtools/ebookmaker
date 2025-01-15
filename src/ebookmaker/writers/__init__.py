@@ -167,7 +167,7 @@ class HTMLishWriter(BaseWriter):
 
         if css_as_string:
             attribs = parsers.ParserAttributes()
-            attribs.orig_mediatype = attribs.HeaderElement('text/css')
+            attribs.orig_mediatype = 'text/css'
             attribs.url = attribs.orig_url = url
             p = ParserFactory.ParserFactory.get(attribs)
             p.parse_string(css_as_string)

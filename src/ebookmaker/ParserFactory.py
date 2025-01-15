@@ -68,7 +68,7 @@ class ParserFactory(object):
         """ Get the right kind of parser. """
 
         try:
-            mediatype = attribs.orig_mediatype.value
+            mediatype = attribs.orig_mediatype
             if mediatype == 'text/plain' and attribs.referrer:
                 # don't use GutenbergTextParser, it's a linked text file
                 return parsers.TxtParser(attribs)
@@ -127,8 +127,7 @@ class ParserFactory(object):
         debug("... creating new parser for %s" % url)
 
         if hasattr(options, 'mediatype_from_extension') and options.mediatype_from_extension:
-            attribs.orig_mediatype = attribs.HeaderElement(MediaTypes.guess_type(url))
-            debug("... set mediatype %s from extension" % attribs.orig_mediatype.value)
+            attribs.orig_mediatype = MediaTypes.guess_type(url)
 
         attribs.orig_url = url
         parser = cls.get(attribs)
@@ -151,8 +150,7 @@ class ParserFactory(object):
             },
             proxies=options.config.PROXIES
         )
-        attribs.orig_mediatype = attribs.HeaderElement.from_str(
-            fp.headers.get('Content-Type', 'application/octet-stream'))
+        attribs.orig_mediatype = fp.headers.get('Content-Type', 'application/octet-stream')
         debug("... got mediatype %s from server" % str(attribs.orig_mediatype))
         attribs.orig_url = url
         attribs.url = fp.url
@@ -184,7 +182,7 @@ class ParserFactory(object):
             except ValueError:  # just a relative path?
                 fp = open_file_from_path(url)
             
-        attribs.orig_mediatype = attribs.HeaderElement(MediaTypes.guess_type(url))
+        attribs.orig_mediatype = MediaTypes.guess_type(url)
 
         debug("... got mediatype %s from guess_type" % str(attribs.orig_mediatype))
         attribs.orig_url = attribs.url = url
@@ -201,7 +199,7 @@ class ParserFactory(object):
         package = o.hostname
         filename = o.path[1:]
         fp = resource_stream(package, filename)
-        attribs.orig_mediatype = attribs.HeaderElement(MediaTypes.guess_type(filename))
+        attribs.orig_mediatype = MediaTypes.guess_type(filename)
 
         debug("... got mediatype %s from guess_type" % str(attribs.orig_mediatype))
         attribs.orig_url = orig_url

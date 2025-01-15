@@ -1124,7 +1124,7 @@ class Writer(writers.HTMLishWriter):
         are targets of links. EPUB does not allow that.
 
         """
-
+        debug(manifest)
         for link in xpath(xhtml, '//xhtml:a[@href]'):
             href = urllib.parse.urldefrag(link.get('href'))[0]
             if href in manifest and not manifest[href].startswith('image'):
@@ -1495,7 +1495,7 @@ class Writer(writers.HTMLishWriter):
                     else:
                         # parsing xml worked, but it isn't xhtml. so we need to reset mediatype
                         # to something that isn't recognized as content
-                        p.attribs.mediatype = parsers.ParserAttributes.HeaderElement('text/xml')
+                        p.attribs.mediatype = 'text/xml'
             for p in job.spider.parsers:
                 if str(p.attribs.mediatype) == 'text/css':
                     p.parse()

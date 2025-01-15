@@ -140,7 +140,7 @@ class Spider(object):
                     if k in ('id', 'title'):
                         setattr(new_attribs, k, v)
                     elif k == 'type':
-                        new_attribs.orig_mediatype = new_attribs.HeaderElement.from_str(v)
+                        new_attribs.orig_mediatype = v
                     elif k == 'rel':
                         new_attribs.rel.update(v.lower().split())
 
@@ -243,12 +243,11 @@ class Spider(object):
         """ Get mediatype out of attribs, guessing if needed. """
         if attribs.orig_mediatype is None:
             mediatype = MediaTypes.guess_type(attribs.url)
-            if mediatype:
-                
-                attribs.orig_mediatype = attribs.HeaderElement(mediatype)
+            if mediatype:               
+                attribs.orig_mediatype = mediatype
             else:
                 return None
-        return attribs.orig_mediatype.value
+        return attribs.orig_mediatype
 
 
     def is_included_mediatype(self, attribs):

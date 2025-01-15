@@ -91,7 +91,7 @@ class Parser(ParserBase):
                 format_ = 'png'
                 self.attribs.url +=  '.png'
                 self.attribs.orig_mediatype = self.attribs.mediatype
-                self.attribs.mediatype = ParserAttributes.HeaderElement(mt.png)
+                self.attribs.mediatype = mt.png
             if format_ == 'jpeg' and unsized_image.mode.lower() not in ('rgb', 'l'):
                 unsized_image = unsized_image.convert('RGB')
 

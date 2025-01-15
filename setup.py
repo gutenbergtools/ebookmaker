@@ -38,7 +38,6 @@ if __name__ == "__main__":
 
         install_requires = [
             'pillow>=8.3.2',
-            'cherrypy',
             'cssutils',
             'docutils>=0.18.1',
             'lxml',

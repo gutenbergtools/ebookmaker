@@ -17,7 +17,7 @@ import re
 import os
 import cchardet
 import copy
-from cherrypy.lib import httputil
+
 import six
 from six.moves import urllib
 import unicodedata
@@ -147,15 +147,11 @@ class ParserAttributes(object): # pylint: disable=too-few-public-methods
       - referrer
       - id
 
-    mediatype and orig_mediatype are of type HeaderElement
-
     mediatype is not necessarily the same as orig_mediatype,
     because parsers may convert between input and output, eg.
     reST to xhtml.
 
     """
-
-    HeaderElement = httputil.HeaderElement
 
     def __init__(self):
         self.url = None
@@ -229,16 +225,6 @@ class ParserBase(object):
         pass
 
 
-    def get_charset_from_content_type(self):
-        """ Get charset from server content-type. """
-
-        charset = self.attribs.orig_mediatype.params.get('charset')
-        if charset:
-            debug('Got charset %s from server' % charset)
-            return charset
-        return None
-
-
     def get_charset_from_meta(self): # pylint: disable=R0201
         """ Parse header metadata for charset.
 
@@ -286,8 +272,7 @@ class ParserBase(object):
         """ Get document content as unicode string. """
 
         if self.unicode_buffer is None:
-            data = (self.decode(self.get_charset_from_content_type()) or
-                    self.decode(self.get_charset_from_meta()) or
+            data = (self.decode(self.get_charset_from_meta()) or
                     self.decode(self.guess_charset_from_body()) or
                     self.decode('utf-8') or
                     self.decode('windows-1252'))
@@ -330,7 +315,6 @@ class ParserBase(object):
             buffer = self.bytes_content()
             buffer = REB_PG_CHARSET.sub(b'', buffer)
             buffer = buffer.decode(charset)
-            self.attribs.orig_mediatype.params['charset'] = charset
             return buffer
         except LookupError as what:
             # unknown charset,
@@ -344,7 +328,7 @@ class ParserBase(object):
     def mediatype(self):
         """ Return parser output mediatype. Helper function. """
         if self.attribs.mediatype:
-            return self.attribs.mediatype.value
+            return self.attribs.mediatype
         return None
 
 
@@ -377,7 +361,7 @@ class TxtParser(ParserBase):
 
     def __init__(self, attribs=None):
         ParserBase.__init__(self, attribs)
-        self.attribs.mediatype = ParserAttributes.HeaderElement(mt.txt)
+        self.attribs.mediatype = mt.txt
 
     def serialize(self):
         return bytes(self.unicode_content(), 'utf8')
@@ -391,7 +375,7 @@ class HTMLParserBase(ParserBase):
 
     def __init__(self, attribs=None):
         ParserBase.__init__(self, attribs)
-        self.attribs.mediatype = ParserAttributes.HeaderElement(mt.xhtml)
+        self.attribs.mediatype = mt.xhtml
         self.xhtml = None
         self._xhtml = None
 

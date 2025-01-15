@@ -480,8 +480,7 @@ def do_job(job):
 
 
             if options.input_mediatype:
-                attribs.orig_mediatype = attribs.HeaderElement.from_str(
-                    options.input_mediatype)
+                attribs.orig_mediatype = options.input_mediatype
 
             spider.recursive_parse(attribs)
             if job.type.split('.')[0] in ('epub', 'epub3', 'html', 'kindle', 'cover', 'pdf'):
