@@ -282,7 +282,7 @@ class Writer(writers.HTMLishWriter):
     @staticmethod
     def fix_body_css(sheet):
         """ 
-            print output can't put margins on body
+            print output can't put margins on body.
         """
         SHOULD_MOVE = re.compile(r'^(margin-?|padding-?).*')
         def style_filter(style, patt=SHOULD_MOVE ):
@@ -538,9 +538,9 @@ class Writer(writers.HTMLishWriter):
             elif hasattr(p, 'xhtml'):
                 p.parse()
                 xhtml = copy.deepcopy(p.xhtml)
+                self.make_links_relative(xhtml, p.attribs.url)
                 if hasattr(p, 'finalize_html5'):
                     p.finalize_html5(xhtml)
-                self.make_links_relative(xhtml, p.attribs.url)
                 rewrite_links(job, xhtml)
 
             else:

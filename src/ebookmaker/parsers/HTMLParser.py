@@ -155,6 +155,7 @@ CSS_FOR_ADDED = {
 SOUND_TYPES = {
     '.mp3': 'audio/mpeg',
     '.ogg': 'audio/ogg; codecs=opus',
+}
 
 INAPPROPRIATE_ALTTEXT = {
     "[image unavailable.]", "_", "[image not available]", " ", "illustration", "cover", "drawing",
@@ -349,9 +350,10 @@ class Parser(HTMLParserBase):
     def finalize_html5(cls, xhtml):
         # workaround to let lxml iterlinks for math@altimg attribute links
         for e in xpath(xhtml, "//xhtml:math"):
-            alttimg = e.attrib.pop('src', None)
-            if alttimg:
-                e.attrib['altimg'] = alttimg
+            altimg = e.attrib.pop('src', None)
+            info(altimg)
+            if altimg:
+                e.attrib['altimg'] = altimg
 
     idnum = 0
     def _to_xhtml11(self):
@@ -577,6 +579,7 @@ class Parser(HTMLParserBase):
                 source.attrib['src'] = link.attrib['href']
                 source.attrib['type'] = snd_mime
                 link.append(source)
+                # when we change a link to an audio element, some attributes don't work
                 for att in parsers.A_NOT_GLOBAL:
                     link.attrib.pop(att, None)
 
@@ -786,7 +789,6 @@ class Parser(HTMLParserBase):
         # workaround to let lxml iterlinks for math@altimg attribute links
         for elem in soup.find_all('math', altimg=True):
             elem["src"] = elem["altimg"]
-            print(elem["altimg"])
 
         marked = mark_soup(soup)
         if not marked:

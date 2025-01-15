@@ -64,7 +64,7 @@ DEPENDENCIES = collections.OrderedDict((
     ('kf8.images', ('epub3.images', )),
     ('html.noimages', ('picsdir.noimages', )),
     ('html.images', ('picsdir.images', )),
-    ('pdf.images', ('html.images',)),
+    ('pdf.images', ('picsdir.images',)),
     ('rst.gen', ('picsdir.images', )),
 ))
 

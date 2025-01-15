@@ -1049,7 +1049,7 @@ class Writer(writers.HTMLishWriter):
             for elem in xpath(xhtml, f"//xhtml:{tag}[@{attr}]"):
                 del elem.attrib[attr]
         for elem in xpath(xhtml, f"//svg:svg[@role]"):
-            del elem.attrib[attr]
+            del elem.attrib["role"]
 
         # translate the audio element
         for tag in xpath(xhtml, '//xhtml:audio'):
