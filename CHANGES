@@ -20,6 +20,7 @@ With this release we add some important new capabilities to Ebookmaker; other mo
     - HTML `audio` elements are deprecated to links for EPUB2 files
     - mp3 and ogg files will be included in EPUB3 files.
     - because PPers have been hiding links to sound files for ebook files using `x-ebookmaker` CSS, we are adding CSS to unhide elements that contain the audio elements, for EPUB3 only.
+    - we no longer include music xml files in our EPUB documents
 
 - groundwork for PDF generation from html5 (v 0.14)
     - removed html.noimages, pdf.noimages.
@@ -34,6 +35,7 @@ With this release we add some important new capabilities to Ebookmaker; other mo
     - store sourcefile urls in ParserFactory to enable skipping duplicate epub generation.
     - this should allow faster processing and less duplication of log messages.
 - nonstandard single-line comments in `style` elements are now removed. These made up a majority of our ERROR logs. fixes #252
+- removed dependency on CherryPy that made code hard to understand and was useful only when using Ebookmaker as a web spider, which we don't do. mediatypes are no longer wrapped in a `Hederelement` object, they're just strings.
 
 0.12.48 December 30, 2024
 - the existing warnings for empty alt attributes proved to be somewhat counterproductive. The physician's motto "first, do no harm" is wise. Empty alt attributes are in many cases the correct solution for accessibility, but there are many commonly used entries that are much worse for accessibility. Based on a census of actual alt text entries, the following changes are being made:
