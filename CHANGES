@@ -33,6 +33,7 @@ With this release we add some important new capabilities to Ebookmaker; other mo
 - Flow optimization
     - store sourcefile urls in ParserFactory to enable skipping duplicate epub generation.
     - this should allow faster processing and less duplication of log messages.
+- nonstandard single-line comments in `style` elements are now removed. These made up a majority of our ERROR logs. fixes #252
 
 0.12.48 December 30, 2024
 - the existing warnings for empty alt attributes proved to be somewhat counterproductive. The physician's motto "first, do no harm" is wise. Empty alt attributes are in many cases the correct solution for accessibility, but there are many commonly used entries that are much worse for accessibility. Based on a census of actual alt text entries, the following changes are being made:

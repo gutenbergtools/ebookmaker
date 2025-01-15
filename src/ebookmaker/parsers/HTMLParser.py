@@ -179,6 +179,11 @@ NO_ALT_TEXT = 'Empty alt text for %s. '
 DECORATIVE_WARNING = 'Replacing "%s" with empty string and adding role=presentation. '
 INAPPROPRIATE_ERROR = 'Replacing inaccessible alt text "%s" with empty string. '
 
+XMLCOMMENT = re.compile(r'<!--(.*?)-->', re.S)
+XMLOPENCOMMENT = re.compile(r'<!--(.*?)')
+CSSCOMMENT = re.compile(r'/\*(.*?)\*/', re.S)
+JSCOMMENT = re.compile(r'//(.*?)')
+
 def nfc(_str):
     return unicodedata.normalize('NFC', EntitySubstitution.substitute_xml(_str))
 
@@ -752,18 +757,19 @@ class Parser(HTMLParserBase):
         # ancient browsers didn't understand stylesheets, so xml comments were used to hide the
         # style text. Our CSS parser is too modern to remember this, it seems.
         # So we needed to un-comment the style text
-        xmlcomment = re.compile(r'<!--(.*?)-->', re.S)
-        for commented_style in soup.find_all('style', string=xmlcomment):
-            commented_style.string = xmlcomment.sub(r'\1', str(commented_style.string))
+        for commented_style in soup.find_all('style', string=XMLCOMMENT):
+            commented_style.string = XMLCOMMENT.sub(r'\1', str(commented_style.string))
 
-        xmlopencomment = re.compile(r'<!--(.*?)')
-        for commented_style in soup.find_all('style', string=xmlopencomment):
-            commented_style.string = xmlopencomment.sub(r'', str(commented_style.string))
+        for commented_style in soup.find_all('style', string=XMLOPENCOMMENT):
+            commented_style.string = XMLOPENCOMMENT.sub(r'', str(commented_style.string))
 
         # pg producers did crazy things in css comments, such as inserting CDATA sections
-        csscomment = re.compile(r'/\*(.*?)\*/', re.S)
-        for commented_style in soup.find_all('style', string=csscomment):
-            commented_style.string = csscomment.sub('', str(commented_style.string))
+        for commented_style in soup.find_all('style', string=CSSCOMMENT):
+            commented_style.string = CSSCOMMENT.sub('', str(commented_style.string))
+
+        # a lot of them thought it was a good idea to put javascript comments in style blocks
+        for commented_style in soup.find_all('style', string=JSCOMMENT):
+            commented_style.string = JSCOMMENT.sub('', str(commented_style.string))
 
         """ same as setting enclose-text option on tidy;
         ' enclose any text it finds in the body element within a <P> element.
