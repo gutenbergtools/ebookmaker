@@ -1,7 +1,7 @@
 0.13.0 (WIP)
 With this release we add some important new capabilities to Ebookmaker; other more profound functionalities such as PDF generation have been deferred to the next major version (0.14), but important groundwork is laid so that problems can surface sooner rather than later.
 
-- This release includes support for MathML. Although it's over 10 years old, it's only recently that all the major web browsers are supporting MathML. MathML has been part of the EPUB3 spec since its beginning. MathML also has important accessibility attributes and some assistive technologies (but not all), are supporting it. It renders math beautifully, allowing equations to reflow in ebooks, the lack of which makes our math-containing ebooks a poor experience in EPUB readers and Kindles.
+- This release includes support for MathML. Although it's over 10 years old, it's only recently that all the major web browsers are supporting MathML. MathML has been part of the EPUB3 spec since its beginning. MathML also has important accessibility attributes and some assistive technologies (but not all), are supporting it. It renders math beautifully, allowing equations to reflow in ebooks, the lack of which makes our math-containing ebooks a poor experience in EPUB readers and Kindles. Fixes #254
     - For compatibility with older ebook readers, we are converting `math` element to `img` elements for our EPUB2 files. The `alttext` attribute of the math element will be used for the `alt` attribute. Because of this, use of the `altimg` and `alttext` attributes on the math element should be encouraged. If altimage is not supplied, the text content of the mathML content will be used in the EPUB2 file. 
     - While support for MathML in Ebookmaker enables experimental use and possibly deployment at PG, it is up to PG and DP management to determine if and when to recommend its use.
     - MathCAT is software to look into for generating alt text from MathML https://nsoiffer.github.io/MathCAT/
@@ -9,13 +9,13 @@ With this release we add some important new capabilities to Ebookmaker; other mo
     - arXiv uses LaTeXML to convert LaTeX math to MathML https://math.nist.gov/~BMiller/LaTeXML/
     - fixed issue where html5 `math` element produced EPUB3 that didn't validate
 
-- This release adds support for inline (embedded) SVG via the `svg` element.
+- This release adds support for inline (embedded) SVG via the `svg` element. Fixes #136, #135,
     - Previous versions of Ebookmaker only supported external svg images.
     - Because Ebookmaker is required to produce XML based output in EPUB files, inline SVG must use XML syntax rather than HTML5 syntax. This means that element and attribute names inside the `svg` element are case-sensitive, and the `svg` element MUST include an `xmlns="http://www.w3.org/2000/svg"` attribute.
     - While use of the alt attribute on external svg images in img elements should be well understood, the impact of inline SVG on accessibility is mixed. If the svg does not contain text elements, the use of the svg title attribute is recommended. See https://www.unimelb.edu.au/accessibility/techniques/accessible-svgs for a good discussion.
     - We remove the svg `role` attribute in EPUB2 files, because there's no way to use use it in EPUB2 files without triggering a validation error. The `role` attribute is retained for inline svg in EPUB3 files. No problems occur for HTML5 files.
 
-- implement HTML5/EPUB3 audio element for sound files
+- implement HTML5/EPUB3 audio element for sound files. Fixes #214.
     - links to mp3 and ogg are replaced with HTML5 audio elements during initial parsing
     - HTML `audio` elements are deprecated to links for EPUB2 files
     - mp3 and ogg files will be included in EPUB3 files.
@@ -25,10 +25,10 @@ With this release we add some important new capabilities to Ebookmaker; other mo
     - removed html.noimages, pdf.noimages.
     - having css attached to the body element can cause all sorts of problems for HTML print pagination. This release adds a 'screen' media selector to problematic css rules that include body in their selector. For now, this is just margin and padding rules. If you find that this changes anything, please let us know!
    
-- added the "production" flag to allow context-sensitive log entries. if the flag is set, then lack of header/footer markers will be reported as CRITICAL errors; if not (the default, there will be INFO messages instead. The production flag also turns on ALTTEXT logging.
+- added the "production" flag to allow context-sensitive log entries. if the flag is set, then lack of header/footer markers will be reported as CRITICAL errors; if not (the default, there will be INFO messages instead. The production flag also turns on ALTTEXT logging. Fixes #251
 - added FILESDIR and CACHEDIR to sample conf file
-- changed the WARNING when FILESDIR was not configured to an INFO; there was already a sensible default.
-- it's been a long time since logging was rationalized. In general, there was much unneeded logging. Many WARNING messages were changed to INFO; many INFO messages were changed to DEBUG, and several DEBUG messages were removed, commented out, or changed to summary messages outside of a loop.
+- changed the WARNING when FILESDIR was not configured to an INFO; there was already a sensible default. Fixes #248.
+- it's been a long time since logging was rationalized. In general, there was much unneeded logging. Many WARNING messages were changed to INFO; many INFO messages were changed to DEBUG, and several DEBUG messages were removed, commented out, or changed to summary messages outside of a loop. Fixes #250, #249
 - any links to gutenberg.org, pglaf.org, or pgdp.org are now considered gutenberg links and get an INFO message rather than a WARNING.
 - Flow optimization
     - store sourcefile urls in ParserFactory to enable skipping duplicate epub generation.
