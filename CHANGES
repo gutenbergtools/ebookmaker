@@ -21,17 +21,18 @@ With this release we add some important new capabilities to Ebookmaker; other mo
     - mp3 and ogg files will be included in EPUB3 files.
     - because PPers have been hiding links to sound files for ebook files using `x-ebookmaker` CSS, we are adding CSS to unhide elements that contain the audio elements, for EPUB3 only.
 
+- groundwork for PDF generation from html5 (v 0.14)
+    - removed html.noimages, pdf.noimages.
+    - having css attached to the body element can cause all sorts of problems for HTML print pagination. This release adds a 'screen' media selector to problematic css rules that include body in their selector. For now, this is just margin and padding rules. If you find that this changes anything, please let us know!
+   
 - added the "production" flag to allow context-sensitive log entries. if the flag is set, then lack of header/footer markers will be reported as CRITICAL errors; if not (the default, there will be INFO messages instead. The production flag also turns on ALTTEXT logging.
 - added FILESDIR and CACHEDIR to sample conf file
 - changed the WARNING when FILESDIR was not configured to an INFO; there was already a sensible default.
 - it's been a long time since logging was rationalized. In general, there was much unneeded logging. Many WARNING messages were changed to INFO; many INFO messages were changed to DEBUG, and several DEBUG messages were removed, commented out, or changed to summary messages outside of a loop.
-- any link to gutenberg.org, pglaf.org, or pgdp.org are now considered gutenberg links and get an INFO message rather than a WARNING.
-- grounwork for PDF generation from html5
-    - remove html.noimages, pdf.noimages.
-    - Add html.images as a pdf requirement    
+- any links to gutenberg.org, pglaf.org, or pgdp.org are now considered gutenberg links and get an INFO message rather than a WARNING.
 - Flow optimization
-    - store sourcefiles in ParserFactory to enable skipping the duplicate html parse
-
+    - store sourcefile urls in ParserFactory to enable skipping duplicate epub generation.
+    - this should allow faster processing and less duplication of log messages.
 
 0.12.48 December 30, 2024
 - the existing warnings for empty alt attributes proved to be somewhat counterproductive. The physician's motto "first, do no harm" is wise. Empty alt attributes are in many cases the correct solution for accessibility, but there are many commonly used entries that are much worse for accessibility. Based on a census of actual alt text entries, the following changes are being made:
