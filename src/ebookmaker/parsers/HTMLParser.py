@@ -351,7 +351,6 @@ class Parser(HTMLParserBase):
         # workaround to let lxml iterlinks for math@altimg attribute links
         for e in xpath(xhtml, "//xhtml:math"):
             altimg = e.attrib.pop('src', None)
-            info(altimg)
             if altimg:
                 e.attrib['altimg'] = altimg
 

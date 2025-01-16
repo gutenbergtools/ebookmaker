@@ -1124,7 +1124,6 @@ class Writer(writers.HTMLishWriter):
         are targets of links. EPUB does not allow that.
 
         """
-        debug(manifest)
         for link in xpath(xhtml, '//xhtml:a[@href]'):
             href = urllib.parse.urldefrag(link.get('href'))[0]
             if href in manifest and not manifest[href].startswith('image'):

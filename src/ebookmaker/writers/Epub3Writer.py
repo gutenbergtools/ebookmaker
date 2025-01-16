@@ -764,7 +764,6 @@ class Writer(EpubWriter.Writer):
                         # to something that isn't recognized as content
                         p.attribs.mediatype = 'text/xml'
             for p in job.spider.parsers:
-                debug(p.attribs.mediatype)
                 if str(p.attribs.mediatype) == 'text/css':
                     p.parse()
                 if hasattr(p, 'sheet') and p.sheet:
