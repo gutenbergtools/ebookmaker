@@ -583,8 +583,8 @@ class Parser(HTMLParserBase):
                     link.attrib.pop(att, None)
 
                 #swallow surrounding parens
-                link.tail = re.sub(r'^ *[\]\}\)]', '', link.tail)
-                link.getprevious().tail = re.sub(r'[\[\]\( *$]', '', link.getprevious().tail)
+                link.tail = re.sub(r'^[ \]\}\)]*', '  ', link.tail)
+                link.getprevious().tail = re.sub(r'[\[\{\( ]*$', '  ', link.getprevious().tail)
                 # enable over-riding directives to hide this link
                 self.add_class(link.getparent(), 'pgshow')
                 
