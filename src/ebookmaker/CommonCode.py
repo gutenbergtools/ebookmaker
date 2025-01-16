@@ -4,7 +4,7 @@
 """
 CommonCode.py
 
-Copyright 2014-2024 by Marcello Perathoner and Project Gutenberg
+Copyright 2014-2025 by Marcello Perathoner and Project Gutenberg
 
 Distributable under the GNU General Public License Version 3 or newer.
 

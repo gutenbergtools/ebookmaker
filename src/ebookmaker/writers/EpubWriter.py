@@ -6,6 +6,7 @@
 EpubWriter.py
 
 Copyright 2009-2012 by Marcello Perathoner
+Copyright 2025 by Project Gutenberg
 
 Distributable under the GNU General Public License Version 3 or newer.
 

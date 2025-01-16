@@ -5,7 +5,7 @@
 
 Epub3Writer.py
 
-Copyright 2022 by Project Gutenberg
+Copyright 2022-2025 by Project Gutenberg
 
 Distributable under the GNU General Public License Version 3 or newer.
 
