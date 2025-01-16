@@ -33,7 +33,8 @@ class TestFromHtml(unittest.TestCase):
         for out in outs:
             self.assertTrue(os.path.exists(os.path.join(self.out_dir, out % book_id)))
             os.remove(os.path.join(self.out_dir, out % book_id))
-        os.remove(os.path.join(self.out_dir, 'images/image.jpg'))              
-        os.remove(os.path.join(self.out_dir, 'images/mathex.jpg'))              
-        os.remove(os.path.join(self.out_dir, 'test.mp3'))              
-        os.rmdir(os.path.join(self.out_dir, 'images'))              
+        os.remove(os.path.join(self.out_dir, 'images/image.jpg'))
+        os.remove(os.path.join(self.out_dir, 'images/mathex.jpg'))
+        os.remove(os.path.join(self.out_dir, 'music/test.mp3'))
+        os.rmdir(os.path.join(self.out_dir, 'images'))
+        os.rmdir(os.path.join(self.out_dir, 'music'))
