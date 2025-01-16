@@ -21,7 +21,10 @@ With this release we add some important new capabilities to Ebookmaker; other mo
     - mp3 and ogg files will be included in EPUB3 files.
     - because PPers have been hiding links to sound files for ebook files using `x-ebookmaker` CSS, we are adding CSS to unhide elements that contain the audio elements, for EPUB3 only.
     - we no longer include music xml files in our EPUB documents
-    - HTML5 audio elements have many attributes. PG and DP need to decide what settings are appropriate to use.
+    - HTML5 audio elements have many attributes. PG and DP need to decide what settings are best to use. No `autoplay` please!
+    - the audio element as converted to mobi by calibre displays, but doesn't play on older Amazon products. It's our understanding that send-to-kindle does not accept EPUBs with audio, so kindle users may need to use our EPUB2 files for send-to-kindle when the ebook contains audio.
+    - When adding HTML5 audio to a book, use code like this: `<audio title="" controls="controls"><source src="music/test.mp3" type="audio/mpeg" id="id-audio">Audio content is not currently supported on your device.</audio>`. It's important to have localized fallback text inside the `audio` element, after the `source` element.
+    - in addition the mp3 audio, the code supports "ogg" audio files, whatever they are.
 
 - groundwork for PDF generation from html5 (v 0.14)
     - removed html.noimages, pdf.noimages.

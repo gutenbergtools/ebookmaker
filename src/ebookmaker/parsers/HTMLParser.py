@@ -579,6 +579,8 @@ class Parser(HTMLParserBase):
                 source.attrib['src'] = link.attrib['href']
                 source.attrib['type'] = snd_mime
                 link.append(source)
+                source.tail = "Audio content is not currently supported on your device."
+
                 # when we change a link to an audio element, some attributes don't work
                 for att in parsers.A_NOT_GLOBAL:
                     link.attrib.pop(att, None)
