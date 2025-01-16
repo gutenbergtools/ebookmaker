@@ -1,4 +1,4 @@
-0.13.0 January 15, 2025
+0.13.1 January 16, 2025
 With this release we add some important new capabilities to Ebookmaker; other more profound functionalities such as PDF generation have been deferred to the next major version (0.14), but important groundwork is laid so that problems can surface sooner rather than later.
 
 - This release includes support for MathML. Although it's over 10 years old, it's only recently that all the major web browsers are supporting MathML. MathML has been part of the EPUB3 spec since its beginning. MathML also has important accessibility attributes and some assistive technologies (but not all), are supporting it. It renders math beautifully, allowing equations to reflow in ebooks, the lack of which makes our math-containing ebooks a poor experience in EPUB readers and Kindles. Fixes #254
@@ -37,6 +37,8 @@ With this release we add some important new capabilities to Ebookmaker; other mo
     - this should allow faster processing and less duplication of log messages.
 - nonstandard single-line comments in `style` elements are now removed. These made up a majority of our ERROR logs. fixes #252
 - removed dependency on CherryPy that made code hard to understand and was useful only when using Ebookmaker as a web spider, which we don't do. mediatypes are no longer wrapped in a `Hederelement` object, they're just strings.
+- inappropriate alt text ERRORs changed to WARNINGs.
+- added test for html5 source file
 
 0.12.48 December 30, 2024
 - the existing warnings for empty alt attributes proved to be somewhat counterproductive. The physician's motto "first, do no harm" is wise. Empty alt attributes are in many cases the correct solution for accessibility, but there are many commonly used entries that are much worse for accessibility. Based on a census of actual alt text entries, the following changes are being made:

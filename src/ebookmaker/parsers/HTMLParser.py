@@ -555,8 +555,8 @@ class Parser(HTMLParserBase):
                 warning(SEE_A11Y_INFO)
             elif alt.lower() in INAPPROPRIATE_ALTTEXT:
                 elem.attrib['alt'] = ''
-                error(INAPPROPRIATE_ERROR, alt)
-                error(SEE_A11Y_INFO)
+                warning(INAPPROPRIATE_ERROR, alt)
+                warning(SEE_A11Y_INFO)
 
             # write img info to logs
             rel_url = make_url_relative(parsers.webify_url(filesdir()), self.attribs.url)
