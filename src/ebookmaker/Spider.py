@@ -67,7 +67,7 @@ class Spider(object):
 
         self.exclude_mediatypes = []
         self.exclude_mediatypes += options.exclude_mediatypes
-        if job.type in {'epub.images', 'epub3.images'}:
+        if job.type in {'epub.images', 'epub.noimages', 'epub3.images'}:
             self.exclude_mediatypes.append('application/xml')
 
         self.max_depth = options.max_depth or six.MAXSIZE

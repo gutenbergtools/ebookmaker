@@ -1,4 +1,4 @@
-0.13.1 January 20, 2025
+0.13.2 January 20, 2025
 With this release we add some important new capabilities to Ebookmaker; other more profound functionalities such as PDF generation have been deferred to the next major version (0.14), but important groundwork is laid so that problems can surface sooner rather than later.
 
 - This release includes support for MathML. Although it's over 10 years old, it's only recently that all the major web browsers are supporting MathML. MathML has been part of the EPUB3 spec since its beginning. MathML also has important accessibility attributes and some assistive technologies (but not all), are supporting it. It renders math beautifully, allowing equations to reflow in ebooks, the lack of which makes our math-containing ebooks a poor experience in EPUB readers and Kindles. Fixes #254
