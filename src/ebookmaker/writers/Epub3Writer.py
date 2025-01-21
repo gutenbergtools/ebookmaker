@@ -345,7 +345,7 @@ class ContentOPF(object):
         if prop == 'cover-image':
             self.add_coverpage(url, id_)
         manifest_atts = {'href': url, 'id': id_, 'media-type': mediatype}
-        if prop:
+        if prop and prop not in {'linked_image'}:
             manifest_atts['properties'] = prop
         self.manifest.append(
             self.opf.item(**manifest_atts))
