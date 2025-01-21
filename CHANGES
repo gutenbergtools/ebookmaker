@@ -1,3 +1,5 @@
+0.13.3 January 21, 2025
+- fix failures with unknown mediatypes.
 0.13.2 January 20, 2025
 With this release we add some important new capabilities to Ebookmaker; other more profound functionalities such as PDF generation have been deferred to the next major version (0.14), but important groundwork is laid so that problems can surface sooner rather than later.
 

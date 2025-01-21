@@ -69,7 +69,9 @@ class Spider(object):
         self.exclude_mediatypes += options.exclude_mediatypes
         if job.type in {'epub.images', 'epub.noimages', 'epub3.images'}:
             self.exclude_mediatypes.append('application/xml')
-
+            self.include_unknown = False
+        else:
+            self.include_unknown = True
         self.max_depth = options.max_depth or six.MAXSIZE
         self.jobtype = job.type
         self.job_dc = job.dc
@@ -260,7 +262,7 @@ class Spider(object):
         mediatype = self.get_mediatype(attribs)
         if not mediatype:
             warning('Mediatype could not be determined from url %s' % attribs.url)
-            return True # always include if mediatype unknown
+            return self.include_unknown # don't include in epubs if mediatype unknown
 
         included = any([fnmatch.fnmatch(mediatype, pattern)
                         for pattern in self.include_mediatypes])
