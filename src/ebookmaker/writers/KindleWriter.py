@@ -47,8 +47,8 @@ class Writer(BaseWriter):
         # kindlegen needs localized paths
         outputdir = os.path.abspath(job.outputdir)
 
-        info("Creating Kindle file: %s" % os.path.join(outputdir, job.outputfile))
-        info("            ... from: %s" % job.url)
+        debug("Creating Kindle file: %s" % os.path.join(outputdir, job.outputfile))
+        debug("            ... from: %s" % job.url)
 
         try:
             cwd = os.getcwd()
@@ -102,7 +102,6 @@ class Writer(BaseWriter):
                         if sline == 'MOBI File generated with WARNINGS!':
                             # we knew that already
                             continue
-                        # info("kindlegen: %s" % sline)
                     elif g == 'warning':
                         if sline.startswith('Cover is too small'):
                             continue
@@ -114,4 +113,4 @@ class Writer(BaseWriter):
                     else:
                         error(line)
 
-        info("Done Kindle file: %s" % os.path.join(outputdir, job.outputfile))
+        debug("Done Kindle file: %s" % os.path.join(outputdir, job.outputfile))

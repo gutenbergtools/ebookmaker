@@ -44,9 +44,9 @@ class Writer(writers.BaseWriter):
                 if gg.is_same_path(src_uri, fn_dest):
                     debug('Not copying %s to %s: same file' % (src_uri, fn_dest))
                     continue
-                debug('Copying %s to %s' % (src_uri, fn_dest))
 
                 fn_dest = gg.normalize_path(fn_dest)
+                debug('Copying %s to %s' % (src_uri, fn_dest))
                 gg.mkdir_for_filename(fn_dest)
                 try:
                     with open(fn_dest, 'wb') as fp_dest:
@@ -61,8 +61,8 @@ class Writer(writers.BaseWriter):
 
         dest_dir = os.path.abspath(job.outputdir)
 
-        info("Creating Pics directory in: %s" % dest_dir)
+        debug("Creating Pics directory in: %s" % dest_dir)
 
         self.copy_aux_files(job, dest_dir)
 
-        info("Done Pics directory in: %s" % dest_dir)
+        debug("Done Pics directory in: %s" % dest_dir)

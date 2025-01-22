@@ -6,11 +6,12 @@
 HTMLParser.py
 
 Copyright 2009 by Marcello Perathoner
+Copyright 2025 by Project Gutenberg
 
 Distributable under the GNU General Public License Version 3 or newer.
 
 """
-
+import copy
 import re
 import unicodedata
 
@@ -86,11 +87,13 @@ DEPRECATED = {
     'background': 'body',
     'bgcolor': 'body',
     'border': 'img ',
+    'charset': 'a',
     'compact': '*',
     'hspace': '*',
     'link': 'body',
     'noshade': 'hr',
     'nowrap': '*',
+    'rev': 'a',
     'start': 'ol',
     'text': 'body',
     'value': 'li',
@@ -142,10 +145,17 @@ CSS_FOR_REPLACED = {
     'font': "",
 }
 BODY_WRAPPER_CLASS = 'pg_body_wrapper'
+
 CSS_FOR_ADDED = {
     'xhtml_div_align': '.xhtml_div_align table {display: inline-table; text-align:initial}',
     'xhtml_p_align': '.xhtml_div_align table {display: inline-table; text-align:initial}',
     BODY_WRAPPER_CLASS: '.%s {display: inline;}' % BODY_WRAPPER_CLASS,
+}
+
+
+SOUND_TYPES = {
+    '.mp3': 'audio/mpeg',
+    '.ogg': 'audio/ogg; codecs=opus',
 }
 
 INAPPROPRIATE_ALTTEXT = {
@@ -169,6 +179,11 @@ SEE_A11Y_INFO = "See https://www.pgdp.net/wiki/Accessible_HTML_eBooks#Alt_text"
 NO_ALT_TEXT = 'Empty alt text for %s. '
 DECORATIVE_WARNING = 'Replacing "%s" with empty string and adding role=presentation. '
 INAPPROPRIATE_ERROR = 'Replacing inaccessible alt text "%s" with empty string. '
+
+XMLCOMMENT = re.compile(r'<!--(.*?)-->', re.S)
+XMLOPENCOMMENT = re.compile(r'<!--(.*?)')
+CSSCOMMENT = re.compile(r'/\*(.*?)\*/', re.S)
+JSCOMMENT = re.compile(r'//(.*?)')
 
 def nfc(_str):
     return unicodedata.normalize('NFC', EntitySubstitution.substitute_xml(_str))
@@ -214,15 +229,10 @@ class Parser(HTMLParserBase):
         # See HTML 4.01 spec section B.2.
 
         if '%' in id_:
+            bytes_id = urllib.parse.unquote(id_.encode('us-ascii')) # undo the %-escaping
             try:
-                bytes_id = urllib.parse.unquote(id_.encode('us-ascii')) # undo the %-escaping
-                try:
-                    id_ = bytes_id.decode('utf-8')
-                except UnicodeError:
-                    doc_encoding = self.attribs.orig_mediatype.params.get('charset')
-                    if doc_encoding:
-                        id_ = bytes_id.decode(doc_encoding)
-            except Exception:
+                id_ = bytes_id.decode('utf-8')
+            except UnicodeError:
                 pass # too broken to fix
 
         id_ = RE_NOT_XML_NAMECHAR.sub('_', id_)
@@ -338,8 +348,12 @@ class Parser(HTMLParserBase):
                     del elem.attrib[key]
                     elem.attrib[new_key] = val
 
-
-
+    def finalize_html5(cls, xhtml):
+        # workaround to let lxml iterlinks for math@altimg attribute links
+        for e in xpath(xhtml, "//xhtml:math"):
+            altimg = e.attrib.pop('src', None)
+            if altimg:
+                e.attrib['altimg'] = altimg
 
     idnum = 0
     def _to_xhtml11(self):
@@ -354,6 +368,11 @@ class Parser(HTMLParserBase):
         # Change content-type meta to application/xhtml+xml.
         for meta in xpath(self.xhtml, "/xhtml:html/xhtml:head/xhtml:meta[@http-equiv]"):
             if meta.get('http-equiv').lower() == 'content-type':
+                meta.getparent().remove(meta)
+
+        # remove meta elements with non-nametoken names
+        for meta in xpath(self.xhtml, "/xhtml:html/xhtml:head/xhtml:meta[@name]"):
+            if not parsers.RE_XML_NAME.match(meta.get('name')):
                 meta.getparent().remove(meta)
 
         # drop javascript
@@ -536,15 +555,45 @@ class Parser(HTMLParserBase):
                 warning(SEE_A11Y_INFO)
             elif alt.lower() in INAPPROPRIATE_ALTTEXT:
                 elem.attrib['alt'] = ''
-                error(INAPPROPRIATE_ERROR, alt)
-                error(SEE_A11Y_INFO)
+                warning(INAPPROPRIATE_ERROR, alt)
+                warning(SEE_A11Y_INFO)
 
             # write img info to logs
             rel_url = make_url_relative(parsers.webify_url(filesdir()), self.attribs.url)
             src_rel_url = make_url_relative(self.attribs.url, elem.get("src"))
-            info(f'[ALTTEXT]{csv_escape([rel_url, id_, alt, src_rel_url, infigure])}')
-                
+            if options.production:
+                info(f'[ALTTEXT]{csv_escape([rel_url, id_, alt, src_rel_url, infigure])}')
 
+        # use html5 audio element instead of links to mp3, ogg files
+        for snd, snd_mime in SOUND_TYPES.items():
+            snd_path = f"//xhtml:a[substring(@href, string-length(@href) - 3) = '{snd}']"
+            for link in xpath(self.xhtml, snd_path):
+                link.tag = NS.xhtml.audio
+                attrib = copy.deepcopy(link.attrib)
+                link.clear(keep_tail=True)
+                attrib['title'] = link.text or ''
+                attrib['controls'] = 'controls'
+                link.attrib.update(attrib)
+
+                source = etree.Element(NS.xhtml.source)
+                source.attrib['src'] = link.attrib['href']
+                source.attrib['type'] = snd_mime
+                link.append(source)
+                source.tail = "Audio content is not currently supported on your device."
+
+                # when we change a link to an audio element, some attributes don't work
+                for att in parsers.A_NOT_GLOBAL:
+                    link.attrib.pop(att, None)
+
+                #swallow surrounding parens
+                link.tail = re.sub(r'^[ \]\}\)]*', '  ', link.tail)
+                if link.getprevious():
+                    link.getprevious().tail = re.sub(r'[\[\{\( ]*$', '  ', link.getprevious().tail)
+                # enable over-riding directives to hide this link
+                self.add_class(link.getparent(), 'pgshow')
+                
+                
+        
         ##### cleanup #######
 
         css_for_deprecated = ' '.join([CSS_FOR_REPLACED.get(tag, '') for tag in deprecated_used])
@@ -676,9 +725,14 @@ class Parser(HTMLParserBase):
 
         debug("HTMLParser.pre_parse() ...")
         if b'xmlns=' in self.bytes_content() or b'-//W3C//DTD X' in self.bytes_content():
-            info('using an XML parser')
-            bs_parser = 'lxml'
-            extra_params = {'exclude_encodings':["us-ascii"]}
+            if b'http://www.w3.org/2000/svg' in self.bytes_content():
+                info('using an HTML5 parser because of svg xml')
+                bs_parser = 'html5lib'
+                extra_params = {}
+            else:
+                info('using an XML parser')
+                bs_parser = 'lxml'
+                extra_params = {'exclude_encodings':["us-ascii"]}
         else:
             info('using an HTML5 parser')
             bs_parser = 'html5lib'
@@ -701,18 +755,19 @@ class Parser(HTMLParserBase):
         # ancient browsers didn't understand stylesheets, so xml comments were used to hide the
         # style text. Our CSS parser is too modern to remember this, it seems.
         # So we needed to un-comment the style text
-        xmlcomment = re.compile(r'<!--(.*?)-->', re.S)
-        for commented_style in soup.find_all('style', string=xmlcomment):
-            commented_style.string = xmlcomment.sub(r'\1', str(commented_style.string))
+        for commented_style in soup.find_all('style', string=XMLCOMMENT):
+            commented_style.string = XMLCOMMENT.sub(r'\1', str(commented_style.string))
 
-        xmlopencomment = re.compile(r'<!--(.*?)')
-        for commented_style in soup.find_all('style', string=xmlopencomment):
-            commented_style.string = xmlopencomment.sub(r'', str(commented_style.string))
+        for commented_style in soup.find_all('style', string=XMLOPENCOMMENT):
+            commented_style.string = XMLOPENCOMMENT.sub(r'', str(commented_style.string))
 
         # pg producers did crazy things in css comments, such as inserting CDATA sections
-        csscomment = re.compile(r'/\*(.*?)\*/', re.S)
-        for commented_style in soup.find_all('style', string=csscomment):
-            commented_style.string = csscomment.sub('', str(commented_style.string))
+        for commented_style in soup.find_all('style', string=CSSCOMMENT):
+            commented_style.string = CSSCOMMENT.sub('', str(commented_style.string))
+
+        # a lot of them thought it was a good idea to put javascript comments in style blocks
+        for commented_style in soup.find_all('style', string=JSCOMMENT):
+            commented_style.string = JSCOMMENT.sub('', str(commented_style.string))
 
         """ same as setting enclose-text option on tidy;
         ' enclose any text it finds in the body element within a <P> element.
@@ -735,11 +790,14 @@ class Parser(HTMLParserBase):
                     elem.wrap(new_div)
                     self.added_classes.add(BODY_WRAPPER_CLASS)
 
-
+        # workaround to let lxml iterlinks for math@altimg attribute links
+        for elem in soup.find_all('math', altimg=True):
+            elem["src"] = elem["altimg"]
 
         marked = mark_soup(soup)
         if not marked:
-            info('No boilerplate found in %s', self.attribs.url)
+            if options.production and self.attribs.id == 'start':
+                critical('Boilerplate markers are missing in %s', self.attribs.url)
 
         html = soup.decode(formatter=nfc_formatter)
         if not html:

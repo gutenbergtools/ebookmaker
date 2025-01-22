@@ -88,7 +88,7 @@ class ZipPackager (BasePackager):
         try:
             os.stat (filename)
             dummy_name, ext = os.path.splitext (filename)
-            info ('  Adding file: %s as %s' % (filename, memberfilename))
+            debug ('  Adding file: %s as %s' % (filename, memberfilename))
             zip_.write (filename, memberfilename,
                         zipfile.ZIP_STORED if ext in ['.zip', '.png']
                         else zipfile.ZIP_DEFLATED)

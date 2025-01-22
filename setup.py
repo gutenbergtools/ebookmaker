@@ -5,7 +5,7 @@
 
 from setuptools import setup
 
-VERSION = '0.12.48'
+VERSION = '0.13.3'
 
 if __name__ == "__main__":
  
@@ -38,7 +38,6 @@ if __name__ == "__main__":
 
         install_requires = [
             'pillow>=8.3.2',
-            'cherrypy',
             'cssutils',
             'docutils>=0.18.1',
             'lxml',

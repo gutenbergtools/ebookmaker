@@ -6,6 +6,7 @@
 Spider.py
 
 Copyright 2009 by Marcello Perathoner
+Copyright 2025 by Project Gutenberg
 
 Distributable under the GNU General Public License Version 3 or newer.
 
@@ -15,6 +16,7 @@ Rudimentary Web Spider
 import copy
 import fnmatch
 import os.path
+import re
 
 from six.moves import urllib
 
@@ -28,7 +30,15 @@ from ebookmaker.CommonCode import Options
 from ebookmaker.ParserFactory import ParserFactory
 
 
+OPS_AUDIO_MEDIATYPES = set((
+    'audio/mpeg',
+    'audio/ogg; codecs=opus',
+    'audio/ogg',  # need both because spider believes type attribute
+))
+
 options = Options()
+
+RE_PGLINK = re.compile(r'^https?://(www.|)(gutenberg|pglaf|pgdp).org(\W|$)', re.I)
 
 class Spider(object):
     """ A very rudimentary web spider. """
@@ -47,14 +57,21 @@ class Spider(object):
         self.include_mediatypes += options.include_mediatypes
         if job.subtype == '.images' or job.type == 'rst.gen':
             self.include_mediatypes.append('image/*')
+        if job.type == 'epub3.images':
+            self.include_mediatypes.extend([str(mt) for mt in OPS_AUDIO_MEDIATYPES])
         if job.type == 'html.images':
             self.include_mediatypes.append('*/*')
+
         self.exclude_urls = []
         self.exclude_urls += options.exclude_urls
 
         self.exclude_mediatypes = []
         self.exclude_mediatypes += options.exclude_mediatypes
-
+        if job.type in {'epub.images', 'epub.noimages', 'epub3.images'}:
+            self.exclude_mediatypes.append('application/xml')
+            self.include_unknown = False
+        else:
+            self.include_unknown = True
         self.max_depth = options.max_depth or six.MAXSIZE
         self.jobtype = job.type
         self.job_dc = job.dc
@@ -106,7 +123,7 @@ class Spider(object):
                 parser._xhtml = copy.deepcopy(parser.xhtml)
 
             # look for more documents to add to the queue
-            debug("Requesting iterlinks for: %s ..." % url)
+            # debug("Requesting iterlinks for: %s ..." % url)
             for url, elem in parser.iterlinks():
                 counter += 1
                 url = urllib.parse.urldefrag(url)[0]
@@ -129,7 +146,7 @@ class Spider(object):
                     if k in ('id', 'title'):
                         setattr(new_attribs, k, v)
                     elif k == 'type':
-                        new_attribs.orig_mediatype = new_attribs.HeaderElement.from_str(v)
+                        new_attribs.orig_mediatype = v
                     elif k == 'rel':
                         new_attribs.rel.update(v.lower().split())
 
@@ -158,7 +175,7 @@ class Spider(object):
                     else:
                         self.enqueue(queue, depth + 1, new_attribs, True)
                         
-                elif tag in (NS.xhtml.img, NS.xhtml.style):
+                elif tag in (NS.xhtml.img, NS.xhtml.style, NS.xhtml.math):
                     if tag == NS.xhtml.style or self.is_image(new_attribs):
                         self.enqueue(queue, depth, new_attribs, False)
                     else:
@@ -168,7 +185,7 @@ class Spider(object):
                         self.enqueue(queue, depth, new_attribs, False)
                     else:
                         self.enqueue(queue, depth + 1, new_attribs, True)
-                elif tag == NS.xhtml.object:
+                elif tag in (NS.xhtml.object, NS.xhtml.source):
                     self.enqueue(queue, depth, new_attribs, False)
 
         debug("End of retrieval")
@@ -185,9 +202,10 @@ class Spider(object):
 
     def enqueue(self, queue, depth, attribs, is_doc):
         """ Enqueue url for parsing."""
+
         if is_doc:
             if not self.is_included_url(attribs):
-                if attribs.url and attribs.url.startswith('https://www.gutenberg.org/'):
+                if attribs.url and RE_PGLINK.search(attribs.url):
                     info('PG link in %s: %s', attribs.referrer, attribs.url)
                 else: 
                     warning('External link in %s: %s', attribs.referrer, attribs.url)
@@ -195,6 +213,7 @@ class Spider(object):
             if depth >= self.max_depth:
                 critical('Omitted file %s due to depth > max_depth' % attribs.url)
                 return
+        
         if not self.is_included_mediatype(attribs) and not self.is_included_relation(attribs):
             return
         elif not self.is_included_url(attribs) and not self.is_included_relation(attribs):
@@ -223,8 +242,6 @@ class Spider(object):
 
         if excluded:
             debug("Dropping excluded %s" % url)
-        if not included:
-            debug("Dropping not included %s" % url)
         return False
 
 
@@ -232,11 +249,11 @@ class Spider(object):
         """ Get mediatype out of attribs, guessing if needed. """
         if attribs.orig_mediatype is None:
             mediatype = MediaTypes.guess_type(attribs.url)
-            if mediatype:
-                attribs.orig_mediatype = attribs.HeaderElement(mediatype)
+            if mediatype:               
+                attribs.orig_mediatype = mediatype
             else:
                 return None
-        return attribs.orig_mediatype.value
+        return attribs.orig_mediatype
 
 
     def is_included_mediatype(self, attribs):
@@ -245,7 +262,7 @@ class Spider(object):
         mediatype = self.get_mediatype(attribs)
         if not mediatype:
             warning('Mediatype could not be determined from url %s' % attribs.url)
-            return True # always include if mediatype unknown
+            return self.include_unknown # don't include in epubs if mediatype unknown
 
         included = any([fnmatch.fnmatch(mediatype, pattern)
                         for pattern in self.include_mediatypes])
@@ -257,8 +274,6 @@ class Spider(object):
 
         if excluded:
             debug("Dropping excluded mediatype %s" % mediatype)
-        if not included:
-            debug("Dropping not included mediatype %s" % mediatype)
 
         return False
 

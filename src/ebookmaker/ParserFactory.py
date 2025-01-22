@@ -6,6 +6,7 @@
 ParserFactory.py
 
 Copyright 2009-14 by Marcello Perathoner
+Copyright 2025 by Project Gutenberg
 
 Distributable under the GNU General Public License Version 3 or newer.
 
@@ -23,6 +24,7 @@ import requests
 
 from libgutenberg.Logger import critical, debug, error, info
 from libgutenberg import MediaTypes
+import libgutenberg.GutenbergGlobals as gg
 from ebookmaker.CommonCode import Options
 from ebookmaker.Version import VERSION
 from ebookmaker import parsers
@@ -60,13 +62,14 @@ class ParserFactory(object):
     """
 
     parsers = {} # cache: parsers[url] = parser
+    sources = {} # sources[outfile] = source
 
     @staticmethod
     def get(attribs):
         """ Get the right kind of parser. """
 
         try:
-            mediatype = attribs.orig_mediatype.value
+            mediatype = attribs.orig_mediatype
             if mediatype == 'text/plain' and attribs.referrer:
                 # don't use GutenbergTextParser, it's a linked text file
                 return parsers.TxtParser(attribs)
@@ -83,6 +86,18 @@ class ParserFactory(object):
             attribs = parsers.ParserAttributes()
 
         # debug("Need parser for %s" % url)
+        
+        # first check if input url is in output directory (we've already made it!)
+        if gg.is_same_path(os.path.abspath(options.outputdir), os.path.dirname(url)):
+            # find the file (and the parser) used to make the file
+            if url in cls.sources: 
+                if cls.sources[url] in cls.parsers:
+                    parser = cls.parsers[cls.sources[url]]
+                    parser.reset()
+                    parser.attribs.update(attribs)
+                    return parser
+                
+        
 
         if url in cls.parsers:
             # debug("... reusing parser for %s" % url)
@@ -112,9 +127,8 @@ class ParserFactory(object):
         # ok. so we have to create a new parser
         debug("... creating new parser for %s" % url)
 
-        if options.mediatype_from_extension:
-            attribs.orig_mediatype = attribs.HeaderElement(MediaTypes.guess_type(url))
-            debug("... set mediatype %s from extension" % attribs.orig_mediatype.value)
+        if hasattr(options, 'mediatype_from_extension') and options.mediatype_from_extension:
+            attribs.orig_mediatype = MediaTypes.guess_type(url)
 
         attribs.orig_url = url
         parser = cls.get(attribs)
@@ -137,8 +151,7 @@ class ParserFactory(object):
             },
             proxies=options.config.PROXIES
         )
-        attribs.orig_mediatype = attribs.HeaderElement.from_str(
-            fp.headers.get('Content-Type', 'application/octet-stream'))
+        attribs.orig_mediatype = fp.headers.get('Content-Type', 'application/octet-stream')
         debug("... got mediatype %s from server" % str(attribs.orig_mediatype))
         attribs.orig_url = url
         attribs.url = fp.url
@@ -170,7 +183,7 @@ class ParserFactory(object):
             except ValueError:  # just a relative path?
                 fp = open_file_from_path(url)
             
-        attribs.orig_mediatype = attribs.HeaderElement(MediaTypes.guess_type(url))
+        attribs.orig_mediatype = MediaTypes.guess_type(url)
 
         debug("... got mediatype %s from guess_type" % str(attribs.orig_mediatype))
         attribs.orig_url = attribs.url = url
@@ -187,7 +200,7 @@ class ParserFactory(object):
         package = o.hostname
         filename = o.path[1:]
         fp = resource_stream(package, filename)
-        attribs.orig_mediatype = attribs.HeaderElement(MediaTypes.guess_type(filename))
+        attribs.orig_mediatype = MediaTypes.guess_type(filename)
 
         debug("... got mediatype %s from guess_type" % str(attribs.orig_mediatype))
         attribs.orig_url = orig_url

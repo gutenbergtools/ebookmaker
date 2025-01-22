@@ -24,7 +24,6 @@ class TestFromRst(unittest.TestCase):
 
         self.assertFalse(output)
         outs = [
-            "%s-pdf.pdf",
             "%s-cover.png",
             "%s-images-pdf.pdf",
         ]

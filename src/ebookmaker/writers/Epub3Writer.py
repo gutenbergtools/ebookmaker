@@ -5,7 +5,7 @@
 
 Epub3Writer.py
 
-Copyright 2022 by Project Gutenberg
+Copyright 2022-2025 by Project Gutenberg
 
 Distributable under the GNU General Public License Version 3 or newer.
 
@@ -33,6 +33,7 @@ from ebookmaker import ParserFactory
 from ebookmaker import HTMLChunker
 from ebookmaker.CommonCode import EbookAltText, Options
 from ebookmaker.Version import VERSION, GENERATOR
+from ebookmaker.Spider import OPS_AUDIO_MEDIATYPES
 
 from .EpubWriter import (
     MAX_IMAGE_SIZE,
@@ -110,6 +111,10 @@ body.x-ebookmaker-coverpage {
     margin: 0;
     padding: 0;
 }
+body.x-ebookmaker.x-ebookmaker-3  .pgshow {
+    visibility: visible;
+    display: initial;
+    }
 """
 
 def alt_text_good(book_id):
@@ -333,15 +338,6 @@ class ContentOPF(object):
 
     def manifest_item(self, url, mediatype, id_=None, prop=None):
         """ Add item to manifest. """
-        def add_prop(prop, newprop):
-            if prop:
-                vals = prop.split()
-            else:
-                vals = []
-            vals.append(newprop)
-            prop = ' '.join(vals)
-            return prop
-
         if id_ is None or xpath(self.manifest, "//*[@id = '%s']" % id_):
             self.item_id += 1
             id_ = 'item%d' % self.item_id
@@ -349,7 +345,7 @@ class ContentOPF(object):
         if prop == 'cover-image':
             self.add_coverpage(url, id_)
         manifest_atts = {'href': url, 'id': id_, 'media-type': mediatype}
-        if prop:
+        if prop and prop not in {'linked_image'}:
             manifest_atts['properties'] = prop
         self.manifest.append(
             self.opf.item(**manifest_atts))
@@ -357,15 +353,14 @@ class ContentOPF(object):
         return id_
 
 
-    def spine_item(self, url, mediatype, id_=None, first=False):
+    def spine_item(self, url, mediatype, id_=None, first=False, prop=None):
         """ Add item to spine and manifest. """
-
         if id_ and id_.startswith('pgepubid'):
             # this is an auto-generated header id, not human-readable and probably duplicated
             # make a new one
             id_ = None
 
-        prop = 'svg' if id_ == 'coverpage-wrapper' else None
+        prop = 'svg' if id_ == 'coverpage-wrapper' else prop
         id_ = self.manifest_item(url, mediatype, id_, prop=prop)
 
         # HACK: ADE needs cover flow as first element
@@ -382,15 +377,21 @@ class ContentOPF(object):
         """ Add item to manifest from parser. """
         if hasattr(p.attribs, 'comment'):
             self.manifest.append(etree.Comment(p.attribs.comment))
-        cover = 'cover-image' if 'icon' in p.attribs.rel else None
-        return self.manifest_item(p.attribs.url, p.mediatype(), id_=p.attribs.id, prop=cover)
+        prop = None
+        for rel in p.attribs.rel:
+            if rel == 'icon':
+                prop = 'cover-image'
+        return self.manifest_item(p.attribs.url, p.mediatype(), id_=p.attribs.id, prop=prop)
 
 
     def spine_item_from_parser(self, p):
         """ Add item to spine and manifest from parser. """
         if hasattr(p.attribs, 'comment'):
             self.manifest.append(etree.Comment(p.attribs.comment))
-        return self.spine_item(p.attribs.url, p.mediatype(), p.attribs.id)
+        prop = None
+        if len(p.attribs.rel):
+            prop = ' '.join(list(p.attribs.rel))
+        return self.spine_item(p.attribs.url, p.mediatype(), id_=p.attribs.id, prop=prop)
 
 
     def toc_item(self, url):
@@ -542,7 +543,7 @@ class Writer(EpubWriter.Writer):
 
     @staticmethod
     def html_for_epub3(xhtml):
-        """ Convert data-epub attribute to ebub attributes
+        """ Convert data-epub attribute to epub attributes
         """
         for e in xpath(xhtml, "//@*[starts-with(name(), 'data-epub')]/.."):
             for key in e.attrib.keys():
@@ -556,6 +557,9 @@ class Writer(EpubWriter.Writer):
             role = e.attrib['data-role']
             e.attrib['role'] = role
             del e.attrib['data-role']
+        # add namespace to math elements
+        for e in xpath(xhtml, "//xhtml:math"):
+            e.attrib['xmlns'] = "http://www.w3.org/1998/Math/MathML"
 
     @staticmethod
     def fix_incompatible_css(sheet):
@@ -566,7 +570,6 @@ class Writer(EpubWriter.Writer):
         for rule in sheet:
             if rule.type == rule.MEDIA_RULE:
                 for medium in rule.media:
-                    info(f'{medium}')
                     if medium == 'handheld':
                         rule.media.deleteMedium(medium)
                         rule.media.appendMedium(HANDHELD_QUERY)
@@ -759,7 +762,7 @@ class Writer(EpubWriter.Writer):
                     else:
                         # parsing xml worked, but it isn't xhtml. so we need to reset mediatype
                         # to something that isn't recognized as content
-                        p.attribs.mediatype = parsers.ParserAttributes.HeaderElement('text/xml')
+                        p.attribs.mediatype = 'text/xml'
             for p in job.spider.parsers:
                 if str(p.attribs.mediatype) == 'text/css':
                     p.parse()
@@ -769,8 +772,12 @@ class Writer(EpubWriter.Writer):
                         p.strip_images()
                     p.rewrite_links(self.url2filename)
                     parserlist.append(p)
+                    continue
                 if str(p.attribs.mediatype) in OPS_FONT_TYPES:
                     warning('font file embedded: %s ;  check its license!', p.attribs.url)
+                    parserlist.append(p)
+                    continue
+                if str(p.attribs.mediatype) in OPS_AUDIO_MEDIATYPES:
                     parserlist.append(p)
 
             # after splitting html into chunks we have to rewrite all
@@ -796,6 +803,8 @@ class Writer(EpubWriter.Writer):
                 p = ParserFactory.ParserFactory.get(attribs)
                 p.xhtml = chunk
                 parserlist.append(p)
+                if hasattr(p, 'finalize_html5'):
+                    p.finalize_html5(p.xhtml)
 
             self.shipout(job, parserlist, ncx, ncx2)
 

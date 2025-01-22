@@ -6,6 +6,7 @@
 Parser Package
 
 Copyright 2009 by Marcello Perathoner
+Copyright 2025 by Project Gutenberg
 
 Distributable under the GNU General Public License Version 3 or newer.
 
@@ -17,7 +18,7 @@ import re
 import os
 import cchardet
 import copy
-from cherrypy.lib import httputil
+
 import six
 from six.moves import urllib
 import unicodedata
@@ -79,6 +80,18 @@ BOGUS_CHARSET_NAMES = {'iso-latin-1': 'iso-8859-1',
                        }
 COREATTRS = ["class", "dir", "id", "lang", "style", "title"]
 
+# legal on A but not GLOBAL
+A_NOT_GLOBAL = [
+    'download',
+    'href',
+    'hreflang',
+    'ping',
+    'referrerpolicy',
+    'rel',
+    'target',
+    'type',
+]
+
 STYLE_LINK = '<link href="pgepub.css" rel="stylesheet"/>'
 
 # note: title is prequoted
@@ -90,7 +103,7 @@ IMAGE_WRAPPER = """<?xml version="1.0"?>{doctype}
   </head>
   <body>
     <div style="text-align: center">
-      <img src="{src}" alt={title} class="{wrapper_class}" />
+      <img src="{src}" alt="" class="{wrapper_class}" />
       {backlink}
     </div>
   </body>
@@ -135,15 +148,11 @@ class ParserAttributes(object): # pylint: disable=too-few-public-methods
       - referrer
       - id
 
-    mediatype and orig_mediatype are of type HeaderElement
-
     mediatype is not necessarily the same as orig_mediatype,
     because parsers may convert between input and output, eg.
     reST to xhtml.
 
     """
-
-    HeaderElement = httputil.HeaderElement
 
     def __init__(self):
         self.url = None
@@ -217,16 +226,6 @@ class ParserBase(object):
         pass
 
 
-    def get_charset_from_content_type(self):
-        """ Get charset from server content-type. """
-
-        charset = self.attribs.orig_mediatype.params.get('charset')
-        if charset:
-            debug('Got charset %s from server' % charset)
-            return charset
-        return None
-
-
     def get_charset_from_meta(self): # pylint: disable=R0201
         """ Parse header metadata for charset.
 
@@ -274,8 +273,7 @@ class ParserBase(object):
         """ Get document content as unicode string. """
 
         if self.unicode_buffer is None:
-            data = (self.decode(self.get_charset_from_content_type()) or
-                    self.decode(self.get_charset_from_meta()) or
+            data = (self.decode(self.get_charset_from_meta()) or
                     self.decode(self.guess_charset_from_body()) or
                     self.decode('utf-8') or
                     self.decode('windows-1252'))
@@ -318,7 +316,6 @@ class ParserBase(object):
             buffer = self.bytes_content()
             buffer = REB_PG_CHARSET.sub(b'', buffer)
             buffer = buffer.decode(charset)
-            self.attribs.orig_mediatype.params['charset'] = charset
             return buffer
         except LookupError as what:
             # unknown charset,
@@ -332,7 +329,7 @@ class ParserBase(object):
     def mediatype(self):
         """ Return parser output mediatype. Helper function. """
         if self.attribs.mediatype:
-            return self.attribs.mediatype.value
+            return self.attribs.mediatype
         return None
 
 
@@ -365,7 +362,7 @@ class TxtParser(ParserBase):
 
     def __init__(self, attribs=None):
         ParserBase.__init__(self, attribs)
-        self.attribs.mediatype = ParserAttributes.HeaderElement(mt.txt)
+        self.attribs.mediatype = mt.txt
 
     def serialize(self):
         return bytes(self.unicode_content(), 'utf8')
@@ -379,7 +376,7 @@ class HTMLParserBase(ParserBase):
 
     def __init__(self, attribs=None):
         ParserBase.__init__(self, attribs)
-        self.attribs.mediatype = ParserAttributes.HeaderElement(mt.xhtml)
+        self.attribs.mediatype = mt.xhtml
         self.xhtml = None
         self._xhtml = None
 
@@ -459,29 +456,37 @@ class HTMLParserBase(ParserBase):
         Assume links and urls are already made absolute.
 
         """
-
         if options.strip_links:
+            replacements = 0
             for link in xpath(xhtml, '//xhtml:a[@href]'):
                 href = urllib.parse.urldefrag(link.get('href'))[0]
                 if href not in manifest:
-                    debug("strip_links: Deleting <a> to %s not in manifest." % href)
+                    replacements += 1
                     del link.attrib['href']
+            if replacements:
+                debug(f"stripped {replacements} <a>s for href not in manifest.")
 
+        replacements = 0
         for link in xpath(xhtml, '//xhtml:link[@href]'):
             href = link.get('href')
             if href not in manifest:
-                debug("strip_links: Deleting <link> to %s not in manifest." % href)
+                replacements += 1
                 link.drop_tree()
+        if replacements:
+            debug(f"stripped {replacements} <link>s for href not in manifest.")
 
-        for image in xpath(xhtml, '//xhtml:img[@src]'):
+        replacements = 0
+        for image in xpath(xhtml, '//xhtml:*[@src]'):
             src = image.get('src')
             if src not in manifest:
-                debug("strip_links: Replacing <img> with src %s not in manifest." % src)
+                replacements += 1
                 image.tag = NS.xhtml.span
                 image.text = image.get('alt', '')
                 for attr  in image.attrib:
                     if attr not in COREATTRS:
                         del image.attrib[attr]
+        if replacements:
+            debug(f"stripped {replacements} <img>s for src not in manifest.")
 
 
     def make_toc(self, xhtml):

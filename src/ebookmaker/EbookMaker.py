@@ -6,6 +6,7 @@
 EbookMaker.py
 
 Copyright 2009-2014 by Marcello Perathoner
+Copyright 2025 by Project Gutenberg
 
 Distributable under the GNU General Public License Version 3 or newer.
 
@@ -51,12 +52,12 @@ CONFIG_FILES = ['/etc/ebookmaker.conf', os.path.expanduser('~/.ebookmaker')]
 DEPENDENCIES = collections.OrderedDict((
     ('all', ('html', 'epub', 'epub3', 'kindle', 'kf8', 'pdf', 'txt', 'rst')),
     ('test', ('html', 'epub', 'epub3')),
-    ('html', ('html.images', 'html.noimages')),
-    ('epub', ('epub.images', 'epub.noimages')),
+    ('html', ('html.images',)),
+    ('epub', ('epub.images', 'epub.noimages',)),
     ('epub3', ('epub3.images',)),
     ('kindle', ('kindle.images',)),
     ('kf8', ('kf8.images',)),
-    ('pdf', ('pdf.images', 'pdf.noimages')),
+    ('pdf', ('pdf.images',)),
     ('txt', ('txt.utf-8', 'txt.iso-8859-1', 'txt.us-ascii')),
     ('rst', ('rst.gen', )),
     ('kindle.noimages', ('epub.noimages', )),
@@ -64,8 +65,7 @@ DEPENDENCIES = collections.OrderedDict((
     ('kf8.images', ('epub3.images', )),
     ('html.noimages', ('picsdir.noimages', )),
     ('html.images', ('picsdir.images', )),
-    ('pdf.noimages', ('picsdir.noimages', )),
-    ('pdf.images', ('picsdir.images', )),
+    ('pdf.images', ('picsdir.images',)),
     ('rst.gen', ('picsdir.images', )),
 ))
 
@@ -73,15 +73,14 @@ BUILD_ORDER = """
 picsdir.images picsdir.noimages
 rst.gen
 txt.utf-8 txt.iso-8859-1 txt.us-ascii
-html.images html.noimages
-epub.noimages kindle.noimages pdf.noimages
+html.images
+epub.noimages kindle.noimages
 epub.images kindle.images pdf.images
 epub3.images kf8.images
 cover.small cover.medium
 qrcode rdf facebook twitter mastodon null""".split()
 
 FILENAMES = {
-    'html.noimages': '{id}-noimages-h.html',
     'html.images': '{id}-h.html',
 
     'epub.noimages': '{id}-epub.epub',
@@ -92,7 +91,6 @@ FILENAMES = {
     'kindle.images': '{id}-images-kindle.mobi',
     'kf8.images': '{id}-kf8-kindle.mobi',
 
-    'pdf.noimages': '{id}-pdf.pdf',
     'pdf.images': '{id}-images-pdf.pdf',
 
     'txt.utf-8': '{id}-0.txt',
@@ -483,8 +481,7 @@ def do_job(job):
 
 
             if options.input_mediatype:
-                attribs.orig_mediatype = attribs.HeaderElement.from_str(
-                    options.input_mediatype)
+                attribs.orig_mediatype = options.input_mediatype
 
             spider.recursive_parse(attribs)
             if job.type.split('.')[0] in ('epub', 'epub3', 'html', 'kindle', 'cover', 'pdf'):
@@ -495,6 +492,7 @@ def do_job(job):
 
         writer = WriterFactory.create(job.maintype)
         writer.build(job)
+        ParserFactory.ParserFactory.sources[job.outputfile] = job.url
 
         if options.validate:
             writer.validate(job)
@@ -511,11 +509,11 @@ def do_job(job):
             # don't us GutenbergTextParser for subsequent builds
             ParserFactory.ParserFactory.parsers = {}
 
-    except SkipOutputFormat as what:
-        warning("%s" % what)
+    except SkipOutputFormat:
+        debug(f"{job.type} skipped")
 
     except Exception as what:
-        exception("%s" % what)
+        exception(f"{job.type} raises exception {what}")
 
     end_time = datetime.datetime.now()
     info(' %s made in %s' % (job.type, end_time - start_time))
@@ -587,7 +585,7 @@ def main():
     dc = None
     for job in job_queue:
         try:
-            info('Job starting for type %s from %s', job.type, job.url)
+            debug('Job starting for type %s from %s', job.type, job.url)
             dc = get_dc(job) # this is when doc at job.url gets parsed!
             job.dc = dc
             job.last_updated()
@@ -602,6 +600,9 @@ def main():
             if job.type.startswith('kf8') and 'epub3.images' in output_files:
                 absoutputdir = os.path.abspath(job.outputdir)
                 job.url = os.path.join(absoutputdir, output_files['epub3.images'])
+            if job.type == 'pdf.images' and 'html.images' in output_files:
+                absoutputdir = os.path.abspath(job.outputdir)
+                job.url = os.path.join(absoutputdir, output_files['html.images'])
 
             options.outputdir = job.outputdir
             do_job(job)

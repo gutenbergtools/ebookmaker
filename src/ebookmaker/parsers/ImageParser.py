@@ -91,7 +91,7 @@ class Parser(ParserBase):
                 format_ = 'png'
                 self.attribs.url +=  '.png'
                 self.attribs.orig_mediatype = self.attribs.mediatype
-                self.attribs.mediatype = ParserAttributes.HeaderElement(mt.png)
+                self.attribs.mediatype = mt.png
             if format_ == 'jpeg' and unsized_image.mode.lower() not in ('rgb', 'l'):
                 unsized_image = unsized_image.convert('RGB')
 
@@ -126,7 +126,7 @@ class Parser(ParserBase):
             comment = "Image: %d x %d size=%d %s" % (
                 image.size[0], image.size[1], len(data), was
             )
-            debug(comment)
+            #debug(comment)
 
             new_parser.image_data = data
             new_parser.dimen = tuple(image.size)

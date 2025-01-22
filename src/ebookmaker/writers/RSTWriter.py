@@ -28,16 +28,16 @@ class Writer (writers.BaseWriter):
 
         filename = os.path.join (os.path.abspath(job.outputdir), job.outputfile)
 
-        info ("Creating RST file: %s" % filename)
+        debug ("Creating RST file: %s" % filename)
 
         parser = ParserFactory.ParserFactory.create (job.url)
 
         if not hasattr (parser, 'rst2nroff'):
-            error ('RSTWriter can only work on a RSTParser.')
+            debug ('RSTWriter can only work on a RSTParser.')
             raise SkipOutputFormat
 
         data = parser.preprocess ('utf-8').encode ('utf-8')
 
         self.write_with_crlf (filename, data)
 
-        info ("Done RST file: %s" % filename)
+        debug ("Done RST file: %s" % filename)

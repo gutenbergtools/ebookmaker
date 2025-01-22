@@ -6,6 +6,7 @@
 HTMLChunker.py
 
 Copyright 2009, 2014 by Marcello Perathoner
+Copyright 2025 by Project Gutenberg
 
 Distributable under the GNU General Public License Version 3 or newer.
 
@@ -133,8 +134,8 @@ class HTMLChunker(object):
     def shipout_chunk(self, attribs, chunk_id = None, comment = None):
         """ ready chunk to be shipped """
 
-        attribs = copy.copy(attribs)
-
+        attribs = copy.deepcopy(attribs)
+        attribs.rel.discard('mathml')
         if self.chunk_size > self.max_chunk_size and not self.nosplit:
             self.split(self.chunk, attribs)
             return
@@ -156,7 +157,12 @@ class HTMLChunker(object):
             if old_id not in self.idmap:
                 self.idmap[old_id] = "%s#%s" % (
                     chunk_name,  urllib.parse.quote(id_))
-
+        for e in xpath(self.chunk, '//xhtml:math'):
+            attribs.rel.add('mathml')
+            break
+        for e in xpath(self.chunk, '//svg:svg'):
+            attribs.rel.add('svg')
+            break
         attribs.url = chunk_name
         attribs.id = chunk_id
         attribs.comment = comment
@@ -238,6 +244,7 @@ class HTMLChunker(object):
             if len(self.chunk_body):
                 chunk_id = self.chunk_body[0].get('id')
             comment = "Chunk: size=%d" % self.chunk_size
+            
             self.shipout_chunk(attribs, chunk_id, comment)
             self.reset_chunk(template)
 

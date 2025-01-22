@@ -6,6 +6,7 @@
 EpubWriter.py
 
 Copyright 2009-2012 by Marcello Perathoner
+Copyright 2025 by Project Gutenberg
 
 Distributable under the GNU General Public License Version 3 or newer.
 
@@ -158,7 +159,7 @@ class OEBPSContainer(zipfile.ZipFile):
 
         self.zipfilename = filename
         self.oebps_path = oebps_path if oebps_path else 'OEBPS/'
-        info('Creating Epub file: %s' % filename)
+        debug('Creating Epub file: %s' % filename)
         mkdir_for_filename(filename)
 
         # open zipfile
@@ -178,7 +179,7 @@ class OEBPSContainer(zipfile.ZipFile):
 
     def commit(self):
         """ Close OCF Container. """
-        info("Done Epub file: %s" % self.zipfilename)
+        debug("Done Epub file: %s" % self.zipfilename)
         self.close()
 
 
@@ -854,7 +855,7 @@ class Writer(writers.HTMLishWriter):
                 elem.text = ''
 
             if count:
-                warning("%d elements having class %s have been rewritten." %
+                info("%d elements having class %s have been rewritten." %
                         (count, class_))
 
 
@@ -1040,10 +1041,32 @@ class Writer(writers.HTMLishWriter):
                 elem.set(attr, fill)
 
         # remove html5-only attribute
-        attrs_to_remove = [('*', 'role'),]
+
+        attrs_to_remove = [('*', 'role'),('*', 'aria-label'),('*', 'aria-labelledby'),
+            ('*', 'itemid'), ('*', 'itemprop'), ('*', 'itemref'), ('*', 'itemscope'),
+            ('*', 'itemtype'),]
+
         for (tag, attr) in attrs_to_remove:
             for elem in xpath(xhtml, f"//xhtml:{tag}[@{attr}]"):
                 del elem.attrib[attr]
+        for elem in xpath(xhtml, f"//svg:svg[@role]"):
+            del elem.attrib["role"]
+
+        # translate the audio element
+        for tag in xpath(xhtml, '//xhtml:audio'):
+            debug('found audio')
+            tag.tag = NS.xhtml.span
+            title = tag.attrib.get('title', None)
+            tag.text = '['
+            # possible audio attributes
+            for att in ['controls', 'crossorigin', 'preload', 'autoplay', 'loop', 'muted']:
+                tag.attrib.pop(att, None)
+            for source in tag.findall(NS.xhtml.source):
+                source.tag = NS.xhtml.a
+                source.attrib['href'] = source.attrib.pop('src', None)
+                source.text = title or source.attrib.pop('type', 'Listen')
+                source.attrib.pop('media', None)
+                source.tail = ']'
 
         # replace html5 block tags
         usedtags = set()
@@ -1060,6 +1083,38 @@ class Writer(writers.HTMLishWriter):
                 tag.tag = NS.xhtml.span
                 writers.HTMLWriter.add_class(tag, newtag)
 
+        # replace html5 math element
+        for tag in xpath(xhtml, f'//xhtml:math'):
+            usedtags.add("math")
+            display = tag.attrib.pop('display', None)
+            altimg = tag.attrib.pop('src', None) # altimg moved to source in pre_parse
+            alttext = tag.attrib.pop('alttext', '')
+            for attr in  ['xref', 'mode', 'overflow', 'macros']:
+                tag.attrib.pop(attr, None)
+            if display:
+                if display == 'block':
+                    tag.tag = NS.xhtml.div
+                    writers.HTMLWriter.add_class(tag, 'div')
+            else:
+                tag.tag = NS.xhtml.span
+                writers.HTMLWriter.add_class(tag, 'span')
+            if altimg:
+                attrib = tag.attrib
+                tag.clear()
+                tag.attrib.update(attrib)
+                img = etree.SubElement(tag, NS.xhtml.img)
+                img.attrib['alt'] = alttext
+                img.attrib['src'] = altimg
+            else:
+                text = tag.text_content()
+                tag.clear()
+                tag.text = text
+            
+            
+            
+
+            
+                
 
     @staticmethod
     def strip_links(xhtml, manifest):
@@ -1070,7 +1125,6 @@ class Writer(writers.HTMLishWriter):
         are targets of links. EPUB does not allow that.
 
         """
-
         for link in xpath(xhtml, '//xhtml:a[@href]'):
             href = urllib.parse.urldefrag(link.get('href'))[0]
             if href in manifest and not manifest[href].startswith('image'):
@@ -1078,7 +1132,9 @@ class Writer(writers.HTMLishWriter):
             if not href.startswith('file:'):
                 continue
             debug("strip_links: Deleting <a> to file not in manifest: %s" % href)
-            del link.attrib['href']
+            link.tag = NS.xhtml.a
+            for att in parsers.A_NOT_GLOBAL:
+                link.attrib.pop(att, None)
 
 
     @staticmethod
@@ -1439,7 +1495,7 @@ class Writer(writers.HTMLishWriter):
                     else:
                         # parsing xml worked, but it isn't xhtml. so we need to reset mediatype
                         # to something that isn't recognized as content
-                        p.attribs.mediatype = parsers.ParserAttributes.HeaderElement('text/xml')
+                        p.attribs.mediatype = 'text/xml'
             for p in job.spider.parsers:
                 if str(p.attribs.mediatype) == 'text/css':
                     p.parse()

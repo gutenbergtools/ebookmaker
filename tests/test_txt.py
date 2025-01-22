@@ -27,8 +27,8 @@ class TestFromTxt(unittest.TestCase):
             "%s.txt",
             "%s-0.txt",
             "%s-8.txt",
-            "%s-noimages-h.html",
             "%s-h.html",
+            "%s-cover.png",
         ]
         for out in outs:
             self.assertTrue(os.path.exists(os.path.join(self.out_dir, out % book_id)))

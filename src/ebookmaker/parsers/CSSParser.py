@@ -98,7 +98,7 @@ class Parser(ParserBase):
                 logging.error('Missing file: %s', self.attribs.url)
                 return
 
-        self.attribs.mediatype = parsers.ParserAttributes.HeaderElement('text/css')
+        self.attribs.mediatype = 'text/css'
         self.lowercase_selectors(self.sheet)
         self.make_links_absolute()
 
@@ -112,7 +112,7 @@ class Parser(ParserBase):
         parser = cssutils.CSSParser()
         self.sheet = parser.parseString(s)
 
-        self.attribs.mediatype = parsers.ParserAttributes.HeaderElement('text/css')
+        self.attribs.mediatype = 'text/css'
         self.lowercase_selectors(self.sheet)
 
 

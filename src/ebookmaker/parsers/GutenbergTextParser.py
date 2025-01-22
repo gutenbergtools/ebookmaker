@@ -161,7 +161,7 @@ class ParagraphMetrics(object):
             except dbm_gnu.error:
                 warning("File containing rhyming dictionary not found: %s" % fn)
         except (ModuleNotFoundError, ImportError):
-            warning("No gnu dbm support found. Rhyming dictionary not used.")
+            debug("No gnu dbm support found. Rhyming dictionary not used.")
     else:
         warning("No config found. Rhyming dictionary not used.")
 
