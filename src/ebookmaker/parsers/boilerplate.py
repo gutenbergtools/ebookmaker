@@ -161,8 +161,8 @@ def strip_headers_from_txt(text):
         return  text, None, text
     header_text, divider, text = markers_split(text, TOP_MARKERS + SMALLPRINT_MARKERS)
     if divider is None:
-        pg_header = '<pre id="pg-header"></pre>'
-        info('No PG header found. This is an ERROR for white-washed files.')
+        pg_header = '<pre id="pg-header" x-header="0"></pre>'
+        info('No PG header found in txt file.')
 
     else:
         divider_tail = ''
@@ -177,8 +177,8 @@ def strip_headers_from_txt(text):
 
     text, divider, footer_text = markers_split(text, BOTTOM_MARKERS)
     if divider is None:
-        pg_footer = '<pre id="pg-footer"></pre>'
-        info('No PG footer found. This is an ERROR for white-washed files.')
+        pg_footer = '<pre id="pg-footer" x-footer="0"></pre>'
+        info('No PG footer found in txt file.')
     else:
         pg_footer = '\n'.join(['<pre id="pg-footer">',
                                divider,

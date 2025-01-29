@@ -627,6 +627,11 @@ class Parser(HTMLParserBase):
 
         text = self.unicode_content()
         text, pg_header, pg_footer = strip_headers_from_txt(text)
+        if 'x-header' in pg_header and options.production:
+            error('header marker is missing in %s', self.attribs.url)
+        if 'x-header' in pg_footer and options.production:
+            error('footer marker is missing in %s', self.attribs.url)
+
         text = parsers.RE_RESTRICTED.sub('', text)
         text = gg.xmlspecialchars(text)
 

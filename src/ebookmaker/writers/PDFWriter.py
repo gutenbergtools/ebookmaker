@@ -38,6 +38,7 @@ class Writer (writers.BaseWriter):
         debug ("Creating PDF file: %s" % outputfilename)
 
         mkdir_for_filename(outputfilename)
+        debug(f'parser input is {inputfilename}')
         parser = ParserFactory.ParserFactory.create (inputfilename)
 
         if not hasattr (parser, 'rst2xetex'):
