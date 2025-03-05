@@ -1,6 +1,7 @@
 0.13.5 WIP
 - completely ignored `input_mediatype`; and added deprecation notice. will remove --input-mediatype in the future. Because we started using cchardet, ebookmaker is much better at determining document encoding than are humans, so we started mostly ignoring declared encodings. But Online Ebookmaker has asked users to declare encoding, which confused v0.13.
 - the error log messages for txt files missing header or footer markers now issue from the parser.
+- fixed a bug triggered by urlencoded spaces in an id fragment - seen in #48368
 
 0.13.4 January 22, 2025
 - fix failed parsing when an `a` element has no tail

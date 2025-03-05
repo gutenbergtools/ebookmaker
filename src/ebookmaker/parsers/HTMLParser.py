@@ -234,6 +234,8 @@ class Parser(HTMLParserBase):
                 id_ = bytes_id.decode('utf-8')
             except UnicodeError:
                 pass # too broken to fix
+            except AttributeError:
+                error(f'bad encoding: id_: {id_}, bytes_id: {bytes_id}')
 
         id_ = RE_NOT_XML_NAMECHAR.sub('_', id_)
         # An xml:id cannot start with a digit, a very common mistake
@@ -246,7 +248,7 @@ class Parser(HTMLParserBase):
             # still invalid ... we tried
             return None
 
-        # debug("_fix_internal_frag: frag = %s" % id_)
+        #debug(f"_fix_internal_frag: {id_}")
         return id_
 
 
