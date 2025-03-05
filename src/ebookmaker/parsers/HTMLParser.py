@@ -570,10 +570,27 @@ class Parser(HTMLParserBase):
         for snd, snd_mime in SOUND_TYPES.items():
             snd_path = f"//xhtml:a[substring(@href, string-length(@href) - 3) = '{snd}']"
             for link in xpath(self.xhtml, snd_path):
+                # swallow surrounding parens
+                if link.tail:
+                    link.tail = re.sub(r'^[ \]\}\)]*', '  ', link.tail)
+                if link.getprevious() != None and link.getprevious().tail:
+                    link.getprevious().tail = re.sub(r'[\[\{\( ]*$', '  ', link.getprevious().tail)
+
+                # wrap the link and move contents
+                audiospan = etree.Element(NS.xhtml.span)
+                audiospan.attrib['class'] = 'pg_audiospan'
+                link.addprevious(audiospan)
+                audiospan.append(link)
+                for el in link:
+                    audiospan.append(el)
+
+                # turn link into an audio element
                 link.tag = NS.xhtml.audio
                 attrib = copy.deepcopy(link.attrib)
-                link.clear(keep_tail=True)
+                #contents = copy.deepcopy(list(link))
+
                 attrib['title'] = link.text or ''
+                link.clear(keep_tail=True)
                 attrib['controls'] = 'controls'
                 link.attrib.update(attrib)
 
@@ -587,14 +604,8 @@ class Parser(HTMLParserBase):
                 for att in parsers.A_NOT_GLOBAL:
                     link.attrib.pop(att, None)
 
-                #swallow surrounding parens
-                if link.tail:
-                    link.tail = re.sub(r'^[ \]\}\)]*', '  ', link.tail)
-                if link.getprevious() and link.getprevious().tail:
-                    link.getprevious().tail = re.sub(r'[\[\{\( ]*$', '  ', link.getprevious().tail)
                 # enable over-riding directives to hide this link
-                self.add_class(link.getparent(), 'pgshow')
-                
+                self.add_class(audiospan.getparent(), 'pgshow')                
                 
         
         ##### cleanup #######
