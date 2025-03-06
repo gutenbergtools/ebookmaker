@@ -587,6 +587,7 @@ def main():
     for job in job_queue:
         try:
             debug('Job starting for type %s from %s', job.type, job.url)
+            Logger.ebook = job.ebook if hasattr(job, 'ebook') else 0
             dc = get_dc(job) # this is when doc at job.url gets parsed!
             job.dc = dc
             job.last_updated()
