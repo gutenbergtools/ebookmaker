@@ -23,7 +23,7 @@ from pkg_resources import resource_string
 
 import libgutenberg.GutenbergGlobals as gg
 from libgutenberg.GutenbergGlobals import xpath, Struct, NS
-from libgutenberg.Logger import warning, info, debug
+from libgutenberg.Logger import debug, error, info, warning
 from libgutenberg.MediaTypes import mediatypes as mt
 
 from ebookmaker import parsers

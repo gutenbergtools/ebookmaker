@@ -3,6 +3,7 @@
 - the error log messages for txt files missing header or footer markers now issue from the parser. Fixes #259.
 - fixed a bug triggered by urlencoded spaces in an id fragment - seen in #48368
 - when audio file links are replaced with audio elements, the link contents is now kept in a span tag containing the audio element. Fixes #260
+- when there is no release date, we no longer report "January 01, 0001". Fixes #261.
 
 0.13.4 January 22, 2025
 - fix failed parsing when an `a` element has no tail
