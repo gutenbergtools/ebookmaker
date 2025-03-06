@@ -1,10 +1,12 @@
-0.13.5 March 5, 2025
+0.13.6 March 6, 2025
 - completely ignored `input_mediatype`; and added deprecation notice. will remove --input-mediatype in the future. Because we started using cchardet, ebookmaker is much better at determining document encoding than are humans, so we started mostly ignoring declared encodings. But Online Ebookmaker has asked users to declare encoding, which confused v0.13.
 - the error log messages for txt files missing header or footer markers now issue from the parser. 
 - fixed a bug triggered by urlencoded spaces in an id fragment - seen in #48368
 - when audio file links are replaced with audio elements, the link contents is now kept in a span tag containing the audio element. Fixes #260
 - when there is no release date, we no longer report "January 01, 0001". Fixes #261.
-- Logger.ebook is now set before the first parse, so that we can better trace encoding problems
+- `ebook` is now an instance attribute of the `job` object. It was persisting across instantiations, which is not desired.
+- Logger.ebook is now set before the first parse, so that we can better trace encoding problems.
+- The file url is now reported when logging encoding errors.
 
 
 0.13.4 January 22, 2025
