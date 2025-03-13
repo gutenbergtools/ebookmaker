@@ -322,7 +322,7 @@ class ParserBase(object):
             error("Invalid charset name: %s (%s)" % (charset, what))
         except UnicodeError as what:
             # mis-stated charset, did not decode
-            error("Text not in charset %s (%s)" % (charset, what))
+            error(f"Text in {self.attribs.url} not in charset {charset} ({what})")
         return None
 
 

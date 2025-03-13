@@ -54,6 +54,7 @@ class Job(object):
         self.opf_identifier = None
         self.main = None
         self.link_map = {}
+        self.job = 0
 
 
     def __str__(self):

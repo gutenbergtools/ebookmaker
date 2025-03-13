@@ -23,7 +23,7 @@ from pkg_resources import resource_string
 
 import libgutenberg.GutenbergGlobals as gg
 from libgutenberg.GutenbergGlobals import xpath, Struct, NS
-from libgutenberg.Logger import warning, info, debug
+from libgutenberg.Logger import debug, error, info, warning
 from libgutenberg.MediaTypes import mediatypes as mt
 
 from ebookmaker import parsers
@@ -627,6 +627,11 @@ class Parser(HTMLParserBase):
 
         text = self.unicode_content()
         text, pg_header, pg_footer = strip_headers_from_txt(text)
+        if 'x-header' in pg_header and options.production:
+            error('header marker is missing in %s', self.attribs.url)
+        if 'x-header' in pg_footer and options.production:
+            error('footer marker is missing in %s', self.attribs.url)
+
         text = parsers.RE_RESTRICTED.sub('', text)
         text = gg.xmlspecialchars(text)
 

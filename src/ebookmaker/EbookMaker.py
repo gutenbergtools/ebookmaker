@@ -481,7 +481,8 @@ def do_job(job):
 
 
             if options.input_mediatype:
-                attribs.orig_mediatype = options.input_mediatype
+                info('the --input-mediatype option is ignored and will be removed')
+                #attribs.orig_mediatype = options.input_mediatype
 
             spider.recursive_parse(attribs)
             if job.type.split('.')[0] in ('epub', 'epub3', 'html', 'kindle', 'cover', 'pdf'):
@@ -586,6 +587,7 @@ def main():
     for job in job_queue:
         try:
             debug('Job starting for type %s from %s', job.type, job.url)
+            Logger.ebook = job.ebook
             dc = get_dc(job) # this is when doc at job.url gets parsed!
             job.dc = dc
             job.last_updated()

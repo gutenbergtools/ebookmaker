@@ -64,6 +64,10 @@ def pgheader(dc):
         updated = ''
     else:
         updated = f'{nl}{padding}Most recently updated: {dc.update_date.strftime(hr_format)}'
+    if dc.release_date == datetime.date.min:
+        release_date = 'No release date'
+    else:
+        release_date = dc.release_date.strftime(hr_format)
     pg_header = '<section class="pg-boilerplate pgheader" id="pg-header" xml:lang="en" lang="en" xmlns="http://www.w3.org/1999/xhtml">'
     pg_header += "<h2 id='pg-header-heading' title=''>"
     pg_header += 'The Project Gutenberg eBook of '
@@ -78,7 +82,7 @@ def pgheader(dc):
         dcauthlist(dc)
     }</div>
 {pstyle('Release Date', 
-            f'{dc.release_date.strftime(hr_format)} [eBook #{dc.project_gutenberg_id}]' + updated)}
+            f'{release_date} [eBook #{dc.project_gutenberg_id}]' + updated)}
 {pstyle('Language', ', '.join(language_list))}
 {pstyle('Original Publication', str(dc.pubinfo))}
 {pstyle('Credits', dc.credit)}
