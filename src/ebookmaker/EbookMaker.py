@@ -383,7 +383,7 @@ def add_local_options(ap):
         metavar="CONFIG_DIR",
         dest="configdir",
         default="",
-        help="config directory (default: ''")
+        help="config directory (default: '')")
 
     ap.add_argument(
         "--output-file",
