@@ -884,6 +884,7 @@ class Writer(writers.HTMLishWriter):
     translate_map = {
         0x2012: 0x2013,    # U+2012 FIGURE-DASH    -> U+2013 EN-DASH (ADE lacks this)
         0x2015: 0x2014,    # U+2015 HORIZONTAL BAR -> U+2014 EM-DASH (ADE lacks this)
+        0x2E3A: 0x2014,    # U+2015 2-EM DASH -> U+2014 EM-DASH (many readers lack this)
     }
 
     @staticmethod
