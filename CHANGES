@@ -1,3 +1,5 @@
+- removed the online ebookmaker script, now at https://github.com/gutenbergtools/ebookmaker-web/
+
 0.13.6 March 6, 2025
 - completely ignored `input_mediatype`; and added deprecation notice. will remove --input-mediatype in the future. Because we started using cchardet, ebookmaker is much better at determining document encoding than are humans, so we started mostly ignoring declared encodings. But Online Ebookmaker has asked users to declare encoding, which confused v0.13.
 - the error log messages for txt files missing header or footer markers now issue from the parser. 
