@@ -1,5 +1,12 @@
 <?php
 
+###==========================================================###
+### DEPRECATION NOTE: This file is no longer used in the     ###
+### production environment and is no longer maintained here. ###
+### The new web front end is now located in a new repo at:   ###
+### https://github.com/gutenbergtools/ebookmaker-web/        ###
+###==========================================================###
+
 #
 # Run ebookmaker on a project.  Allow the user to specify a few options
 #
