@@ -1045,11 +1045,12 @@ class Writer(writers.HTMLishWriter):
 
         attrs_to_remove = [('*', 'role'),('*', 'aria-label'),('*', 'aria-labelledby'),
             ('*', 'itemid'), ('*', 'itemprop'), ('*', 'itemref'), ('*', 'itemscope'),
-            ('*', 'itemtype'),]
+            ('*', 'itemtype'), ('ol', 'start'), ('li', 'value')]
 
         for (tag, attr) in attrs_to_remove:
             for elem in xpath(xhtml, f"//xhtml:{tag}[@{attr}]"):
                 del elem.attrib[attr]
+
         for elem in xpath(xhtml, f"//svg:svg[@role]"):
             del elem.attrib["role"]
 
@@ -1415,6 +1416,7 @@ class Writer(writers.HTMLishWriter):
                     if hasattr(p, 'rst2epub2'):
                         xhtml = p.rst2epub2(job)
                         xhtml = copy.deepcopy(xhtml)
+                        self.fix_html5(xhtml)
 
                         if options.verbose >= 2:
                             # write html to disk for debugging
