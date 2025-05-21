@@ -94,7 +94,6 @@ DEPRECATED = {
     'noshade': 'hr',
     'nowrap': '*',
     'rev': 'a',
-    'start': 'ol',
     'text': 'body',
     'value': 'li',
     'version': 'html',

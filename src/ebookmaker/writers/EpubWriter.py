@@ -884,6 +884,7 @@ class Writer(writers.HTMLishWriter):
     translate_map = {
         0x2012: 0x2013,    # U+2012 FIGURE-DASH    -> U+2013 EN-DASH (ADE lacks this)
         0x2015: 0x2014,    # U+2015 HORIZONTAL BAR -> U+2014 EM-DASH (ADE lacks this)
+        0x2E3A: 0x2014,    # U+2015 2-EM DASH -> U+2014 EM-DASH (many readers lack this)
     }
 
     @staticmethod
@@ -1044,11 +1045,12 @@ class Writer(writers.HTMLishWriter):
 
         attrs_to_remove = [('*', 'role'),('*', 'aria-label'),('*', 'aria-labelledby'),
             ('*', 'itemid'), ('*', 'itemprop'), ('*', 'itemref'), ('*', 'itemscope'),
-            ('*', 'itemtype'),]
+            ('*', 'itemtype'), ('ol', 'start'), ('li', 'value')]
 
         for (tag, attr) in attrs_to_remove:
             for elem in xpath(xhtml, f"//xhtml:{tag}[@{attr}]"):
                 del elem.attrib[attr]
+
         for elem in xpath(xhtml, f"//svg:svg[@role]"):
             del elem.attrib["role"]
 
@@ -1414,6 +1416,7 @@ class Writer(writers.HTMLishWriter):
                     if hasattr(p, 'rst2epub2'):
                         xhtml = p.rst2epub2(job)
                         xhtml = copy.deepcopy(xhtml)
+                        self.fix_html5(xhtml)
 
                         if options.verbose >= 2:
                             # write html to disk for debugging

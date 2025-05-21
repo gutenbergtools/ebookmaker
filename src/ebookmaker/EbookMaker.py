@@ -383,7 +383,7 @@ def add_local_options(ap):
         metavar="CONFIG_DIR",
         dest="configdir",
         default="",
-        help="config directory (default: ''")
+        help="config directory (default: '')")
 
     ap.add_argument(
         "--output-file",
@@ -517,7 +517,8 @@ def do_job(job):
         exception(f"{job.type} raises exception {what}")
 
     end_time = datetime.datetime.now()
-    info(' %s made in %s' % (job.type, end_time - start_time))
+    info('%s output in %s' % (job.type, job.outputfile))
+    info('%s completed in %s' % (job.type, end_time - start_time))
 
     if log_handler:
         close_log(log_handler)
