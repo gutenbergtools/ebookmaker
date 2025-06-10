@@ -92,6 +92,14 @@ Check your install:
 `$ ebookmaker --version`
 `EbookMaker 0.12.0`
 
+> Note: If you get an error similar to this one:
+>
+> `ModuleNotFoundError: No module named 'pkg_resources'`
+>
+> You can fix it by installing the `setuptools` module:
+>
+> `$ pipenv run pip install setuptools`
+
 Since you're in the shell, you can navigate to a book's directory and convert it:
 
 `$ ebookmaker -v -v --make=epub.images --ebook 10001 --title "The Luck of the Kid" --author "Ridgwell Cullum" luck-kid.html`
