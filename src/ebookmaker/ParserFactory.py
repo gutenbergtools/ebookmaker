@@ -126,7 +126,7 @@ class ParserFactory(object):
         # ok. so we have to create a new parser
         debug("... creating new parser for %s" % url)
 
-        if options.mediatype_from_extension:
+        if hasattr(options, 'mediatype_from_extension') and options.mediatype_from_extension:
             attribs.orig_mediatype = attribs.HeaderElement(MediaTypes.guess_type(url))
             debug("... set mediatype %s from extension" % attribs.orig_mediatype.value)
 

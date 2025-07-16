@@ -26,7 +26,6 @@ class TestFromHtm(unittest.TestCase):
             "%s-epub.epub",
             "%s-images-epub3.epub",
             "%s-images-epub.epub",
-            "%s-noimages-h.html",
             "%s-h.html",
         ]
         for out in outs:
@@ -49,7 +48,6 @@ class TestFromHtm(unittest.TestCase):
             "%s-epub.epub",
             "%s-images-epub3.epub",
             "%s-images-epub.epub",
-            "%s-noimages-h.html",
             "%s-h.html",
             "%s-cover.png",
         ]

@@ -155,6 +155,7 @@ CSS_FOR_ADDED = {
 SOUND_TYPES = {
     '.mp3': 'audio/mpeg',
     '.ogg': 'audio/ogg; codecs=opus',
+}
 
 INAPPROPRIATE_ALTTEXT = {
     "[image unavailable.]", "_", "[image not available]", " ", "illustration", "cover", "drawing",
