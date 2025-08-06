@@ -1,3 +1,6 @@
+0.13.8 August ?, 2025
+- to address kobo reader crash when a span containing multiple spaces has padded, moved txt padding spaces out of the span with padding
+
 0.13.7 May 21, 2025
 - fixed typo in add_local_options, added a log message to report outputfile location (thanks @cpeel)
 - removed the online ebookmaker script, now at https://github.com/gutenbergtools/ebookmaker-web/ from (@Rossolson)

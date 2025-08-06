@@ -31,7 +31,8 @@ def pgheader(dc):
             return ''
         val = f'<br/>\n{padding}'.join([html.escape(v) for v in val.split('\n')])
         if key == 'Previous':
-            return f'''<p style='margin-top:0'><span style='padding-left: 7.5ex'>{padding}</span>{val}</p>{nl}'''
+            # note: having the padding inside the span was causing kobo readers to crash
+            return f'''<p style='margin-top:0'>{padding}<span style='padding-left: 7.5ex'></span>{val}</p>{nl}'''
         else:
             return f'''<p><strong>{key}</strong>: {val}</p>{nl}'''
 
