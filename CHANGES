@@ -1,3 +1,12 @@
+0.13.8 August 7, 2025
+- to address kobo reader crash when a span containing multiple spaces has padded, moved txt padding spaces out of the span with padding. fixes #286
+- updated CSSParser for  https://www.w3.org/TR/css-writing-modes-3/ . fixes #285
+    - `direction` and `unicode-bidi`  are not supported based on the standard's recommendationies a
+    - the following properties are no longer errors. Ebookmaker makes no attempt to modify these for EPUB2. This should allow better rendering in reading systems that support asian languages and bidirectional text, which are most modern reading systems.
+        - `writing-mode`
+        - `text-orientation`
+        - `text-combine-upright`
+
 0.13.7 May 21, 2025
 - fixed typo in add_local_options, added a log message to report outputfile location (thanks @cpeel)
 - removed the online ebookmaker script, now at https://github.com/gutenbergtools/ebookmaker-web/ from (@Rossolson)

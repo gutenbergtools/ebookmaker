@@ -61,6 +61,12 @@ PG_CSS_PROFILE = (
         'text-decoration': 'initial',
         'text-indent': 'initial',
         'text-transform': 'initial',
+        
+        # updated for  https://www.w3.org/TR/css-writing-modes-3/
+        # direction and unicode-bidi  are not supported based on the standard's recommendation
+        'writing-mode': 'vertical-lr|vertical-rl|horizontal-tb',
+        'text-orientation': 'mixed|upright|sideways',
+        'text-combine-upright': 'none | all',      
     },
     {
         'numeric-figure-values': 'lining-nums|oldstyle-nums',
