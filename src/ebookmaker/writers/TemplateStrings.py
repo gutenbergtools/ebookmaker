@@ -150,7 +150,7 @@ distribution of electronic works, by using or distributing this work
 (or any other work associated in any way with the phrase “Project
 Gutenberg”), you agree to comply with all the terms of the Full
 Project Gutenberg™ License available with this file or online at
-www.gutenberg.org/license.
+<a href="https://www.gutenberg.org/license">www.gutenberg.org/license</a>.
 </div><div class='secthead'>
 Section 1. General Terms of Use and Redistributing Project Gutenberg™
 electronic works
@@ -403,7 +403,7 @@ U.S. federal laws and your state’s laws.
 The Foundation’s business office is located at 809 North 1500 West,
 Salt Lake City, UT 84116, (801) 596-1887. Email contact links and up
 to date contact information can be found at the Foundation’s website
-and official page at www.gutenberg.org/contact
+and official page at <a href="https://www.gutenberg.org/contact">www.gutenberg.org/contact</a>.
 </div><div class='secthead'>
 Section 4. Information about Donations to the Project Gutenberg
 Literary Archive Foundation
@@ -437,7 +437,7 @@ outside the United States. U.S. laws alone swamp our small staff.
 Please check the Project Gutenberg web pages for current donation
 methods and addresses. Donations are accepted in a number of other
 ways including checks, online payments and credit card donations. To
-donate, please visit: www.gutenberg.org/donate.
+donate, please visit: <a href="https://www.gutenberg.org/donate/">www.gutenberg.org/donate</a>.
 </div><div class='secthead'>
 Section 5. General Information About Project Gutenberg™ electronic works
 </div><div>
