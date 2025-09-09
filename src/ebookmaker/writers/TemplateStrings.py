@@ -271,7 +271,7 @@ provided that:
 </div><ul>
     <li>• You pay a royalty fee of 20% of the gross profits you derive from
         the use of Project Gutenberg works calculated using the method
-        you already use to calculate your applicable taxes. They fee is owed
+        you already use to calculate your applicable taxes. The fee is owed
         to the owner of the Project Gutenberg trademark, but he has
         agreed to donate royalties under this paragraph to the Project
         Gutenberg Literary Archive Foundation. Royalty payments must be paid
