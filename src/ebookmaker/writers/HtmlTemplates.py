@@ -70,7 +70,7 @@ def pgheader(dc):
     else:
         release_date = dc.release_date.strftime(hr_format)
 
-    bibrecord_url = f'<a href="/ebooks/{dc.project_gutenberg_id}">https://www.gutenberg.org/ebooks/{dc.project_gutenberg_id}</a>'
+    bibrecord_url = f'<a href="https://www.gutenberg.org/ebooks/{dc.project_gutenberg_id}">https://www.gutenberg.org/ebooks/{dc.project_gutenberg_id}</a>'
 
     pg_header = '<section class="pg-boilerplate pgheader" id="pg-header" xml:lang="en" lang="en" xmlns="http://www.w3.org/1999/xhtml">'
     pg_header += "<h2 id='pg-header-heading' title=''>"
@@ -89,7 +89,7 @@ def pgheader(dc):
             f'{release_date} [eBook #{dc.project_gutenberg_id}]' + updated)}
 {pstyle('Language', ', '.join(language_list))}
 {pstyle('Original Publication', str(dc.pubinfo))}
-{pstyle('Bibliographic Record', str(bibrecord_url))}
+{pstyle('Other information and formats', str(bibrecord_url))}
 {pstyle('Credits', dc.credit)}
 </div><div id='pg-start-separator'>
 <span>*** START OF THE PROJECT GUTENBERG EBOOK {html.escape(dc.title_no_subtitle.upper())} ***</span>
