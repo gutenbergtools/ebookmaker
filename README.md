@@ -73,6 +73,8 @@ Install pipenv  (might be `pip install --user pipenv`, depending on your default
 
 `$ pip3 install --user pipenv`
 
+(Debian/Ubuntu Linux users will instead need to use `apt install pipenv`.)
+
 The default install location is `${HOME}/.local/bin`, so add this to your login shell's ${PATH} if needed.
 
 Change directories to where you want to have your ebookmaker environment. Then, to initialize a python 3 virtual environment, do
@@ -91,6 +93,14 @@ Check your install:
 
 `$ ebookmaker --version`
 `EbookMaker 0.12.0`
+
+> **If you get an error similar to this one:**
+>
+> `ModuleNotFoundError: No module named 'pkg_resources'`
+>
+> You can fix it by installing the `setuptools` module:
+>
+> `$ pipenv install setuptools`
 
 Since you're in the shell, you can navigate to a book's directory and convert it:
 
