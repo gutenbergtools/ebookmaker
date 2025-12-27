@@ -26,6 +26,7 @@ from ebookmaker.CommonCode import Options
 options = Options()
 
 PDFCSS = os.path.join(os.path.dirname(__file__), 'pdf.css')
+PAGEDJSCLI_HOOKS_HANDLER_PATH = './pagedjs_hooks.js'
 
 class Writer(writers.BaseWriter):
     """ Class to write PDF. """
@@ -52,6 +53,7 @@ class Writer(writers.BaseWriter):
                         job.url,
                         '--style', PDFCSS,
                         '-o', outputfilename,
+                        '--additional-script', PAGEDJSCLI_HOOKS_HANDLER_PATH
                     ],
                     capture_output=True
                 )
