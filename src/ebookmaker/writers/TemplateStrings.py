@@ -400,8 +400,8 @@ number is 64-6221541. Contributions to the Project Gutenberg Literary
 Archive Foundation are tax deductible to the full extent permitted by
 U.S. federal laws and your state’s laws.
 </div><div>
-The Foundation’s business office is located at 809 North 1500 West,
-Salt Lake City, UT 84116, (801) 596-1887. Email contact links and up
+The Foundation’s business office is located at 41 Watchung Plaza #516,
+Montclair NJ 07042, USA, +1 (862) 621-9288. Email contact links and up
 to date contact information can be found at the Foundation’s website
 and official page at www.gutenberg.org/contact
 </div><div class='secthead'>
