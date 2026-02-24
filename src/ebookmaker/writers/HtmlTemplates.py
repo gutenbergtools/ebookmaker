@@ -25,11 +25,11 @@ except ValueError:
 
 
 def pgheader(dc):
-    def pstyle(key, val):
+    def pstyle(key, val, escape=True):
         key = key.capitalize()
         if not key or not val:
             return ''
-        val = f'<br/>\n{padding}'.join([html.escape(v) for v in val.split('\n')])
+        val = f'<br/>\n{padding}'.join([(html.escape(v) if escape else v) for v in val.split('\n')])
         if key == 'Previous':
             # note: having the padding inside the span was causing kobo readers to crash
             return f'''<p style='margin-top:0'>{padding}<span style='padding-left: 7.5ex'></span>{val}</p>{nl}'''
@@ -69,6 +69,9 @@ def pgheader(dc):
         release_date = 'No release date'
     else:
         release_date = dc.release_date.strftime(hr_format)
+
+    bibrecord_url = f'<a href="https://www.gutenberg.org/ebooks/{dc.project_gutenberg_id}">www.gutenberg.org/ebooks/{dc.project_gutenberg_id}</a>'
+
     pg_header = '<section class="pg-boilerplate pgheader" id="pg-header" xml:lang="en" lang="en" xmlns="http://www.w3.org/1999/xhtml">'
     pg_header += "<h2 id='pg-header-heading' title=''>"
     pg_header += 'The Project Gutenberg eBook of '
@@ -82,10 +85,12 @@ def pgheader(dc):
     }<div id='pg-header-authlist'>{
         dcauthlist(dc)
     }</div>
+<br/>\n{padding}
 {pstyle('Release Date', 
             f'{release_date} [eBook #{dc.project_gutenberg_id}]' + updated)}
 {pstyle('Language', ', '.join(language_list))}
 {pstyle('Original Publication', str(dc.pubinfo))}
+{pstyle('Other information and formats', bibrecord_url, escape=False)}
 {pstyle('Credits', dc.credit)}
 </div><div id='pg-start-separator'>
 <span>*** START OF THE PROJECT GUTENBERG EBOOK {html.escape(dc.title_no_subtitle.upper())} ***</span>
