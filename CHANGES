@@ -1,3 +1,15 @@
+0.13.9 February XX, 2026
+- added viewport tag in the html made by GutenbergTextParser. Partial fix for #289.
+    - we need a better handle on when the viewport hurt html in the backfile.
+- added documentation for debian environments. Thanks @tangledhelix
+- added link to bibrec page to headers. Fixes #294 Thanks @Rossolson
+- remove some ™ marks in boilerplate. Fixes #291 Thanks @Rossolson
+- fixed a typo in boilerplate. Thanks @Rossolson
+- updated address in license
+- added test for <wbr>, fixed handling in EPUB2
+- bumped the requirement for lxml to 6.0.0. This fixes the serialization problems reported in #297
+
+
 0.13.8 August 7, 2025
 - to address kobo reader crash when a span containing multiple spaces has padded, moved txt padding spaces out of the span with padding. fixes #286
 - updated CSSParser for  https://www.w3.org/TR/css-writing-modes-3/ . fixes #285
