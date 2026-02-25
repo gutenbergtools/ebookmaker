@@ -8,7 +8,7 @@
 - updated address in license
 - added test for <wbr>, fixed handling in EPUB2
 - bumped the requirement for lxml to 6.0.0. This fixes the serialization problems reported in #297
-
+- fixed setting the mathml attribute in EPUB3. fixes #283
 
 0.13.8 August 7, 2025
 - to address kobo reader crash when a span containing multiple spaces has padded, moved txt padding spaces out of the span with padding. fixes #286

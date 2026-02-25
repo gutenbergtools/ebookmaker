@@ -157,7 +157,10 @@ class HTMLChunker(object):
             if old_id not in self.idmap:
                 self.idmap[old_id] = "%s#%s" % (
                     chunk_name,  urllib.parse.quote(id_))
-        for e in xpath(self.chunk, '//xhtml:math'):
+        for e in xpath(self.chunk, '//xhtml:math'): # should have has mathml namespace set.
+            attribs.rel.add('mathml')
+            break
+        for e in xpath(self.chunk, '//mathml:math'):
             attribs.rel.add('mathml')
             break
         for e in xpath(self.chunk, '//svg:svg'):
