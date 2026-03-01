@@ -52,7 +52,7 @@ class TestJob(unittest.TestCase):
         job.dc = get_dc(job)
         self.assertTrue(len(job.dc.files) > 0)
         job.last_updated()
-        self.assertEqual(job.dc.update_date, datetime.date(2013,7,9))
+        self.assertEqual(job.dc.update_date, datetime.date(2024, 10, 23)) # per database
         
 
 

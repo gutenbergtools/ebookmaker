@@ -27,7 +27,7 @@ class TestHeaders(unittest.TestCase):
  
     def test_templates(self):
         self.assertTrue('in the United States' in TemplateStrings.headera)
-        self.assertTrue('FULL PROJECT GUTENBERG LICENSE' in TemplateStrings.headerb)
+        self.assertTrue('FULL PROJECT GUTENBERG™ LICENSE' in TemplateStrings.headerb)
         self.assertTrue('COPYRIGHTED' in TemplateStrings.headera_copy)
         self.assertTrue('This particular' in TemplateStrings.headerb_copy)
         self.assertTrue('<div>' not in TemplateStrings.headera_txt)
