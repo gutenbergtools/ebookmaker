@@ -211,7 +211,7 @@ def get_dc(job):
         try:
             parser.parse()
         except AttributeError as e:
-            critical('the file {job.url} could not be found or was unparsable')
+            critical(f'the file {job.url} could not be found or was unparsable')
             raise Exception(f'the file {job.url} could not be found or was unparsable')
 
     if options.is_job_queue:

@@ -1022,7 +1022,7 @@ class Writer(writers.HTMLishWriter):
         for meta in xpath(xhtml, '//xhtml:meta[@charset]'):
             meta.getparent().remove(meta)
 
-        for newtag in ['wbr',]:
+        for newtag in ['wbr']:
             for tag in xpath(xhtml, f'//xhtml:{newtag}'):
                 tag.getparent().remove(tag)
 

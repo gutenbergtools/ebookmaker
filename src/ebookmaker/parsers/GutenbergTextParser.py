@@ -671,6 +671,8 @@ class Parser(HTMLParserBase):
         self.xhtml = em.html(
             em.head(
                 em.title(' '),
+                em.meta(**{'name': 'viewport',
+                           'content': 'width=device-width, initial-scale=1'}),
                 em.meta(**{'http-equiv': 'Content-Style-Type',
                            'content': 'text/css'}),
                 em.meta(**{'http-equiv': 'Content-Type',
