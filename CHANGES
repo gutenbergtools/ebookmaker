@@ -1,4 +1,4 @@
-0.13.9 February XX, 2026
+0.13.9 February 28, 2026
 - added viewport tag in the html made by GutenbergTextParser. Partial fix for #289.
     - we need a better handle on when the viewport hurt html in the backfile.
 - added documentation for debian environments. Thanks @tangledhelix
