@@ -1,3 +1,6 @@
+0.13.10 May, 2026
+- disallowed setting `text-decoration` for `a` to `none` for accessibility
+
 0.13.9 February 28, 2026
 - added viewport tag in the html made by GutenbergTextParser. Partial fix for #289.
     - we need a better handle on when the viewport hurt html in the backfile.

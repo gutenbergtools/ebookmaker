@@ -120,6 +120,8 @@ REPLACEMENTS = [
     ('col td th tr', 'valign', 'vertical-align', lambda x: x),
     ('tbody tfoot thead', 'valign', 'vertical-align', lambda x: x),
     ('col', 'width', 'width', css_len),
+    # for a11y, don't allow removal of link underlines
+    ('a', 'text-decoration', 'text-decoration', lambda x: 'underline' if x == 'none' else x),
 ]
 
 DIVIDER = re.compile(r'\*\*+.*\*\*+')
