@@ -20,13 +20,13 @@ import zipfile
 import time
 import os
 import copy
+import importlib
 
 from xml.sax.saxutils import quoteattr
 
 from six.moves import urllib
 from lxml import etree
 from lxml.builder import ElementMaker
-from pkg_resources import resource_string # pylint: disable=E0611
 
 from libgutenberg.GutenbergGlobals import NS, mkdir_for_filename
 from libgutenberg.Logger import critical, debug, error, exception, info, warning
@@ -754,7 +754,9 @@ class ContentOPF(object):
                     ocf.add_bytes(Writer.url2filename(url), f.read(), mediatype)
             except IOError:
                 url = 'cover.jpg'
-                ocf.add_bytes(url, resource_string('ebookmaker.writers', url), mediatype)
+                ref = importlib.resources.files('ebookmaker.writers').joinpath(url)
+                contents = ref.read_bytes()
+                ocf.add_bytes(url, contents, mediatype)
             id_ = self.manifest_item(url, mediatype)
 
         debug("Adding coverpage id: %s url: %s" % (id_, url))

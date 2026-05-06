@@ -16,6 +16,7 @@ from __future__ import unicode_literals
 # FIXME:
 # use docinfo instead of meta for pg header
 
+import importlib
 import re
 from functools import partial
 
@@ -27,8 +28,6 @@ import lxml.html
 import docutils.readers.standalone
 from docutils import nodes, frontend
 import docutils
-
-from pkg_resources import resource_string # pylint: disable=E0611
 
 from libgutenberg.GutenbergGlobals import NS
 from libgutenberg.Logger import info, debug, warning, error
@@ -351,7 +350,9 @@ class Parser (HTMLParser.Parser):
 
 
     def get_resource (self, package, resource):
-        return resource_string ('ebookmaker.' + package, resource).decode ('utf-8')
+        ref = importlib.resources.files('ebookmaker.' + package).joinpath(resource)
+        contents = ref.read_bytes()
+        return contents.decode ('utf-8')
 
 
     def get_image_size_from_parser (self, uri):

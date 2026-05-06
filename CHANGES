@@ -1,4 +1,7 @@
-0.13.10 May, 2026
+0.14.0 May, 2026
+- pkg_resources is deprecated, removed in Python 3.12. switched to using importlib. 
+    - Ebookmaker will no longer run for Python < 3.7
+    - would appreciate confirmation that it works in Python 3.12
 - disallowed setting `text-decoration` for `a` to `none` for accessibility
 
 0.13.9 February 28, 2026

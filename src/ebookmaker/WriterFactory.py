@@ -13,10 +13,8 @@ Writer factory. Dynamically loads writers from directories.
 
 """
 
-
+import importlib
 import os.path
-
-from pkg_resources import resource_listdir # pylint: disable=E0611
 
 from libgutenberg.Logger import error, debug
 from ebookmaker.CommonCode import Options
@@ -28,13 +26,13 @@ writers = {}
 def __load_writers_from (package_name):
     """ See what types we can write. """
 
-    for fn in resource_listdir (package_name, ''):
-        modulename, ext = os.path.splitext (fn)
+    for fn in importlib.resources.files(package_name).iterdir():
+        modulename, ext = os.path.splitext (fn.name)
         if ext == '.py' and modulename.endswith ('Writer'):
             type_ = modulename.lower ().replace ('writer', '')
             try:
                 debug ("Loading writer type %s from module %s" % (type_, modulename))
-                module = __import__ (package_name + '.' + modulename, fromlist = [modulename])
+                module = importlib.import_module(package_name + '.' + modulename)
                 writers[type_] = module
             except ImportError as what:
                 error (

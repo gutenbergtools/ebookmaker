@@ -14,12 +14,9 @@ Parse an url of type image/*.
 """
 
 import copy
-
+import importlib
 import six
 from PIL import Image, ImageFile
-
-
-from pkg_resources import resource_stream # pylint: disable=E0611
 
 from libgutenberg.Logger import debug, error
 from libgutenberg.MediaTypes import mediatypes as mt
@@ -138,9 +135,9 @@ class Parser(ParserBase):
         except IOError as what:
             error("Could not resize image: %s; message %s", self.attribs.url, what)
             new_parser.attribs = copy.copy(self.attribs)
-            fp = resource_stream('ebookmaker.parsers', 'broken.png')
-            new_parser.image_data = fp.read()
-            fp.close()
+            ref = importlib.resources.files('ebookmaker.parsers').joinpath('broken.png')
+            with ref.open('rb') as fp:
+                new_parser.image_data = fp.read()
 
         return new_parser
 

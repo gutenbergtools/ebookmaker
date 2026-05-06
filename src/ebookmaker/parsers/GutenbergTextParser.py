@@ -13,13 +13,12 @@ Distributable under the GNU General Public License Version 3 or newer.
 
 from __future__ import unicode_literals
 
+import importlib
 import re
 
 import six
 import lxml
 from lxml import etree
-
-from pkg_resources import resource_string
 
 import libgutenberg.GutenbergGlobals as gg
 from libgutenberg.GutenbergGlobals import xpath, Struct, NS
@@ -610,8 +609,9 @@ class Parser(HTMLParserBase):
 
 
     def css_content(self):
-        default_css = resource_string(
-            'ebookmaker.parsers', 'txt2all.css').decode('utf-8')
+        ref = importlib.resources.files('ebookmaker.parsers').joinpath('txt2all.css')
+        default_css = ref.read_bytes().decode('utf-8')
+        
         return default_css
 
 

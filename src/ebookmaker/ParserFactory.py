@@ -15,11 +15,10 @@ Distributable under the GNU General Public License Version 3 or newer.
 
 import os.path
 import re
-
+import importlib
 from six.moves import urllib
 import six
 
-from pkg_resources import resource_listdir, resource_stream # pylint: disable=E0611
 import requests
 
 from libgutenberg.Logger import critical, debug, error, info
@@ -35,11 +34,11 @@ parser_modules = {}
 def load_parsers():
     """ See what types we can parse. """
 
-    for fn in resource_listdir('ebookmaker.parsers', ''):
-        modulename, ext = os.path.splitext(fn)
+    for fn in importlib.resources.files('ebookmaker.parsers').iterdir():
+        modulename, ext = os.path.splitext(fn.name)
         if ext == '.py':
             if modulename.endswith('Parser'):
-                module = __import__('ebookmaker.parsers.' + modulename, fromlist=[modulename])
+                module = importlib.import_module('ebookmaker.parsers.' + modulename)
                 debug("Loading parser from module: %s for mediatypes: %s" % (
                     modulename, ', '.join(module.mediatypes)))
                 for mediatype in module.mediatypes:
@@ -199,7 +198,8 @@ class ParserFactory(object):
         o = urllib.parse.urlsplit(orig_url)
         package = o.hostname
         filename = o.path[1:]
-        fp = resource_stream(package, filename)
+        ref = importlib.resources.files(package).joinpath(filename)
+        fp = ref.open('rb')
         attribs.orig_mediatype = MediaTypes.guess_type(filename)
 
         debug("... got mediatype %s from guess_type" % str(attribs.orig_mediatype))

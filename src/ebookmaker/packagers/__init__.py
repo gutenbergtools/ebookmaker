@@ -14,11 +14,10 @@ Base class for Packager modules.
 """
 
 
+import importlib
 import os.path
 import gzip
 import zipfile
-
-from pkg_resources import resource_listdir  # pylint: disable=E0611
 
 from libgutenberg.Logger import debug, info, warning, error
 import libgutenberg.GutenbergGlobals as gg
@@ -157,12 +156,11 @@ class PackagerFactory (object):
     def load_packagers (cls):
         """ Load the packagers in the packagers directory. """
 
-        for fn in resource_listdir ('ebookmaker.packagers', ''):
-            modulename, ext = os.path.splitext (fn)
+        for fn in importlib.resources.files('ebookmaker.packagers').iterdir():
+            modulename, ext = os.path.splitext (fn.name)
             if ext == '.py':
                 if modulename.endswith ('Packager'):
-                    module = __import__ ('ebookmaker.packagers.' + modulename,
-                                         fromlist = [modulename])
+                    module = importlib.import_module('ebookmaker.packagers.' + modulename)
                     debug ("Loading packager type: %s from module: %s for formats: %s" % (
                         module.TYPE, modulename, ', '.join (module.FORMATS)))
                     for format_ in module.FORMATS:
