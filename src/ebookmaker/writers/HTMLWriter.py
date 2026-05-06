@@ -215,7 +215,7 @@ class Writer(writers.HTMLishWriter):
             next_el = pg_footer.getnext()
             parent = pg_footer.getparent()
             while next_el is not None:
-                parent.remove(next)
+                parent.remove(next_el)
                 next_el = pg_footer.getnext()
             parent.replace(pg_footer, new_bp)
             break
