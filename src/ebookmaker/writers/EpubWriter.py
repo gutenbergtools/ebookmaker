@@ -906,7 +906,7 @@ class Writer(writers.HTMLishWriter):
         """
 
         cssclass = re.compile(r'\.(-?[_a-zA-Z]+[_a-zA-Z0-9-]*)')
-        html5tag = re.compile(r'(^|[ ,~>+])(figure|figcaption|footer|header|section)')
+        html5tag = re.compile(r'(^|[ ,~>+])(figure|figcaption|footer|header|section|nav|main)')
 
         for rule in sheet:
             if rule.type == rule.MEDIA_RULE:
@@ -1073,7 +1073,7 @@ class Writer(writers.HTMLishWriter):
 
         # replace html5 block tags
         usedtags = set()
-        for newtag in ['article', 'figcaption', 'figure', 'footer', 'header', 'section']:
+        for newtag in ['article', 'figcaption', 'figure', 'footer', 'header', 'section', 'nav', 'main']:
             for tag in xpath(xhtml, f'//xhtml:{newtag}'):
                 usedtags.add(newtag)
                 tag.tag = NS.xhtml.div

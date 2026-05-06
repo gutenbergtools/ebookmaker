@@ -2,7 +2,16 @@
 - pkg_resources is deprecated, removed in Python 3.12. switched to using importlib. 
     - Ebookmaker will no longer run for Python < 3.7
     - would appreciate confirmation that it works in Python 3.12
+    - fixes #280
 - disallowed setting `text-decoration` for `a` to `none` for accessibility
+    - fixes #298
+- css for pg header changed from all:initial to all:inherit for better dark-mode compatibility.
+    - should fix #216
+- removed spurious empty body wrapper elements (caused empty epub pages)
+- added support for `nav` and `main` elements.
+    - Use `nav` to mark TOC's.
+    - Use `main` immediately after the "*** START" and before "*** END" lines to help disabled users start at the beginning of the book. `section` tags are the appropriate markup for front matter, back matter, and ad sections of books.
+    - Ebookmaker now uses `header` and `footer` markup for boilerplate
 - delinting
 
 0.13.9 February 28, 2026

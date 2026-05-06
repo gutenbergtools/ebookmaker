@@ -72,7 +72,7 @@ def pgheader(dc):
 
     bibrecord_url = f'<a href="https://www.gutenberg.org/ebooks/{dc.project_gutenberg_id}">www.gutenberg.org/ebooks/{dc.project_gutenberg_id}</a>'
 
-    pg_header = '<section class="pg-boilerplate pgheader" id="pg-header" xml:lang="en" lang="en" xmlns="http://www.w3.org/1999/xhtml">'
+    pg_header = '<header class="pg-boilerplate pgheader" id="pg-header" xml:lang="en" lang="en" xmlns="http://www.w3.org/1999/xhtml">'
     pg_header += "<h2 id='pg-header-heading' title=''>"
     pg_header += 'The Project Gutenberg eBook of '
     pg_header += f'''<span lang='{lang}' xml:lang='{lang}' id='pg-title-no-subtitle'>{
@@ -94,7 +94,7 @@ def pgheader(dc):
 {pstyle('Credits', dc.credit)}
 </div><div id='pg-start-separator'>
 <span>*** START OF THE PROJECT GUTENBERG EBOOK {html.escape(dc.title_no_subtitle.upper())} ***</span>
-</div></section>
+</div></header>
 '''
     return etree.fromstring(pg_header.replace('\n\n\n', '\n\n'), lxml.html.XHTMLParser())
     
@@ -103,12 +103,12 @@ def pgfooter(dc):
     copyright_addition = COPYRIGHT_ADDITION if 'copyright' in dc.rights.lower() else ''
 
     pg_footer = f'''
-<section class="pg-boilerplate pgheader" id="pg-footer" lang='en' xml:lang='en' xmlns="http://www.w3.org/1999/xhtml">
+<footer class="pg-boilerplate pgheader" id="pg-footer" lang='en' xml:lang='en' xmlns="http://www.w3.org/1999/xhtml">
 <div id='pg-end-separator'>
 <span>*** END OF THE PROJECT GUTENBERG EBOOK {html.escape(dc.title_no_subtitle.upper())} ***</span>
 </div>
 
     {HEADERB.format(copyright_addition=copyright_addition)}
-</section>
+</footer>
 '''
     return etree.fromstring(pg_footer, lxml.html.XHTMLParser())

@@ -38,6 +38,8 @@ SECTIONS = [
     ('div.section', 0.0),
     ('div.chapter', 0.0),
     ('section', 0.0),
+    ('header', 0.0),
+    ('footer', 0.0),
     ('h1', 0.5),
     ('div', 0.5),
     ('h2', 0.7),
