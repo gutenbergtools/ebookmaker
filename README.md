@@ -42,7 +42,7 @@ A web interface for Ebookmaker, used for [Online Ebookmaker](https://ebookmaker.
 * DejaVu Sans Mono https://dejavu-fonts.github.io/
 * TexLive (to build PDF from TeX and rst)
 
-Tested with Python 3.8
+Tested with Python 3.9
 
 ## Install
 

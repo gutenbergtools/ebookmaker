@@ -32,7 +32,6 @@ if __name__ == "__main__":
 
         scripts = [
             'scripts/ebookmaker',
-            'scripts/convert_unitame',
             'scripts/rhyme_compiler',
         ],
 

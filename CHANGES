@@ -3,6 +3,8 @@
     - Ebookmaker will no longer run for Python < 3.7
     - would appreciate confirmation that it works in Python 3.12
     - fixes #280
+- removed Unitame. this was used in the pre-unicode days to help process unicode characters
+- removes nroff support. This was used in the pre-HTML Era to produce styled text
 - disallowed setting `text-decoration` for `a` to `none` for accessibility
     - fixes #298
 - css for pg header changed from all:initial to all:inherit for better dark-mode compatibility.
@@ -13,6 +15,7 @@
     - Use `main` immediately after the "*** START" and before "*** END" lines to help disabled users start at the beginning of the book. `section` tags are the appropriate markup for front matter, back matter, and ad sections of books.
     - Ebookmaker now uses `header` and `footer` markup for boilerplate
 - delinting
+
 
 0.13.9 February 28, 2026
 - added viewport tag in the html made by GutenbergTextParser. Partial fix for #289.

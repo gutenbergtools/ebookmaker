@@ -74,8 +74,6 @@ class Writer(writers.BaseWriter):
 
         data = insert_boilerplate(job, data)
 
-        data = data.encode('utf_8_sig' if encoding == 'utf-8' else encoding, 'unitame')
-
-        self.write_with_crlf(filename, data)
+        self.write_with_crlf(filename, data.encode())
 
         debug("Done plain text file: %s" % filename)

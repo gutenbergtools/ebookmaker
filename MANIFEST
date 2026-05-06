@@ -8,8 +8,6 @@ ebookmaker/EbookMaker.py
 ebookmaker/HTMLChunker.py
 ebookmaker/ParserFactory.py
 ebookmaker/Spider.py
-ebookmaker/Unitame.py
-ebookmaker/UnitameData.py
 ebookmaker/Version.py
 ebookmaker/WriterFactory.py
 ebookmaker/__init__.py
@@ -56,6 +54,5 @@ ebookmaker/writers/RSTWriter.py
 ebookmaker/writers/TxtWriter.py
 ebookmaker/writers/__init__.py
 ebookmaker/writers/cover.jpg
-scripts/convert_unitame
 scripts/ebookmaker
 scripts/rhyme_compiler
