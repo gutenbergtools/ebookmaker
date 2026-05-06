@@ -124,7 +124,7 @@ def or_(iterable1, iterable2):
     return [i[0] or i[1] for i in zip(iterable1, iterable2)]
 
 
-class MinMaxAvg(object):
+class MinMaxAvg:
     """ Store min, max, avg of a list of values. """
 
     __slots__ = "min max avg first last cnt values".split()
@@ -146,7 +146,7 @@ class MinMaxAvg(object):
             self.last = values[-1]
 
 
-class ParagraphMetrics(object):
+class ParagraphMetrics:
     """ Calculates some metrics. """
 
     words = None
@@ -248,7 +248,7 @@ class ParagraphMetrics(object):
                 pass
 
 
-class Par(object):
+class Par:
     """ Contains one paragraph with lots of metrics. """
 #    __slots__ = ('lines styles tag before after id scores'.split())
 
@@ -591,12 +591,12 @@ class Parser(HTMLParserBase):
         return '<%s%s%s%s%s>%s</%s>' % (par.tag, ns, id_, style, title, text, par.tag)
 
 
-    def iterlinks(self): # pylint: disable=R0201
+    def iterlinks(self):
         """ There are no links in text files. """
         return []
 
 
-    def rewrite_links(self, f): # pylint: disable=R0201
+    def rewrite_links(self, f):
         """ There are no links in text files. """
         return
 
@@ -611,7 +611,7 @@ class Parser(HTMLParserBase):
     def css_content(self):
         ref = importlib.resources.files('ebookmaker.parsers').joinpath('txt2all.css')
         default_css = ref.read_bytes().decode('utf-8')
-        
+
         return default_css
 
 
@@ -705,6 +705,7 @@ class Parser(HTMLParserBase):
             return
 
     def add_title(self, dc):
+        """ add title from dc object """
         if dc.title:
             for elem in xpath(self.xhtml, '//xhtml:title'):
                 dc.title = re.sub(r'\s*[\r\n]+\s*', '\n', dc.title)

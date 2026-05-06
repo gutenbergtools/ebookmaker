@@ -15,27 +15,28 @@ Distributable under the GNU General Public License Version 3 or newer.
 
 import copy
 import os
-from pathlib import Path
 import re
-from urllib.parse import urlparse, urljoin
 import uuid
+from pathlib import Path
+from urllib.parse import urlparse
 
 from lxml import etree
 
 from libgutenberg.Logger import debug, exception, info, error, warning
 from libgutenberg.GutenbergGlobals import PG_URL
 
-from ebookmaker import writers
-from ebookmaker.EbookMaker import FILENAMES
-from ebookmaker.CommonCode import Options
-from ebookmaker.parsers import webify_url, CSSParser
-from ebookmaker.parsers.CSSParser import cssutils
 from cssutils import css
 
+from ebookmaker import writers
+from ebookmaker.CommonCode import Options
+from ebookmaker.EbookMaker import FILENAMES
+from ebookmaker.parsers import webify_url, CSSParser
+from ebookmaker.parsers.CSSParser import cssutils
 from ebookmaker.utils import (
     add_class, add_style, css_len, check_lang, replace_elements, gg, xpath, NS
 )
 from ebookmaker.writers import HtmlTemplates
+
 options = Options()
 cssutils.ser.prefs.validOnly = True
 
@@ -142,6 +143,7 @@ def serialize(xhtml):
 
 
 def canonical_url(dc, type_):
+    """ use std style for generated files """
     textnum = dc.project_gutenberg_id or '00000'
     filename = FILENAMES.get(type_, 'pg{id}.' + type_).format(id=textnum)
     return f'{PG_URL}cache/epub/{textnum}/{filename}'
@@ -165,6 +167,7 @@ class Writer(writers.HTMLishWriter):
                 head.append(e)
 
     def add_moremeta(self, job, tree, url):
+        """ Add assorted metadata metadata to <head>. """
 
         self.add_prop(tree, "og:title", job.dc.title)
 
@@ -180,20 +183,19 @@ class Writer(writers.HTMLishWriter):
 
     @staticmethod
     def replace_boilerplate(job, tree):
-        # get text after the divider, put in dc.credit if not already there
+        """ get text after the divider, put in dc.credit if not already there"""
         for pre in xpath(tree, '//*[@id="pg-header"]//xhtml:pre'):
             divided = DIVIDER.split(' '.join(pre.itertext()))
             if len(divided) > 1 and len(divided[1].strip()) > 0:
                 job.dc.add_credit(divided[1])
                 info('credit text from source file : %s', divided[1].strip())
 
-        body = None
         for body in xpath(tree, '//xhtml:body'):
             break
         else:
             error('No Body!!!')
             return
-        
+
         new_bp = HtmlTemplates.pgheader(job.dc)
 
         for pg_header in xpath(tree, '//*[@id="pg-header"]'):
@@ -205,21 +207,19 @@ class Writer(writers.HTMLishWriter):
             parent.replace(pg_header, new_bp)
             break
         else:
-            #body.insert(0, new_bp)
             debug('No pg-header found, not inserting a generated one.')
-            
+
         new_bp = HtmlTemplates.pgfooter(job.dc)
 
         for pg_footer in xpath(tree, '//*[@id="pg-footer"]'):
-            next = pg_footer.getnext()
+            next_el = pg_footer.getnext()
             parent = pg_footer.getparent()
-            while next is not None:
+            while next_el is not None:
                 parent.remove(next)
-                next = pg_footer.getnext()
+                next_el = pg_footer.getnext()
             parent.replace(pg_footer, new_bp)
             break
         else:
-            #body.append(new_bp)
             debug('No pg-footer found, not inserting a generated one')
 
         for pg_smallprint in xpath(tree, '//*[@id="pg-smallprint"]'):
@@ -284,7 +284,7 @@ class Writer(writers.HTMLishWriter):
 
     @staticmethod
     def fix_body_css(sheet):
-        """ 
+        """
             print output can't put margins on body.
         """
         SHOULD_MOVE = re.compile(r'^(margin-?|padding-?).*')
@@ -297,7 +297,7 @@ class Writer(writers.HTMLishWriter):
                 else:
                     in_style.removeProperty(p.name)
             return (in_style, out_style)
-            
+
         old_rules = sheet.cssRules.copy()
         sheet.cssRules.clear()
 
@@ -305,16 +305,16 @@ class Writer(writers.HTMLishWriter):
             if rule.type == rule.STYLE_RULE and 'body' in rule.selectorText:
                 for selector in rule.selectorList:
                     # if there are selectors like 'body.CLASSNAME' we shouldn't need to worry
-                    # because they won't stick to the print body anyway 
+                    # because they won't stick to the print body anyway
                     if selector.selectorText == 'body':
                         # separate properties we can't have on print body from the others
-                        should_move_sty, can_keep_sty = style_filter(rule.style) 
-                
+                        should_move_sty, can_keep_sty = style_filter(rule.style)
+
                         # make a rule that keeps the properties that have been set on body
                         if len(list(can_keep_sty)) > 0:
                             new_rule = css.CSSStyleRule(selectorText='body', style=can_keep_sty)
                             sheet.add(new_rule)
- 
+
                         if len(list(should_move_sty)) > 0:
                             # make a rule that will apply to the screen body
                             at_rules = css.CSSRuleList()
@@ -323,7 +323,7 @@ class Writer(writers.HTMLishWriter):
                             new_rule = css.CSSMediaRule(mediaText='screen')
                             new_rule.cssRules = at_rules
                             sheet.add(new_rule)
-                
+
                             # make a rule that will apply to the page divs
                             new_rule = css.CSSStyleRule(
                                 selectorText='.pagedjs_page_content > div', style=should_move_sty)
@@ -333,10 +333,10 @@ class Writer(writers.HTMLishWriter):
                         new_rule = css.CSSStyleRule(
                             selectorText=selector.selectorText, style=rule.style)
                         sheet.add(new_rule)
-                   
+
             else:
                 sheet.add(rule)
-        
+
 
     @staticmethod
     def fix_incompatible_css(sheet):
@@ -559,7 +559,7 @@ class Writer(writers.HTMLishWriter):
                         html.attrib['lang'] = job.dc.languages[0].id or lang
                         del html.attrib[NS.xml.lang]
                     else:
-                        html.attrib['lang'] = job.dc.languages[0].id 
+                        html.attrib['lang'] = job.dc.languages[0].id
 
                     self.add_dublincore(job, html)
                     self.add_meta_generator(html)
@@ -576,7 +576,7 @@ class Writer(writers.HTMLishWriter):
                     # Remove unused namespace declarations
                     etree.cleanup_namespaces(html)
 
-                    self.write_with_crlf(outfile, serialize(html))                   
+                    self.write_with_crlf(outfile, serialize(html))
                     debug("Done generating HTML file: %s" % outfile)
 
                 else:

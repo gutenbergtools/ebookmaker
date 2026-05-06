@@ -3,6 +3,7 @@
     - Ebookmaker will no longer run for Python < 3.7
     - would appreciate confirmation that it works in Python 3.12
 - disallowed setting `text-decoration` for `a` to `none` for accessibility
+- delinting
 
 0.13.9 February 28, 2026
 - added viewport tag in the html made by GutenbergTextParser. Partial fix for #289.

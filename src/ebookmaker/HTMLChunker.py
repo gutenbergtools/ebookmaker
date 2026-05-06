@@ -57,7 +57,7 @@ def normalize_uri(uri):
     return urllib.parse.unquote(uri) # .decode('utf-8')
 
 
-class HTMLChunker(object):
+class HTMLChunker:
     """ Splits HTML tree into smaller chunks.
 
     Some epub viewers are limited in that they cannot display files

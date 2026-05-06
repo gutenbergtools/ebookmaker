@@ -14,13 +14,13 @@ Writes an EPUB file.
 
 """
 
-import re
-import datetime
-import zipfile
-import time
-import os
 import copy
+import datetime
 import importlib
+import os
+import re
+import time
+import zipfile
 
 from xml.sax.saxutils import quoteattr
 
@@ -31,16 +31,15 @@ from lxml.builder import ElementMaker
 from libgutenberg.GutenbergGlobals import NS, mkdir_for_filename
 from libgutenberg.Logger import critical, debug, error, exception, info, warning
 from libgutenberg.MediaTypes import mediatypes as mt
+
 from ebookmaker import parsers
 from ebookmaker import ParserFactory
 from ebookmaker import HTMLChunker
-# from ebookmaker import Spider
 from ebookmaker import writers
 from ebookmaker.CommonCode import Options
 from ebookmaker.Version import VERSION, GENERATOR
-from ebookmaker.utils import (
-    add_class, add_style, css_len, gg, xpath,
-)
+from ebookmaker.utils import gg, xpath
+
 from . import HTMLWriter
 
 options = Options()
@@ -273,7 +272,7 @@ class OEBPSContainer(zipfile.ZipFile):
         return filename
 
 
-class AdobePageMap(object):
+class AdobePageMap:
     """ Class that builds a page-map xml file. """
 
     def __init__(self, ncx):
@@ -305,7 +304,7 @@ class AdobePageMap(object):
         return page_map
 
 
-class OutlineFixer(object):
+class OutlineFixer:
     """ Class that fixes outline levels. """
 
     def __init__(self):
@@ -334,7 +333,7 @@ class OutlineFixer(object):
         return in_level - promotion
 
 
-class TocNCX(object):
+class TocNCX:
     """ Class that builds toc.ncx. """
 
     def __init__(self, dc):
@@ -489,7 +488,7 @@ class TocNCX(object):
                     ncx.navLabel(ncx.text(pagename)),
                     ncx.content(src=url),
                     **{'id': "pt-%d" % len(root),
-                       'value': str(len(root)), # fixme: extract value
+                       'value': str(len(root)), 
                        'type': 'normal' if re.search('[0-9]', pagename) else 'front',
                        'playOrder': po})
 
@@ -498,7 +497,7 @@ class TocNCX(object):
         return root
 
 
-class ContentOPF(object):
+class ContentOPF:
     """ Class that builds content.opf metadata. """
 
     def __init__(self):
@@ -680,7 +679,7 @@ class ContentOPF(object):
 
         for author in dc.authors:
             pretty_name = dc.make_pretty_name(author.name)
-            if author.marcrel == 'aut' or author.marcrel == 'cre':
+            if author.marcrel in ('aut', 'cre'):
                 self.metadata.append(dcterms.creator(
                     pretty_name, {NS.opf['file-as']: author.name}))
             else:
@@ -822,7 +821,7 @@ class Writer(writers.HTMLishWriter):
                         elem.tag = NS.xhtml.span
                         for attr in elem.attrib:
                             if attr not in parsers.COREATTRS:
-                                del elem.attrib[attr]                      
+                                del elem.attrib[attr]
 
                 for sub_elem in elem.xpath(".//*"):
                     # the element contains elements with ids. make sure they're flow
@@ -1053,7 +1052,7 @@ class Writer(writers.HTMLishWriter):
             for elem in xpath(xhtml, f"//xhtml:{tag}[@{attr}]"):
                 del elem.attrib[attr]
 
-        for elem in xpath(xhtml, f"//svg:svg[@role]"):
+        for elem in xpath(xhtml, "//svg:svg[@role]"):
             del elem.attrib["role"]
 
         # translate the audio element
@@ -1113,12 +1112,12 @@ class Writer(writers.HTMLishWriter):
                 text = tag.text_content()
                 tag.clear()
                 tag.text = text
-            
-            
-            
 
-            
-                
+
+
+
+
+
 
     @staticmethod
     def strip_links(xhtml, manifest):
@@ -1444,7 +1443,7 @@ class Writer(writers.HTMLishWriter):
 
                         # rewrite the changed image links
                         p.remap_links(idmap)
-                        
+
                         xhtml.make_links_absolute(base_url=p.attribs.url)
                         self.fix_html5(xhtml)
 

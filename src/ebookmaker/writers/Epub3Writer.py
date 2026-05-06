@@ -275,7 +275,7 @@ class Toc(TocNCX):
         return root
 
 
-class ContentOPF(object):
+class ContentOPF:
     """ Class that builds content.opf metadata. """
 
     def __init__(self):

@@ -21,8 +21,6 @@ from PIL import Image, ImageFile
 from libgutenberg.Logger import debug, error
 from libgutenberg.MediaTypes import mediatypes as mt
 from ebookmaker.parsers import ParserBase
-from ebookmaker.ParserFactory import ParserFactory
-from . import ParserAttributes
 
 # works around problems with bad checksums in a small number of png files
 ImageFile.LOAD_TRUNCATED_IMAGES = True
@@ -71,7 +69,7 @@ class Parser(ParserBase):
                     else:
                         raise e
             return buf.getvalue()
-        
+
         # can't do anything with SVG files
         if self.attribs.url.endswith('.svg'):
             return self
@@ -143,6 +141,7 @@ class Parser(ParserBase):
 
 
     def get_image_dimen(self):
+        """ image dimensions """
         if self.dimen is None:
             if self.image_data:
                 try:

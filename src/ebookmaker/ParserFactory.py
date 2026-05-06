@@ -13,20 +13,22 @@ Distributable under the GNU General Public License Version 3 or newer.
 """
 
 
-import os.path
-import re
 import importlib
-from six.moves import urllib
+import re
+import os.path
+
 import six
+from six.moves import urllib
 
 import requests
 
-from libgutenberg.Logger import critical, debug, error, info
 from libgutenberg import MediaTypes
+from libgutenberg.Logger import critical, debug, error, info
 import libgutenberg.GutenbergGlobals as gg
+
+from ebookmaker import parsers
 from ebookmaker.CommonCode import Options
 from ebookmaker.Version import VERSION
-from ebookmaker import parsers
 
 options = Options()
 parser_modules = {}
@@ -53,7 +55,7 @@ def unload_parsers():
         del parser_modules[k]
 
 
-class ParserFactory(object):
+class ParserFactory:
     """ A factory and a cache for parsers.
 
     So we don't reparse the same file twice.
@@ -85,18 +87,18 @@ class ParserFactory(object):
             attribs = parsers.ParserAttributes()
 
         # debug("Need parser for %s" % url)
-        
+
         # first check if input url is in output directory (we've already made it!)
         if gg.is_same_path(os.path.abspath(options.outputdir), os.path.dirname(url)):
             # find the file (and the parser) used to make the file
-            if url in cls.sources: 
+            if url in cls.sources:
                 if cls.sources[url] in cls.parsers:
                     parser = cls.parsers[cls.sources[url]]
                     parser.reset()
                     parser.attribs.update(attribs)
                     return parser
-                
-        
+
+
 
         if url in cls.parsers:
             # debug("... reusing parser for %s" % url)
@@ -115,7 +117,7 @@ class ParserFactory(object):
         else:
             fp = cls.open_file(url, attribs)
         if fp is None:
-            return
+            return None
         if attribs.url in cls.parsers:
             # reuse parser because parsing may be expensive, eg. reST docs
             # debug("... reusing parser for %s" % attribs.url)
@@ -124,7 +126,7 @@ class ParserFactory(object):
             return parser
 
         # ok. so we have to create a new parser
-        debug("... creating new parser for %s" % url)
+        debug(f"... creating new parser for {url}")
 
         if hasattr(options, 'mediatype_from_extension') and options.mediatype_from_extension:
             attribs.orig_mediatype = MediaTypes.guess_type(url)
@@ -168,7 +170,7 @@ class ParserFactory(object):
             except IsADirectoryError:
                 critical('Missing file is a directory: %s' % url)
             return None
-            
+
         if re.search(r'^([a-zA-z]:|/)', url):
             fp = open_file_from_path(url)
         else:
@@ -181,7 +183,7 @@ class ParserFactory(object):
                 return None
             except ValueError:  # just a relative path?
                 fp = open_file_from_path(url)
-            
+
         attribs.orig_mediatype = MediaTypes.guess_type(url)
 
         debug("... got mediatype %s from guess_type" % str(attribs.orig_mediatype))

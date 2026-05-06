@@ -40,7 +40,7 @@ options = Options()
 
 RE_PGLINK = re.compile(r'^https?://(www.|)(gutenberg|pglaf|pgdp).org(\W|$)', re.I)
 
-class Spider(object):
+class Spider:
     """ A very rudimentary web spider. """
 
     def __init__(self, job):
