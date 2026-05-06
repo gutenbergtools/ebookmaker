@@ -37,7 +37,6 @@ from ebookmaker.mydocutils import nodes as mynodes
 from ebookmaker.mydocutils.writers import xhtml1, epub2, xetex
 
 from ebookmaker.mydocutils.gutenberg import parsers as gutenberg_parsers
-from ebookmaker.mydocutils.gutenberg.writers import nroff as gutenberg_nroff
 
 mediatypes =(mt.rst, )
 
@@ -262,31 +261,6 @@ class Parser(HTMLParser.Parser):
         doc.transformer.apply_transforms()
 
         return writer.write(doc, destination)
-
-
-    def rst2nroff(self, job, charset = 'utf-8'):
-        """ Convert RST to nroff. """
-
-        writer = gutenberg_nroff.Writer()
-        destination = docutils.io.StringOutput(encoding='unicode') # !
-
-        overrides = {
-            'doctitle_xform': 1,
-            'sectsubtitle_xform': 1,
-            'footnote_references': 'superscript',
-            'compact_lists': 1,
-            'compact_simple': 1,
-            'page_numbers': 1,
-            'no_images': True,
-            'get_resource': self.get_resource,
-            'format': job.type,
-            'encoding': charset,
-            'base_url': self.attribs.url,
-            }
-
-        doc = self._full_parse(writer, overrides)
-        return writer.write(doc, destination)
-
 
     def rst2xetex(self, job):
         """ Convert RST to xetex. """

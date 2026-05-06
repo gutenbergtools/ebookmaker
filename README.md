@@ -49,7 +49,7 @@ Tested with Python 3.8
 (master branch, editable install)
 `pipenv install ebookmaker`
 
-Use the ebookmaker.conf file to pass a path to your kindlegen, tex, and groff programs 
+Use the ebookmaker.conf file to pass a path to your kindlegen, tex
 if they're not in your PATH. Edit the ebookmaker.conf and copy it to /etc/ebookmaker.conf to 
 reset the paths.
 Copy ebookmaker.conf to ~/.ebookmaker to override settings in /etc/ebookmaker.conf or to set default 

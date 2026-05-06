@@ -542,7 +542,6 @@ def config():
             'mobigen' : 'ebook-convert',
             'mobilang': 'ebook-convert',
             'mobikf8': 'ebook-convert',
-            'groff'   : 'groff',
             'rhyming_dict': None,
             'timestamp': datetime.datetime.today().isoformat()[:19],
         }
