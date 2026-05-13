@@ -44,7 +44,7 @@ PG_CSS_PROFILE = (
         'font-family': 'initial',
         'font-size': 'initial',
         'font-style': 'initial',
-        'font-variant': 'initial',
+        'font-variant': 'initial|all-small-caps',
         'font-weight': 'initial',
         'font': 'initial',
         'margin-right': 'initial',
@@ -61,6 +61,7 @@ PG_CSS_PROFILE = (
         'text-decoration': 'initial',
         'text-indent': 'initial',
         'text-transform': 'initial',
+
         
         # updated for  https://www.w3.org/TR/css-writing-modes-3/
         # direction and unicode-bidi  are not supported based on the standard's recommendation

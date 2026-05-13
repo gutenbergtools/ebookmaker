@@ -14,6 +14,7 @@
     - Use `nav` to mark TOC's.
     - Use `main` immediately after the "*** START" and before "*** END" lines to help disabled users start at the beginning of the book. `section` tags are the appropriate markup for front matter, back matter, and ad sections of books.
     - Ebookmaker now uses `header` and `footer` markup for boilerplate
+- added `all-small-caps` as an option for the CSS `font-variant` property fixes #307
 - delinting
 
 
