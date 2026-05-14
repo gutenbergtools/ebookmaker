@@ -170,6 +170,7 @@ class Writer(writers.HTMLishWriter):
     def add_moremeta(self, job, tree, url):
         """ Add assorted metadata metadata to <head>. """
 
+        self.add_meta(tree, "format-detection", "telephone=no,date=no,address=no,email=no,url=no")
         self.add_prop(tree, "og:title", job.dc.title)
 
         for dcmitype in job.dc.dcmitypes:
