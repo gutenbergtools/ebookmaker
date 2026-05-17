@@ -227,7 +227,7 @@ class Writer(writers.HTMLishWriter):
 
         for pg_wrapper in xpath(tree, f'//*[@class="{BODY_WRAPPER_CLASS}"]'):
             for elem in pg_wrapper:
-                if elem:
+                if elem != None:
                     break # not empty
             else:
                 parent = pg_wrapper.getparent()
