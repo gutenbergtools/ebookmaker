@@ -41,6 +41,8 @@ PG_CSS_PROFILE = (
         'font-variant-numeric': r'normal|{font-variant-attrs}(\s+{font-variant-attrs})*',
 
         # (partial) update to CSS Cascading and Inheritance Level 3
+        'background': 'initial',
+        'color': 'initial',
         'font-family': 'initial',
         'font-size': 'initial',
         'font-style': 'initial',

@@ -5,7 +5,7 @@
     - fixes #280
 - removed Unitame. this was used in the pre-unicode days to help process unicode characters
 - removes nroff support. This was used in the pre-HTML Era to produce styled text
-- disallowed setting `text-decoration` for `a` to `none` for accessibility
+- reset `text-decoration` for `a` and `background` and `color` for `body` to `initial` for accessibility
     - fixes #298
 - css for pg header changed from all:initial to all:inherit for better dark-mode compatibility.
     - should fix #216

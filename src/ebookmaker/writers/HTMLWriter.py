@@ -345,6 +345,11 @@ class Writer(writers.HTMLishWriter):
             else:
                 sheet.add(rule)
 
+        # don't let the source change the body bgcolor or text color
+        new_rule = css.CSSStyleRule(selectorText='body', style='background:initial;color:initial')
+        sheet.add(new_rule)
+        new_rule = css.CSSStyleRule(selectorText='a', style='text-decoration:initial')
+        sheet.add(new_rule)
 
     @staticmethod
     def fix_incompatible_css(sheet):
