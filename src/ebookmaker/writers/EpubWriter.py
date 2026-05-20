@@ -1042,18 +1042,22 @@ class Writer(writers.HTMLishWriter):
             for elem in xpath(xhtml, f"//xhtml:{tag}[not(@{attr})]"):
                 elem.set(attr, fill)
 
+        
         # remove html5-only attribute
-
-        attrs_to_remove = [('*', 'role'),('*', 'aria-label'),('*', 'aria-labelledby'),
+        
+        attrs_to_remove = [('*', 'role'),
             ('*', 'itemid'), ('*', 'itemprop'), ('*', 'itemref'), ('*', 'itemscope'),
-            ('*', 'itemtype'), ('ol', 'start'), ('li', 'value')]
+            ('*', 'itemtype'), ('ol', 'start'), ('li', 'value'), ('*', 'focusable')]
+
+        svgattrs_to_remove = [('*', 'role'), ('*', 'focusable')]
 
         for (tag, attr) in attrs_to_remove:
             for elem in xpath(xhtml, f"//xhtml:{tag}[@{attr}]"):
                 del elem.attrib[attr]
-
-        for elem in xpath(xhtml, "//svg:svg[@role]"):
-            del elem.attrib["role"]
+        
+        for (tag, attr) in svgattrs_to_remove:
+            for elem in xpath(xhtml, f"//svg:{tag}[@{attr}]"):
+                del elem.attrib[attr]
 
         # translate the audio element
         for tag in xpath(xhtml, '//xhtml:audio'):

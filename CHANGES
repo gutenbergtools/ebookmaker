@@ -20,7 +20,8 @@
     - we can now manipulate the SVG XML
     - any `data-variant` attributes in the SVG file are removed. fixes #296
     - aria-*, role, and focusable attributes are also removed. fixes #275
-- silence deprecation warnings about truth-testing for None
+- all aria-* attributes are now supported (they are removed in EPUB2 files)
+- silenced deprecation warnings about truth-testing for None
 - delinting
 
 
