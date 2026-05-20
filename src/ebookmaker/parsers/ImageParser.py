@@ -15,10 +15,12 @@ Parse an url of type image/*.
 
 import copy
 import importlib
+import io
 import six
 from PIL import Image, ImageFile
+from lxml import etree
 
-from libgutenberg.Logger import debug, error
+from libgutenberg.Logger import debug, critical, error
 from libgutenberg.MediaTypes import mediatypes as mt
 from ebookmaker.parsers import ParserBase
 
@@ -71,7 +73,8 @@ class Parser(ParserBase):
             return buf.getvalue()
 
         # can't do anything with SVG files
-        if self.attribs.url.endswith('.svg'):
+        if self.attribs.mediatype == mt.svg:
+            #it's xml!
             return self
 
         new_parser = Parser()
@@ -164,4 +167,14 @@ class Parser(ParserBase):
 
     def serialize(self):
         """ Serialize the image. """
+        if self.attribs.mediatype == mt.svg:
+            try:
+                tree = etree.parse(io.BytesIO(self.image_data))
+            except etree.XMLSyntaxError as e:
+                critical(f'SVG image {self.attribs.url} was badly formed XML: {e}')
+                return self.image_data
+            for element in tree.iter():
+                if 'data-variant' in element.attrib:
+                    del element.attrib['data-variant']
+            self.image_data = etree.tostring(tree, encoding="utf-8")
         return self.image_data

@@ -16,6 +16,9 @@
     - Ebookmaker now uses `header` and `footer` markup for boilerplate
 - added `all-small-caps` as an option for the CSS `font-variant` property fixes #307
 - add `format-detection` meta tag. fixes #303
+- ebookmaker now checks linked SVG files for well-formed XML
+    - we can now manipulate the SVG XML
+    - any `data-variant` attributes in the SVG file are removed. fixes #296
 - silence deprecation warnings about truth-testing for None
 - delinting
 
