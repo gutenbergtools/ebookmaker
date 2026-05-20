@@ -168,13 +168,18 @@ class Parser(ParserBase):
     def serialize(self):
         """ Serialize the image. """
         if self.attribs.mediatype == mt.svg:
+            atts_to_remove = ['data-variant', 'focusable', 'role']
             try:
                 tree = etree.parse(io.BytesIO(self.image_data))
             except etree.XMLSyntaxError as e:
                 critical(f'SVG image {self.attribs.url} was badly formed XML: {e}')
                 return self.image_data
             for element in tree.iter():
-                if 'data-variant' in element.attrib:
-                    del element.attrib['data-variant']
+                for att in atts_to_remove:
+                    if att in element.attrib:
+                        del element.attrib[att]
+                for att in copy.copy(element.attrib):
+                    if att.startswith('aria-'):
+                        del element.attrib[att]
             self.image_data = etree.tostring(tree, encoding="utf-8")
         return self.image_data

@@ -19,6 +19,7 @@
 - ebookmaker now checks linked SVG files for well-formed XML
     - we can now manipulate the SVG XML
     - any `data-variant` attributes in the SVG file are removed. fixes #296
+    - aria-*, role, and focusable attributes are also removed. fixes #275
 - silence deprecation warnings about truth-testing for None
 - delinting
 
