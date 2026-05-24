@@ -26,7 +26,7 @@ from libgutenberg.Logger import debug, info, error, warning
 from libgutenberg.Models import File
 from . import parsers
 
-class Struct(object):
+class Struct:
     pass
 
 options = Options()
@@ -34,7 +34,7 @@ options = Options()
 class EbookmakerBadFileException(Exception):
     pass
 
-class Job(object):
+class Job:
     """Hold 'globals' for a job.
 
     A job is defined as one unit of work, acting on one input url.

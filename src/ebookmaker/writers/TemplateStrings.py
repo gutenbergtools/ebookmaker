@@ -15,7 +15,7 @@ import re
 
 CSS_FOR_HEADER = '''
 #pg-header div, #pg-footer div {
-    all: initial;
+    all: inherit;
     display: block;
     margin-top: 1em;
     margin-bottom: 1em;

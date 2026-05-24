@@ -43,7 +43,7 @@ class variable (nodes.Inline, nodes.TextElement):
     """
 
 
-class node_selector (object):
+class node_selector:
     """ Allows CSS-like selectors as condition function for nodes.traverse (). """
 
     def __init__ (self, selector):

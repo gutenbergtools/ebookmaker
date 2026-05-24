@@ -42,14 +42,14 @@ A web interface for Ebookmaker, used for [Online Ebookmaker](https://ebookmaker.
 * DejaVu Sans Mono https://dejavu-fonts.github.io/
 * TexLive (to build PDF from TeX and rst)
 
-Tested with Python 3.8
+Tested with Python 3.9
 
 ## Install
 
 (master branch, editable install)
 `pipenv install ebookmaker`
 
-Use the ebookmaker.conf file to pass a path to your kindlegen, tex, and groff programs 
+Use the ebookmaker.conf file to pass a path to your kindlegen, tex
 if they're not in your PATH. Edit the ebookmaker.conf and copy it to /etc/ebookmaker.conf to 
 reset the paths.
 Copy ebookmaker.conf to ~/.ebookmaker to override settings in /etc/ebookmaker.conf or to set default 
@@ -93,14 +93,6 @@ Check your install:
 
 `$ ebookmaker --version`
 `EbookMaker 0.12.0`
-
-> **If you get an error similar to this one:**
->
-> `ModuleNotFoundError: No module named 'pkg_resources'`
->
-> You can fix it by installing the `setuptools` module:
->
-> `$ pipenv install setuptools`
 
 Since you're in the shell, you can navigate to a book's directory and convert it:
 

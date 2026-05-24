@@ -5,7 +5,7 @@
 
 from setuptools import setup
 
-VERSION = '0.13.9'
+VERSION = '0.14.0'
 
 if __name__ == "__main__":
  
@@ -27,12 +27,10 @@ if __name__ == "__main__":
             'ebookmaker.mydocutils.gutenberg',
             'ebookmaker.mydocutils.gutenberg.parsers',
             'ebookmaker.mydocutils.gutenberg.transforms',
-            'ebookmaker.mydocutils.gutenberg.writers',
         ],
 
         scripts = [
             'scripts/ebookmaker',
-            'scripts/convert_unitame',
             'scripts/rhyme_compiler',
         ],
 
@@ -44,7 +42,7 @@ if __name__ == "__main__":
             'roman',
             'requests',
             'six>=1.4.1',
-            'libgutenberg[covers]>=0.10.22',
+            'libgutenberg[covers]>=0.10.36',
             'cchardet==2.2.0a2',
             'beautifulsoup4',
             'html5lib',
@@ -70,13 +68,12 @@ if __name__ == "__main__":
         description = "The Project Gutenberg tool to generate EPUBs and other ebook formats.",
         long_description = open ('README.md', encoding='utf-8').read (),
         long_description_content_type = 'text/markdown',
-        license = "GPL v3",
+        license = "GPL-3.0-or-later",
         keywords = "ebook epub kindle pdf rst reST reStructuredText project gutenberg format conversion",
         url = "https://github.com/gutenbergtools/ebookmaker/",
 
         classifiers = [
             "Topic :: Text Processing",
-            "License :: OSI Approved :: GNU General Public License (GPL)",
             "Environment :: Console",
             "Operating System :: OS Independent",
             "Intended Audience :: Other Audience",
@@ -84,7 +81,8 @@ if __name__ == "__main__":
             "Programming Language :: Python :: 3.9",
             "Programming Language :: Python :: 3.10",
             "Programming Language :: Python :: 3.11",
-        ],
+            "Programming Language :: Python :: 3.12",
+       ],
 
         platforms = 'OS-independent'
     )

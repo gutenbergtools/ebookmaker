@@ -1,3 +1,32 @@
+0.14.0 May 20, 2026
+- pkg_resources is deprecated, removed in Python 3.12. switched to using importlib. 
+    - Ebookmaker will no longer run for Python < 3.7
+    - would appreciate confirmation that it works in Python 3.12
+    - fixes #280
+- removed Unitame. this was used in the pre-unicode days to help process unicode characters
+- removes nroff support. This was used in the pre-HTML Era to produce styled text
+- reset `text-decoration` for `a` and `background` and `color` for `body` to `initial` for accessibility
+    - fixes #298
+- css for pg header changed from all:initial to all:inherit for better dark-mode compatibility.
+    - should fix #216
+- removed spurious empty body wrapper elements (caused empty epub pages)
+- added support for `nav` and `main` elements.
+    - Use `nav` to mark TOC's.
+    - Use `main` immediately after the "*** START" and before "*** END" lines to help disabled users start at the beginning of the book. `section` tags are the appropriate markup for front matter, back matter, and ad sections of books.
+    - Ebookmaker now uses `header` and `footer` markup for boilerplate
+- added `all-small-caps` as an option for the CSS `font-variant` property fixes #307
+- add `format-detection` meta tag. fixes #303
+- ebookmaker now checks linked SVG files for well-formed XML
+    - we can now manipulate the SVG XML
+    - any `data-variant` attributes in the SVG file are removed. fixes #296
+    - aria-*, role, and focusable attributes are also removed. fixes #275
+- the focusable and role attributes are now fully supported
+    - while this was done to support math, perhaps useful for accessibility
+- silenced deprecation warnings about truth-testing for None
+- bumps libgutenberg to 0.10.36 fixes #300
+- delinting
+
+
 0.13.9 February 28, 2026
 - added viewport tag in the html made by GutenbergTextParser. Partial fix for #289.
     - we need a better handle on when the viewport hurt html in the backfile.

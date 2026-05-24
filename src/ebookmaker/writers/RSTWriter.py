@@ -32,10 +32,6 @@ class Writer (writers.BaseWriter):
 
         parser = ParserFactory.ParserFactory.create (job.url)
 
-        if not hasattr (parser, 'rst2nroff'):
-            debug ('RSTWriter can only work on a RSTParser.')
-            raise SkipOutputFormat
-
         data = parser.preprocess ('utf-8').encode ('utf-8')
 
         self.write_with_crlf (filename, data)

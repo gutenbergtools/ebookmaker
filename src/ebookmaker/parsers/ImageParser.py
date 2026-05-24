@@ -14,18 +14,15 @@ Parse an url of type image/*.
 """
 
 import copy
-
+import importlib
+import io
 import six
 from PIL import Image, ImageFile
+from lxml import etree
 
-
-from pkg_resources import resource_stream # pylint: disable=E0611
-
-from libgutenberg.Logger import debug, error
+from libgutenberg.Logger import debug, critical, error
 from libgutenberg.MediaTypes import mediatypes as mt
 from ebookmaker.parsers import ParserBase
-from ebookmaker.ParserFactory import ParserFactory
-from . import ParserAttributes
 
 # works around problems with bad checksums in a small number of png files
 ImageFile.LOAD_TRUNCATED_IMAGES = True
@@ -74,9 +71,10 @@ class Parser(ParserBase):
                     else:
                         raise e
             return buf.getvalue()
-        
+
         # can't do anything with SVG files
-        if self.attribs.url.endswith('.svg'):
+        if self.attribs.mediatype == mt.svg:
+            #it's xml!
             return self
 
         new_parser = Parser()
@@ -138,14 +136,15 @@ class Parser(ParserBase):
         except IOError as what:
             error("Could not resize image: %s; message %s", self.attribs.url, what)
             new_parser.attribs = copy.copy(self.attribs)
-            fp = resource_stream('ebookmaker.parsers', 'broken.png')
-            new_parser.image_data = fp.read()
-            fp.close()
+            ref = importlib.resources.files('ebookmaker.parsers').joinpath('broken.png')
+            with ref.open('rb') as fp:
+                new_parser.image_data = fp.read()
 
         return new_parser
 
 
     def get_image_dimen(self):
+        """ image dimensions """
         if self.dimen is None:
             if self.image_data:
                 try:
@@ -168,4 +167,19 @@ class Parser(ParserBase):
 
     def serialize(self):
         """ Serialize the image. """
+        if self.attribs.mediatype == mt.svg:
+            atts_to_remove = ['data-variant', 'focusable', 'role']
+            try:
+                tree = etree.parse(io.BytesIO(self.image_data))
+            except etree.XMLSyntaxError as e:
+                critical(f'SVG image {self.attribs.url} was badly formed XML: {e}')
+                return self.image_data
+            for element in tree.iter():
+                for att in atts_to_remove:
+                    if att in element.attrib:
+                        del element.attrib[att]
+                for att in copy.copy(element.attrib):
+                    if att.startswith('aria-'):
+                        del element.attrib[att]
+            self.image_data = etree.tostring(tree, encoding="utf-8")
         return self.image_data

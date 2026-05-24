@@ -120,7 +120,7 @@ ALLOWED_IN_BODY = {
     "address", "article", "blockquote", "del", "div", "dl", "figure", "footer",
     "h1", "h2", "h3", "h4", "h5", "h6",
     "header", "hr", "ins", "noscript", "ol", "p",
-    "pre", "section", "script", "table", "ul", "svg",
+    "pre", "section", "script", "table", "ul", "svg", "main", "nav"
 }
 
 REPLACEMENTS = [

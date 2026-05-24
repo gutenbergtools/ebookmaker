@@ -26,7 +26,6 @@ import docutils.transforms.parts
 
 from ebookmaker.mydocutils import nodes as mynodes
 from libgutenberg.Logger import error, warning, info, debug
-from ebookmaker import Unitame
 
 # pylint: disable=W0142
 
@@ -904,16 +903,9 @@ class CharsetTransform (docutils.transforms.Transform):
     def apply (self, **kwargs):
         if self.document.settings.encoding != 'utf-8':
             charset = self.document.settings.encoding
-            del Unitame.unhandled_chars[:]
 
             for n in self.document.traverse (nodes.Text):
                 text  = n.astext ()
-                text2 = text.encode (charset, 'unitame').decode (charset)
-                if text != text2:
-                    n.parent.replace (n, nodes.Text (text2)) # cannot change text nodes
-
-            if Unitame.unhandled_chars:
-                error ("unitame: unhandled chars: %s" % ", ".join (set (Unitame.unhandled_chars)))
 
 
 class TextNodeWrapper (docutils.transforms.Transform):

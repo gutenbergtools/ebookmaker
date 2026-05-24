@@ -137,7 +137,7 @@ def update_urls(text):
     text = RE_PG_OLD_HOST.sub('https://www.gutenberg.org/', text)
     return RE_PG_HTML_URL.sub(REPL_PG_HTML5_URL, text)
 
-class ParserAttributes(object): # pylint: disable=too-few-public-methods
+class ParserAttributes: # pylint: disable=too-few-public-methods
     """ Object to hold attributes for the lifetime of a parser.
 
     Typical attributes held here would be:
@@ -181,7 +181,7 @@ class ParserAttributes(object): # pylint: disable=too-few-public-methods
         return '\n'.join(a)
 
 
-class ParserBase(object):
+class ParserBase:
     """ Base class for more specialized parsers. """
 
     def __init__(self, attribs=None):

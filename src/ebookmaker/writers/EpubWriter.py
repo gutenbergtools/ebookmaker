@@ -14,33 +14,32 @@ Writes an EPUB file.
 
 """
 
-import re
-import datetime
-import zipfile
-import time
-import os
 import copy
+import datetime
+import importlib
+import os
+import re
+import time
+import zipfile
 
 from xml.sax.saxutils import quoteattr
 
 from six.moves import urllib
 from lxml import etree
 from lxml.builder import ElementMaker
-from pkg_resources import resource_string # pylint: disable=E0611
 
 from libgutenberg.GutenbergGlobals import NS, mkdir_for_filename
 from libgutenberg.Logger import critical, debug, error, exception, info, warning
 from libgutenberg.MediaTypes import mediatypes as mt
+
 from ebookmaker import parsers
 from ebookmaker import ParserFactory
 from ebookmaker import HTMLChunker
-# from ebookmaker import Spider
 from ebookmaker import writers
 from ebookmaker.CommonCode import Options
 from ebookmaker.Version import VERSION, GENERATOR
-from ebookmaker.utils import (
-    add_class, add_style, css_len, gg, xpath,
-)
+from ebookmaker.utils import gg, xpath
+
 from . import HTMLWriter
 
 options = Options()
@@ -273,7 +272,7 @@ class OEBPSContainer(zipfile.ZipFile):
         return filename
 
 
-class AdobePageMap(object):
+class AdobePageMap:
     """ Class that builds a page-map xml file. """
 
     def __init__(self, ncx):
@@ -305,7 +304,7 @@ class AdobePageMap(object):
         return page_map
 
 
-class OutlineFixer(object):
+class OutlineFixer:
     """ Class that fixes outline levels. """
 
     def __init__(self):
@@ -334,7 +333,7 @@ class OutlineFixer(object):
         return in_level - promotion
 
 
-class TocNCX(object):
+class TocNCX:
     """ Class that builds toc.ncx. """
 
     def __init__(self, dc):
@@ -489,7 +488,7 @@ class TocNCX(object):
                     ncx.navLabel(ncx.text(pagename)),
                     ncx.content(src=url),
                     **{'id': "pt-%d" % len(root),
-                       'value': str(len(root)), # fixme: extract value
+                       'value': str(len(root)), 
                        'type': 'normal' if re.search('[0-9]', pagename) else 'front',
                        'playOrder': po})
 
@@ -498,7 +497,7 @@ class TocNCX(object):
         return root
 
 
-class ContentOPF(object):
+class ContentOPF:
     """ Class that builds content.opf metadata. """
 
     def __init__(self):
@@ -680,7 +679,7 @@ class ContentOPF(object):
 
         for author in dc.authors:
             pretty_name = dc.make_pretty_name(author.name)
-            if author.marcrel == 'aut' or author.marcrel == 'cre':
+            if author.marcrel in ('aut', 'cre'):
                 self.metadata.append(dcterms.creator(
                     pretty_name, {NS.opf['file-as']: author.name}))
             else:
@@ -754,7 +753,9 @@ class ContentOPF(object):
                     ocf.add_bytes(Writer.url2filename(url), f.read(), mediatype)
             except IOError:
                 url = 'cover.jpg'
-                ocf.add_bytes(url, resource_string('ebookmaker.writers', url), mediatype)
+                ref = importlib.resources.files('ebookmaker.writers').joinpath(url)
+                contents = ref.read_bytes()
+                ocf.add_bytes(url, contents, mediatype)
             id_ = self.manifest_item(url, mediatype)
 
         debug("Adding coverpage id: %s url: %s" % (id_, url))
@@ -820,7 +821,7 @@ class Writer(writers.HTMLishWriter):
                         elem.tag = NS.xhtml.span
                         for attr in elem.attrib:
                             if attr not in parsers.COREATTRS:
-                                del elem.attrib[attr]                      
+                                del elem.attrib[attr]
 
                 for sub_elem in elem.xpath(".//*"):
                     # the element contains elements with ids. make sure they're flow
@@ -905,7 +906,7 @@ class Writer(writers.HTMLishWriter):
         """
 
         cssclass = re.compile(r'\.(-?[_a-zA-Z]+[_a-zA-Z0-9-]*)')
-        html5tag = re.compile(r'(^|[ ,~>+])(figure|figcaption|footer|header|section)')
+        html5tag = re.compile(r'(^|[ ,~>+])(figure|figcaption|footer|header|section|nav|main)')
 
         for rule in sheet:
             if rule.type == rule.MEDIA_RULE:
@@ -1041,18 +1042,22 @@ class Writer(writers.HTMLishWriter):
             for elem in xpath(xhtml, f"//xhtml:{tag}[not(@{attr})]"):
                 elem.set(attr, fill)
 
+        
         # remove html5-only attribute
-
-        attrs_to_remove = [('*', 'role'),('*', 'aria-label'),('*', 'aria-labelledby'),
+        
+        attrs_to_remove = [('*', 'role'),
             ('*', 'itemid'), ('*', 'itemprop'), ('*', 'itemref'), ('*', 'itemscope'),
-            ('*', 'itemtype'), ('ol', 'start'), ('li', 'value')]
+            ('*', 'itemtype'), ('ol', 'start'), ('li', 'value'), ('*', 'focusable')]
+
+        svgattrs_to_remove = [('*', 'role'), ('*', 'focusable')]
 
         for (tag, attr) in attrs_to_remove:
             for elem in xpath(xhtml, f"//xhtml:{tag}[@{attr}]"):
                 del elem.attrib[attr]
-
-        for elem in xpath(xhtml, f"//svg:svg[@role]"):
-            del elem.attrib["role"]
+        
+        for (tag, attr) in svgattrs_to_remove:
+            for elem in xpath(xhtml, f"//svg:{tag}[@{attr}]"):
+                del elem.attrib[attr]
 
         # translate the audio element
         for tag in xpath(xhtml, '//xhtml:audio'):
@@ -1072,7 +1077,7 @@ class Writer(writers.HTMLishWriter):
 
         # replace html5 block tags
         usedtags = set()
-        for newtag in ['article', 'figcaption', 'figure', 'footer', 'header', 'section']:
+        for newtag in ['article', 'figcaption', 'figure', 'footer', 'header', 'section', 'nav', 'main']:
             for tag in xpath(xhtml, f'//xhtml:{newtag}'):
                 usedtags.add(newtag)
                 tag.tag = NS.xhtml.div
@@ -1111,12 +1116,12 @@ class Writer(writers.HTMLishWriter):
                 text = tag.text_content()
                 tag.clear()
                 tag.text = text
-            
-            
-            
 
-            
-                
+
+
+
+
+
 
     @staticmethod
     def strip_links(xhtml, manifest):
@@ -1442,7 +1447,7 @@ class Writer(writers.HTMLishWriter):
 
                         # rewrite the changed image links
                         p.remap_links(idmap)
-                        
+
                         xhtml.make_links_absolute(base_url=p.attribs.url)
                         self.fix_html5(xhtml)
 
