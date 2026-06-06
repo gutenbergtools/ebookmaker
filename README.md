@@ -3,7 +3,7 @@
 
 Ebookmaker is the tool used for format conversion at Project Gutenberg.
 It builds HTML5, EPUB2, EPUB3 and Kindle files (including KF8) from HTML.
-It builds builds thes formats and PDF files from reST sources.
+It builds these formats and PDF files from reST sources.
 
 If you are preparing HTML for use with Ebookmaker, the [Usage Notes](USAGE.md) may be of interest.
 
