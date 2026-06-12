@@ -1,3 +1,7 @@
+0.14.0 June 12, 2026
+- fixed bug where text directly under body is deleted.
+
+
 0.14.0 May 20, 2026
 - pkg_resources is deprecated, removed in Python 3.12. switched to using importlib. 
     - Ebookmaker will no longer run for Python < 3.7

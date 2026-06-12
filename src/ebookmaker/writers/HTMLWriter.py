@@ -226,6 +226,8 @@ class Writer(writers.HTMLishWriter):
             pg_smallprint.getparent().remove(pg_smallprint)
 
         for pg_wrapper in xpath(tree, f'//*[@class="{BODY_WRAPPER_CLASS}"]'):
+            if pg_wrapper.text:
+                continue
             for elem in pg_wrapper:
                 if elem != None:
                     break # not empty
