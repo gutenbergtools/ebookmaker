@@ -350,7 +350,7 @@ class Writer(writers.HTMLishWriter):
         # don't let the source change the body bgcolor or text color
         new_rule = css.CSSStyleRule(selectorText='body', style='background:initial;color:initial')
         sheet.add(new_rule)
-        new_rule = css.CSSStyleRule(selectorText='a', style='text-decoration:initial')
+        new_rule = css.CSSStyleRule(selectorText='a', style='text-decoration:underline')
         sheet.add(new_rule)
 
     @staticmethod
