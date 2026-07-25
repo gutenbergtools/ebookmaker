@@ -1,3 +1,7 @@
+0.14.2 July 25, 2026
+- EbookAltText can load preferred alt text from altpoet at build time
+  (ALTPOET_URL + ALTPOET_API_KEY); falls back to local alt{ebook}.json
+
 0.14.1 June 12, 2026
 - fixed bug where text directly under body is deleted.
 - updated idna and beautifulsoup dependencies

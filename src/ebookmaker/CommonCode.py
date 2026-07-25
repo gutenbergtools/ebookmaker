@@ -20,6 +20,8 @@ import re
 from io import StringIO
 from six.moves import configparser
 
+import requests
+
 from libgutenberg.CommonOptions import Options
 from libgutenberg.GutenbergGlobals import archive2files
 from libgutenberg.Logger import debug, info, error, warning
@@ -275,8 +277,12 @@ ALTTEXT_DIR = os.path.join(PRIVATE, 'logs', 'alt')
 
 class EbookAltText:
     _alt_map = None
-    
+
     def __init__(self, ebook):
+        self._alt_map = self._fetch_from_altpoet(ebook)
+        if self._alt_map:
+            return
+
         alt_text_file = os.path.join(ALTTEXT_DIR, f'alt{ebook}.json')
         if os.path.exists(alt_text_file):
             with open(alt_text_file, 'r') as data:
@@ -285,7 +291,29 @@ class EbookAltText:
                 except json.decoder.JSONDecodeError as jde:
                     self._alt_map = None
                     error(f'{alt_text_file} is not valid json. {jde}')
-                    
+
+    @staticmethod
+    def _fetch_from_altpoet(ebook):
+        if not (ebook and hasattr(options, 'config')
+                and hasattr(options.config, 'ALTPOET_URL')
+                and hasattr(options.config, 'ALTPOET_API_KEY')):
+            return None
+        url = options.config.ALTPOET_URL.rstrip('/') + '/api/documents/get-project-item/'
+        for _ in range(3):
+            try:
+                r = requests.get(
+                    url,
+                    params={'project': 'Project Gutenberg', 'item': ebook},
+                    headers={'X-Api-Key': options.config.ALTPOET_API_KEY},
+                    timeout=30,
+                )
+            except requests.RequestException:
+                continue
+            if r.status_code == 200:
+                alt_map = r.json()
+                return alt_map if alt_map else None
+            return None
+        return None
 
     # note that this returns None if there is no alt text file for the ebook
     def get(self, img_id):
