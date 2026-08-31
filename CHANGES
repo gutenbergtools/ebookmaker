@@ -1,3 +1,6 @@
+0.14.6
+-fix issue when rendering in an env without PGURL
+
 0.14.5 August 30, 2026
 - fixed a regression affecting books with external SVG files
 

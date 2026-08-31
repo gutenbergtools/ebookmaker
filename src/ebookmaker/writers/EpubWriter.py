@@ -716,7 +716,7 @@ class ContentOPF:
 
         source = dc.source
         if hasattr(options.config, 'FILESDIR'):
-            if source.startswith(options.config.FILESDIR):
+            if source.startswith(options.config.FILESDIR) and hasattr(options.config, 'PGURL'):
                 source = source[len(options.config.FILESDIR):]
                 source = urllib.parse.urljoin(options.config.PGURL, source)
 
