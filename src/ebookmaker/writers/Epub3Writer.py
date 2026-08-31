@@ -132,7 +132,7 @@ class OEBPSContainer(EpubWriter.OEBPSContainer):
         (cover_x, cover_y) = parser.get_image_dimen()
         wrapper = f'''
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="{NS.epub}" lang="en">
   <head>
     <title>"Cover"</title>
     <link href="pgepub.css" rel="stylesheet"/>
