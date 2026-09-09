@@ -1,6 +1,7 @@
 0.14.6
 - fix issue when rendering in an env without PGURL
 - apparently Apple Books wants the epub namespace in the root element of the EPUB chunks. This turns out to be harder than I expected. So now, the `data-epub-type="noteref"` and `data-epub-type="toc"` annotations seem to work as promised in Apple Books. Fixes #349
+- correctly skip rst.gen output when source is plain text. Fixes #356
 
 0.14.5 August 30, 2026
 - fixed a regression affecting books with external SVG files
