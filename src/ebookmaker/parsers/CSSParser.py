@@ -237,7 +237,8 @@ PG_CSS_PROFILE = {
         # initial-letter-wrap: none | first | all | grid | <length-percentage>
         'initial-letter-wrap': r'(?:none|first|all|grid|{lop})',
 
-
+        'background-size': (r'^(?:cover|contain|(?:auto|{length}|{percentage})(?:\s+(?:auto|{length}|{percentage}))?)(?:\s*,\s*(?:cover|contain|(?:auto|{length}|{percentage})(?:\s+(?:auto|{length}|{percentage}))?))*$'
+        )
 }
         
 # ---------------------------------------------------------------------------
