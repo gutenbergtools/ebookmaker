@@ -13,7 +13,7 @@ docutils = ">=0.18.1"
 html5lib = "*"
 cchardet = "==2.2.0a2"
 lxml = ">=6.0.0"
-libgutenberg = {extras = ["covers"], version = ">=0.10.34"}
 beautifulsoup4 = "*"
 idna = "*"
+libgutenberg = {extras = ["covers"], version = ">=0.11.3"}
 ebookmaker = {file = ".", editable = true}
