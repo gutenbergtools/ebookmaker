@@ -107,12 +107,12 @@ FILENAMES = {
 
 COVERPAGE_MIN_AREA = 200 * 200
 
-def id_from_filename(fn):
     idmatch = re.search(r'\d+', fn)
     if idmatch:
         return int(idmatch.group(0))
     else:
         return 0
+TEXT_DCMI = gg.struct(id='Text', description='Text') 
 
 def make_output_filename(type_, dc):
     """ Make a suitable filename for output type. """
@@ -244,6 +244,11 @@ def get_dc(job):
 
     dc.source = parser.attribs.url
     dc.title = options.title or dc.title or 'NA'
+    if parser.attribs.mediatype in mt.TEXT_MEDIATYPES:
+        # need to set category as 'text'
+        dc.dcmitypes = [CommonCode.struct(id='Text', description='Text')]
+    else:
+        warning('category probably not text')
 
     if options.author:
         dc.add_author(options.author, 'cre')
