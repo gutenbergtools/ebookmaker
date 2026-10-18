@@ -21,15 +21,13 @@ from io import StringIO
 from six.moves import configparser
 
 from libgutenberg.CommonOptions import Options
-from libgutenberg.GutenbergGlobals import archive2files
+from libgutenberg.GutenbergGlobals import archive2files, Struct, struct
 from libgutenberg.Logger import debug, info, error, warning
 from libgutenberg.Models import File
 from . import parsers
 
-class Struct:
-    pass
-
 options = Options()
+
 
 class EbookmakerBadFileException(Exception):
     pass
