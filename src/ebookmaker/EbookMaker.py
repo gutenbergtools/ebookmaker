@@ -107,12 +107,14 @@ FILENAMES = {
 
 COVERPAGE_MIN_AREA = 200 * 200
 
+TEXT_DCMI = gg.struct(id='Text', description='Text') 
+
+def id_from_filename(fn):
     idmatch = re.search(r'\d+', fn)
     if idmatch:
         return int(idmatch.group(0))
     else:
         return 0
-TEXT_DCMI = gg.struct(id='Text', description='Text') 
 
 def make_output_filename(type_, dc):
     """ Make a suitable filename for output type. """
