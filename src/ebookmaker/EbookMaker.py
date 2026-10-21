@@ -107,8 +107,6 @@ FILENAMES = {
 
 COVERPAGE_MIN_AREA = 200 * 200
 
-TEXT_DCMI = gg.struct(id='Text', description='Text') 
-
 def id_from_filename(fn):
     idmatch = re.search(r'\d+', fn)
     if idmatch:

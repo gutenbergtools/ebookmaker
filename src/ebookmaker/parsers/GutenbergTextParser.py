@@ -21,7 +21,7 @@ import lxml
 from lxml import etree
 
 import libgutenberg.GutenbergGlobals as gg
-from libgutenberg.GutenbergGlobals import xpath, Struct, struct, NS
+from libgutenberg.GutenbergGlobals import xpath, Struct, NS
 from libgutenberg.Logger import debug, error, info, warning
 from libgutenberg.MediaTypes import mediatypes as mt
 
