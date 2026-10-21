@@ -679,6 +679,9 @@ class ContentOPF:
         self.metadata.append(dcterms.identifier(dc.opf_identifier, {
             NS.opf.scheme: 'URI',
             'id': 'id'})) # should be NS.xml.id
+        if dc.isbn:
+            self.metadata.append(dcterms.identifier(dc.isbn, {
+                NS.opf['scheme']: 'ISBN'}))
 
         for author in dc.authors:
             pretty_name = dc.make_pretty_name(author.name)
