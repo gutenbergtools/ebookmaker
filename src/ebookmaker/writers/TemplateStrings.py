@@ -447,7 +447,7 @@ freely shared with anyone. For forty years, he produced and
 distributed Project Gutenberg eBooks with only a loose network of
 volunteer support.
 </div><div>
-Project Gutenberg eBooks are often created from several printed
+Project Gutenberg eBooks have often been created from several printed
 editions, all of which are confirmed as not protected by copyright in
 the U.S. unless a copyright notice is included. Thus, we do not
 necessarily keep eBooks in compliance with any particular paper
