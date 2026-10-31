@@ -14,6 +14,7 @@ Distributable under the GNU General Public License Version 3 or newer.
 from __future__ import unicode_literals
 
 import importlib
+import os
 import re
 
 import six
@@ -34,6 +35,43 @@ options = Options()
 mediatypes = (mt.txt, )
 
 MAX_BEFORE = 5 # no. of empty lines that mark a <h1>
+
+# A paragraph in which *every* line starts with at least this many spaces was
+# hand-indented and hand-wrapped by the transcriber, so its line breaks are
+# intentional: keep them instead of reflowing the paragraph.
+#
+# Without this, verse is recognized mainly by every line starting with a
+# capital letter.  Languages that do not capitalize every verse line
+# (Finnish, Swedish, German, ...) lose: the penalty grows with the number of
+# lines, so long stanzas were always reflowed into a prose block quote.
+#
+# Set to 0 to restore the old behaviour.  Can be overridden per run with the
+# environment variable EBOOKMAKER_VERSE_INDENT.
+try:
+    VERSE_INDENT = int(os.environ.get('EBOOKMAKER_VERSE_INDENT', 4))
+except ValueError:
+    VERSE_INDENT = 4
+
+# Strip the common leading indentation from a preformatted (verse) block and
+# express it as a CSS margin instead.  The transcriber's indentation is only a
+# marker; rendering it as hard &#xa0; characters makes the block start with
+# stray spaces and prevents it from adapting to the reader's screen.  Relative
+# indentation *inside* the block (a line indented deeper than its siblings) is
+# always preserved.
+VERSE_STRIP_INDENT = True
+
+# The margin that replaces the stripped indentation.  It is deliberately the
+# same for every block: a poem whose stanzas were indented by slightly
+# different amounts should still line up, and a title page centered with 30
+# spaces should not end up pushed a third of the way across the screen.
+VERSE_MARGIN = 5 # per cent
+
+# A block whose longest line falls short of this fraction of the width the
+# transcription is filled to was broken by hand, not by a word wrapper.
+# Reflowed prose always fills its lines nearly to the margin, so a block that
+# never comes close was typed one line at a time: a publisher's imprint, a
+# cast of characters, a table of contents, an address, a signature.
+SHORT_BLOCK_RATIO = 0.66
 
 RE_ITALICS = re.compile(r"\b_([^_]+?)_\b")
 RE_INDENT = re.compile(r"^\s+")
@@ -175,7 +213,19 @@ class ParagraphMetrics:
         self.indents = list(map(self._indent, lines))
 
         self.titles = list(map(self._istitle, lines))
+        self.numbers = list(map(self._isnumbered, lines))
+        if most(self.numbers):
+            # A numbered list (table of contents, numbered verse, dated
+            # entries) is hand-broken just like a capitalized one.  Roman
+            # numerals always counted as titles because they are letters;
+            # arabic numerals did not, so "1. 2. 3." was reflowed while
+            # "I. II. III." was not.  Only applied when most lines are
+            # numbered, so that a prose line happening to start with a
+            # number ("...Apartment / 60.") is not mistaken for a list.
+            self.titles = or_(self.titles, self.numbers)
         self.uppers = list(map(six.text_type.isupper, lines))
+        # lines starting with VERSE_INDENT or more spaces
+        self.indenteds = [i >= VERSE_INDENT for i in self.indents]
 
         # skip last line, which is almost always shorter
         self.length = MinMaxAvg(self.lengths[:-1])
@@ -209,6 +259,11 @@ class ParagraphMetrics:
         """ Return True if the first char is uppercase. """
         m = re.search(r'\w', line)
         return m and m.group(0).isupper()
+    @staticmethod
+    def _isnumbered(line):
+        """ Return True if the line starts with a number. """
+        m = re.search(r'\w', line)
+        return bool(m) and m.group(0).isdigit()
 
     def _rhyme_stemmer(self, line):
         """ Return the stem of the rhyme.
@@ -261,7 +316,12 @@ class Par:
         self.after = 0
         self.id = None
         self.prev = None
+        self.next = None
         self.debug_message = ''
+        self.force_verse = False
+        self.short_block = False
+        self.strip_indent = 0
+        self.fill_width = 0
 
         self.scores = Struct()
         for subject in SUBJECTS:
@@ -318,6 +378,25 @@ class Par:
 
         # same indentation pattern as pars before and after
 
+    def deeply_indented(self):
+        """ Return True if *every* line starts with VERSE_INDENT+ spaces. """
+        if not VERSE_INDENT:
+            return False
+        return bool(self.metrics.indenteds) and all(self.metrics.indenteds)
+    def is_block(self):
+        """ Return True if this par is shipped as a hand-broken block. """
+        return self.force_verse or self.scores.quote > THRESHOLD
+    def is_flowed_prose(self):
+        """ Return True if this par is an ordinary, re-wrapped prose par.
+
+        Only such a par wants the first-line indent that the stylesheet gives
+        to every <p>.  Hand-broken blocks (verse, title pages, tables of
+        contents) do not: their first line would start with a stray indent
+        that the transcription does not have.
+        """
+
+        return not (self.is_block() or self.short_block or
+                    self.scores.header > THRESHOLD)
     def header_smells(self):
         """ Test some words we know hint at headers """
         return RE_HEADER_SMELLS.findall(" ".join(self.lines))
@@ -369,6 +448,21 @@ class Par:
         if any(self.header_smells()):
             self.msg("any header smells")
             self.scores.header *= 2.0
+
+        # hand-indented block: never reflow
+
+        if not any(self.p_smells()):
+            if self.deeply_indented():
+                self.msg("every line indented >= %d" % VERSE_INDENT)
+                self.force_verse = True
+
+            elif (self.fill_width and self.metrics.lengths and
+                  max(self.metrics.lengths) < self.fill_width * SHORT_BLOCK_RATIO):
+                self.msg("no line reaches %d of %d columns" % (
+                    max(self.metrics.lengths), self.fill_width))
+                self.short_block = True
+                if self.metrics.cnt_lines > 1:
+                    self.force_verse = True
 
         # analyze indentation
 
@@ -472,11 +566,9 @@ class Parser(HTMLParserBase):
         self.text = ""
         self.pg_header = ""
         self.pg_footer = ""
-
         
     def unicode_content(self):
         return self.pg_header + self.text + self.pg_footer
-
 
     def get_charset_from_meta(self):
         """ Parse text for hints about charset. """
@@ -507,6 +599,14 @@ class Parser(HTMLParserBase):
                 last_par.next = par
             last_par = par
 
+        # The width the transcription is filled to.  Taken as a high
+        # percentile rather than the maximum, so that one stray long line
+        # does not set the standard for the whole book.
+        lengths = sorted(len(line) for par in self.pars for line in par.lines)
+        fill_width = lengths[int(len(lengths) * 0.9)] if lengths else 0
+        for par in self.pars:
+            par.fill_width = fill_width
+
         for par in self.pars:
             par.analyze()
 
@@ -536,9 +636,30 @@ class Parser(HTMLParserBase):
                 level = max(MAX_BEFORE - par.before, 0)
                 par.tag = "h%d"  % (level + 1)
             else:
-                if par.scores.quote > THRESHOLD:
-                    if par.scores.verse > 1.0:
+                # Kill the stylesheet's first-line indent on blocks that were
+                # broken by hand.  The stylesheet only suppresses it after a
+                # heading, so the *first* stanza of a poem looked right while
+                # every following stanza -- and every line of a title page or
+                # a table of contents -- started with a stray indent.
+                if par.is_block():
+                    par.styles['text-indent'] = '0'
+                elif par.short_block or par.metrics.cnt_lines == 1:
+                    # A lone line is ambiguous: in a novel it is a one line
+                    # prose paragraph and keeps its indent; between headings
+                    # and hand-broken blocks it is front matter -- a byline,
+                    # an imprint, a section title, a numbered subtitle.
+                    neighbours = [p for p in (par.prev, par.next) if p]
+                    if not any(p.is_flowed_prose() for p in neighbours):
+                        par.styles['text-indent'] = '0'
+
+                if par.is_block():
+                    # force_verse: hand-indented, keep the line breaks
+                    if par.force_verse or par.scores.verse > 1.0:
                         par.styles['white-space'] = 'pre'
+                        if VERSE_STRIP_INDENT and par.metrics.indents:
+                            par.strip_indent = min(par.metrics.indents)
+                            if par.strip_indent:
+                                par.styles['margin-left'] = '%d%%' % VERSE_MARGIN
                     else:
                         par.styles['margin-left'] = '%d%%' % (
                             par.metrics.indent.first * 100 / 72)
@@ -572,6 +693,15 @@ class Parser(HTMLParserBase):
             return RE_ITALICS.sub(it_repl, s)
 
         if par.styles.get('white-space', '') == 'pre':
+            if par.strip_indent:
+                n = par.strip_indent
+                par.lines = [line[n:] for line in par.lines]
+            if par.lines:
+                # A block never starts indented relative to its own body:
+                # the blank line above it is what separates it from the
+                # previous paragraph.  Indentation on *later* lines is
+                # meaningful and is kept.
+                par.lines[0] = par.lines[0].lstrip(' ')
             par.lines = map(self.preformat, par.lines)
             del par.styles['white-space']
 
