@@ -103,7 +103,7 @@ class BaseWriter:
 
 
 
-em = ElementMaker()
+em = ElementMaker(namespace=str(gg.NS.xhtml), nsmap={None: str(gg.NS.xhtml)})
 
 class HTMLishWriter(BaseWriter):
     """ Base class for writers with HTMLish contents. """
@@ -120,11 +120,11 @@ class HTMLishWriter(BaseWriter):
     @staticmethod
     def add_meta(xhtml, name, content):
         """ Add a meta tag. """
-
         for head in gg.xpath(xhtml, '//xhtml:head'):
-            meta = em.meta(name=name, content=remove_cr(content))
-            meta.tail = '\n'
-            head.append(meta)
+            if not gg.xpath(head, f"//xhtml:meta[@name='{name}']"):
+                meta = em.meta(name=name, content=remove_cr(content))
+                meta.tail = '\n'
+                head.append(meta)
 
     @staticmethod
     def add_prop(xhtml, prop, content):
