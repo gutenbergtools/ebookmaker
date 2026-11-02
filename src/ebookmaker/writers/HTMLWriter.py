@@ -168,6 +168,7 @@ class Writer(writers.HTMLishWriter):
     def add_moremeta(self, job, tree, url):
         """ Add assorted metadata metadata to <head>. """
 
+        self.add_meta(tree, "viewport", "width=device-width, initial-scale=1")
         self.add_meta(tree, "format-detection", "telephone=no,date=no,address=no,email=no,url=no")
         self.add_prop(tree, "og:title", job.dc.title)
 
