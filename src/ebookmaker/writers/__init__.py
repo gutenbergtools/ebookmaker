@@ -118,13 +118,20 @@ class HTMLishWriter(BaseWriter):
 
 
     @staticmethod
-    def add_meta(xhtml, name, content):
+    def add_meta(xhtml, name, content, replace=True):
         """ Add a meta tag. """
         for head in gg.xpath(xhtml, '//xhtml:head'):
-            if not gg.xpath(head, f"//xhtml:meta[@name='{name}']"):
-                meta = em.meta(name=name, content=remove_cr(content))
-                meta.tail = '\n'
-                head.append(meta)
+            old_metas = gg.xpath(head, f"//xhtml:meta[@name='{name}']")
+            exists = bool(old_metas) # there's already a meta
+            if exists and not replace:
+                # don't add the new meta
+                continue
+            for old_meta in old_metas:
+                # replace existing metas
+                old_meta.getparent().remove(old_meta)
+            meta = em.meta(name=name, content=remove_cr(content))
+            meta.tail = '\n'
+            head.append(meta)
 
     @staticmethod
     def add_prop(xhtml, prop, content):

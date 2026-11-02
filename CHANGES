@@ -1,4 +1,4 @@
-0.14.7 October, 2026
+0.14.7 November, 2026
 - refactors use of Struct from libgutenberg.GutenbergGlobals
     - requires libgutenberg>=0.11.7
 - sets 'Text' dcmi_type; needs to handl this to deciide whether to use ISBN
@@ -10,6 +10,10 @@
     - HTML meta tags
     - EPUB2 OPF
     - EPUB3 OPF
+- add viewport tag if not already present
+- meta elements added in HTMLWriter did not check for an element already existing.
+    - default behavior is to remove the existing meta element
+    - added a parameter to heep existing
 
 0.14.6 September 10, 2026
 - fix issue when rendering in an env without PGURL
