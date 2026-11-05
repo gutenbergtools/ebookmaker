@@ -423,6 +423,12 @@ class Parser(HTMLParserBase):
                     colgroup.append(col)
             table.insert(0, colgroup)
 
+        # empty th should be td
+
+        for th in xpath(self.xhtml, "//xhtml:th[not(normalize-space())]"):
+            # these should be td instead
+            th.tag = NS.xhtml.td
+
         # move lang to xml:lang
 
         for elem in xpath(self.xhtml, "//xhtml:*[@lang]"):
@@ -819,6 +825,10 @@ class Parser(HTMLParserBase):
 
         if '\r' in html or '\u2028' in html:
             html = '\n'.join(html.splitlines())
+ 
+        # inject epub namespace
+        html = re.sub(r'<html ([^>]*)>', r'<html \1 xmlns:epub="http://www.idpf.org/2007/ops">',
+                      html, count=1)
         self.unicode_buffer = html
 
         self.xhtml = self.__parse(html)     # let exception bubble up

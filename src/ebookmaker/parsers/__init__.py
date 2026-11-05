@@ -116,7 +116,7 @@ REPL_PG_HTML5_URL = r'\g<1>https://www.gutenberg.org/cache/epub/\g<3>/pg\g<3>-im
 
 em = ElementMaker(makeelement=lxml.html.xhtml_parser.makeelement,
                   namespace=str(NS.xhtml),
-                  nsmap={None: str(NS.xhtml)})
+                  nsmap={None: str(NS.xhtml), 'epub': str(NS.epub),  'svg': str(NS.svg)})
 
 def webify_url(url):
     """ make the url for a parser, accounting for platform """

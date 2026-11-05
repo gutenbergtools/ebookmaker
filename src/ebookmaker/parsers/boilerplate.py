@@ -51,6 +51,8 @@ SMALLPRINT_MARKERS = [
     re.compile(r"\** ?These\s+\w+\s+Were\s+Prepared\s+By\s+Thousands", re.I),
 ]
 MARKER_END = re.compile(r"\*+")
+STRIPPED_START = '*** START OF THE PROJECT GUTENBERG ***'
+STRIPPED_END = '*** END OF THE PROJECT GUTENBERG ***'
 
 def prune(root, divider, after=True):
     ''' prune parts of the root element before or after a divider  '''
@@ -146,8 +148,9 @@ def mark_soup(soup):
 
 def strip_headers_from_txt(text):
     '''
-    when input is plain text, strip the heaters and return (stripped_text, pg_header, pg_footer)
+    when input is plain text, strip the headers and return (stripped_text, pg_header, pg_footer)
     '''
+    debug('stripping headers from txt')
     def markers_split(text, markers):
         for marker in markers:
             divider = marker.search(text)
@@ -156,32 +159,24 @@ def strip_headers_from_txt(text):
                 after_sections = MARKER_END.split(after, maxsplit=1)
                 if len(after_sections) == 2 and len(after_sections[0]) < 500:
                     after = after_sections[1]
-                
                 return before, divider.group(0), after
         return  text, None, text
     header_text, divider, text = markers_split(text, TOP_MARKERS + SMALLPRINT_MARKERS)
     if divider is None:
-        pg_header = '<pre id="pg-header" x-header="0"></pre>'
+        pg_header = '\n*** x-header ***\n'
         info('No PG header found in txt file.')
 
     else:
         divider_tail = ''
         if '\n' in text:
             divider_tail, text = text.split('\n', maxsplit=1)
-        pg_header = '\n'.join([
-            '<pre id="pg-header">',
-            xmlspecialchars(header_text),
-            xmlspecialchars(divider),
-            xmlspecialchars(divider_tail),
-            '</pre>'])
+        pg_header = '\n'.join([header_text, STRIPPED_START, divider_tail])
 
     text, divider, footer_text = markers_split(text, BOTTOM_MARKERS)
     if divider is None:
-        pg_footer = '<pre id="pg-footer" x-footer="0"></pre>'
+        pg_footer = '\n*** x-header ***\n'
         info('No PG footer found in txt file.')
     else:
-        pg_footer = '\n'.join(['<pre id="pg-footer">',
-                               divider,
-                               xmlspecialchars(footer_text),
-                               '</pre>'])
+        pg_footer = '\n'.join([STRIPPED_END, footer_text])
+
     return text, pg_header, pg_footer

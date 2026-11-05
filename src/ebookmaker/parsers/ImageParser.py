@@ -20,6 +20,7 @@ import six
 from PIL import Image, ImageFile
 from lxml import etree
 
+from libgutenberg.GutenbergGlobals import NS
 from libgutenberg.Logger import debug, critical, error
 from libgutenberg.MediaTypes import mediatypes as mt
 from ebookmaker.parsers import ParserBase
@@ -28,8 +29,9 @@ from ebookmaker.parsers import ParserBase
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 mediatypes = (mt.jpeg, mt.png, mt.gif, mt.svg)
-
-
+SVGNS = {str(NS.svg), "http://www.w3.org/1999/xlink"}
+SVGJUNKNS = {"http://www.inkscape.org/namespaces/inkscape", 
+           "http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"}
 
 class Parser(ParserBase):
     """Parse an image.
@@ -171,15 +173,30 @@ class Parser(ParserBase):
             atts_to_remove = ['data-variant', 'focusable', 'role']
             try:
                 tree = etree.parse(io.BytesIO(self.image_data))
+                svg = tree.getroot()
             except etree.XMLSyntaxError as e:
                 critical(f'SVG image {self.attribs.url} was badly formed XML: {e}')
                 return self.image_data
+
             for element in tree.iter():
+                #remove attributes that cause trouble
                 for att in atts_to_remove:
                     if att in element.attrib:
                         del element.attrib[att]
                 for att in copy.copy(element.attrib):
-                    if att.startswith('aria-'):
+                    if att.startswith('aria-') or att.startswith('data-'):
                         del element.attrib[att]
+
+                # explicitly set all elements in the SVG file that are not xlink or svg to svg
+                if etree.QName(element).namespace not in SVGNS:
+                    # remove Inkspace junk
+                    if etree.QName(element).namespace in SVGJUNKNS:
+                        element.getparent().remove(element)
+                    else:
+                        element.tag = NS.svg.__getitem__(etree.QName(element).localname)
+
+            # set the root namespace
+            svg.tag = NS.svg.svg
+
             self.image_data = etree.tostring(tree, encoding="utf-8")
         return self.image_data

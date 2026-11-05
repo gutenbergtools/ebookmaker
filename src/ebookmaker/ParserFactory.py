@@ -86,7 +86,7 @@ class ParserFactory:
         if attribs is None:
             attribs = parsers.ParserAttributes()
 
-        # debug("Need parser for %s" % url)
+        debug("Need parser for %s" % url)
 
         # first check if input url is in output directory (we've already made it!)
         if gg.is_same_path(os.path.abspath(options.outputdir), os.path.dirname(url)):
@@ -101,7 +101,7 @@ class ParserFactory:
 
 
         if url in cls.parsers:
-            # debug("... reusing parser for %s" % url)
+            debug("... reusing parser for %s" % url)
             # reuse same parser, maybe already filled with data
             parser = cls.parsers[url]
             parser.reset()

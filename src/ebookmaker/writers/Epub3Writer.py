@@ -113,7 +113,7 @@ body.x-ebookmaker-coverpage {
 }
 body.x-ebookmaker.x-ebookmaker-3  .pgshow {
     visibility: visible;
-    display: initial;
+    display: inline;
     }
 """
 
@@ -132,7 +132,7 @@ class OEBPSContainer(EpubWriter.OEBPSContainer):
         (cover_x, cover_y) = parser.get_image_dimen()
         wrapper = f'''
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="{NS.epub}" lang="en">
   <head>
     <title>"Cover"</title>
     <link href="pgepub.css" rel="stylesheet"/>
@@ -487,7 +487,7 @@ class ContentOPF:
 
         source = dc.source
         if hasattr(options.config, 'FILESDIR'):
-            if source.startswith(options.config.FILESDIR):
+            if source.startswith(options.config.FILESDIR) and hasattr(options.config, 'PGURL'):
                 source = source[len(options.config.FILESDIR):]
                 source = urllib.parse.urljoin(options.config.PGURL, source)
 
@@ -560,6 +560,10 @@ class Writer(EpubWriter.Writer):
         # add namespace to math elements
         for e in xpath(xhtml, "//xhtml:math"):
             e.attrib['xmlns'] = "http://www.w3.org/1998/Math/MathML"
+        # add namespace to svg
+        for e in xpath(xhtml, "//xhtml:svg"):
+            e.attrib['xmlns'] = "http://www.w3.org/2000/svg"
+        
 
     @staticmethod
     def fix_incompatible_css(sheet):
@@ -783,6 +787,7 @@ class Writer(EpubWriter.Writer):
             # after splitting html into chunks we have to rewrite all
             # internal links in HTML
             chunker.rewrite_internal_links()
+            chunker.set_running_headers()
             # also in the TOC
             if not ncx.toc:
                 ncx.toc.append([job.spider.parsers[0].attribs.url, 'Start', 1])

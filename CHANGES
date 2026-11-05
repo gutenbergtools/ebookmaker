@@ -1,6 +1,58 @@
-0.14.2 July 25, 2026
+
+0.14.7 July 25, 2026
 - EbookAltText can load preferred alt text from altpoet at build time
   (ALTPOET_URL + ALTPOET_API_KEY); falls back to local alt{ebook}.json
+
+0.14.6 September 10, 2026
+- fix issue when rendering in an env without PGURL
+- apparently Apple Books wants the epub namespace in the root element of the EPUB chunks. This turns out to be harder than I expected. So now, the `data-epub-type="noteref"` and `data-epub-type="toc"` annotations seem to work as promised in Apple Books. Fixes #349
+- correctly skip rst.gen output when source is plain text. Fixes #356
+- removes inkscape junk in svg's produced by Inkscape; really, producers should use plain svg export
+    - fixes #354, #357
+- add support for the `background-size` attribute. Fixes #320
+
+0.14.5 August 30, 2026
+- fixed a regression affecting books with external SVG files
+
+0.14.4 August 15, 2026
+- fixed a regression in text boilerplate stripping. Affected only txt -> html (and thus epub, mobi, etc)
+- fixed setup and added parse() invocation in tests_txt
+
+0.14.3 August 12, 2026
+
+This release includes several important updates. There are quite a few issues still waiting to be addressed; they are not forgotten.
+- To balance the long-standing policy of only using "REC" CSS against legal requirements for accessibility, we are significantly relaxing our CSS validation. This means that post-processors should take care to provide "graceful degradation" for CSS that might not be supported in every reading device.
+    - CSS Grid Layout Level 1 is now supported. Fixes #322. Grid layout should be strongly considered as a replacement for the use of table for layout
+    - CSS Flexbox Level 1 is now supported. Together with Grid, the should be no reason to use table for layout; going forward, layout tables will need to be converted to more accessible CSS based layout.
+    - CSS3 Text Decoration properties are now supported. These were the most often used properties removed by Ebookmaker as not yet REC. 
+    - The first-letter property is now supported. While this is still not supported in every browser, it is supported by most ebook readers. Use this property to make drop caps in an accessible way.  Fixes #310 
+    - Ebookmaker uses the Python module 'CSSUtils' to do CSS validation. It does not support the full grammar used in newer CSS. In particular it does not support the "var()" construct; do not expect this to change anytime soon.
+    - The current version of CSSUtils does not support the `rem` measurement, so CSS with rem in it will cause errors to be reported and CSS 2.1 rules containing `rem` will be removed. The current version of CSSUtils, that supports `rem`, requires a Python version newer than we have running in production. When our python version is updated, we will update CSSUtils.
+
+- In both in HTML and EPUB, for improved accessibility, added the CSS rule `a[href] {text-decoration: underline;}` to make sure links are underlined. Previously, we underlined all `a` elements, which ignored prior usage as an link target.
+
+- The `aside` element is now allowed. becomes div[class=aside] in epub2.
+
+- handling of inline SVG has been improved.
+    - the inline SVG element is now handled whether or not it has set the svg namespace.
+    - inline SVG is changed to standalone files in EPUB2
+    - inline html5 SVG now adapted for EPUB3, which cares about namespaces
+
+- an error is no longer emitted when rst output is requested from html input
+
+- uses hN element to set the title element of each chunk in the epub. fixes #331
+
+- refactored boilerplate stripping for txt files so it only needs to be done once per book. boilerplate is now detected in the text Parser, instead of in the text Writer.
+
+- support HTML5 `time` element. fixes #332 
+
+- `a` tags can't contain block tags in xhtml, so div in `a` and `p` in `a` cause EPUB2 validation errors, so Ebookmaker now changes `p` and `div` occurring in `a` to `span` for EPUB2. I'm not sure why anyone would want to use this markup in a book. Fixes #333
+
+- empty `th` elements are replaced by empty `td` elements for better accessibility. Fixes #315.
+
+
+0.14.2 July 4, 2026
+- `text-decoration` for `a` should be reset to `underline`, not initial. Fixes #316.
 
 0.14.1 June 12, 2026
 - fixed bug where text directly under body is deleted.
@@ -500,7 +552,7 @@ Beautiful Soup, by contrast, only changes the source when absolutely needed to m
     - CSS for the EPUB cover is has been updated to better handle small or oddly sized cover images.
 - Ebookmaker breaks HTML source into chunks to improve performance on EPUB readers. For EPUB3 files, the chunker treats `section` elements the same way it treated `div.section` elements for EPUB2. Similarly section elements in HTML5 source are converted to div.section elements for EPUB2. In addition, the maximum chunk size for EPUB3 is 300KB compared to 100KB for EPUB2.
 - Ebookmaker now supports attributes in the epub namespace {http://www.idpf.org/2007/ops} These can be entered in source file in two ways:
-    - any `data-epub-*` attribute in an html or xhtml source file is moved to the epub namespace for EPUB2, stripped for EPUB2, and preserved as-is for HTML5. This option will allow permit validation with the W3C 'nu' validator.
+    - any `data-epub-*` attribute in an html or xhtml source file is moved to the epub namespace for EPUB3, stripped for EPUB2, and preserved as-is for HTML5. This option will allow permit validation with the W3C 'nu' validator.
     - any 'epub:*' attribute in a properly namespaced XHTML file will be preserved for EPUB3, stripped for EPUB2, and converted to a `data-epub-*` attribute in HTML5.
 - This version expands support for accessibility attributes.
     - the epub:role attribute (see above for using the epub namespace)

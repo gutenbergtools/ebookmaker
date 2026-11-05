@@ -38,6 +38,7 @@ u2u = {
 
 
 def insert_boilerplate(job, text):
+    debug("inserting boilerplate")
     text, header, footer = strip_headers_from_txt(text)
     pg_header = pgheader(job.dc).text_content()
     pg_footer = pgfooter(job.dc).text_content()
