@@ -234,6 +234,9 @@ class Toc(TocNCX):
                 continue
             count += 1
             toc_item = em.a(title, **{'href': url, 'id': "np-%d" % count})
+            aria_label = getattr(title, 'aria_label', None)
+            if aria_label is not None:
+                toc_item.set('aria-label', aria_label)
             if depth > prev_depth:
                 while depth > prev_depth:
                     for el in reversed(current_ol):
