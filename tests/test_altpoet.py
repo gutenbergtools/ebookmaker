@@ -12,9 +12,12 @@ class TestFromTxt(unittest.TestCase):
         eat = EbookAltText
 
     def test_fetch(self):
-        eat = EbookAltText(1)
-        self.assertTrue(eat._alt_map)
+        # test having a local alt file
+        eat = EbookAltText(67098)
+        self.assertTrue(len(eat._alt_map) > 100)
+        # test a book with no images
         eat = EbookAltText(57448)
         self.assertFalse(eat._alt_map)
-        eat = EbookAltText(46)
+        # test a book with images and alt text
+        eat = EbookAltText(20782)
         self.assertTrue(eat._alt_map)
