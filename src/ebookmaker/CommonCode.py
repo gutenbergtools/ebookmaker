@@ -304,7 +304,7 @@ class EbookAltText:
                 r = requests.get(
                     url,
                     params={'project': 'Project Gutenberg', 'item': ebook},
-                    headers={'X-Api-Key': options.config.ALTPOET_API_KEY},
+                    headers={'X-Api-Key': options.config.ALTPOET_API_KEY.strip('\'')},
                     timeout=30,
                 )
             except requests.RequestException:
