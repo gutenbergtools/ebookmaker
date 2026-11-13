@@ -90,6 +90,7 @@ def pgheader(dc):
             f'{release_date} [eBook #{dc.project_gutenberg_id}]' + updated)}
 {pstyle('Language', ', '.join(language_list))}
 {pstyle('Original Publication', str(dc.pubinfo))}
+{pstyle('ISBN (HTML)', str(dc.isbn))}
 {pstyle('Other information and formats', bibrecord_url, escape=False)}
 {pstyle('Credits', dc.credit)}
 </div><div id='pg-start-separator'>

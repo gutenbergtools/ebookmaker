@@ -244,6 +244,11 @@ def get_dc(job):
 
     dc.source = parser.attribs.url
     dc.title = options.title or dc.title or 'NA'
+    if parser.attribs.mediatype in mt.TEXT_MEDIATYPES:
+        # need to set category as 'text'
+        dc.dcmitypes = [CommonCode.struct(id='Text', description='Text')]
+    else:
+        warning('category probably not text')
 
     if options.author:
         dc.add_author(options.author, 'cre')

@@ -1,14 +1,33 @@
 
-0.14.7 July 25, 2026
-- EbookAltText can load preferred alt text from altpoet at build time
-  (ALTPOET_URL + ALTPOET_API_KEY); falls back to local alt{ebook}.json
+0.14.7 November 13, 2026
+- refactors use of Struct from libgutenberg.GutenbergGlobals
+    - requires libgutenberg>=0.11.7
+- sets 'Text' dcmi_type; needs to handl this to deciide whether to use ISBN
+    - EbookConverter sets this - it's defined in the database.
+    - no new non-text has been pushed in 8 years
+    - there currently is no way to create non-text items except manual database changes
+- add ISBN to ebook files 
+    - HTML header text
+    - HTML meta tags
+    - EPUB2 OPF
+    - EPUB3 OPF
+- add viewport tag if not already present
+- meta elements added in HTMLWriter did not check for an element already existing.
+    - default behavior is to remove the existing meta element
+    - added a parameter to heep existing
+- fixed bug when SVG file contains a comment. Fixes #361 
+- EbookAltText loads alt text from altpoet at build time
+  - requires settings ALTPOET_URL, ALTPOET_API_KEY
+  - uses local alt{ebook}.json if present
+  - fixes #325
 
 0.14.6 September 10, 2026
 - fix issue when rendering in an env without PGURL
 - apparently Apple Books wants the epub namespace in the root element of the EPUB chunks. This turns out to be harder than I expected. So now, the `data-epub-type="noteref"` and `data-epub-type="toc"` annotations seem to work as promised in Apple Books. Fixes #349
 - correctly skip rst.gen output when source is plain text. Fixes #356
-- removes inkscape junk in svg's produced by Inkscape; really, producers should use plain svg export
+- removes inkscape junk in svg's produced by Inkscape; really, producers should use plain svg export.
     - fixes #354, #357
+- also removes data-* attributes from svg external files
 - add support for the `background-size` attribute. Fixes #320
 
 0.14.5 August 30, 2026
