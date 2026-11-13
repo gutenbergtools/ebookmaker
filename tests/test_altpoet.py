@@ -13,8 +13,9 @@ class TestFromTxt(unittest.TestCase):
 
     def test_fetch(self):
         # test having a local alt file
+        # make sure there's a file $PRIVATE/logs/alt/alt67098.json with a sample map with 10 entries
         eat = EbookAltText(67098)
-        self.assertTrue(len(eat._alt_map) > 100)
+        self.assertTrue(len(eat._alt_map) > 10)
         # test a book with no images
         eat = EbookAltText(57448)
         self.assertTrue(len(eat._alt_map)==2)

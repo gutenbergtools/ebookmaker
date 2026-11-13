@@ -277,18 +277,23 @@ class EbookAltText:
     _alt_map = None
 
     def __init__(self, ebook):
+        self._alt_map = self._fetch_from_file(ebook)
+        if self._alt_map:
+            return
         self._alt_map = self._fetch_from_altpoet(ebook)
         if self._alt_map:
             return
 
+    @staticmethod
+    def _fetch_from_file(ebook):
         alt_text_file = os.path.join(ALTTEXT_DIR, f'alt{ebook}.json')
         if os.path.exists(alt_text_file):
             with open(alt_text_file, 'r') as data:
                 try:
-                    self._alt_map = json.loads(data.read())
+                    return json.loads(data.read())
                 except json.decoder.JSONDecodeError as jde:
-                    self._alt_map = None
                     error(f'{alt_text_file} is not valid json. {jde}')
+                    return None
 
     @staticmethod
     def _fetch_from_altpoet(ebook):

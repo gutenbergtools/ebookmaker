@@ -16,8 +16,10 @@
     - default behavior is to remove the existing meta element
     - added a parameter to heep existing
 - fixed bug when SVG file contains a comment. Fixes #361 
-- EbookAltText can load preferred alt text from altpoet at build time
-  (ALTPOET_URL + ALTPOET_API_KEY); falls back to local alt{ebook}.json
+- EbookAltText loads alt text from altpoet at build time
+  - requires settings ALTPOET_URL, ALTPOET_API_KEY
+  - uses local alt{ebook}.json if present
+  - fixes #325
 
 0.14.6 September 10, 2026
 - fix issue when rendering in an env without PGURL
