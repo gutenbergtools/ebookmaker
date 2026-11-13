@@ -116,8 +116,8 @@ holder on this work are set forth at the beginning of this work.</div>
 
 HEADERB = '''
 <div>
-Updated editions will replace the previous one—the old editions will
-be renamed.
+If you enjoyed this eBook, please consider making a donation to Project Gutenberg.
+For details, please visit <a href="https://www.gutenberg.org/donate/">www.gutenberg.org/donate/</a>
 </div><div>
 Creating the works from print editions not protected by U.S. copyright
 law means that no one owns a United States copyright in these works,
@@ -423,7 +423,7 @@ considerable effort, much paperwork and many fees to meet and keep up
 with these requirements. We do not solicit donations in locations
 where we have not received written confirmation of compliance. To SEND
 DONATIONS or determine the status of compliance for any particular state
-visit <a href="https://www.gutenberg.org/donate/">www.gutenberg.org/donate</a>.
+visit <a href="https://www.gutenberg.org/donate/">www.gutenberg.org/donate/</a>.
 </div><div>
 While we cannot and do not solicit contributions from states where we
 have not met the solicitation requirements, we know of no prohibition
