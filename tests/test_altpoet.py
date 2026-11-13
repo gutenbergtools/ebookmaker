@@ -22,3 +22,5 @@ class TestFromTxt(unittest.TestCase):
         # test a book with images and alt text
         eat = EbookAltText(20782)
         self.assertTrue(len(eat._alt_map['img_images_eest_C3th.jpg']) > 50)
+        eat = EbookAltText('xx')
+        self.assertFalse(eat._alt_map)

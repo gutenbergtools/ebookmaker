@@ -524,7 +524,7 @@ class Parser(HTMLParserBase):
         # process img tags
         for elem in xpath(self.xhtml, "//xhtml:img"):
             id_ = elem.get('id')
-            if self.alter.get(id_) != None:  # it's None if there is no json file
+            if self.alter.get(id_) != None:  # it's None if there is no mapping
                 alt = self.alter.get(id_)
                 elem.attrib['alt'] = alt
                 continue
