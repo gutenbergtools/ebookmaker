@@ -1,3 +1,8 @@
+
+0.14.7 July 25, 2026
+- EbookAltText can load preferred alt text from altpoet at build time
+  (ALTPOET_URL + ALTPOET_API_KEY); falls back to local alt{ebook}.json
+
 0.14.6 September 10, 2026
 - fix issue when rendering in an env without PGURL
 - apparently Apple Books wants the epub namespace in the root element of the EPUB chunks. This turns out to be harder than I expected. So now, the `data-epub-type="noteref"` and `data-epub-type="toc"` annotations seem to work as promised in Apple Books. Fixes #349

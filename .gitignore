@@ -79,6 +79,9 @@ celerybeat-schedule
 # dotenv
 .env
 
+# local ebookmaker secrets (ALTPOET_API_KEY etc.)
+.ebookmaker
+
 # virtualenv
 venv/
 ENV/
