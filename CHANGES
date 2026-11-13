@@ -1,4 +1,5 @@
-0.14.7 November, 2026
+
+0.14.7 November 13, 2026
 - refactors use of Struct from libgutenberg.GutenbergGlobals
     - requires libgutenberg>=0.11.7
 - sets 'Text' dcmi_type; needs to handl this to deciide whether to use ISBN
@@ -15,6 +16,8 @@
     - default behavior is to remove the existing meta element
     - added a parameter to heep existing
 - fixed bug when SVG file contains a comment. Fixes #361 
+- EbookAltText can load preferred alt text from altpoet at build time
+  (ALTPOET_URL + ALTPOET_API_KEY); falls back to local alt{ebook}.json
 
 0.14.6 September 10, 2026
 - fix issue when rendering in an env without PGURL

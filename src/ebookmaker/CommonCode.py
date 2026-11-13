@@ -20,6 +20,8 @@ import re
 from io import StringIO
 from six.moves import configparser
 
+import requests
+
 from libgutenberg.CommonOptions import Options
 from libgutenberg.GutenbergGlobals import archive2files, Struct, struct
 from libgutenberg.Logger import debug, info, error, warning
@@ -273,8 +275,12 @@ ALTTEXT_DIR = os.path.join(PRIVATE, 'logs', 'alt')
 
 class EbookAltText:
     _alt_map = None
-    
+
     def __init__(self, ebook):
+        self._alt_map = self._fetch_from_altpoet(ebook)
+        if self._alt_map:
+            return
+
         alt_text_file = os.path.join(ALTTEXT_DIR, f'alt{ebook}.json')
         if os.path.exists(alt_text_file):
             with open(alt_text_file, 'r') as data:
@@ -283,12 +289,63 @@ class EbookAltText:
                 except json.decoder.JSONDecodeError as jde:
                     self._alt_map = None
                     error(f'{alt_text_file} is not valid json. {jde}')
-                    
+
+    @staticmethod
+    def _fetch_from_altpoet(ebook):
+        if not (ebook and hasattr(options, 'config')
+                and hasattr(options.config, 'ALTPOET_URL')
+                and hasattr(options.config, 'ALTPOET_API_KEY')):
+            return None
+        url = options.config.ALTPOET_URL.rstrip('/') + '/api/documents/get-project-item/'
+        for _ in range(3):
+            try:
+                r = requests.get(
+                    url,
+                    params={'project': 'Project Gutenberg', 'item': ebook},
+                    headers={'X-Api-Key': options.config.ALTPOET_API_KEY.strip('\'')},
+                    timeout=300,
+                )
+            except requests.RequestException:
+                error('could not query altpoet')
+                continue
+            if r.status_code == 200:
+                alt_map = EbookAltText.altpoet_api_to_alt_map(r.json())
+                return alt_map if alt_map else None
+            return None
+        return None
 
     # note that this returns None if there is no alt text file for the ebook
     def get(self, img_id):
+        
         if self._alt_map != None:
             return self._alt_map.get(img_id, '')
+
+    @staticmethod
+    def altpoet_api_to_alt_map(altpoet_api):
+        if altpoet_api and altpoet_api.get('imgs', None):
+            imgs = altpoet_api['imgs']
+            alt_table = {}
+            for img in imgs:
+                img_id = img['img_id']
+                max_votes = 0
+                is_user = False
+                pref_alt = None
+                for alt in img.get('alts', []):
+                    if alt['votes'] > max_votes:
+                        max_votes = alt['votes']
+                        pref_alt = alt
+                        continue
+                    if alt['user_sub'] and not is_user:
+                        is_user = True
+                        pref_alt = alt
+                        continue
+                    pref_alt = alt
+                alt_table[img_id] = alt['text']
+            return alt_table
+        else:
+            return {}
+
+
 
 ONELINE = re.compile(r'[\r\n]+')
 def csv_escape(items):
