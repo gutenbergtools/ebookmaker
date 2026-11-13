@@ -305,20 +305,49 @@ class EbookAltText:
                     url,
                     params={'project': 'Project Gutenberg', 'item': ebook},
                     headers={'X-Api-Key': options.config.ALTPOET_API_KEY.strip('\'')},
-                    timeout=30,
+                    timeout=300,
                 )
             except requests.RequestException:
+                error('could not query altpoet')
                 continue
             if r.status_code == 200:
-                alt_map = r.json()
+                alt_map = EbookAltText.altpoet_api_to_alt_map(r.json())
                 return alt_map if alt_map else None
             return None
         return None
 
     # note that this returns None if there is no alt text file for the ebook
     def get(self, img_id):
+        
         if self._alt_map != None:
             return self._alt_map.get(img_id, '')
+
+    @staticmethod
+    def altpoet_api_to_alt_map(altpoet_api):
+        if altpoet_api and altpoet_api.get('imgs', None):
+            imgs = altpoet_api['imgs']
+            alt_table = {}
+            for img in imgs:
+                img_id = img['img_id']
+                max_votes = 0
+                is_user = False
+                pref_alt = None
+                for alt in img.get('alts', []):
+                    if alt['votes'] > max_votes:
+                        max_votes = alt['votes']
+                        pref_alt = alt
+                        continue
+                    if alt['user_sub'] and not is_user:
+                        is_user = True
+                        pref_alt = alt
+                        continue
+                    pref_alt = alt
+                alt_table[img_id] = alt['text']
+            return alt_table
+        else:
+            return {}
+
+
 
 ONELINE = re.compile(r'[\r\n]+')
 def csv_escape(items):

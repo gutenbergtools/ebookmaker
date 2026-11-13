@@ -169,7 +169,7 @@ DECORATIVE_ALTTEXT = {
     "decoration", "decorative line", "(decorative)", "décoration",
     "ilustración de adorno", "dekoration", "divider", "ornamental line", "adorno", "ornament.",
     "page deco", "decorative image", "[decorative image unavailable.]", "decorative header",
-    "adorno fin de capítulo", "ornament",
+    "adorno fin de capítulo", "ornament", "[decorative image]",
 }
 
 RE_NOT_XML_NAMECHAR = re.compile(r'[^\w.-]')
@@ -558,8 +558,9 @@ class Parser(HTMLParserBase):
             elif alt.lower() in DECORATIVE_ALTTEXT:
                 elem.attrib['alt'] = ''
                 elem.attrib['data-role'] = 'presentation'
-                warning(DECORATIVE_WARNING, alt)
-                warning(SEE_A11Y_INFO)
+                if alt.lower() != '[decorative image]':
+                    warning(DECORATIVE_WARNING, alt)
+                    warning(SEE_A11Y_INFO)
             elif alt.lower() in INAPPROPRIATE_ALTTEXT:
                 elem.attrib['alt'] = ''
                 warning(INAPPROPRIATE_ERROR, alt)

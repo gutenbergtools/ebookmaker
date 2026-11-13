@@ -17,7 +17,7 @@ class TestFromTxt(unittest.TestCase):
         self.assertTrue(len(eat._alt_map) > 100)
         # test a book with no images
         eat = EbookAltText(57448)
-        self.assertFalse(eat._alt_map)
+        self.assertTrue(len(eat._alt_map)==2)
         # test a book with images and alt text
         eat = EbookAltText(20782)
-        self.assertTrue(eat._alt_map)
+        self.assertTrue(len(eat._alt_map['img_images_eest_C3th.jpg']) > 50)
