@@ -279,7 +279,7 @@ class ContentOPF:
     """ Class that builds content.opf metadata. """
 
     def __init__(self):
-        self.nsmap = gg.build_nsmap('opf dc dcterms xsi')
+        self.nsmap = gg.build_nsmap('opf dc dcterms xsi onix')
         self.lang = None
 
         # FIXME: remove this when lxml is fixed
@@ -449,6 +449,11 @@ class ContentOPF:
             self.metadata.append(dcterms.rights(dc.rights))
 
         self.metadata.append(dcterms.identifier(dc.opf_identifier, {'id': 'id'}))
+        if dc.isbn:
+            self.metadata.append(dcterms.identifier(dc.isbn, {'id': 'isbn'}))
+            self.metadata.append(self.opf.meta('15',
+                {'refines': '#isbn', 'property': "identifier-type", 'scheme': 'onix:codelist5'}))
+
 
         for count, author in enumerate(dc.authors):
             pretty_name = dc.make_pretty_name(author.name)

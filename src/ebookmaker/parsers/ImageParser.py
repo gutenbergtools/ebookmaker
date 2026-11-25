@@ -30,7 +30,7 @@ ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 mediatypes = (mt.jpeg, mt.png, mt.gif, mt.svg)
 SVGNS = {str(NS.svg), "http://www.w3.org/1999/xlink"}
-SVGJUNKNS = {"http://www.inkscape.org/namespaces/inkscape", 
+SVGJUNKNS = {"http://www.inkscape.org/namespaces/inkscape",
            "http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"}
 
 class Parser(ParserBase):
@@ -186,9 +186,13 @@ class Parser(ParserBase):
                 for att in copy.copy(element.attrib):
                     if att.startswith('aria-') or att.startswith('data-'):
                         del element.attrib[att]
+                        continue
+                    for namespace in SVGJUNKNS:
+                        if att.startswith(f"{{{namespace}}}"):
+                            del element.attrib[att]
 
                 # explicitly set all elements in the SVG file that are not xlink or svg to svg
-                if etree.QName(element).namespace not in SVGNS:
+                if isinstance(element.tag, str) and etree.QName(element).namespace not in SVGNS:
                     # remove Inkspace junk
                     if etree.QName(element).namespace in SVGJUNKNS:
                         element.getparent().remove(element)
