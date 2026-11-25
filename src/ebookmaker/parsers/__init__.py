@@ -137,6 +137,15 @@ def update_urls(text):
     text = RE_PG_OLD_HOST.sub('https://www.gutenberg.org/', text)
     return RE_PG_HTML_URL.sub(REPL_PG_HTML5_URL, text)
 
+class TocText(str):
+    """Visible TOC text with an optional spoken label for EPUB 3 navigation."""
+
+    def __new__(cls, text, aria_label=None):
+        value = super().__new__(cls, text)
+        value.aria_label = aria_label
+        return value
+
+
 class ParserAttributes: # pylint: disable=too-few-public-methods
     """ Object to hold attributes for the lifetime of a parser.
 
@@ -492,7 +501,8 @@ class HTMLParserBase(ParserBase):
     def make_toc(self, xhtml):
         """ Build a TOC from HTML headers.
 
-        Return a list of tuples (url, text, depth).
+        Return a list of triples (url, text, depth). Text remains a string;
+        labelled headings also carry an aria_label for EPUB 3 navigation.
 
         Page numbers are also inserted because DTBook NCX needs the
         play_order to be sequential.
@@ -569,9 +579,19 @@ class HTMLParserBase(ParserBase):
                     depth = 2 # avoid top level
 
                 #join consecutive headers
+                aria_label = header.get('aria-label')
                 next = header.getnext()
                 while next is not None and next.tag == header.tag:
-                    text = (text + ' ' + get_header_text(next)).strip()
+                    next_text = get_header_text(next)
+                    if aria_label is not None or next.get('aria-label') is not None:
+                        # Empty labels do not replace a heading's accessible
+                        # name. Keep its visible text in a combined entry too.
+                        label = aria_label if aria_label and aria_label.strip() else text
+                        next_label = next.get('aria-label')
+                        if not next_label or not next_label.strip():
+                            next_label = next_text
+                        aria_label = (label + ' ' + next_label).strip()
+                    text = (text + ' ' + next_text).strip()
                     next = next.getnext()
 
                 # if <h*> is first element of a <div> use <div> instead
@@ -582,6 +602,8 @@ class HTMLParserBase(ParserBase):
                         parent.text.strip() == ''):
                     header = parent
 
+                if aria_label is not None:
+                    text = TocText(text, aria_label)
                 toc.append(["%s#%s" % (self.attribs.url, get_id(header)), text, depth])
 
         return toc
