@@ -2,7 +2,7 @@
 0.14.7 November 13, 2026
 - refactors use of Struct from libgutenberg.GutenbergGlobals
     - requires libgutenberg>=0.11.7
-- sets 'Text' dcmi_type; needs to handl this to deciide whether to use ISBN
+- sets 'Text' dcmi_type; needs to handle this to deciide whether to use ISBN
     - EbookConverter sets this - it's defined in the database.
     - no new non-text has been pushed in 8 years
     - there currently is no way to create non-text items except manual database changes
@@ -11,15 +11,18 @@
     - HTML meta tags
     - EPUB2 OPF
     - EPUB3 OPF
-- add viewport tag if not already present
+- add viewport tag if not already present fixes #289
 - meta elements added in HTMLWriter did not check for an element already existing.
     - default behavior is to remove the existing meta element
-    - added a parameter to heep existing
+    - added a parameter to keep existing
 - fixed bug when SVG file contains a comment. Fixes #361 
-- EbookAltText loads alt text from altpoet at build time
+- EbookAltText loads alt text from altpoet at build time Fixes #325
   - requires settings ALTPOET_URL, ALTPOET_API_KEY
   - uses local alt{ebook}.json if present
-  - fixes #325
+  - wil choose text with most votes
+  - will choose human created alt text over AI text unless aitext has more votes
+- puts donation info at top of license
+
 
 0.14.6 September 10, 2026
 - fix issue when rendering in an env without PGURL
